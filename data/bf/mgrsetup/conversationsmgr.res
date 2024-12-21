@@ -1,7 +1,7 @@
 // vim: set syntax=c :
 
-conversationManager conversations
+/*conversationManager conversations
 {
     class-id = "conversation mgr"
 }
-
+*/

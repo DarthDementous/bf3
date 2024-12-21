@@ -39,13 +39,6 @@ template gunStateNormalFire : gunState
     canLowerFromThisState = "true"
 }
 
-template gunStateFidget : gunState
-{
-    countsAsGunBeingUsed = "false"
-    canLowerFromThisState = "true"
-
-    validToSend = "false"
-}
 
 template gunStateDown : gunState
 {
@@ -71,14 +64,6 @@ template gunStateRaise : gunState
     countsAsGunBeingUsed = "false"
 }
 
-template gunStateAimOn : gunState
-{
-    reticuleVisibility		    = "1.0f, 0.0f"
-    swayWithWalk		    = "1.0f, 0.0f"
-    blendIntoAltFirstPersonPosRot   = "0.0f, 1.0f"
-    allowMoveBackwardsIfByWall	    = "1.0f, 0.0f"
-    canZoom			    = "yes-hide-view"
-}
 
 template gunStateAimOff : gunState
 {
@@ -89,25 +74,7 @@ template gunStateAimOff : gunState
     canZoom			    = "yes-hide-view"
 }
 
-template gunStateAimIdle : gunState
-{
-    reticuleVisibility		    = "0.0f"
-    swayWithWalk		    = "0.0f"
-    blendIntoAltFirstPersonPosRot   = "1.0f"
-    allowMoveBackwardsIfByWall	    = "0.0f"
-    canZoom			    = "yes-hide-view"
-    countsAsGunBeingUsed	    = "false"
-}
 
-template gunStateAimFire : gunState
-{
-    reticuleVisibility		    = "0.0f"
-    swayWithWalk		    = "0.0f"
-    blendIntoAltFirstPersonPosRot   = "1.0f"
-    allowMoveBackwardsIfByWall	    = "0.0f"
-    equiv			    = "fire"
-    canZoom			    = "yes-hide-view"
-}
 
 template gunUbiks
 {
@@ -131,18 +98,23 @@ template gun : staticprop
 	{
 	    permLevelOb = "true"
 	}
+ 
+    	hologramBaseSetup hologramSetup 
+	{
+	}
+
+	canBeHologram = "true"
+
+	castReflections	= "true"
     }
 }
 
-template gunZoomControl_manual
-{
-    class-id			= "gun zoom control - manual"
-}
-
+/* --- auto commented out by commentOutTemplate
 template gunZoomControl_stages
 {
     class-id			= "gun zoom control - stages"
 }
+*/ // --- auto commented out by commentOutTemplate
 
 template gunZoomComponent_noView
 {
@@ -154,175 +126,40 @@ template gunZoomComponent_justChangeFov
 {
     class-id			= "gun zoom component - just change fov"
 //  canBeEnabled		= "true"
-    scaleBreatheCycleWhenActivated  =	0.5f
+    scaleBreatheCycleWhenActivated  = 0.5f
+    scaleRecoilWhenActivated	    = 1.0f
 }
 
 template gunZoomComponent_scope
 {
-    class-id			= "gun zoom component - scope"
-    zoomBlurAmount		= 0.05f
-    scaleBreatheCycleWhenActivated = 0.2f
+    class-id			    = "gun zoom component - scope"
+    zoomBlurAmount		    = 0.05f
+    scaleBreatheCycleWhenActivated  = 2.0f
+    scaleRecoilWhenActivated	    = 0.2f
+    scaleFovWhenActivated[]	    {0.4f, 0.2f}
+    scaleTurnSpeedWhenActivated[]   {0.095f, 0.095f}
+    timeToZoomBetweenLevels	    = 0.3f
 }
-
-/*
-
-template gunZoomComponent_withView : gunZoomComponent_base
-
-{
-    class-id			= "gun zoom component with view"
-//  canBeEnabled		= "true"
-    
-    zoomview
-    {
-	class-id		= "gun-mounted camera"
-
-	texture-field alphaTexture
-	{
-	    default = "misctex/hud/test_circle_32x32"
-	}
-	texture-field afterTexture
-	{
-	    default = ""
-	}
-	stretchTextures = "true"
-	float backgroundColour[] { 0.f, 0.f, 0.f, 1.f }
-    }
-}
-*/
 
 template gunAiFireInfo
 {
+    fireMode = "k_aifm_timedBurst"
     maxBurstFireTime = 3.0f
     minBurstFireTime = 2.0f
     maxLullFireTime = 1.0f
     minLullFireTime = 0.1f
-    minEffectiveFireDistance = 3.f
-    maxEffectiveFireDistance = 20.f
-    minDamagingFireDistance = 0.f		//NPCs using this weapon won't shoot inside this distance (should switch to sidearm)
-    maxDamagingFireDistance = 200.f		//NPCs using this weapon wont shoot above this distance
+    minFireDistance = 0.f			//NPCs using this weapon won't shoot inside this distance
+    maxFireDistance = 200.f			//NPCs using this weapon wont shoot above this distance
     dangerZoneRadius = 0.f			//NPCs using this weapon won't shoot if friendlies are within this distance
-    maxVehicleDamagingDistance = 30.f		//Distance at which npcs using this weapon will come out of cover to attack target in vehicle.
-    effectiveFireDistanceVehicleMult = 10.0f	//When attacking a vehicle, this is multiplied by the optimum attack distance.
+    visionRange = 50.f				//Max distance NPCs can see when using this weapon
     devOver1m = 0.01f
-    damagePerSec = 0.2f
     canOpportuneFire = "true"
-    canDoHighAccuracyShot = "true"
-    canDoStrafeFiring = "false"			//if set, when npc fires this weapon the bullets initially strafe along ground toward target
-    canDoUbiksSpreadFire = "true"
 
-    inaccuracy-closerange			    =   1.0f
-    inaccuracy-closerange-cutoff		    =   25.f
-    inaccuracy-closerange-unawareAccIncrease	    =   0.5f
-    inaccuracy-closerange-unawareAccDecrease	    =   1.0f
-    inaccuracy-closerange-unawareAccMin		    =   0.0f
-    inaccuracy-closerange-unawareAlwaysMissTime	    =	0.0f
-    inaccuracy-closerange-maxProbHit		    =	0.9f
-
-    inaccuracy-mediumrange			    =   1.2f
-    inaccuracy-mediumrange-cutoff		    =   60.0f
-    inaccuracy-mediumrange-unawareAccIncrease	    =   8.0f
-    inaccuracy-mediumrange-unawareAccDecrease	    =   2.0f
-    inaccuracy-mediumrange-unawareAccMin	    =   0.0f
-    inaccuracy-mediumrange-unawareAlwaysMissTime    =	0.5f
-    inaccuracy-mediumrange-maxProbHit		    =	0.9f
-
-    inaccuracy-longrange			    =   3.0f
-//	inaccuracy-longrange-cutoff		    =   
-    inaccuracy-longrange-unawareAccIncrease	    =   8.0f
-    inaccuracy-longrange-unawareAccDecrease	    =   2.0f
-    inaccuracy-longrange-unawareAccMin		    =   0.0f
-    inaccuracy-longrange-unawareAlwaysMissTime	    =	0.5f
-    inaccuracy-longrange-maxProbHit		    =	0.9f
-}
-
-template gunFireInfo
-{
-    manualFireTime		= -1.0f
-    autoFireTime		= -1.0f
-
-    bulletDamage		= -1.f
-    bulletExpireTime		= 1.f
-    bulletSpeed			= 1.f
-    bulletPenetration		= 2.f
-    bulletStartInaccuracy	= 0.0f
-    bulletEndInaccuracy		= 0.0f
-    bulletsPerShot		= 1
-    repeatTime                  = 0.0f
-    hitReactType	        = "e_ChrHitReactType_FullBody"
-    tracerProportion		= 1.0f
-    whooshSound			= "b_whoosh"
-    hitPlayerSound		= ""
-    playerHitSound		= ""
-    headshotSound		= ""
-    bulletType			= "k_bultypeStandard"
-    decalAge			= 0.0f //most standard weapons will have 0 for permanent decals
-    createBulletScript		= "recoil;doBullet"
-    lightOnScript		= "sfx(light)"
-    lightOffScript		= "sfx(light)"
-    bulletRadius		= 0.15f
-    glowRadius			= 0.24f
-    laserSliding		= 0.0f
-    missileLockTime		= 1.0f
-
-    damageToBeAbsorbed = 0.0f
-    
-    tooCloseNoAutoAimDist	    = 1.8f
-    startTooCloseAutoAimFalloffDist = 3.0f
-    tooFarNoAutoAimDist		    = 50.0f
-    startTooFarAutoAimFalloffDist   = 35.0f
-    distanceFromTargetToStickyAim   = 2.0f
-    distanceFromTargetToBulletBend  = 1.5f
-    
-
-    clipSize			= 30
-    canFireWhileReloading	= "false"
-    shootFromEyePos		= "false"
-    shootFromCamPos		= "false"
-    
-    bulletLength		= 1.0f //multiplier to 'tick' length - for lasers
-    
-    loseFractionOfDamagePerMetreTravelled   =	0.f
-}
-
-template gunInfo
-{
-    nameForHud			= "???"
-    scriptedResponseEventID	= "pickedGun"
-    gunFireInfo fireInfo
-    {
-    }
-    
-    wristThrowOffset[] {0.10f, -0.05f, -0.03f}
-
-    thirdPersonAttachRot[] {0.f, 0.f, 0.f}
-    thirdPersonAttachPos[] {0.f, 0.f, 0.f}
-    thirdPersonAttachBone = "rwrist"
-
-    float firstPersonPropPos []	{0.0f, 0.0f, 0.0f}
-    float firstPersonPropRot []	{0.0f, 0.0f, 0.0f}
- 
-    fidgetDelayMin				= 1.5f
-    fidgetDelayMax				= 9.0f
-    firstPersonPivotDistance			= 0.1f
-    scaleFirstPersonMoveLagWhenPreciseAiming	= 0.1f
-    scaleFirstPersonTurnLagWhenPreciseAiming	= 0.1f
-    lowerGunWhenOutOfGrenades = "false"
-    torchPropPartsList = ""
-
-    firstPersonGunTiltAroundScreenPosX = 0.f	// By default, guns rotate around Z axis passing through
-    firstPersonGunTiltAroundScreenPosY = 0.f	// centre of screen
-    
-    barrelLength = 0.4f
-    fpGunMoveBackwardsWhenWallThisClose = 0.6f
-
-    gunMoveWithStep_smoothing = 0.6f
-    gunMoveWithStep_rotateX = -7.0f
-    gunMoveWithStep_rotateY = 1.0f
-    gunMoveWithStep_rotateZ = 0.5f
-
-    gunAiFireInfo  aiFireInfo
-    {
-    }
+    inaccuracy				=   1.0f
+    inaccuracy-unawareAccIncrease	=   0.5f
+    inaccuracy-unawareAccDecrease	=   1.0f
+    inaccuracy-unawareAccMin		=   0.0f
+    inaccuracy-unawareAlwaysMissTime	=   0.0f
 }
 
 template gunRecoilInfo
@@ -341,6 +178,128 @@ template gunRecoilInfo
 
     scatterMax		    = 0.0f  // Maximum recoil scatter amount (default = none)
     scatterScalePrevious    = 0.5f  // When applying scatter, multiply current scatter by this to reduce it.				    // ie. 1.f means keep old scatter values completely, 0.f means forget them completely
+
+    recoilAnim = "blaster1"
+    recoilScale = 1.0f
+}
+
+template gunFireInfo
+{
+    manualFireTime		= -1.0f
+    autoFireTime		= -1.0f
+
+    bulletDamage		= -1.f
+    bulletExpireTime		= 1.f
+    bulletSpeed			= 1.f
+    bulletPenetration		= 2.f
+    bulletStartInaccuracy	= 0.0f
+    bulletEndInaccuracy		= 0.0f
+    inaccuracyIncreasePerBullet = 0.f
+    inaccuracyDecreaseRate	= 0.f
+    inaccuracyMax		= 0.f
+    inaccuracyIncreasePowerFactor = 0.f
+    inaccuracySpreadOverY	= "true"
+    randomiseInaccuracy		= "true"
+    bulletsPerShot		= 1
+    shotsPerFire		= 1;	// Different from bulletsPerShot in that this is the number of times to perform the fire action per button press (see Han Solo's pistol)
+					// Can be used in conjunction with bulletsPerShot to create a multi shooting shotgun
+    timeBetweenShots		= 0.f;
+    hitReactType	        = "e_ChrHitReactType_FullBody"
+    tracerProportion		= 1.0f
+    whooshSound			= "b_whoosh"
+    hitPlayerSound		= ""
+    playerHitSound		= ""
+    headshotSound		= ""
+    bulletType			= "k_bultypeLaser"
+    decalAge			= 0.0f //most standard weapons will have 0 for permanent decals
+    createBulletScript		= "recoil;doBullet"
+    bulletRadius		= 0.15f
+    glowRadius			= 0.24f
+    laserSliding		= 0.0f
+    missileLockTime		= 1.0f
+    ricochetLikelihood		= 0.f
+    useHeightMultiplier		= "false"
+    muzzleFlash = "inf_blue"
+
+    chargeFire	    = "false"
+    chargeTime	    = 1.0f	    //This is now used for the amount of time it takes vehicle weapons to charge another
+				    //shot, as well as for charge->fire weapon mechanics
+    minChargeMultiplier = 1.0f
+    maxChargeMultiplier = 1.0f
+    maxChargeNumBulletsMultiplier = 1
+    maxChargeAmmoMultiplier = 1
+
+    //fsuriano 
+    scaleRadius = 2.f    
+    rayLength = 30.f 
+    lightning_Shoot_Colour[] {0.86f,0.45f,0.30f,1.f}
+    lifeScale = 0.72f
+    //
+    
+    colour = "blue"
+    
+    tooCloseNoAutoAimDist	    = 1.8f
+    startTooCloseAutoAimFalloffDist = 3.0f
+    tooFarNoAutoAimDist		    = 50.0f
+    startTooFarAutoAimFalloffDist   = 35.0f
+    
+
+    clipSize			= 30
+    canFireWhileReloading	= "false"
+    //shootFromEyePos		= "false"
+    shootFromCamPos		= "false"
+    
+    bulletLength		= 1.0f //multiplier to 'tick' length - for lasers
+    
+    loseFractionOfDamagePerMetreTravelled   =	0.f
+    damageFallOffStartDistance = 0.f
+
+    wiiLightColour[]	    = {0.0f, 1.0f, 0.0f}
+
+    gunRecoilInfo recoilInfo
+    {
+	cameraBlur	    = 0.f
+    }
+
+    //		 {Magnitude, Duration}
+    fireVibration[] = {0.2f, 0.05f}
+    hitVibration[]  = {0.2f, 0.1f}
+}
+
+template gunInfo
+{
+    nameForHud			= "???"
+
+    //scriptedResponseEventID	= "pickedGun"	// removed from code as nothing used it, can be re-added if required. saving CChar16
+    //firstPersonArmsPropDrawnParts = "-"	// removed from code as nothing used it, can be re-added if required. saving s8[64]
+    
+    wristThrowOffset[] {0.10f, -0.05f, -0.03f}
+    firstPersonThrowOffset[] {0.f,0.f,0.f}
+
+    thirdPersonAttachRot[] {0.f, 0.f, 0.f}
+    thirdPersonAttachPos[] {0.f, 0.f, 0.f}
+    thirdPersonAltAttachRot[] {0.f, 0.f, 0.f}
+    thirdPersonAltAttachPos[] {0.f, 0.f, 0.f}
+    
+    thirdPersonAttachBone = "rwrist"
+
+    float firstPersonPropPos []	{0.0f, 0.0f, 0.0f}
+    float firstPersonPropRot []	{0.0f, 0.0f, 0.0f}
+ 
+    fidgetDelayMin				= 1.5f
+    fidgetDelayMax				= 9.0f
+    torchPropPartsList = ""
+
+    barrelLength = 0.4f
+    fpGunMoveBackwardsWhenWallThisClose = 0.6f
+
+    gunFireInfo fireInfo
+    {
+    }
+
+    gunAiFireInfo  aiFireInfo
+    {
+    }
 }
 
 template recoilComponent
@@ -367,6 +326,7 @@ template firstpersonanimatedprop : prop
 	inherited-field model
 	{
 	    permLevelOb = "true" // stop all player attached props from being deleted when setups these props started in are removed
+	    excludeWii = "true"
 	}
     }
     firstpersonanimator anim
@@ -376,6 +336,7 @@ template firstpersonanimatedprop : prop
     // again these shouldn't be needed as props should be away from bgs when their setups are deleted
     propflags = "k_protectFromBgDeletion|k_protectFromLevelChangeDeletion"  // stop all player attached props from being deleted when levels these props started in are removed
     baseobflags	= "k_baseobflag_dontRuntimeSerialiseSave|k_baseobflag_dontNetworkSerialiseSave"
+    isAllowedNetworkComponent = "false"
 }
 
 template animfirstpersongun : firstpersonanimatedprop
@@ -389,11 +350,9 @@ template staticfirstpersongun : staticpropnophysics
 template gunAnimationGroup
 {
     class-id = "gun animation group"
-//    autoRecurseTemplateName-field set
-//    {
-//    }
     animmap-field animmap
     {
+	default = "xxxreplacexx"
     }
     reactmap-field reactmap
     {
@@ -401,17 +360,9 @@ template gunAnimationGroup
     }
 }
 
-template ubiks_default
-{
-//    channels = "hips;waist;neck;head;rshoulder+;lshoulder+;lspad+;rspad+"
-//    channels = "neck+;rshoulder+;lshoulder+;lspad+;rspad+"
-
-    channels = "waist;hips;neck+;rshoulder+;lshoulder+;lspad+;rspad+"
-}
-
 template guncomponent_base
 {
-    ubiks = "ubiks_default"
+    //ubiks = "ubiks_default"
 
     hasFirePos		=   "false"
     hasCartridgePos	=   "false"
@@ -424,19 +375,13 @@ template guncomponent_base
     curtime = 0.0f
     scriptCharOffset = 0
     scriptNextFrame = ""
-    gunDescFlags = "k_gunDescFlag_none"
     weaponID = ""
     weaponType = "k_noWeaponType"
     loweredAmount = 1.f
     useUbiks = "true"
     canFire = "true"
+    canMelee = "true"
     
-    // Weapon preference
-    weaponPreference = "k_weaponPreferenceDefault"
-    
-    // Default melee etc. swipe test values
-    swipe_maxDamage = 20.0f
-
     stateAfterGrenadeThrow = "grena2"
     
     autoRecurseTemplateName-field firstperson
@@ -444,23 +389,23 @@ template guncomponent_base
 	default = ""
     }
 
-    soundmap-field soundmap {}		// For storing sounds
-    soundmap-field soundmap_player {}	// For storing sounds
-    soundmap-field soundmap_npc {}	// For storing sounds
+    soundmap-field soundmap 
+    {
+	default = ""
+    }
 
     soundcomponent soundComponent	// For playing sounds
     {
     }
 
+    soundeventsystem sndeventsystem
+    {
+	definition = "sndevt_guncomponent"
+    }	
+
     grenadeThrowComponent grenadeThrow
     {
     }
-
-    enum-field hudDisplayType
-    {
-	default = "k_hudDisplayType_none"
-	enumtype = "CGunComponent_hudDisplayType"
-    }    
 
     enum-field spentCaseType
     {
@@ -469,66 +414,19 @@ template guncomponent_base
     }
 }
 
-template gunPluginWildlife
-{
-    class-id = "gun plugin - wildlife"
-    
-    autoRecurseTemplateName-field wildlifeProp
-    {
-	default = ""
-    }
-}
 
 template gunPluginOverheat
 {
     class-id = "gun plugin - overheat"	    // Let's encourage burst firing!
 	    
-    shotsRequiredToOverheat		    = 5
-    timeAfterFireBeforeCoolDown		    = 0.15f	// Should be just a tiny bit more than autoFireTime for gun to behave the same no matter what the frame rate is
-    timeAfterOverheatBeforeCoolDown	    = 0.f	// Additional time to normal fire time before cooldown which applies when the gun overheats
-    gunUnusableWhenOverheats		    = "false"	// If this is true, gun can't be fired if gets fully hot until it fully cools down
-    coolDownPercentageBeforeCanFireAgain    = 0.f
-    coolDownTime			    = 0.2f	// Takes this long to go from hot to cold
-    gunRecoilMultiplyWhenCold		    = 1.0f
-    gunRecoilMultiplyWhenHot		    = 1.0f
+    current_canFire = "true"
     current_heatFraction		    = 0.0f
-    current_timeBeforeCoolDown		    = 0.0f
+    increaseInHeatPerBullet		    = 0.02f
+    decreaseInHeatPerSecond		    = 0.33f
+    maxHeatWhileBarrelSpinning		    = 0.0f
+    overheatEffect			    = ""
 }
 
-template gunPluginExtraFirstPersonProp
-{
-    class-id = "gun plugin - extra first person prop"
-    localPlayerOnly = "true"
-
-    autoRecurseTemplateName-field extraProp
-    {
-	default = ""
-    }
-
-    visible = "true"
-}
-
-/*
-template guncomponent_physics : guncomponent_base
-{
-    class-id = "gun physics"
-
-    firespeed = 40.f
-    targetdist = 30.f
-}
-
-template guncomponent_grapple : guncomponent_base
-{
-    class-id = "gun grapple"
-
-    targetdist = 30.f
-}
-
-template guncomponent_remotemine : guncomponent_base
-{
-    class-id = "gun remote mine"
-}
-*/
 
 template guncomponent_linetest : guncomponent_base
 {
@@ -550,26 +448,17 @@ template guncomponent_linetest : guncomponent_base
 
     mustBeOnGroundToFire = "false"
 
-    tracerParticleEffect = "tracerYellow"   // Was previously hardcoded to be this... so I guess that's the default we want?
-
-    autoRecurseTemplateName-field cartridgePropTemplate
-    {
-	default=""	// template that cartridges are created from
-    }
-
-/*    muzzleFlash_lightTimer	    =   0.f
-    muzzleFlash_lightDuration	    =	0.1f
-    muzzleFlash_lightRadius	    =	1.6f
-    float muzzleFlash_lightColour[]     {1.f, 0.9f, 0.8f}
-*/
+//    muzzleFlash_lightTimer	    =   0.f
+//  muzzleFlash_lightDuration	    =	0.1f
+//  muzzleFlash_lightRadius	    =	1.6f
+//  float muzzleFlash_lightColour[]     {1.f, 0.9f, 0.8f}
+//
 
     muzzleFlash_lightTimer	    =   0.f
     muzzleFlash_lightDuration	    =	0.2f
     muzzleFlash_lightRadius	    =	3.0f
     float muzzleFlash_lightColour[]     {1.f, 1.f, 1.f}
     float muzzleFlash_lightOffset[]     {0.3f, 0.2f, 0.0f}
-
-    hudDisplayType = "k_hudDisplayType_ammoWithClip"
 }
 
 template tickingProjectileComponent
@@ -583,7 +472,9 @@ template tickingProjectileComponent
     
     usedictangvel		=   "false"
     detonateAfterTimeElapsed	=   "true"
+    detonateOnContactWithProp	=   "false"
     sticky			=   "false"
+    stickToBackground		=   "true"  //this is only used if sticky is true, it means everything currently using sticky will work the same
     projectileState		=   "k_projectileState_held"
     speed			=   0.0f
     acceleration		=   0.0f
@@ -599,35 +490,24 @@ template tickingProjectileComponent
 
     throwStrengthScale		= 0.f
     throwArcScale		= 0.f
+    timerCookingScale		= 1.f
+    activeWeaponType		= "k_nonactive_weapon"
 
-    singleSound-field explosion_soundid	    // Surely detonator component should handle this?
+    glow_onTime			= 0.1f
+    glow_offTime		= 0.2f
+    glow_fadeTime		= 0.05f
+    glow_timeScaleAtDetTime	= 1.0f
+
+    soundmap-field soundmap
     {
-	default = ""
-    }
-    singleSound-field debris_soundid
-    {
-	default = ""
-    }
-    singleSound-field travel_soundid
-    {
-	default = ""
+	default	= ""
     }
 
-    soundMap = ""
+    soundeventsystem sndeventsystem
+    {
+	definition = "sndevt_grenade"
+    }
     
 }
 
-template weaponCartridgeProp : tickingphysicsprop
-{
-    render
-    {
-	castshadows = "false"
-	receiveshadows = "false"
-    }
-    tick
-    {
-        class-id = "ticking cartridge"
-	timer = 2.f
-    }
-}
 

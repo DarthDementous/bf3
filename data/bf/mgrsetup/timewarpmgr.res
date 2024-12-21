@@ -4,7 +4,7 @@
 ** timewarpmgr.res
 ******************************************************************************/
 
-timeWarpManagerTemplate timeWarpManager
+/*timeWarpManagerTemplate timeWarpManager
 {
 }
-
+*/

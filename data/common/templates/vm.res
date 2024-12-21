@@ -88,10 +88,6 @@ template vmCore : vmComp
     class-id	=   "vm core"
 }
 
-template vmProxy
-{
-    class-id = "vm proxy"
-}
 
 // Perhaps the rest of this too
 template vmEvent
@@ -114,11 +110,6 @@ template vmProp : prop
     class-id	=   "vm prop"
     ticktype	= "k_tickAlways"
     
-//    network
-//    {
-//	networkflags = "k_serverOnly"
-//    }
-
     vmEvent event
     {
 
@@ -132,6 +123,11 @@ template vmProp : prop
     vmCutsceneController cutscenecontroller
     {
     
+    }
+
+    staticNetworkComponent network
+    {
+	networkflags = "k_serverOnly"	// NEEDED?????????
     }
 
     string stringVars[] = 
@@ -148,11 +144,6 @@ template vmProp : prop
         "null"            
     }
     
-    soundArray-field extraPreloadSounds
-    {
-	// all sounds ids in this array will be preloaded (optional)
-    }
-
     streamedAnimArray-field extraPreloadAnims
     {
 	// all anims ids in this array will be preloaded (optional)
@@ -169,6 +160,16 @@ template vmProp : prop
 	receiveshadows = "false"
     }
 
+    // can't rely on propflags now in templates as all the props in the world already have their propflags saved out ready to overwrite any templates settings
+    dontSaveOutRotation = "true"    // vmprops dont care about rotations dont expensively calculate them when checkpoint saving
+
+    bool-field editorTickActive
+    {
+       default = "false"	// By default don't tick this vm prop in the setup editor
+    }
+
+    propflags |= "k_protectFromVolumeDeletion"
+	
     meta
     {
 	canCreateInEditor  = 1
@@ -186,6 +187,11 @@ template vmPropNoDel : vmProp
 	excludeWhenChangingLevelDeletion = "true"
     }
     propflags |= "k_protectFromBgDeletion"
+}
+
+template vmPropPreloadProp : vmProp
+{
+    propflags |= "k_checkPointLoadFromOriginalSetup"
 }
 
 template vmAnimProp : vmProp
@@ -212,7 +218,8 @@ template VMActionComponent
 {
     class-id = "vm action component"
 
-    string-field actionScript
+    //string-field actionScript
+    autoVms-field actionScript
     {
 	default = ""	    // important: keep defaults empty as if all callbacks are empty it doesn't bother doing any vm compilation at all which is much better for spawning
 	    views = "basic setup"
@@ -224,7 +231,8 @@ template VMActionComponent
 	    IMPORTANT - If no functionality is desired, be sure to drag select, try to move the cursor with the cursor keys and make sure this text window has NO CHARACTERS in it. That way the code will disable this callback"
     }
 
-    string-field canActivateScript
+    //string-field canActivateScript
+    autoVms-field canActivateScript
     {
 	default = ""	    // important: keep defaults empty as if all callbacks are empty it doesn't bother doing any vm compilation at all which is much better for spawning
 	    views = "basic setup"
@@ -240,11 +248,5 @@ template VMActionComponent
     }
 }
 
-template SimpleActivateWithVm : SimpleActivate
-{
-    VMActionComponent vmActionComp
-    {
-    }
-}
 
 

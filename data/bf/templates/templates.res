@@ -11,4 +11,8 @@
 #include "gendata/bf/gunanims/include.res"
 #include "gendata/bf/animmaps/include.res"
 
+//this must be included before the sound.res
+#include "data/bf/sound/database/sndtemplate.res" 
+#include "data/bf/sound/database/sounds.res"
+
 #include "data/bf/templates/common_templates_aftergendata.res"

@@ -110,21 +110,25 @@
 template reactmap-field : field
 {
     type = "reactmap"
+    preloadable = "true"
 }
 
 template facialanimmap-field : field
 {
     type = "facialanimmap"
+    preloadable = "true"
 }
 
 template animtree-field : field
 {
     type = "animtree"
+    preloadable = "true"
 }
 
 template animmap-field : field
 {
     type = "animmap"	    // this field refers to an animmap template
+    preloadable = "true"
 
     /*
      example use:
@@ -142,23 +146,27 @@ template singleAnim-field : field
 {
     type	    = "singleAnim"	    // this field refers to a single anim anim resource
     dbgUsageType    = "k_animtype_levelSpecific"
+    preloadable = "true"
 }
 
 template singleStreamedAnim-field : field
 {
     type	    = "singleAnim"	    // this field refers to a single anim anim resource
     dbgUsageType    = "k_animtype_levelSpecificShouldBeStreamed"
+    preloadable = "true"
 }
 
 template singleAnimOrAnimMapID-field : field
 {
     type	    = "singleAnimOrAnimMapId"	// can be a single anim as above, or an animmap ID. Check for the value starting with AN_ and assume if not that its an animmap ID that doesn't need preloading
     dbgUsageType    = "k_animtype_levelSpecific"
+    preloadable = "true"
 }
 
 template animArray-field : field	// array of anim ids that should be preloaded
 {
     type = "animArray"
+    preloadable = "true"
     singleAnim-field itemmeta		// this is the meta type of all entries in this array
     {
     }
@@ -175,11 +183,13 @@ template streamedAnimArray-field : animArray-field	// array of anim ids that sho
 template singleSound-field : field
 {
     type = "singleSound"    //this field refers to a single sound sound resource
+    preloadable = "true"
 }
 
 template soundArray-field : field	// array of sound ids that should be preloaded
 {
     type = "soundArray"
+    preloadable = "true"
     singleSound-field itemmeta		// this is the meta type of all entries in this array
     {
     }
@@ -188,11 +198,19 @@ template soundArray-field : field	// array of sound ids that should be preloaded
 template soundmap-field : field
 {
     type = "soundmap"	    // this field refers to a soundmap template
+    preloadable = "true"
+}
+
+template soundeventsystem-field : field
+{
+    type = "soundeventsystem"
+    preloadable = "true"
 }
 
 template file-field : field
 {
     type = "file"
+    preloadable = "true"
 //  fileType = ""	    // required!!
 //  filePattern = ""	    // not fully supported yet
 //  defaultDir = ""	    // importantly all files MUST be underneath this dir
@@ -203,6 +221,12 @@ template texture-field : file-field
 {
 //    type = "textureFileName"    // this field refers to a texture filename
     fileType = "textureFileName"
+    tileUV   = "false"
+}
+
+template textureTile-field : texture-field
+{
+    tileUV   = "true"
 }
 
 template textureArray-field : field
@@ -218,6 +242,13 @@ template obasset-field : file-field
 {
     fileType = "obasset"
     permLevelOb = "false"   // this field can be used to keep a streaming ob loaded for the duration of a level (set of GUs)
+    texStreamHi = "false"
+    fieldType = "string"
+}
+
+template obasset-field-no-wii : obasset-field
+{
+    excludeWii = "true"
 }
 
 template obasset-field-no-stream : file-field
@@ -234,6 +265,14 @@ template editorObasset-field : file-field
 template vms-field : file-field
 {
     fileType = "vmsFileName"
+    filePattern = "*.vms"
+    defaultDir = "vm"
+    fileEditable = "true"
+}
+
+template autoVms-field : file-field
+{
+    fileType = "autoVmsFileName"
     filePattern = "*.vms"
     defaultDir = "vm"
     fileEditable = "true"
@@ -314,6 +353,10 @@ template string-field : field
     maxNumChars = 0	// no max by default
     multiLines = "false"
     height = 200	// only used for multiline strings
+    optionList = ""
+    fileFolder = ""
+    fileFolderPrefix = ""
+    fileSuffix = ""
 }
 
 template strid-field : string-field
@@ -321,8 +364,18 @@ template strid-field : string-field
     type = "strid"
 }
 
+template boolOptions
+{
+    options[]=
+    {
+	"true",
+	"false"	    
+    }
+}
+
 template bool-field : string-field
 {
+    optionList = "boolOptions"
 }
 
 template zone-field : field

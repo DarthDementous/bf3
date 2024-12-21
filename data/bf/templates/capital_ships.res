@@ -10,17 +10,13 @@
 //if it's an exterior with gibs use :staticprop with the descript extras which can be tailored for each prop or set of gibs
 //[i will put a specific template with the descript for standard gibs in later - examples are in bf/templates/descript.res ]
 
+//////////////////////////////////////////
+//  CAPITAL SHIP DESCRIPT COMPONENTS	//
+//////////////////////////////////////////
+
 //SUB DESCRIPT FOR CAPITAL SHIP BROKEN PARTS
-template bfcapitalgib 
+template bfcapitalgib : descriptcomponent 
 {
-
-    class-id		    = "bfdescript"
-
-    // wont be serialised just for preloading
-    soundArray-field extraPreloadSounds
-    {
-    }
-
     propid-field forceTriggerProp
     {
 	default = ""
@@ -29,7 +25,7 @@ template bfcapitalgib
     }
 
     script = " 
-    BTOP 
+    * 
     {
 	event init
 	{
@@ -40,37 +36,28 @@ template bfcapitalgib
 		setdmgstate( damaged )
 		
 		makevisible_wc( BTOP, false )
-		makevisible_wc( B_SPLITPART*, true )
 		makevisible_wc( B_FILLPOLY*, true )
 
-		// debugprintf(EVENT_INIT_bfcapitalgib_EVENT_INIT)
-    //	    particleeffectimmediate(cap_ext_split, part2_explosion9,0)
-		particleeffectimmediate(cs_main_exp, EXPLOMAIN_01,0)
-		particleeffectimmediate(cs_main_fire, FLAMES_01,1)
-		particleeffectimmediate(cs_main_fire, FLAMES_02,2)
-		particleeffectimmediate(cs_main_fire, FLAMES_03,3)
-		particleeffectimmediate(cs_main_fire, FLAMES_04,4)
-		particleeffectimmediate(cs_main_fire, FLAMES_05,5)
-		particleeffectseries(cs_mini_exp, 50 , 1.0, EXPLOSION, 0)
-		// gibeffect(mun_ptrail, 1, 100.0, 0, 0)
-		//particleeffectdelayed(mun_explo, 30.0,0,0)
+		particleeffectimmediate(cs_main_exp, EXPLOMAIN_01,0, true)
+		particleeffectimmediate(cs_main_fire, FLAMES_01,1, true)
+		particleeffectimmediate(cs_main_fire, FLAMES_02,2, true)
+		particleeffectimmediate(cs_main_fire, FLAMES_03,3, true)
+		particleeffectimmediate(cs_main_fire, FLAMES_04,4, true)
+		particleeffectimmediate(cs_main_fire, FLAMES_05,5, true)
+		particleeffectseries(cs_mini_exp, 50 , 1.0, EXPLOSION, 0, true)
 	    }
-	    setcollisiondelayhack(5) //because it also switches off gravity and resistance on next gibste
+	    setcollisiondelayhack(5)
 	    
 	}
 	
 	event damage
 	{
-	    //particleeffectseries(  imp_explode,  3 , 1.0, 0, 0)
 	    debugprintf(SECONDARY_EVENT_DAMAGE)
 	}
 
-	//dont need to delete on zero health because the gib code has it in the health listener
 	event zerohealth
 	{
 	    debugprintf(SECONDARY_EVENT_ZEROHEALTH)
-	   
-     	    //explode the next gibs
 	    deleteprop()
 	}
     }
@@ -78,15 +65,12 @@ template bfcapitalgib
    "
 }
 
-
 //TOP LEVEL DESCRIPT FOR CAPITAL SHIPS
 //for props where the main gibs are called B_broken* these may or may not have their own gibs called B_Gib*
 template bfcapitalshipdescript : bfdescriptcomponent
 {
-    script = "
-        
     //because some of our props think the BTop is being hit so we need a total wildcard for all of it
-
+    script = "
     BTOP
     {
 	event init
@@ -102,31 +86,21 @@ template bfcapitalshipdescript : bfdescriptcomponent
 	event init
 	{
 	    setdmgstate( normal )
+	    makevisible_wc( BDOOR*, false )
 	    makevisible_wc( BTOP, false )
 	    makevisible_wc( B_SPLITPART*, true )
 	    makevisible_wc( B_FILLPOLY*, false )
-   
-	    //debugprintf(LARGEVEHICLE_EVENT_INIT)
- 
-	    
   	}
 
-	event damage //CHealthComponent
+	event damage
 	{
-	    //debugprintf(LARGEVEHICLE_EVENT_DAMAGE)
-	    
 	    if comparedmgstate( normal )
 	    {
-		if healthlessthan( 0.25 )  //a ratio
+		if healthlessthan( 0.25 )
 		{
 		    debugprintf(LOTSOF_DAMAGE_STATE)
 		    setdmgstate( damaged )
     		}
-	    }
-	    if comparedmgstate( damaged )
-	    {
-		//set off a series of explosions for any damage while it is low
-		//particleeffectseries(  imp_explode, 3, 1.0 ,0, 0)
 	    }
 
 	    debugprintf(damage)
@@ -145,73 +119,38 @@ template bfcapitalshipdescript : bfdescriptcomponent
 	{
 	    debugprintf(LARGEVEHICLE_LATENT_GIBS)
 	    
-	    ///latent(die, 3.0)
-	    //setdmgstate( dead ) 
-	    
-	    setgibextras(1.0, 0, 0, 0)
+	    setgibextras(1.0, NULL, false, false, true)
 	    
 	    setcollisiondelayhack(30) //number of ticks to wait
 	    setartificialgravity(0.0, -2.0, 0.0)
-	    explode_wc_launch( B_SPLITPART* , 25.0,  25.0, 0.01, bfcapitalgib) //name of the gib, length of the force vector, life, angular velocity factor, name of the descript to use for the bits
+	    explode_wc_launch( B_SPLITPART* , 25.0,  25.0, 0.01, bfcapitalgib) 
 	    
-	    //sub_explode_wc_launch( B_SUB_GIB*, subexplode,2.0 , 25.0, 25.0, 0.01, 0)
-	    
-	    //make entire prop invisible and then delete it later
 	    makevisible_wc( BTOP, false )
-	    makevisible_wc( B_detail*, false ) //it is a bug / prop error that this needs doing - or were these bits supposed to be part of the gib?
-	    //makevisible_wc( B_broken*, false )
+	    makevisible_wc( B_detail*, false )
 	
-	    //makevisible_wc( B_gib*, true ) //gib+broken = whole part for the capital ship
-	    playsound(frigate_explosion)
-	    playsound(frigate_stereo_boom)
 	
 	    latent(die, 5.0) 
 	    
 	    deleteprop()  
-
-	}
-
-	event bullethit
-	{
-	    //particleeffectnew( imp_explode, 0.0, 0.0, 0.0, $1.v,$2.v )
-	    
-	    //particleeffectnew( mun_explo, 0.0, 0.0, 0.0, $1.v,$2.v )
-	    
-	   // particleeffectnew( ship_sparks, 0.0, 0.0, 0.0, $1.v,$2.v)
 	}
 
 	event zerohealth
 	{
 	    debugprintf(LARGEVEHICLE_EVENT_zerohealth)
 
-        setdmgstate( damaged )            
+		if comparedmgstatenot(dying)
+		{
+	    	    setdmgstate( dying )            
 
-		debugprintf(SETTING_LATENT_GIB_FUNCTION)
+		    debugprintf(SETTING_LATENT_GIB_FUNCTION)
 
-		//assuming zero health is reached when the platform hits it, try not to happen sooner
+		    setstaticpropvelocity(0.0, -10.0, 0.0)
+		    setstaticproprotspeeds(-2.0 ,0.0, 1.0)
+		
 
-		//either script this for a specific prop or, get the hit pos and dir and work it out
-		//for now all capital props will fall a bit and explode before they separate
-		setstaticpropvelocity(0.0, -10.0, 0.0)
-		setstaticproprotspeeds(-2.0 ,0.0, 1.0)
-	    
-		//particleeffectseries( imp_explode, 12 , 0.4, 0, 0)
-		//right now any player inside the prop is dying 
-		setdmgstate( moving ) //so it only sets latent once
-
-		//then do the usual code
-		latent(blowitup, 5.0) 
+		    latent(blowitup, 5.0) 
+		}
 	    }
-	/*	    
-	    if comparedmgstate( dead )
-	    {
-		debugprintf(SETTING_LATENT_DIE_FUNCTION)
-
-		latent(die, 3.0)
-		setdmgstate( latentdead ) 
-	    }
-	    */
-
     }
     
     "
@@ -219,10 +158,8 @@ template bfcapitalshipdescript : bfdescriptcomponent
 
 template bfdeathstardescript : bfdescriptcomponent
 {
-    script = "
-        
     //because some of our props think the BTop is being hit so we need a total wildcard for all of it
-
+    script = "
     BTOP 
     {	
 	event init
@@ -230,15 +167,13 @@ template bfdeathstardescript : bfdescriptcomponent
 	    setdmgstate( normal )
 	    makevisible_wc( BTOP, true )
 	    makevisible_wc( B_detail, true )
-	    //makevisible_wc( B_GIB*, false )
-	    //makevisible_wc( B_broken*, false )
   	}
 
-	event damage //CHealthComponent
+	event damage
 	{
 	    if comparedmgstate( normal )
 	    {
-		if healthlessthan( 0.25 )  //a ratio
+		if healthlessthan( 0.25 )
 		{
 		    debugprintf(LOTSOF_DAMAGE_STATE)
 		    setdmgstate( damaged )
@@ -261,39 +196,21 @@ template bfdeathstardescript : bfdescriptcomponent
 	{
 	    debugprintf(LARGEVEHICLE_LATENT_GIBS)
 	    
-	    //setgibextras(1.0, 0, 0, 0)
-	    
-	    //setcollisiondelayhack(30) //number of ticks to wait
-	    //setartificialgravity(0.0, -2.0, 0.0)
-	    //explode_wc_launch( B_GIB* , 50.0,  25.0, 0.02, bfacclamatorgib) //name of the gib, length of the force vector, life, angular velocity factor, name of the descript to use for the bits
-	    playsound(frigate_explosion)
-	    playsound(frigate_stereo_boom)
 
 	    makevisible_wc( BTOP, true )
 	    makevisible_wc( B_detail, false )
- 	    particleeffectseries(cs_main_exp, 5000 , 0.2, first, 23)
- 	    particleeffectseries(ds_exp_large, 5000 , 0.4, second, 46)
- 	    particleeffectseries(ds_exp_large, 5000 , 0.8, third, 46)
-	    particleeffectdelayed(ds_exp_large, 14.95,0,0)
+ 	    particleeffectseries(cs_main_exp, 5000 , 0.2, first, 23, true)
+ 	    particleeffectseries(ds_exp_large, 5000 , 0.4, second, 46, true)
+ 	    particleeffectseries(ds_exp_large, 5000 , 0.8, third, 46, true)
+	    particleeffectdelayed(ds_exp_large, 14.95,NULL,0,true)
 	    latent(die, 15.0) 
-	    
-	    //deleteprop()  
 	}
 
 	event zerohealth
 	{
-	    //debugprintf(LARGEVEHICLE_EVENT_zerohealth)
-		
-	    //setdmgstate( damaged )
-    
-	    //debugprintf(SETTING_LATENT_GIB_FUNCTION)
-
-    	    //setstaticpropvelocity(0.0, -10.0, 0.0)
-	    //setstaticproprotspeeds(-2.0 ,0.0, 1.0)
-	    
     	    if comparedmgstate( normal )
 	    {
-    		setdmgstate( moving ) //so it only sets latent once
+    		setdmgstate( moving )
 		latent(blowitup, 5.0)
 	    }
 	}
@@ -302,576 +219,144 @@ template bfdeathstardescript : bfdescriptcomponent
     "
 }
 
-template bfacclamatorgib 
-{
-
-    class-id		    = "bfdescript"
-
-    // wont be serialised just for preloading
-    soundArray-field extraPreloadSounds
-    {
-    }
-
-    propid-field forceTriggerProp
-    {
-	default = ""
-	views = "basic setup"
-	tip = "set a propID to be force triggered in descript via descript function forceTriggerTriggered()"
-    }
-
-    script = " 
-    * 
-    {
-	event init
-	{
-	    debugprintf(SECONDARY_EVENT_INIT)
-	    //sub_explode_wc_launch( B_SUB_GIB*, subexplode,2.0 , 25.0, 25.0, 0.01, 0)
-		
-	    if comparedmgstate( default )
-	    {
-		setdmgstate( damaged )
-		
-		makevisible_wc( BTOP, false )
-		makevisible_wc( B_SPLITPART*, true )
-    		makevisible_wc( B_FILLPOLY*, true )
-
-    //	    particleeffectimmediate(cap_ext_split, big_bang,0)
-		particleeffectimmediate(cs_main_exp, big_bang,0)
-		particleeffectimmediate(cs_main_fire, flames1,1)
-		particleeffectimmediate(cs_main_fire, flames6,2)
-		particleeffectimmediate(cs_main_fire, flames12,3)
-		particleeffectimmediate(cs_main_fire, flames18,4)
-		particleeffectimmediate(cs_main_fire, flames24,5)
-		particleeffectimmediate(cs_main_fire, flames30,6)
-		particleeffectimmediate(cs_main_fire, flames36,7)
-
-	    //    particleeffectseries(  cs_main_fire, 50 , 1.0, explosion, 0)
-		particleeffectseries(cs_mini_exp, 50 , 1.0, explosion, 0)
-	    }
-	    setcollisiondelayhack(5) //because it also switches off gravity and resistance on next gibste
-	}
-	
-	event damage
-	{
-	    debugprintf(SECONDARY_EVENT_DAMAGE)
-	}
-
-	//dont need to delete on zero health because the gib code has it in the health listener
-	event zerohealth
-	{
-	    debugprintf(SECONDARY_EVENT_ZEROHEALTH)
-	    deleteprop()
-	}
-    }
-
-   "
-}
 
 template bfacclamatordescript : bfdescriptcomponent
 {
-    script = "
-        
     //because some of our props think the BTop is being hit so we need a total wildcard for all of it
-    BTOP
-    {
-	event init
-	{
-    	    particleeffectinternal( csi_exp_large , EXP_large,  64.0 )
-    	    particleeffectinternal( csi_exp_medium, EXP_medium, 16.0 )
-    	    particleeffectinternal( csi_exp_small , EXP_small,  8.0 )
-	}
-    }
-	
-
-    * 
-    {	
-	event init
-	{
-	    setdmgstate( normal )
-	    makevisible_wc( BTOP, false )
-	    makevisible_wc( B_SPLITPART*, true )
-	    makevisible_wc( B_FILLPOLY*, false )
-  	}
-
-	event damage //CHealthComponent
-	{
-	    if comparedmgstate( normal )
-	    {
-		if healthlessthan( 0.25 )  //a ratio
-		{
-		    debugprintf(LOTSOF_DAMAGE_STATE)
-		    setdmgstate( damaged )
-    		}
-	    }
-
-	    debugprintf(damage)
-	}
-	
-	event die
-	{
-	    debugprintf(LARGEVEHICLE_LATENT_GIB_FUNCTION_DIE)
-	    
-	    cleargibextras()
-	    deleteprop()   
-	}
-	
-	    
-	event blowitup
-	{
-	    debugprintf(LARGEVEHICLE_LATENT_GIBS)
-	    
-	    setgibextras(1.0, 0, 0, 0)
-	    
-	    setcollisiondelayhack(30) //number of ticks to wait
-	    setartificialgravity(0.0, -2.0, 0.0)
-	    explode_wc_launch( B_SPLITPART* , 50.0,  25.0, 0.02, bfacclamatorgib) //name of the gib, length of the force vector, life, angular velocity factor, name of the descript to use for the bits
-	    playsound(frigate_explosion)
-	    playsound(frigate_stereo_boom)
-
-	    makevisible_wc( BTOP, false )
-	    latent(die, 5.0) 
-	    
-	    deleteprop()  
-	}
-
-	event zerohealth
-	{
-	    debugprintf(LARGEVEHICLE_EVENT_zerohealth)
-		
-	    setdmgstate( damaged )
-    
-	    debugprintf(SETTING_LATENT_GIB_FUNCTION)
-
-    	    setstaticpropvelocity(0.0, -10.0, 0.0)
-	    setstaticproprotspeeds(-2.0 ,0.0, 1.0)
-	    
-    	    setdmgstate( moving ) //so it only sets latent once
-		
-    	    latent(blowitup, 5.0) 
-	}
-    }
-    
-    "
-}
-
-template bfciscruisergib 
-{
-
-    class-id		    = "bfdescript"
-
-    // wont be serialised just for preloading
-    soundArray-field extraPreloadSounds
-    {
-    }
-
-    propid-field forceTriggerProp
-    {
-	default = ""
-	views = "basic setup"
-	tip = "set a propID to be force triggered in descript via descript function forceTriggerTriggered()"
-    }
-
-    script = " 
+    script = "
     BTOP 
     {
 	event init
 	{
-	    debugprintf(SECONDARY_EVENT_INIT)
-	    //sub_explode_wc_launch( B_sub_gib*, secondary1,2.0 , 25.0, 25.0, 0.01, 0)
-	    //sub_explode_wc_launch( B_sub_gib*, secondary2,2.0 , 25.0, 25.0, 0.01, 0)
-		
-	    if comparedmgstate( default )
-	    {
-		setdmgstate( damaged )
-		//makevisible_wc( BTOP, false )
-		makevisible_wc( B_SPLITPART*, true )
-    		makevisible_wc( B_FILLPOLY*, true )
-		//makevisible_wc( B_sub*, true )
+	    setdmgstate( normal )
+	    makevisible_wc( B_DOOR*, false )
+	    makevisible_wc( B_FILLPOLY*, false )
+	    makevisible_wc( B_SPLITPART*, true )
 
-    //	    particleeffectimmediate(cap_ext_split, fuse1,0)
-    //	    particleeffectimmediate(cap_ext_split, fuse2,1)
-		particleeffectimmediate(cs_main_exp, EXPLOMAIN_01,0)
-	    //    particleeffectimmediate(cap_ext_flame, fire13,2)
-		particleeffectimmediate(cs_main_fire, FLAMES_01,1)
-		particleeffectimmediate(cs_main_fire, FLAMES_02,2)
-		particleeffectimmediate(cs_main_fire, FLAMES_03,3)
-		particleeffectimmediate(cs_main_fire, FLAMES_04,3)
-		particleeffectimmediate(cs_main_fire, FLAMES_05,3)
-		particleeffectimmediate(cs_main_fire, FLAMES_06,3)
+	    particleeffectinternal( csi_exp_large , EXP_large,  64.0 )
+    	    particleeffectinternal( csi_exp_medium, EXP_medium, 16.0 )
+    	    particleeffectinternal( csi_exp_small , EXP_small,  8.0 )
 
-		particleeffectseries(cs_mini_exp, 50 , 1.0, EXPLOSION, 2)
-	    }
-	    setcollisiondelayhack(5) //because it also switches off gravity and resistance on next gibste
-	}
-	
-	event damage
-	{
-	    debugprintf(SECONDARY_EVENT_DAMAGE)
+  	    tagstoparticleeffect_wc( hangars, cis_exp_split, HANGAR)
+  	    tagstoparticleeffect_wc( breaks, cis_exp_split, SPLIT)
+  	    tagstoparticleeffect_wc( breaks, cis_trail_gib, FLAMES)
+  	    tagstoparticleeffect_wc( deaths, cs_exp_death, DEATH)
+  	    tagskillalleffects_wc( deaths )
+  	    tagseffectseries_wc( breaks, dcs_exp_bang, BANG, 50, 2.0, 0)
+  	    tagskillallseries_wc( deaths )
+	    tagspartswitch_wc( deaths, B_SPLITPART_, false)
+	    tagspartswitch_wc( deaths, B_FILLPOLY_, false)
 	}
 
-	//dont need to delete on zero health because the gib code has it in the health listener
 	event zerohealth
 	{
-	    debugprintf(SECONDARY_EVENT_ZEROHEALTH)
-	    deleteprop()
+	    if comparedmgstate( normal )
+	    {
+		makevisible_wc( B_FILLPOLY*, true )
+		forcetoplod()
+		playanimation(deathanim)
+		deletepropwhenanimstops()
+		setdmgstate( damaged )
+	    }
 	}
     }
-
-   "
+    "
+    dofParticleEffects = 64;
 }
 
 template bfciscruiserdescript : bfdescriptcomponent
 {
-    script = "
-        
     //because some of our props think the BTop is being hit so we need a total wildcard for all of it
-
+    script = "
     BTOP
     {
-	event init
-	{
-    	    particleeffectinternal( csi_exp_large, EXP_large , 64.0)
-    	    particleeffectinternal( csi_exp_medium, EXP_medium , 32.0)
-    	    particleeffectinternal( csi_exp_small, EXP_small , 8.0)
-  	}
-    }
-    
-    * 
-    {	
 	event init
 	{
 	    setdmgstate( normal )
-	    makevisible_wc( BTOP, false )
+	    makevisible_wc( B_DOOR*, false )
 	    makevisible_wc( B_SPLITPART*, true )
 	    makevisible_wc( B_FILLPOLY*, false )
-	    //makevisible_wc( B_sub*, false )
-  	}
+    	    particleeffectinternal( csi_exp_large, EXP_large , 64.0)
+    	    particleeffectinternal( csi_exp_medium, EXP_medium , 32.0)
+    	    particleeffectinternal( csi_exp_small, EXP_small , 8.0)
+  	    tagstoparticleeffect_wc( hangars, cis_exp_split, HANGAR)
+  	    tagstoparticleeffect_wc( breaks, cis_exp_split, SPLIT)
+  	    tagstoparticleeffect_wc( breaks, cis_trail_gib, FLAMES)
+  	    tagstoparticleeffect_wc( deaths, cs_exp_death, DEATH)
+  	    tagskillalleffects_wc( deaths )
+  	    tagseffectseries_wc( breaks, dcs_exp_bang, BANG, 50, 2.0, 0)
+  	    tagskillallseries_wc( deaths )
+	    tagspartswitch_wc( deaths, B_SPLITPART_, false)
+	    tagspartswitch_wc( deaths, B_FILLPOLY_, false)
+	}
 
-	event damage //CHealthComponent
+	event zerohealth
 	{
 	    if comparedmgstate( normal )
 	    {
-		if healthlessthan( 0.25 )  //a ratio
-		{
-		    debugprintf(LOTSOF_DAMAGE_STATE)
-		    setdmgstate( damaged )
-    		}
-	    }
-
-	    debugprintf(damage)
-	}
-	
-	event die
-	{
-	    debugprintf(LARGEVEHICLE_LATENT_GIB_FUNCTION_DIE)
-	    
-	    cleargibextras()
-	    deleteprop()   
-	}
-	
-	    
-	event blowitup
-	{
-	    debugprintf(LARGEVEHICLE_LATENT_GIBS)
-	    
-	    setgibextras(1.0, 0, 0, 0)
-	    
-	    setcollisiondelayhack(30) //number of ticks to wait
-	    setartificialgravity(0.0, -2.0, 0.0)
-	    explode_wc_launch( B_SPLITPART* , 50.0,  25.0, 0.02, bfciscruisergib) //name of the gib, length of the force vector, life, angular velocity factor, name of the descript to use for the bits
-	    playsound(frigate_explosion)
-	    playsound(frigate_stereo_boom)
-
-	    makevisible_wc( BTOP, false )
-	    latent(die, 5.0) 
-	    
-	    deleteprop()  
-	}
-
-	event zerohealth
-	{
-	    debugprintf(LARGEVEHICLE_EVENT_zerohealth)
-		
-	    setdmgstate( damaged )
-    
-	    debugprintf(SETTING_LATENT_GIB_FUNCTION)
-
-    	    setstaticpropvelocity(0.0, -10.0, 0.0)
-	    setstaticproprotspeeds(-2.0 ,0.0, 1.0)
-	    
-    	    setdmgstate( moving ) //so it only sets latent once
-		
-    	    latent(blowitup, 5.0) 
-	}
-    }
-    
-    "
-}
-
-template bfdroidcommandgib 
-{
-
-    class-id		    = "bfdescript"
-
-    // wont be serialised just for preloading
-    soundArray-field extraPreloadSounds
-    {
-    }
-
-    propid-field forceTriggerProp
-    {
-	default = ""
-	views = "basic setup"
-	tip = "set a propID to be force triggered in descript via descript function forceTriggerTriggered()"
-    }
-
-    script = " 
-    * 
-    {
-	event init
-	{
-	    debugprintf(SECONDARY_EVENT_INIT)
-	    //sub_explode_wc_launch( B_sub_gib*, secondary1,2.0 , 25.0, 25.0, 0.01, 0)
-	    //sub_explode_wc_launch( B_sub_gib*, secondary2,2.0 , 25.0, 25.0, 0.01, 0)
-		
-	    if comparedmgstate( default )
-	    {
+    		makevisible_wc( B_FILLPOLY*, true )
+		forcetoplod()
+		playanimation(deathanim)
+		deletepropwhenanimstops()
 		setdmgstate( damaged )
-		//makevisible_wc( BTOP, true )
-		//makevisible_wc( B_SPLITPART*, true )
-		makevisible_wc( B_FILLPOLY*, true )
-		//makevisible_wc( B_sub*, true )
-
-		particleeffectimmediate(cs_main_exp, EXPLOMAIN_01,0)
-		particleeffectimmediate(cs_main_fire, FLAMES_01,1)
-		particleeffectimmediate(cs_main_fire, FLAMES_02,2)
-		particleeffectimmediate(cs_main_fire, FLAMES_03,3)
-		particleeffectimmediate(cs_main_fire, FLAMES_04,4)
-		particleeffectimmediate(cs_main_fire, FLAMES_05,5)
-		particleeffectimmediate(cs_main_fire, FLAMES_06,6)
-		particleeffectimmediate(cs_main_fire, FLAMES_07,7)
-
-		particleeffectseries(cs_mini_exp, 50 , 1.0, EXPLOSION, 0)
 	    }
-	    setcollisiondelayhack(5) //because it also switches off gravity and resistance on next gibste
-	}
-	
-	event damage
-	{
-	    debugprintf(SECONDARY_EVENT_DAMAGE)
-	}
-
-	//dont need to delete on zero health because the gib code has it in the health listener
-	event zerohealth
-	{
-	    debugprintf(SECONDARY_EVENT_ZEROHEALTH)
-	    deleteprop()
 	}
     }
-
-   "
+    "
+    dofParticleEffects = 64;
 }
+
 
 template bfdroidcommanddescript : bfdescriptcomponent
 {
-    script = "
-        
     //because some of our props think the BTop is being hit so we need a total wildcard for all of it
-
+    script = "
+	
     BTOP
     {
 	event init
 	{
-    	    particleeffectinternal( dsi_exp_large, EXP_large , 120.0)
-    	  //  particleeffectinternal( cap_int_exp_01, EXP_large , 420.0)
-    	  //  particleeffectinternal( cap_int_stm, EXP_wall , 0.5)
-    	  //  particleeffectinternal( cap_int_spk, EXP_ceiling , 10.0)
-  	}
+	    particleeffectinternal( dsi_exp_large, EXP_large , 120.0)
+	    tagstoparticleeffect_wc( hangars, cis_exp_split, HANGAR)
+	    tagstoparticleeffect_wc( breaks, cis_exp_split, SPLIT)
+	    tagstoparticleeffect_wc( breaks, cis_trail_gib, FLAMES)
+	    tagstoparticleeffect_wc( deaths, cs_exp_death, DEATH)
+	    tagskillalleffects_wc( deaths )
+	    tagseffectseries_wc( breaks, dcs_exp_bang, BANG, 50, 2.0, 0)
+	    tagskillallseries_wc( deaths )
+	    tagspartswitch_wc( deaths, B_SPLITPART_, false)
+	    tagspartswitch_wc( deaths, B_FILLPOLY_, false)
+	}
+
+	event zerohealth
+	{
+	    if comparedmgstate( normal )
+	    {
+		makevisible_wc( B_FILLPOLY*, true )
+		forcetoplod()
+		playanimation(deathAnim)
+		deletepropwhenanimstops()
+		setdmgstate( damaged )
+	    }
+	}
     }
-    
+
     *
     {	
 	event init
 	{
 	    setdmgstate( normal )
-	    makevisible_wc( BTOP, false )
+		makevisible_wc( B_DOOR*, false )
 	    makevisible_wc( B_SPLITPART*, true )
 	    makevisible_wc( B_FILLPOLY*, false )
-	    //makevisible_wc( B_sub*, false )
-  	}
-
-	event damage //CHealthComponent
-	{
-	    if comparedmgstate( normal )
-	    {
-		if healthlessthan( 0.25 )  //a ratio
-		{
-		    debugprintf(LOTSOF_DAMAGE_STATE)
-		    setdmgstate( damaged )
-    		}
-	    }
-
-	    debugprintf(damage)
-	}
-	
-	event die
-	{
-	    debugprintf(LARGEVEHICLE_LATENT_GIB_FUNCTION_DIE)
-	    
-	    cleargibextras()
-	    deleteprop()   
-	}
-	
-	    
-	event blowitup
-	{
-	    debugprintf(LARGEVEHICLE_LATENT_GIBS)
-	    
-	    setgibextras(1.0, 0, 0, 0)
-	    
-	    setcollisiondelayhack(30) //number of ticks to wait
-	    setartificialgravity(0.0, -2.0, 0.0)
-	    explode_wc_launch( B_SPLITPART* , 50.0,  25.0, 0.02, bfdroidcommandgib) //name of the gib, length of the force vector, life, angular velocity factor, name of the descript to use for the bits
-	    playsound(frigate_explosion)
-	    playsound(frigate_stereo_boom)
-
-	    //makevisible_wc( BTOP, false )
-	    latent(die, 5.0) 
-	    
-	    deleteprop()  
-	}
-
-	event zerohealth
-	{
-	    debugprintf(LARGEVEHICLE_EVENT_zerohealth)
-		
-	    setdmgstate( damaged )
-    
-	    debugprintf(SETTING_LATENT_GIB_FUNCTION)
-
-    	    setstaticpropvelocity(0.0, -10.0, 0.0)
-	    setstaticproprotspeeds(-2.0 ,0.0, 1.0)
-	    
-    	    setdmgstate( moving ) //so it only sets latent once
-		
-    	    latent(blowitup, 5.0) 
 	}
     }
-    
     "
+    dofParticleEffects = 64;
 }
 
-template capitalShipPart : staticprop
+template bftributarygib : descriptcomponent 
 {
-    class-id = "capital ship part prop"
-    ticktype = "k_tickAlways"
-
-    obinstrenderer render
-    {
-	model = "capital_ships/components/generic"
-	//model = "props/space/asteroids/asteroid_medium"
-    }
-
-    autoAimTargetComponentBF autoaim
-    {
-	playerBulletsAttractedToTarget = "true"
-	flags |= "k_autoAimBF_canBeLockedOnto|k_autoAimBF_canBeLockedOntoByGroundVehicle|k_autoAimBF_canBeLockedOntoByStarFighter|k_autoAimBF_alwaysDisplayWithAdditionalInfo|k_autoAimBF_doNotDrawOnHudInStoryMode"
-    }
-
-    bfexplodingpropdescript descript
-    {
-    }
-
-    physics
-    {
-	isMoveable	    =	"true"
-    }
-   
-    dmghealthcomponentbf health
-    {
-	fullhealth	= 5.0f
-        isrepairable	= "false"
-    }
-
-    shipDamage = 150.0f
-    starPoints = 8
-}
-
-template capitalShipPart_sensors : capitalShipPart
-{
-    render
-    {
-	// todo: model = "capital_ships/components/sensors"
-    }
-
-    autoaim
-    {
-	nameKey = "STR_FRIGATE_COMPONENT_SENSORS"
-    }
-}
-
-template capitalShipPart_comms : capitalShipPart
-{
-    render
-    {
-	// todo: model = "capital_ships/components/comms"
-    }
-
-    autoaim
-    {
-	nameKey = "STR_FRIGATE_COMPONENT_COMMS"
-    }
-}
-
-template capitalShipPart_lifeSupport : capitalShipPart
-{
-    render
-    {
-	// todo: model = "capital_ships/components/life_support"
-    }
-
-    autoaim
-    {
-	nameKey = "STR_FRIGATE_COMPONENT_LIFE_SUPPORT"
-    }
-}
-
-template capitalShipPart_scanners : capitalShipPart
-{
-    render
-    {
-	// todo: model = "capital_ships/components/scanners"
-    }
-
-    autoaim
-    {
-	nameKey = "STR_FRIGATE_COMPONENT_SCANNERS"
-    }
-}
-
-template capitalShipPart_auxPower : capitalShipPart
-{
-    render
-    {
-	// todo: model = "capital_ships/components/aux_power"
-    }
-
-    autoaim
-    {
-	nameKey = "STR_FRIGATE_COMPONENT_POWER"
-    }
-}
-
-template bftributarygib 
-{
-
-    class-id		    = "bfdescript"
-
-    // wont be serialised just for preloading
-    soundArray-field extraPreloadSounds
-    {
-    }
-
     propid-field forceTriggerProp
     {
 	default = ""
@@ -890,27 +375,26 @@ template bftributarygib
 	    {
     		setdmgstate( normal )
 		
-		makevisible_wc( BTOP, true )
-		makevisible_wc( B_broken*, true )
+		makevisible_wc( B_FILLPOLY*, true )
 
-		particleeffectimmediate(cs_main_exp, MAIN_1,0)
-		particleeffectimmediate(cs_main_fire, FLAME_BE1,1)
-		particleeffectimmediate(cs_main_fire, FLAME_BE3,2)
-		particleeffectimmediate(cs_main_fire, FLAME_BE4,3)
-		particleeffectimmediate(cs_main_fire, FLAME_BO1,4)
-		particleeffectimmediate(cs_main_fire, FLAME_BO3,5)
-		particleeffectimmediate(cs_main_fire, FLAME_BO4,6)
-		particleeffectimmediate(cs_main_fire, FLAME_BO6,7)
-		particleeffectimmediate(cs_main_fire, FLAME_E1,8)
-		particleeffectimmediate(cs_main_fire, FLAME_E3,9)
-		particleeffectimmediate(cs_main_fire, FLAME_E5,10)
-		particleeffectimmediate(cs_main_fire, FLAME_F1,11)
-		particleeffectimmediate(cs_main_fire, FLAME_F3,12)
-		particleeffectimmediate(cs_main_fire, FLAME_F4,13)
-		particleeffectimmediate(cs_main_fire, FLAME_B1,14)
-		particleeffectimmediate(cs_main_fire, FLAME_B3,15)
+		particleeffectimmediate(cs_main_exp, MAIN_1,0, true)
+		particleeffectimmediate(cs_main_fire, FLAME_BE1,1, true)
+		particleeffectimmediate(cs_main_fire, FLAME_BE3,2, true)
+		particleeffectimmediate(cs_main_fire, FLAME_BE4,3, true)
+		particleeffectimmediate(cs_main_fire, FLAME_BO1,4, true)
+		particleeffectimmediate(cs_main_fire, FLAME_BO3,5, true)
+		particleeffectimmediate(cs_main_fire, FLAME_BO4,6, true)
+		particleeffectimmediate(cs_main_fire, FLAME_BO6,7, true)
+		particleeffectimmediate(cs_main_fire, FLAME_E1,8, true)
+		particleeffectimmediate(cs_main_fire, FLAME_E3,9, true)
+		particleeffectimmediate(cs_main_fire, FLAME_E5,10, true)
+		particleeffectimmediate(cs_main_fire, FLAME_F1,11, true)
+		particleeffectimmediate(cs_main_fire, FLAME_F3,12, true)
+		particleeffectimmediate(cs_main_fire, FLAME_F4,13, true)
+		particleeffectimmediate(cs_main_fire, FLAME_B1,14, true)
+		particleeffectimmediate(cs_main_fire, FLAME_B3,15, true)
 
-		particleeffectseries(cs_mini_exp, 50 , 1.0, EXPLODE, 0)
+		particleeffectseries(cs_mini_exp, 50 , 1.0, EXPLODE, 0, true)
 	    }
 		setcollisiondelayhack(15) //because it also switches off gravity and resistance on next gibste
 	}
@@ -933,10 +417,8 @@ template bftributarygib
 
 template bftributarydescript : bfdescriptcomponent
 {
-    script = "
-        
     //because some of our props think the BTop is being hit so we need a total wildcard for all of it
-
+    script = "
     BTOP
     {
 	event init
@@ -944,7 +426,9 @@ template bftributarydescript : bfdescriptcomponent
     	    particleeffectinternal( csi_exp_large, EXP_large , 64.0)
     	    particleeffectinternal( csi_exp_medium, EXP_medium , 32.0)
     	    particleeffectinternal( csi_exp_small, EXP_small , 8.0)
-  	}
+ 	    makevisible_wc( BTOP, true )
+	    makevisible_wc( B_FILLPOLY*, false )
+ 	}
     }
     
     *
@@ -952,15 +436,13 @@ template bftributarydescript : bfdescriptcomponent
 	event init
 	{
 	    setdmgstate( normal )
-	    makevisible_wc( BTOP, true )
-	    makevisible_wc( B_broken*, false )
   	}
 
-	event damage //CHealthComponent
+	event damage
 	{
 	    if comparedmgstate( normal )
 	    {
-		if healthlessthan( 0.25 )  //a ratio
+		if healthlessthan( 0.25 )
 		{
 		    debugprintf(LOTSOF_DAMAGE_STATE)
 		    setdmgstate( damaged )
@@ -983,14 +465,20 @@ template bftributarydescript : bfdescriptcomponent
 	{
 	    debugprintf(LARGEVEHICLE_LATENT_GIBS)
 	    
-	    setgibextras(1.0, 0, 0, 0)
+	    setgibextras(1.0, NULL, false, false, true)
 	    
-	    setcollisiondelayhack(30) //number of ticks to wait
+//	    particleeffectimmediate(cis_exp_split, GIB_EXPLO1_1,1, true)
+//	    particleeffectimmediate(cs_exp_death, GIB_EXPLO2_1,1, true)
+//	    particleeffectimmediate(dcs_exp_bang, GIB_BANG1,1, true)
+	    
+	    setcollisiondelayhack(300)
 	    setartificialgravity(0.0, -2.0, 0.0)
-	    explode_wc_launch( B_broken* , 50.0,  25.0, 0.02, bftributarygib) //name of the gib, length of the force vector, life, angular velocity factor, name of the descript to use for the bits
-	    playsound(frigate_explosion)
-	    playsound(frigate_stereo_boom)
+	    explode_wc_launch( B_SPLITPART* , 50.0,  25.0, 0.02, bftributarygib)
 
+//	    particleeffectimmediate(cis_exp_large, GIB_EXPLO1_1,1, true)
+//	    particleeffectimmediate(cs_exp_split, GIB_EXPLO2_,1, true)
+//	    particleeffectimmediate(dcs_exp_bang, GIB_BANG,1, true)
+	    
 	    makevisible_wc( BTOP, false )
 	    latent(die, 5.0) 
 	    
@@ -1005,7 +493,7 @@ template bftributarydescript : bfdescriptcomponent
     
 	    debugprintf(SETTING_LATENT_GIB_FUNCTION)
 	    
-    	    setdmgstate( moving ) //so it only sets latent once
+    	    setdmgstate( moving )
 		
     	    latent(blowitup, 0.3) 
 	}
@@ -1014,11 +502,1778 @@ template bftributarydescript : bfdescriptcomponent
     "
 }
 
+template bfcisfrigatedescript : bfdescriptcomponent
+{
+    //because some of our props think the BTop is being hit so we need a total wildcard for all of it
+    script = "
+    BTOP 
+    {
+	event init
+	{
+    	    particleeffectinternal( csi_exp_large , EXP_large,  64.0 )
+    	    particleeffectinternal( csi_exp_medium, EXP_medium, 16.0 )
+    	    particleeffectinternal( csi_exp_small , EXP_small,  8.0 )
+  	    tagseffectseries_wc(     breaks, cis_exp_split, BANG  , 50, 3.0, 0)
+  	    tagstoparticleeffect_wc( breaks, cis_trail_gib, FLAMES)
+  	    tagstoparticleeffect_wc( breaks, cis_exp_split, SPLIT)
+  	    tagstoparticleeffect_wc( deaths, cs_gib_death , DEATH)
+	    tagskillallseries_wc(    deaths )
+  	    tagskillalleffects_wc(   deaths )
+	    tagspartswitch_wc(       deaths, B_SPLITPART_, false)
+	    tagspartswitch_wc(       deaths, B_FILLPOLY_0, false)
+	}
+
+	event zerohealth
+	{
+	    if comparedmgstate( normal )
+	    {
+		makevisible_wc( B_FILLPOLY*, true )
+		forcetoplod()
+		playanimation(deathanim)
+		particleeffectimmediate(cs_exp_death, DEATH5_1, 1, true)
+		particleeffectseries(cs_exp_flare, 50 , 2.0, BANG, 0, true)
+		deletepropwhenanimstops()
+		setdmgstate( damaged )
+	    }
+	}
+    }
+	
+    * 
+    {	
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( B_SPLITPART*, true )
+	    makevisible_wc( B_FILLPOLY*, false )
+	    makevisible_wc( B_DOOR*, false )
+  	}
+    }
+    
+    "
+   dofParticleEffects = 64;
+}
+
+//SUB DESCRIPT FOR STAR DESTROYER GIBS
+/* --- auto commented out by commentOutTemplate
+template stardestroyergib : descriptcomponent 
+{
+    propid-field forceTriggerProp
+    {
+	default = ""
+	views = "basic setup"
+	tip = "set a propID to be force triggered in descript via descript function forceTriggerTriggered()"
+    }
+
+    script = " 
+    * 
+    {
+	event init
+	{
+	    debugprintf(SECONDARY_EVENT_INIT)
+		
+	    if comparedmgstate( default )
+	    {
+		setdmgstate( damaged )
+		
+		makevisible_wc( BTOP, false )
+    		makevisible_wc( B_FILLPOLY*, true )
+
+		// debugprintf(EVENT_INIT_bfcapitalgib_EVENT_INIT)
+    //	    particleeffectimmediate(cap_ext_split, part2_explosion9,0, true)
+		//particleeffectimmediate(cs_main_exp, part2_explosion9,0, true)
+		particleeffectimmediate(cs_main_fire, FLAME_01,1, true)
+		particleeffectimmediate(cs_main_fire, FLAME_02,2, true)
+		particleeffectimmediate(cs_main_fire, FLAME_03,3, true)
+		particleeffectimmediate(cs_main_fire, FLAME_04,4, true)
+		particleeffectimmediate(cs_main_fire, FLAME_05,5, true)
+		particleeffectimmediate(cs_main_fire, FLAME_06,6, true)
+		particleeffectimmediate(cs_main_fire, FLAME_07,7, true)
+		particleeffectimmediate(cs_main_fire, FLAME_08,8, true)
+		particleeffectimmediate(cs_main_fire, FLAME_09,9, true)
+		particleeffectimmediate(cs_main_fire, FLAME_10,10, true)
+		particleeffectseries(csi_exp_large, 50 , 1.0, EXPLODE, 0, true)
+		// gibeffect(mun_ptrail, 1, 100.0, 0, 0)
+		//particleeffectdelayed(mun_explo, 30.0,NULL,0,true)
+	    }
+	    setcollisiondelayhack(5) //because it also switches off gravity and resistance on next gibste
+	    
+	}
+	
+	event damage
+	{
+	    //particleeffectseries(  imp_explode,  3 , 1.0, NULL, 0, true)
+	    debugprintf(SECONDARY_EVENT_DAMAGE)
+	}
+
+	//dont need to delete on zero health because the gib code has it in the health listener
+	event zerohealth
+	{
+	    debugprintf(SECONDARY_EVENT_ZEROHEALTH)
+	   
+     	    //explode the next gibs
+	    deleteprop()
+	}
+    }
+
+   "
+}
+*/ // --- auto commented out by commentOutTemplate
+
+template bfstardestroyerdescript : bfdescriptcomponent
+{
+    //because some of our props think the BTop is being hit so we need a total wildcard for all of it
+    script = "
+    BTOP 
+    {
+	event init
+	{
+    	    particleeffectinternal( csi_exp_large , EXP_large,  64.0 )
+    	    particleeffectinternal( csi_exp_medium, EXP_medium, 16.0 )
+    	    particleeffectinternal( csi_exp_small , EXP_small,  8.0 )
+
+  	    tagstoparticleeffect_wc( hangars, cis_exp_split, HANGAR)
+  	    tagstoparticleeffect_wc( breaks, cis_exp_split, SPLIT)
+  	    tagstoparticleeffect_wc( breaks, cis_trail_gib, FLAMES)
+  	    tagstoparticleeffect_wc( deaths, cs_exp_death, DEATH)
+  	    tagskillalleffects_wc( deaths )
+  	    tagseffectseries_wc( breaks, dcs_exp_bang, BANG, 50, 2.0, 0)
+  	    tagskillallseries_wc( deaths )
+	    tagspartswitch_wc( deaths, B_SPLITPART_, false)
+	    tagspartswitch_wc( deaths, B_FILLPOLY_, false)
+	}
+	
+	event damage
+	{
+	    if greaterthan($0.f, 10.0)
+	    {
+		stopallparticleeffectseries()
+		particleeffectseries(star_disable, 230, 0.108696, shield, 92, true)
+    		makevisible_wc( B_DISABLE, true )
+    		latent(undisable, 20.0)
+	    }
+	}
+
+	event zerohealth
+	{
+	    if comparedmgstate( normal )
+	    {
+    		makevisible_wc( B_FILLPOLY*, true )
+		makevisible_wc( B_DETAILGEOM, false )
+		makevisible_wc( B_DISABLE, false )
+		forcetoplod()
+		playanimation(deathanim)
+		deletepropwhenanimstops()
+		setdmgstate( damaged )
+	    }
+	}
+
+	event undisable
+	{
+	    makevisible_wc( B_DISABLE, false )
+	}
+    }
+
+    * 
+    {	
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( BTOP, true )
+	    makevisible_wc( B_SPLITPART*, true )
+	    makevisible_wc( B_FILLPOLY*, false )
+	    makevisible_wc( B_DOOR*, false )
+	    makevisible_wc( B_DISABLE, false )
+  	}
+    }
+    
+    "
+    dofParticleEffects = 64;
+}
+
+template bfstardestroyerdmgdescript : bfdescriptcomponent
+{
+    script = "
+    //because some of our props think the BTop is being hit so we need a total wildcard for all of it
+    * 
+    {	
+	event init
+	{
+	    makevisible_wc( B_DOOR*, false )
+  	}
+    }
+    "
+}
+
+template bfrebfrigatedescript : bfdescriptcomponent
+{
+    //because some of our props think the BTop is being hit so we need a total wildcard for all of it
+    script = "
+    BTOP 
+    {
+	event init
+	{
+    	    particleeffectinternal( dsi_exp_large, EXP_large , 120.0)
+  	    tagstoparticleeffect_wc( hangars, cis_exp_split, HANGAR)
+  	    tagstoparticleeffect_wc( breaks, cis_exp_split, SPLIT)
+  	    tagstoparticleeffect_wc( breaks, cis_trail_gib, FLAMES)
+  	    tagstoparticleeffect_wc( deaths, cs_exp_death, DEATH)
+  	    tagskillalleffects_wc( deaths )
+  	    tagseffectseries_wc( breaks, cis_exp_split, BANG, 50, 2.0, 0)
+  	    tagskillallseries_wc( deaths )
+	    tagspartswitch_wc( deaths, B_SPLITPART_, false)
+	    tagspartswitch_wc( deaths, B_FILLPOLY_, false)
+	}
+ 
+	event zerohealth
+	{
+	    if comparedmgstate( normal )
+	    {
+    		makevisible_wc( B_FILLPOLY*, true )
+		makevisible_wc( B_DETAIL, false )
+		forcetoplod()
+		playanimation(deathanim)
+		deletepropwhenanimstops()
+		setdmgstate( damaged )
+	    }
+	}
+   }
+    
+    *
+    {	
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( B_SPLITPART*, true )
+	    makevisible_wc( B_FILLPOLY*, false )
+	    makevisible_wc( B_DOOR*, false )
+  	}
+    }
+    
+    "
+    dofParticleEffects = 64;
+}
+
+template venatorgib : descriptcomponent 
+{
+    propid-field forceTriggerProp
+    {
+	default = ""
+	views = "basic setup"
+	tip = "set a propID to be force triggered in descript via descript function forceTriggerTriggered()"
+    }
+
+    script = " 
+    * 
+    {
+	event init
+	{
+	    debugprintf(SECONDARY_EVENT_INIT)
+		
+	    if comparedmgstate( default )
+	    {
+		setdmgstate( damaged )
+		
+		makevisible_wc( BTOP, false )
+		makevisible_wc( B_GIB*, true )
+
+		particleeffectimmediate(cs_main_exp, part2_explosion9,0, true)
+		particleeffectimmediate(cs_main_fire, part1_flame1,1, true)
+		particleeffectimmediate(cs_main_fire, part1_flame2,2, true)
+		particleeffectimmediate(cs_main_fire, part1_flame3,3, true)
+		particleeffectimmediate(cs_main_fire, part2_flame1,4, true)
+		particleeffectimmediate(cs_main_fire, part2_flame2,5, true)
+		particleeffectimmediate(cs_main_fire, part2_flame3,6, true)
+		particleeffectseries(cs_mini_exp, 50 , 1.0, panel_explosion, 0, true)
+	    }
+	    setcollisiondelayhack(5)
+	    
+	}
+	
+	event damage
+	{
+	    debugprintf(SECONDARY_EVENT_DAMAGE)
+	}
+
+	//dont need to delete on zero health because the gib code has it in the health listener
+	event zerohealth
+	{
+	    debugprintf(SECONDARY_EVENT_ZEROHEALTH)
+	   
+     	    //explode the next gibs
+	    deleteprop()
+	}
+    }
+
+   "
+}
+
+//TOP LEVEL DESCRIPT FOR CAPITAL SHIPS
+//for props where the main gibs are called B_broken* these may or may not have their own gibs called B_Gib*
+template venatordescript : bfcapitalshipdescript
+{
+    //because some of our props think the BTop is being hit so we need a total wildcard for all of it
+    script = "
+    * 
+    {	
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( BTOP, true )
+	    makevisible_wc( B_GIB*, false )
+	    makevisible_wc( B_DOOR*, false )
+  	}
+
+	event damage
+	{
+	    if comparedmgstate( normal )
+	    {
+		if healthlessthan( 0.25 )
+		{
+		    debugprintf(LOTSOF_DAMAGE_STATE)
+		    setdmgstate( damaged )
+    		}
+	    }
+	    if comparedmgstate( damaged )
+	    {
+	    }
+
+	    debugprintf(damage)
+	}
+	
+	event die
+	{
+	    debugprintf(LARGEVEHICLE_LATENT_GIB_FUNCTION_DIE)
+	    
+	    cleargibextras()
+	    deleteprop()   
+	}
+	
+	    
+	event blowitup
+	{
+	    debugprintf(LARGEVEHICLE_LATENT_GIBS)
+	    
+	    setgibextras(1.0, NULL, false, false, true)
+	    
+	    setcollisiondelayhack(30)
+	    setartificialgravity(0.0, -2.0, 0.0)
+	    explode_wc_launch( B_GIB* , 25.0,  25.0, 0.01, venatorgib)
+	   
+	    makevisible_wc( BTOP, false )
+	    makevisible_wc( B_detail*, false )
+	
+	
+	    latent(die, 5.0) 
+	    
+	    deleteprop()  
+
+	}
+
+	event zerohealth
+	{
+	    if comparedmgstatenot(blowingup)
+	    {
+    		debugprintf(LARGEVEHICLE_EVENT_zerohealth)
+		debugprintf(SETTING_LATENT_GIB_FUNCTION)
+
+		setstaticpropvelocity(0.0, -10.0, 0.0)
+		setstaticproprotspeeds(-2.0 ,0.0, 1.0)
+	    
+		setdmgstate( blowingup )
+
+		latent(blowitup, 5.0)
+	    }
+	}
+    }
+    
+    "
+}
+
+/* --- auto commented out by commentOutTemplate
+template bfinterdictorgib : descriptcomponent 
+{
+    propid-field forceTriggerProp
+    {
+	default = ""
+	views = "basic setup"
+	tip = "set a propID to be force triggered in descript via descript function forceTriggerTriggered()"
+    }
+
+    script = " 
+    * 
+    {
+	event init
+	{
+	    debugprintf(SECONDARY_EVENT_INIT)
+	    //sub_explode_wc_launch( B_SUB_GIB*, subexplode,2.0 , 25.0, 25.0, 0.01, 0)
+		
+	    if comparedmgstate( default )
+	    {
+		setdmgstate( damaged )
+		
+		makevisible_wc( BTOP, false )
+		makevisible_wc( B_GIB*, true )
+		makevisible_wc( B_broken*, false ) 
+
+    //	    particleeffectimmediate(cap_ext_split, big_bang,0, true)
+		particleeffectimmediate(cs_main_exp, big_bang,0, true)
+		particleeffectimmediate(cs_main_fire, flames1,1, true)
+		particleeffectimmediate(cs_main_fire, flames6,2, true)
+		particleeffectimmediate(cs_main_fire, flames12,3, true)
+		particleeffectimmediate(cs_main_fire, flames18,4, true)
+		particleeffectimmediate(cs_main_fire, flames24,5, true)
+		particleeffectimmediate(cs_main_fire, flames30,6, true)
+		particleeffectimmediate(cs_main_fire, flames36,7, true)
+
+		particleeffectseries(cs_mini_exp, 50 , 1.0, explosion, 0, true)
+	    }
+	    setcollisiondelayhack(5) //because it also switches off gravity and resistance on next gibste
+	}
+	
+	event damage
+	{
+	    debugprintf(SECONDARY_EVENT_DAMAGE)
+	}
+
+	//dont need to delete on zero health because the gib code has it in the health listener
+	event zerohealth
+	{
+	    debugprintf(SECONDARY_EVENT_ZEROHEALTH)
+	    deleteprop()
+	}
+    }
+
+   "
+}
+*/ // --- auto commented out by commentOutTemplate
+
+template bfinterdictordescript : bfdescriptcomponent
+{
+    //because some of our props think the BTop is being hit so we need a total wildcard for all of it
+
+    script = "
+    BTOP 
+    {
+	event init
+	{
+    	    particleeffectinternal( csi_exp_large , EXP_large,  64.0 )
+    	    particleeffectinternal( csi_exp_medium, EXP_medium, 16.0 )
+    	    particleeffectinternal( csi_exp_small , EXP_small,  8.0 )
+
+  	    tagstoparticleeffect_wc( hangars, dcs_exp_split, HANGAR)
+  	    tagstoparticleeffect_wc( breaks, dcs_exp_split, SPLIT)
+  	    tagstoparticleeffect_wc( breaks, dcs_trail_gib, FLAMES)
+  	    tagstoparticleeffect_wc( deaths, ds_exp_large, DEATH)
+  	    tagskillalleffects_wc( deaths )
+  	    tagseffectseries_wc( breaks, dcs_exp_bang, BANG, 50, 2.0, 0)
+  	    tagskillallseries_wc( deaths )
+	    tagspartswitch_wc( deaths, B_SPLITPART_, false)
+	    tagspartswitch_wc( deaths, B_FILLPOLY_, false)
+	}
+
+	event zerohealth
+	{
+	    if comparedmgstate( normal )
+	    {
+		makevisible_wc( B_FILLPOLY*, true )
+		makevisible_wc( B_detailgeom, false )
+		forcetoplod()
+		playanimation(deathanim)
+		deletepropwhenanimstops()
+		setdmgstate( damaged )
+	    }
+	}
+    }
+	
+    * 
+    {	
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( B_SPLITPART*, true )
+	    makevisible_wc( B_FILLPOLY*, false )
+	    makevisible_wc( B_DOOR*, false )
+  	}
+    }
+    
+    "
+    dofParticleEffects = 64;
+}
+
+//////////////////////////////////
+//  INTERNAL CAPITAL SHIP PROPS	//
+//////////////////////////////////
+
+// Main Reactor Prop Template
+template main_reactor : bfshatteringstaticprop
+{
+    class-id = "ship reactor prop bf"
+
+    autoAimTargetComponentBF autoaim
+    {
+        nameKey    = "STR_REACTOR_CORE"
+	isPOI	    = "true"
+    }
+
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 100.f // It's not meant to be easy
+    }
+    
+    vistableseercomp vtseer
+    {
+	checkPosOffset[]    {0.0f, 5.0f, 0.0f}
+    }
+    
+    guardablecomponent guardable
+    {
+    }
+
+    propid-field shipPropID
+    {
+        default = ""
+	views	= "basic setup"
+	tips	= "Prop ID of the associated capital ship"
+    }
+
+    bool-field destroyShipWhenDestroyed
+    {
+	default = "false"
+	views	= "basic setup"
+	tips	= "Should destroying the reactor blow up the ship?"
+    }
+}
+
+// Reactor prop for the Munificent
+template munificent_reactor : main_reactor
+{
+    render
+    {
+        model = "capital_ships/cis/cis_frigate_interior/frigate_generator/cis_frigate_generator"
+		castshadows = "true"
+		receiveshadows = "true"
+    }
+
+    autoaim
+    {
+	overridePosition[]  = {0.f, 5.f, 0.f}
+	poiYOffset = -27.f
+    }
+    
+    teamNum = 1
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "cisfrig_react"
+	editorPath         = "bf/props/capital_ships/reactors/cis"
+    }
+}
+
+// Reactor prop for the Acclamator
+template acclamator_reactor : main_reactor
+{
+    render
+    {
+	model = "capital_ships/rep/rep_acclamator_reactor"
+	castshadows = "true"
+	receiveshadows = "true"
+    }
+    
+    teamNum = 0
+
+    autoaim
+    {
+	overridePosition[] = {0.f, 10.f, 0.f}
+	poiYOffset = -5.f
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "repfrig_react"
+	editorPath         = "bf/props/capital_ships/reactors/rep"
+    }
+}
+
+// Reactor Prop for Nebulon
+template reb_neb_rc : main_reactor
+{
+    class-id = "ship reactor prop bf"
+
+    render
+    {
+        model = "capital_ships/reb/reb_frigate_int/props/reb_nebulon_reactor"
+		castshadows = "true"
+		receiveshadows = "true"
+		castReflections ="true"
+    }
+
+    autoaim
+    {
+	overridePosition[] = {0.f, 2.f, 0.f}
+	poiYOffset = -4.f	
+    }
+    
+    teamNum = 0
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "reb_neb_rc"
+	editorPath         = "bf/capitalships/reb"
+    }
+}
+
+// Reactor Prop for Interdictor
+template imp_int_rc : main_reactor
+{
+    render
+    {
+        model = "capital_ships/imp/imp_frigate_int/props/imp_interdictor_reactor"
+	castshadows = "true"
+	receiveshadows = "true"
+    }
+
+    autoaim
+    {
+	overridePosition[] = {0.f, 0.f, 5.f}
+	poiYOffset = -3.f	
+    }
+    
+    teamNum = 1
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "imp_int_rc"
+	editorPath         = "bf/capitalships/imp"
+    }
+}
+
+//  Reactor Shield Prop for Munificent
+template munificent_reactor_shield : staticprop
+{
+    class-id = "ship reactor shield prop bf"
+
+    teamNum = 1
+
+    render
+    {
+	model = "capital_ships/cis/cis_frigate_interior/frigate_generator/frigate_generator_shield"
+    }
+
+    propid-field shipReactorPropID
+    {
+        default = ""
+	views	= "basic setup"
+	tips	= "Prop ID of the associated ship reactor"
+    }
+
+    bool-field protectReactor
+    {
+	default = "false"
+	views	= "basic setup"
+	tips	= "Should the shield prevent the reactor from being damaged?"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "cis_rtr_shld"
+	editorPath         = "bf/props/capital_ships/reactors/cis"
+    }
+}
+
+// Reactor Shield Prop for Acclamator
+template rep_acc_rcs : staticprop
+{
+    class-id = "ship reactor shield prop bf"
+
+    teamNum = 0
+
+    render
+    {
+	model = "capital_ships/rep/rep_acclamator_reactor_shield"
+    }
+
+    propid-field shipReactorPropID
+    {
+        default = ""
+	views	= "basic setup"
+	tips	= "Prop ID of the associated ship reactor"
+    }
+
+    bool-field protectReactor
+    {
+	default = "false"
+	views	= "basic setup"
+	tips	= "Should the shield prevent the reactor from being damaged?"
+    }
+
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "rep_acc_rcs"
+	editorPath         = "bf/capitalships/rep"
+    }
+}
+
+// Reactor Shield Prop for Nebulon
+template reb_neb_rcs : staticprop
+{
+    class-id = "ship reactor shield prop bf"
+
+    teamNum = 0
+
+    render
+    {
+	model = "capital_ships/reb/reb_frigate_int/props/reb_nebulon_reactor_shield"
+        castReflections ="true"
+    }
+
+    propid-field shipReactorPropID
+    {
+        default = ""
+	views	= "basic setup"
+	tips	= "Prop ID of the associated ship reactor"
+    }
+
+    bool-field protectReactor
+    {
+	default = "false"
+	views	= "basic setup"
+	tips	= "Should the shield prevent the reactor from being damaged?"
+    }
+
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "reb_neb_rcs"
+	editorPath         = "bf/capitalships/reb"
+    }
+}
+
+// Reactor Shield prop for Interdictor
+template imp_int_rcs : staticprop
+{
+    class-id = "ship reactor shield prop bf"
+
+    teamNum = 1
+
+    render
+    {
+	model = "capital_ships/imp/imp_frigate_int/props/imp_interdictor_reactor_shield"
+    }
+
+    propid-field shipReactorPropID
+    {
+        default = ""
+	views	= "basic setup"
+	tips	= "Prop ID of the associated ship reactor"
+    }
+
+    bool-field protectReactor
+    {
+	default = "false"
+	views	= "basic setup"
+	tips	= "Should the shield prevent the reactor from being damaged?"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "imp_int_rcs"
+	editorPath         = "bf/capitalships/imp"
+    }
+}
+
+// Sign Posts for Capital Ship interior navigation
+//Escape Pods
+template cis_escpod_sign : staticprop
+{
+    render
+    {
+	model = "capitalships/cis/cis_crusier_int/props/escapepod_sign"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "mun_escpod_sign"
+	editorPath         = "bf/capitalships/cis/signs"
+    }
+}
+
+// Sign Post External Turrets
+template cis_exttur_sign : staticprop
+{
+    render
+    {
+	model = "capitalships/cis/cis_crusier_int/props/exteriorturret_sign"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "mun_exttur_sign"
+	editorPath         = "bf/capitalships/cis/signs"
+    }
+}
+
+// Sign Post CIS Hangar
+template cis_hang_sign : staticprop
+{
+    render
+    {
+	model = "capitalships/cis/cis_crusier_int/props/cis_hangar_sign"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "cis_hang_sign"
+	editorPath         = "bf/capitalships/cis/signs"
+    }
+}
+
+// Sign Post Imperial Hangar
+template imp_hang_sign : staticprop
+{
+    render
+    {
+	model = "capitalships/cis/cis_crusier_int/props/tie_hangar_sign"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "imp_hang_sign"
+	editorPath         = "bf/capitalships/imp/signs"
+    }
+}
+
+// Sign Post Republic Hangar
+template rep_hang_sign : staticprop
+{
+    render
+    {
+	model = "capitalships/cis/cis_crusier_int/props/rep_hangar_sign"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "rep_hang_sign"
+	editorPath         = "bf/capitalships/rep/signs"
+    }
+}
+
+// Sign Post Rebel Hangar
+template reb_hang_sign : staticprop
+{
+    render
+    {
+	model = "capitalships/cis/cis_crusier_int/props/reb_hangar_sign"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "reb_hang_sign"
+	editorPath         = "bf/capitalships/reb/signs"
+    }
+}
+
+// Sign Post Interior Turrets
+template cis_inttur_sign : staticprop
+{
+    render
+    {
+	model = "capitalships/cis/cis_crusier_int/props/internalsecurity_sign"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "mun_inttur_sign"
+	editorPath         = "bf/capitalships/cis/signs"
+    }
+}
+
+// Sign Post Ion Cannon
+template cis_ioncan_sign : staticprop
+{
+    render
+    {
+	model = "capitalships/cis/cis_crusier_int/props/ioncannon_sign"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "mun_ioncan_sign"
+	editorPath         = "bf/capitalships/cis/signs"
+    }
+}
+
+// Sign Post Reactor
+template cis_react_sign : staticprop
+{
+    render
+    {
+	model = "capitalships/cis/cis_crusier_int/props/reactor_sign"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "mun_react_sign"
+	editorPath         = "bf/capitalships/cis/signs"
+    }
+}
+
+// Sign Post Reactor Shield
+template cis_shield_sign : staticprop
+{
+    render
+    {
+	model = "capitalships/cis/cis_crusier_int/props/shield_sign"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "mun_shield_sign"
+	editorPath         = "bf/capitalships/cis/signs"
+    }
+}
+
+// Munificent Crates
+// CIS Munificent Crate Large
+template cis_mun_crl : staticprop
+{
+    render
+    {
+	model = "capitalships/cis/cis_frigate_int/props/cis_frigate_int_largebox"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "cis_mun_crl"
+	editorPath         = "bf/capitalships/cis"
+    }
+}
+
+// CIS Munificent Crate Small
+template cis_mun_crs : staticprop
+{
+    render
+    {
+	model = "capitalships/cis/cis_frigate_int/props/cis_frigate_int_smallbox"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "cis_mun_crs"
+	editorPath         = "bf/capitalships/cis"
+    }
+}
+
+// Star Destroyer Cover Props
+
+// Star Destroyer Crate Cover
+template strdst_crate_cover : staticprop
+{
+    obinstrenderer render
+    {
+	model = "capitalships/imp/imp_stardestroyer_int/props/cover/sd_crate_cover"
+	castReflections ="true"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "crate_cover"
+    	editorPath         = "bf/props/star_destroyer/cover"
+    }
+}
+
+// Star Destroyer Crate Coruch
+template strdst_crate_crouch : staticprop
+{
+    obinstrenderer render
+    {
+	model = "capitalships/imp/imp_stardestroyer_int/props/cover/sd_crate_crouch"
+	castReflections ="true"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "crate_crouch"
+    	editorPath         = "bf/props/star_destroyer/cover"
+    }
+}
+
+// Star Destroyer Crate Stand
+template strdst_crate_stand : staticprop
+{
+    obinstrenderer render
+    {
+	model = "capitalships/imp/imp_stardestroyer_int/props/cover/sd_crate_stand"
+	castReflections ="true"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "crate_stand"
+    	editorPath         = "bf/props/star_destroyer/cover"
+    }
+}
+
+// ---------------- New Console and Hologram Props ------------------
+
+// Smaller Reactor Console For Bridge
+template strdst_bridgecon : staticprop
+{
+    obinstrenderer render
+    {
+	model = "capital_ships/imp/imp_stardestroyer_interior/bridgecon"
+	castReflections = "true"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "bridgecon"
+    	editorPath         = "bf/props/star_destroyer"
+    }
+}
+
+// Small Blue Hologram
+template strdst_holo_bl : staticprop
+{
+    obinstrenderer render
+    {
+	model = "capital_ships/imp/imp_stardestroyer_interior/holo_blue"
+	castReflections ="true"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "hol_bl"
+    	editorPath         = "bf/props/star_destroyer"
+    }
+}
+
+// Small Orange Hologram
+template strdst_holo_or : staticprop
+{
+    obinstrenderer render
+    {
+	model = "capital_ships/imp/imp_stardestroyer_interior/holo_orange"
+	castReflections ="true"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "hol_or"
+    	editorPath         = "bf/props/star_destroyer"
+    }
+}
+
+// Small Red Hologram
+template strdst_holo_re : staticprop
+{
+    obinstrenderer render
+    {
+	model = "capital_ships/imp/imp_stardestroyer_interior/holo_red"
+	castReflections ="true"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "hol_re"
+    	editorPath         = "bf/props/star_destroyer"
+    }
+}
+
+// Big Blue Hologram
+template strdst_holo_big_bl : staticprop
+{
+    obinstrenderer render
+    {
+	model = "capital_ships/imp/imp_stardestroyer_interior/holo_big_blue"
+	castReflections ="true"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "hol_big_bl"
+    	editorPath         = "bf/props/star_destroyer"
+    }
+}
+
+// Big Orange Hologram
+template strdst_holo_big_or : staticprop
+{
+    obinstrenderer render
+    {
+	model = "capital_ships/imp/imp_stardestroyer_interior/holo_big_orange"
+	castReflections ="true"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "hol_big_or"
+    	editorPath         = "bf/props/star_destroyer"
+    }
+}
+
+// Big Red Hologram
+template strdst_holo_big_re : staticprop
+{
+    obinstrenderer render
+    {
+	model = "capital_ships/imp/imp_stardestroyer_interior/holo_big_red"
+	castReflections ="true"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "hol_big_re"
+    	editorPath         = "bf/props/star_destroyer"
+    }
+}
+
+// -----------------------------------------
+
+// Star Destroyer Bridge Collision For Hoth Story
+template bridge_coll : staticprop
+{
+    obinstrenderer render
+    {
+	model = "capital_ships/imp/imp_stardestroyer_int/bridge_collision"
+    }
+
+    editor_invisible_hits_bridge editor-only-render
+    {
+    }
+
+    teamNum = 1 
+
+    physics
+    {
+	isMoveable = "true"
+    }
+    
+    healthcomponentbf health
+    {
+	fullhealth	= 1.0f
+    }    
+       
+    soundeventsystem sndeventsystem
+    {
+	definition = "props"
+    }
+    
+    groupingcomp grouping
+    {
+	maxgroups = 2
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "brdge_coll"
+	editorPath         = "bf/props/star_destroyer"
+    }
+}
+
+// Cell Powercell
+template powercell : bfexplodingstaticprop
+{
+
+    obinstrenderer render
+    {
+	model = "capital_ships/imp/imp_stardestroyer_int/cell_powercell"
+   	//numLods = 2
+	//lodDist[] 
+	//{ 100.0, 300.0 }
+	castshadows = "true"
+	receiveshadows = "true"
+
+    }
+    autoAimTargetComponentBF autoaim
+    {
+        nameKey    = "STR_STARDESTROYER_CELL_POWERCELL"
+    }
+
+    teamNum = 1 
+
+    physics
+    {
+	isMoveable = "true"
+    }
+    
+    healthcomponentbf health
+    {
+	fullhealth	= 0.5f
+    }    
+
+    guardablecomponent guardable
+    {
+	ai_weighting = 100.0f
+    }
+       
+    groupingcomp grouping
+    {
+	maxgroups = 2
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "powercell"
+	editorPath         = "bf/props/star_destroyer"
+    }
+}
+
+// Shield Controls
+template shield_cont : bfexplodingstaticprop
+{
+    class-id = "ship reactor controls prop bf"
+
+    obinstrenderer render
+    {
+	model = "capital_ships/imp/imp_stardestroyer_int/bridge_shield_power"
+   	//numLods = 2
+	//lodDist[] 
+	//{ 100.0, 300.0 }
+	castshadows = "true"
+	receiveshadows = "true"
+
+    }
+    autoAimTargetComponentBF autoaim
+    {
+        nameKey		    = "STR_STARDESTROYER_SHIELD_CONTROLS"
+	overridePosition[]  = {0.f, 0.75f, 0.f}
+    }
+
+    teamNum = 1 
+
+    physics
+    {
+	isMoveable = "true"
+    }
+    
+    healthcomponentbf health
+    {
+	fullhealth	= 2.0f
+    }    
+
+    guardablecomponent guardable
+    {
+	ai_weighting = 100.0f
+    }
+    
+    propid-field shipReactorShieldPropID
+    {
+        default = ""
+	views	= "basic setup"
+	tips	= "Prop ID of the associated ship reactor shield"
+    }
+
+    bool-field destroyShieldWhenDestroyed
+    {
+	default = "false"
+	views	= "basic setup"
+	tips	= "Should destroying the console remove the reactor shield?"
+    }
+
+    fractionRemovedFromShieldWhenDestroyed = 1.0f
+    
+    groupingcomp grouping
+    {
+	maxgroups = 2
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "shld_cont"
+	editorPath         = "bf/props/star_destroyer"
+    }
+}
+
+// Nebulon Chair
+template reb_frigate_chair : staticprop
+{
+	obinstrenderer render
+    {
+	model = "capitalships/reb/reb_frigate_int/props/reb_frigate_chair"
+   	}
+  
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "neb_chair"
+	editorPath         = "bf/props/frigates"
+    }
+}
+
+// Nebulon Fan
+template reb_frigate_fans : staticprop
+{
+    obinstrenderer render
+    {
+	model = "capitalships/reb/reb_frigate_int/props/reb_frigate_fans"
+    }
+    
+    transform_tick tick
+    {
+	degreesPerSec[]	{0.0f, 0.0f, 90.0f}
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "neb_fan"
+	editorPath         = "bf/props/frigates"
+    }
+}
+
+template dscamera : bfshatteringstaticprop
+{    
+    render
+    {
+	model = "capitalships/imp/imp_deathstar2_int/props/cameras"
+    }
+
+    isMoveable = "true"
+
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 0.1f
+    }
+
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }
+ 
+    soundmap-field soundmap
+    {
+	default = "sndmap_console_empire"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "dscamera"
+	editorPath         = "bf/props/deathstar"
+    }
+}
+
+// Deathstar Cover Props
+
+// Deathstar Crate Cover
+template death_crate_cover : staticprop
+{
+    obinstrenderer render
+    {
+	    model = "backgrounds/deathstar2/props/dth_crate_cover"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	    editorInstanceName = "crate_cover"
+    	editorPath         = "bf/props/deathstar/cover"
+    }
+}
+
+// Deathstar Crate Stand
+template death_crate_stand : staticprop
+{
+    obinstrenderer render
+    {
+	    model = "backgrounds/deathstar2/props/dth_crate_stand"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	    editorInstanceName = "crate_stand"
+    	editorPath         = "bf/props/deathstar/cover"
+    }
+}
+
+//////////////////////////////////
+//  EXTERNAL CAPITAL SHIP PARTS	//
+//////////////////////////////////
+
+template capitalShipPart : staticprop
+{
+    class-id = "capital ship part prop"
+    ticktype = "k_tickAlways"
+
+    obinstrenderer render
+    {
+	model = "capital_ships/components/sensors"
+	//model = "props/space/asteroids/asteroid_medium"
+    }
+
+    autoAimTargetComponentBF autoaim
+    {
+	playerBulletsAttractedToTarget = "true"
+	isPOI	    = "true"
+	flags |= "k_autoAimBF_canBeLockedOntoByGroundVehicle|k_autoAimBF_canBeLockedOntoByStarFighter|k_autoAimBF_doNotDrawOnHudInStoryMode"
+	
+    }
+
+    frigcompdescript descript
+    {
+    }
+
+    physics
+    {
+	isMoveable	    =	"true"
+    }
+   
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 30.0f
+    }
+
+    shipDamage = 150.0f
+    starPoints = 5
+    syncData = "true"
+}
+
+// Sensors
+template capitalShipPart_sensors : capitalShipPart
+{
+    render
+    {
+	model = "capital_ships/components/sensors"
+    }
+
+    autoaim
+    {
+	nameKey = "STR_FRIGATE_COMPONENT_SENSORS"
+	float overridePosition[] = {0.0f, 3.0f, 0.0f}
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "cpsnsr"
+	editorPath         = "bf/props"
+    }
+
+    syncData = "false"
+}
+
+// Communications Array
+template capitalShipPart_comms : capitalShipPart
+{
+    render
+    {
+	model = "capital_ships/components/comms"
+    }
+
+    autoaim
+    {
+	nameKey = "STR_FRIGATE_COMPONENT_COMMS"
+	float overridePosition[] = {0.0f, 3.0f, 0.0f}
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "cpcmms"
+	editorPath         = "bf/props"
+    }
+
+    syncData = "false"
+}
+
+// Life Support
+template capitalShipPart_lifeSupport : capitalShipPart
+{
+    render
+    {
+	model = "capital_ships/components/life_support"
+    }
+
+    autoaim
+    {
+	nameKey = "STR_FRIGATE_COMPONENT_LIFE_SUPPORT"
+	float overridePosition[] = {0.0f, 3.0f, 0.0f}
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "cplfsprt"
+	editorPath         = "bf/props"
+    }
+
+    syncData = "false"
+}
+
+// Scanners
+template capitalShipPart_scanners : capitalShipPart
+{
+    render
+    {
+	model = "capital_ships/components/scanners"
+    }
+
+    autoaim
+    {
+	nameKey = "STR_FRIGATE_COMPONENT_SCANNERS"
+	float overridePosition[] = {0.0f, 3.0f, 0.0f}
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "cpscn"
+	editorPath         = "bf/props"
+    }
+
+    syncData = "false"
+}
+
+// Auxiliary Power
+template capitalShipPart_auxPower : capitalShipPart
+{
+    render
+    {
+	model = "capital_ships/components/aux_power"
+    }
+
+    autoaim
+    {
+	nameKey = "STR_FRIGATE_COMPONENT_POWER"
+	float overridePosition[] = {0.0f, 3.0f, 0.0f}
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "cpaux"
+	editorPath         = "bf/props"
+    }
+
+    syncData = "false"
+}
+
+template capitalShipPart_ionCannon : capIonCannon 
+{
+}
+
+template capitalShipPart_ionCnnTat : capIonCannon 
+{
+    brain
+    {
+	targetToFireAtName = ""
+    }
+}
+ 
+//Generic Hoth Orbital Cannon Template - added by TJS
+template capitalShipPart_ionCnnHot : capIonCannon 
+{
+    brain
+    {
+	targetToFireAtName = ""
+    }
+}
+
+/* --- auto commented out by commentOutTemplate
+template capitalShipPart_ionCnnDes : capIonCannon 
+{
+    brain
+    {
+	targetToFireAtName = "cannon_target1"
+    }
+}
+*/ // --- auto commented out by commentOutTemplate
+
+/* --- auto commented out by commentOutTemplate
+template capitalShipPart_ionCnnCat : capIonCannon 
+{
+    brain
+    {
+	targetToFireAtName = ""
+    }
+}
+*/ // --- auto commented out by commentOutTemplate
+
+//Generic Bespin Orbital Cannon Template - added by TJS
+/* --- auto commented out by commentOutTemplate
+template capitalShipPart_ionCnnBes : capIonCannon 
+{
+    brain
+    {
+	targetToFireAtName = ""
+    }
+}
+*/ // --- auto commented out by commentOutTemplate
+
+/* --- auto commented out by commentOutTemplate
+template capitalShipPart_ionCnnDan : capIonCannon
+{
+    brain
+    {
+	targetToFireAtName = ""
+    }
+}
+*/ // --- auto commented out by commentOutTemplate
+
+/* --- auto commented out by commentOutTemplate
+template capitalShipPart_ionCnnMus : capIonCannon
+{
+    brain
+    {
+	targetToFireAtName = ""
+    }
+}
+*/ // --- auto commented out by commentOutTemplate
+
+/* --- auto commented out by commentOutTemplate
+template capitalShipPart_ionCnnYav : capIonCannon
+{
+    brain
+    {
+	targetToFireAtName = ""
+    }
+}
+*/ // --- auto commented out by commentOutTemplate
+
+/* --- auto commented out by commentOutTemplate
+template capitalShipPart_ionCnnDat : capIonCannon
+{
+    brain
+    {
+	targetToFireAtName = ""
+    }
+}
+*/ // --- auto commented out by commentOutTemplate
+
+/* --- auto commented out by commentOutTemplate
+template capitalShipPart_ionCnnKas : capIonCannon
+{
+    brain
+    {
+	targetToFireAtName = ""
+    }
+}
+*/ // --- auto commented out by commentOutTemplate
+
+/* --- auto commented out by commentOutTemplate
+template capitalShipPart_ionCnnCor : capIonCannon
+{
+    brain
+    {
+	targetToFireAtName = ""
+    }
+}
+*/ // --- auto commented out by commentOutTemplate
+
+template capitalShipPart_ionCnnCorStory : capIonCannon
+{
+    brain
+    {
+	targetToFireAtName = "Target"
+    }
+}
+
+template capitalShipPart_ionCnnCorTrailer : capIonCannon
+{
+    remoteGun
+    {
+        gunComponent
+        {   
+            gunInfoFromMgr = "ionCannonTrailer"
+	}
+    }
+    
+    brain
+    {
+	targetToFireAtName = "Target"
+    }
+}
+
+template capitalShipPart_ionCnnCorT2 : capIonCannon
+{
+
+    float startAngles [] = {-33.f, 99.44f}
+    remoteGun
+    {
+        gunComponent
+        {   
+            gunInfoFromMgr = "ionCannonTrailer"
+	}
+    }
+    
+    brain
+    {
+	targetToFireAtName = "Target"
+    }
+}
+
+//Damaged blastdoors for the interdictor
+template imp_frigate_blastdoors : bfexplodingstaticprop 
+{
+    render
+    {
+	model = "capital_ships/imp/imp_stardestroyer_damaged_ext/props/imp_damaged_blastdoors"
+    }
+
+    autoAimTargetComponentBF autoaim
+    {
+        nameKey    = "STR_DAMAGED_BLASTDOOR"
+    }
+    
+    teamNum = 1
+
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 25.f
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "imp_bd_dmg"
+	editorPath         = "bf/capitalships/imp/blastdoors"
+    }
+}
+
+//////////////////////
+//  CAPITAL SHIPS   //
+//////////////////////
+
 template capitalshipprop : staticprop
 {
     class-id		= "capital ship prop"
     ticktype		= "k_tickAlways"  
-   
+
     render
     {
         worldRoom = "true"
@@ -1031,7 +2286,7 @@ template capitalshipprop : staticprop
     
     vehiclehealthcomponent health
     {
-	fullhealth	= 2000.f
+	fullhealth	= 3000.f //increased from 2000
 	modifyReceivedDamage
 	{
 	    // Foward, backward, right, left, up, down
@@ -1044,8 +2299,8 @@ template capitalshipprop : staticprop
 	playerTurnToFaceAutomatically	= "true"
 	playerBulletsAttractedToTarget	= "true"
 	canOverrideSquadOrders		= "true"
-
-	flags |= "k_autoAimBF_alwaysDisplayWithAdditionalInfo|k_autoAimBF_doNotDrawOnHudInStoryMode|k_autoAimBF_displayFixedSizePoiIcon"
+	isCapitalShip			= "true"
+	flags |= "k_autoAimBF_alwaysDisplayWithAdditionalInfo|k_autoAimBF_doNotDrawOnHudInStoryMode"
 		
 	sizeScale = 20.0f
     }  
@@ -1065,13 +2320,23 @@ template capitalshipprop : staticprop
 	fadeOutTime = 5.0f  //want the ambient under attack to fade out over quite a long period
     }
 
+    soundeventsystem sndeventsystem
+    {
+	definition = "sndevt_capship"
+    }
+
+    dynamicNetworkComponent network
+    {
+    }
+
     hudTextureName = "no_image"
     topOfVehicleInHudImage = 0.f
     bottomOfVehicleInHudImage = 1.f
 
-    timeStayingAlive = 21.0f
+    timeStayingAlive = 35.0f
+    timeBeingDisabled = 30.0f
     
-    soundmap = "sndmap_capship"
+    soundmap = "sndmap_acclamator"
 
 //leave this out by default until the interior is ready - assume for now it has to be specified for each instance
 //if it is not there, the code will just ignore interior behaviour - still figuring out the setup.
@@ -1084,12 +2349,14 @@ template capitalshipprop : staticprop
 	//hopefully, this default will result in an invalid bg handle and the code will do nothing instead
    }
   */
+
+    //horribble hack to make sure ion cannon soundmap is loaded as multiple attached props
+    //do not preload properly at the minute
+    soundmap-field aftertouchsndmap
+    {
+	default = "sndmap_ioncannon"
+    }
 }
-
-
-
-
-
 
 /*
 // CIS Droid Command Ship
@@ -1126,23 +2393,6 @@ template attachedTurretsComponent
     {
     }
 }
-    
-template attachedTurretsComponent_Blue
-{
-    class-id = "multi attached props"
-
-    attached_props
-    {
-    	string cruiserSentryGun_Blue[] = 
-	    {
-    	}
-    }
-
-    // Reference the cruiserSentryGun template to ensure the gun anims are loaded.
-    cruiserSentryGun_Blue fakeGun
-    {
-    }
-}
 
 template attachedTurretsComponent_Green
 {
@@ -1161,17 +2411,15 @@ template attachedTurretsComponent_Green
     }
 }
 
-// CIS Cruiser Ship
-template cis_cruiser :capitalshipprop // staticprop
+//
+//// CIS Cruiser Ship
+//
+
+template cis_cruiser : capitalshipprop // staticprop
 {
     obasset-field preloadhack
-  {
-	default = "props/turrets/cis_cruiser/cis_cruiser_turret"
-    }
-
-    network
     {
-        networkflags |= "k_syncWithBg"
+	default = "turrets/cis/cis_cruiser/cis_cruiser_turret/cis_cruiser_turret"
     }
 
     teamNum = 1
@@ -1217,6 +2465,17 @@ template cis_cruiser :capitalshipprop // staticprop
 	    }
 	}
     }
+
+    AnimComponentBF anim
+    {
+	animmap-field animmap 
+        { 
+	    default = "am_ciscruiserdth" 
+	}
+
+	animset = "am_ciscruiserdth"
+	startup = "deathanim"
+    }
    
     bfciscruiserdescript descript
     {
@@ -1229,55 +2488,132 @@ template cis_cruiser :capitalshipprop // staticprop
     render
     {
 	model = "capital_ships/cis_cruiser_exterior"
-	detailCullDist = 2000.f
+	/*
+	//Set the visible parts of the ship we want to show.
+	//This current implimentation will hide the hangar shield and show only the hangar doors.
+	visibleParts = "B_SPLITPART_1;B_SPLITPART_2;B_SPLITPART_3;B_SPLITPART_4;B_SPLITPART_5;B_SPLITPART_6;B_DOOR_L;B_DOOR_R"
+	*/
+	detailCullDist = 700.f
 	numLods = 1
 	lodDist[] 
-	{ 2000.0 }
+	{ 1000.0 }
     }
-
+	
+    hudTextureName = "cis_cruiser_icon"
+    topOfVehicleInHudImage = 0.0390625f
+    bottomOfVehicleInHudImage = 0.9609375f
+    
     meta
     {
 	canCreateInEditor  = 1
 	editorInstanceName = "ciscruiser"
 	editorPath         = "bf/capitalships/cis"
     }
+}
 
-    draw_as_background_component background_map
-    {	
-	mapImage = "misctex/hud/cis_cruiser_outline"
-	mapImageName = "cis_cruiser_outline"
-	mapCentreDofName = "MAPCENTER"
-	isOverlayImage = "true"	
+//  CIS Cruiser - 6 Turrets
+template cis_cruiser_few_guns : cis_cruiser
+{
+    anim = 42
+    descript = 42
+        
+    health 
+    {
+        healthComponentSettings = "k_healthComponentSetting_isInvincible|k_healthComponentSetting_isInvincibleToPlayerDmg|k_healthComponentSetting_doNotAttack"
+    }
 
-	float mapTextureAreaDimensions []
+    attachedTurretsComponent attachedProps
+    {
+	attached_props
 	{
-	    1536.000000, 0.000000, 1536.000000
+	    string cruiserSentryGun_Mun[] = 
+	    {
+		"gun1",
+		"gun3",
+		"gun14",
+		"gun23",
+		"gun25",
+		"gun27"
+	    }
 	}
-    
-	float mapWalkableAreaCentre []
-	{
-	    0.000000, 0.000000, 0.000000
-	}
-
-	float mapWalkableAreaDimensions []
-	{
-	    1536.000000, 0.000000, 1536.000000
-	}
-	isInSpace = "false"
     }
 }
 
-// CIS Cruiser Ship
-template cis_cruiser_nohealthbar : staticprop
+// CIS Cruiser - 0 Turrets
+template cis_cruiser_movable : cis_cruiser // Full Moveable Version
 {
-    obasset-field preloadhack
+
+    health 
     {
-	default = "props/turrets/cis_cruiser/cis_cruiser_turret"
+        healthComponentSettings = "k_healthComponentSetting_isInvincible|k_healthComponentSetting_isInvincibleToPlayerDmg|k_healthComponentSetting_doNotAttack"
     }
 
-    network
+    attachedProps
     {
-        networkflags |= "k_syncWithBg"
+        attached_props
+        {
+            string cruiserSentryGun_Mun []
+            {
+            }
+
+            string cruiserSentryGun_Dest []
+            {
+            }
+
+            string cruiserSentryGun []
+            {
+            }
+        }
+    }    
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "ciscruisermov"
+	editorPath         = "bf/capitalships/cis"
+    }
+}
+
+// CIS Cruiser - Dest guns for use in coruscant story bonus objective
+template cis_cruiser_cor : cis_cruiser 
+{
+    attachedProps
+    {
+        attached_props
+        {
+            string cruiserSentryGun_Mun []
+            {
+            }
+
+            string cruiserSentryGun_Dest []
+            {
+                "gun16", // near side hangar gun /left
+                "gun17", // near side hangar gun /left
+                "gun18", // near side hangar gun /right
+                "gun19", // near side hangar gun /right
+                "gun20", // far side hangar gun /left
+                "gun21", // far side hangar gun /left
+                "gun22", // far side hangar gun /right
+                "gun23"//, // far side hangar gun /right
+            }
+
+            string cruiserSentryGun []
+            {
+            }
+        }
+    }
+
+    timeStayingAlive = 0.0f
+}
+
+// CIS Cruiser Ship - No Health Bar
+template cis_cruiser_nohealthbar : staticprop
+{
+    ticktype            = "k_tickAlways"
+    
+    obasset-field preloadhack
+    {
+	default = "turrets/cis/cis_cruiser/cis_cruiser_turret/cis_cruiser_turret"
     }
 
     teamNum = 1
@@ -1286,8 +2622,6 @@ template cis_cruiser_nohealthbar : staticprop
     {
 	nameKey	= "STR_CAPITALSHIP_CIS_CRUISER"	
     }
-
-    
 
     attachedTurretsComponent attachedProps
     {
@@ -1326,10 +2660,6 @@ template cis_cruiser_nohealthbar : staticprop
 	}
     }
     
-    bfciscruiserdescript descript
-    {
-    }
-    
     cruiserSentryGun testhack
     {
     }
@@ -1337,10 +2667,15 @@ template cis_cruiser_nohealthbar : staticprop
     render
     {
 	model = "capital_ships/cis_cruiser_exterior"
-	detailCullDist = 2000.f
-	numLods = 1
+	detailCullDist = 700.f
+	numLods = 0
 	lodDist[] 
-	{ 3000.0 }
+	{ 1000.0 }
+    }
+    
+    physics
+    {
+	isMoveable = "true"
     }
 
     meta
@@ -1403,15 +2738,46 @@ template cis_cruiser_nohealthbar : staticprop
     
 }
 
-// CIS Frigate Munificent
+//
+//// CIS Frigate Munificent
+//
+
 template cis_frigate_munificent : capitalshipprop //staticprop
 {
     obasset-field preloadhack
     {
-	default = "props/turrets/cis_cruiser/cis_cruiser_turret"
+	default = "turrets/cis/cis_cruiser/cis_cruiser_turret/cis_cruiser_turret"
+    }
+    obasset-field preloadhack2
+    {
+	default = "capital_ships/components/sensors"
+    }
+    obasset-field preloadhack3
+    {
+	default = "capital_ships/components/comms"
+    }
+    obasset-field preloadhack4
+    {
+	default = "capital_ships/components/life_support"
+    }
+    obasset-field preloadhack5
+    {
+	default = "capital_ships/components/scanners"
+    }
+    obasset-field preloadhack6
+    {
+	default = "capital_ships/components/aux_power"
+    }
+    obasset-field preloadhack7
+    {
+	default = "props/planet_cannons/capship/capship_cannon_barrel"
     }
 
     teamNum = 1
+
+    bfcisfrigatedescript descript
+    {
+    }
 
     autoaimtarget
     {
@@ -1419,19 +2785,19 @@ template cis_frigate_munificent : capitalshipprop //staticprop
     }
     string gunMoveDescs[] = 
     {
-	"bf_180_gun", // topgun4
-	"bf_frig360_gun", // lwinggun1
-	"bf_frig360_gun", // lwinggun2
-	"bf_frig360_gun", // rwinggun1
-	"bf_frig360_gun", // rwinggun2
-	"bf_180_gun", // rbackgun1
-	"bf_180_gun", // lbackgun
-	"bf_inv360_gun", // bottomgun1
-	"bf_inv360_gun", // bottomgun2
-	"bf_180_gun", // topgun3
-	"bf_mAcc_gun", // topgun1
-    	"bf_mAcc_gun", // topgun2
-	"bf_mAcc_gun" // topgun5
+	"bf_mun_tfgun", // topgun4
+	"bf_mun_twgun", // lwinggun1
+	"bf_mun_bwgun", // lwinggun2
+	"bf_mun_twgun", // rwinggun1
+	"bf_mun_bwgun", // rwinggun2
+	"bf_mun_trrgun", // rbackgun1
+	"bf_mun_trlgun", // lbackgun
+	"bf_mun_bgun", // bottomgun1
+	"bf_mun_bgun", // bottomgun2
+	"bf_mun_tfgun", // topgun3
+	"bf_mun_tfrgun", // topgun1
+    	"bf_mun_tfrgun", // topgun2
+	"bf_mun_tfgun" // topgun5
     }
     
     attachedTurretsComponent attachedProps
@@ -1474,6 +2840,12 @@ template cis_frigate_munificent : capitalshipprop //staticprop
 	    string capitalShipPart_auxPower[] = {
 		"OBJECTIVE_5"
 	    }
+
+	    string capitalShipPart_ionCannon[] = 
+	    {
+		"CANNON"
+	    }
+
 	}
     }
 
@@ -1484,16 +2856,17 @@ template cis_frigate_munificent : capitalshipprop //staticprop
     render
     {
 	model = "capital_ships/banking_clan_frigate/munificent/munificent_exterior"
-        detailCullDist = 2000.f
-	numLods = 0
-	//lodDist[] 
-	//{ 2000.0 }
+        detailCullDist = 700.f
+	numLods = 1
+	lodDist[] 
+	{ 1100.0 }
     }
 // LOCAL TO TEST INTERIOR EFFECTS - use F12 in game to test - F12 removes 2.0f from health value
+// Commented out on 15/05/2008 by TJS to fix Bug ID 8406
 //    dmghealthcomponentbf health
 //    {
 //	fullhealth	= 27.1f //a test value - modified so ships can't be one hit killed.
-	//fullhealth	= 100.f
+//	//fullhealth	= 100.f
 //    }
     
 
@@ -1508,6 +2881,7 @@ template cis_frigate_munificent : capitalshipprop //staticprop
     {
 	particleEffectListDict
 	{
+	    /*
 	    // Three large thrusters
 	    particleEffectElement fx_element_00
 	    { 
@@ -1552,146 +2926,66 @@ template cis_frigate_munificent : capitalshipprop //staticprop
 		dofName = "THRUSTER7"
 		enableEffect = "true"
 	    }
+	    */
 	}
     }
-    
-    draw_as_background_component background_map
-    {	
-	mapImage = "misctex/hud/cis_munificent_outline"
-	mapImageName = "cis_munificent_outline"
-	isOverlayImage = "true"	
-
-	float mapTextureAreaDimensions []
-	{
-	    1536.000000, 0.000000, 1536.000000
-	}
-    
-	float mapWalkableAreaCentre []
-	{
-	    0.000000, 0.000000, 0.000000
+   
+    AnimComponentBF anim
+    {
+	animmap-field animmap 
+        { 
+	    default = "am_cisfrigatedth" 
 	}
 
-	float mapWalkableAreaDimensions []
-	{
-	    1536.000000, 0.000000, 1536.000000
-	}
-	isInSpace = "false"
+	animset = "am_cisfrigatedth"
+	startup = "deathanim"
     }
-    hudTextureName = "cis_munificent_outline"
+
+    hudTextureName = "guide_friendly_frigate_cis"
     topOfVehicleInHudImage = 0.24f
     bottomOfVehicleInHudImage = 0.78f
+    compassImage = "cis_munificent_compass"
+    compassBorderImage = "cis_munificent_compass_border"
+    compassHealthBarLeft = 0.0390625f
+    compassHealthBarRight = 0.9609375f
 }
 
-// CIS Frigate Munificent
-template cis_frig_muni_noguns : cis_frigate_munificent //staticprop
-{
-    attachedTurretsComponent attachedProps
+// CIS Munificent - 6 Turrets
+template cis_frig_few_guns : cis_frigate_munificent
+{    
+    health 
     {
-        attached_props
-        {
-            string cruiserSentryGun_Mun[] = 
-            {
-      //		"topgun1",
-      // 	        "topgun2",
-      //    "topgun3",
-      //    "lwinggun1",
-       //   "lwinggun2",
-       //         "rwinggun1",
-       //   "rwinggun2",
-      //		"rbackgun1",
-      //	        "lbackgun1",
-          //    "bottomgun1",
-          //  	"bottomgun2"
-            }
-        }
+        healthComponentSettings = "k_healthComponentSetting_isInvincible|k_healthComponentSetting_isInvincibleToPlayerDmg|k_healthComponentSetting_doNotAttack"
     }
 
-
-}
-
-// CIS Frigate Munificent NO HOLE
-template cis_frigate_munificent_nohole : staticprop
-{
-    obasset-field preloadhack
-    {
-	default = "props/turrets/cis_cruiser/cis_cruiser_turret"
-    }
-
-    teamNum = 0
-
-    cruiserSentryGun testhack
-    {
-    }
-    
+    anim = 42
+    descript = 42
     attachedTurretsComponent attachedProps
     {
 	attached_props
 	{
 	    string cruiserSentryGun_Mun[] = 
 	    {
-//		"topgun1",
-// 	        "topgun2",
-		"topgun3",
 		"lwinggun1",
-		"lwinggun2",
 	        "rwinggun1",
-		"rwinggun2",
-//		"rbackgun1",
-//	        "lbackgun1",
-	      	"bottomgun1",
-	    	"bottomgun2"
+	        "bottomgun1",
+	    	"bottomgun2",
+		"topgun3",
+		"topgun2"
 	    }
 	}
     }
-
-    render
-    {
-	model = "capital_ships/banking_clan_frigate/munificent/munificent_noholes"
-        detailCullDist = 2000.f
-	//numLods = 1
-	//lodDist[] 
-	//{ 2000.0 }
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "cisfrignh"
-	editorPath         = "bf/capitalships/cis"
-    }
-
-    draw_as_background_component background_map
-    {	
-	mapImage = "misctex/ship_outlines/cis_munificent_outline"
-	mapImageName = "cis_munificent_outline"
-	isOverlayImage = "true"	
-
-	float mapTextureAreaDimensions []
-	{
-	    1536.000000, 0.000000, 1536.000000
-	}
-    
-	float mapWalkableAreaCentre []
-	{
-	    0.000000, 0.000000, 0.000000
-	}
-
-	float mapWalkableAreaDimensions []
-	{
-	    1536.000000, 0.000000, 1536.000000
-	}
-	isInSpace = "false"
-    }
 }
 
-
-// CIS Frigate Munificent
-template cis_frigate_munificent_lod : staticprop
+// CIS Frigate Munificent - 0 Turrets
+template cis_frigate_munificent_lod : cis_frig_few_guns //staticprop
 {
-    render
+    health 
     {
-	model = "capital_ships/banking_clan_frigate/munificent/munificent_exterior_lod1"
+        healthComponentSettings = "k_healthComponentSetting_isInvincible|k_healthComponentSetting_isInvincibleToPlayerDmg|k_healthComponentSetting_doNotAttack"
     }
+	
+    useAttachedProps = "false"
 
     meta
     {
@@ -1701,124 +2995,32 @@ template cis_frigate_munificent_lod : staticprop
     }
 }
 
-// Reactor prop for the Munificent
-template munificent_reactor : bfshatteringstaticprop
+template cis_frig_story : cis_frigate_munificent // new model set up for story - PLEASE LEAVE DESCRIPT AS IT BREAKS THE LEVEL.
 {
-    class-id = "ship reactor prop bf"
-
-    render
+    attachedTurretsComponent attachedProps
     {
-        model = "capital_ships/cis/cis_frigate_interior/frigate_generator/cis_frigate_generator"
-	castshadows = "true"
-	receiveshadows = "true"
-    }
-
-    autoAimTargetComponentBF autoaim
-    {
-        nameKey    = "STR_REACTOR_CORE"
-    }
-    
-    teamNum = 1
-
-    dmghealthcomponentbf health
-    {
-	fullhealth	= 5.f // Initial low health for testing
-    }
-
-    autoaimtarget
-    {
-        nameKey    = "STR_REACTOR_CORE"
-    } 
-    
-    vistableseercomp vtseer
-    {
-	checkPosOffset[]    {0.0f, 5.0f, 0.0f}
-    }
-    
-    guardablecomponent guardable
-    {
-    }
-
-    propid-field shipPropID
-    {
-        default = ""
-	views	= "basic setup"
-	tips	= "Prop ID of the associated capital ship"
-    }
-
-    bool-field destroyShipWhenDestroyed
-    {
-	default = "false"
-	views	= "basic setup"
-	tips	= "Should destroying the reactor blow up the ship?"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "cisfrig_react"
-	editorPath         = "bf/props/capital_ships/reactors/cis"
+	attached_props
+	{
+	    string cruiserSentryGun_Mun[] = 
+	    {
+		"lwinggun1",
+	        "rwinggun1",
+	        "bottomgun1",
+	    	"bottomgun2",
+		"topgun3",
+		"topgun2"
+	    }
+	}
     }
 }
 
-// Shield Prop for the Munificent
-template munificent_reactor_shield : staticprop
-{
-    class-id = "ship reactor shield prop bf"
-
-    teamNum = 1
-
-    render
-    {
-	model = "capital_ships/cis/cis_frigate_interior/frigate_generator/frigate_generator_shield"
-    }
-
-    propid-field shipReactorPropID
-    {
-        default = ""
-	views	= "basic setup"
-	tips	= "Prop ID of the associated ship reactor"
-    }
-
-    bool-field protectReactor
-    {
-	default = "false"
-	views	= "basic setup"
-	tips	= "Should the shield prevent the reactor from being damaged?"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "cis_rtr_shld"
-	editorPath         = "bf/props/capital_ships/reactors/cis"
-    }
-}
-
-// CIS Cruiser - LOD
-template cis_cruiser_lod : staticprop
-{
-    render
-    {
-	model = "capital_ships/cis_cruiser_exterior_lod1"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "ciscrulod"
-	editorPath         = "bf/capitalships/cis"
-    }
-}
-
-// CIS Cruiser - LOD
-template cis_cruiser_lod_moveable : staticprop
+template cis_munificent_nohole_moving : staticprop
 {
     ticktype            = "k_tickAlways"
-
+    
     render
     {
-	model = "capital_ships/cis_cruiser_exterior_lod1"
+	model = "capital_ships/banking_clan_frigate/munificent/munificent_noholes"
     }
 
     physics
@@ -1829,40 +3031,11 @@ template cis_cruiser_lod_moveable : staticprop
     meta
     {
 	canCreateInEditor  = 1
-	editorInstanceName = "crulodmov"
+	editorInstanceName = "munimoving"
 	editorPath         = "bf/capitalships/cis"
     }
 }
 
-template cis_cruiser_60_scaled_lod : staticprop
-{
-    render
-    {
-	model = "capital_ships/cis_cruiser_exterior_60_scaled_lod"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "ciscrusca60"
-	editorPath         = "bf/capitalships/cis"
-    }
-}
-
-template cis_cruiser_30_scaled_lod : staticprop
-{
-    render
-    {
-	model = "capital_ships/cis_cruiser_exterior_30_scaled_lod"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "ciscrusca30"
-	editorPath         = "bf/capitalships/cis"
-    }
-}
 /*
 template imp_deathstar2 : staticprop
 {
@@ -1880,203 +3053,33 @@ template imp_deathstar2 : staticprop
 }
 */
 
-//SUB DESCRIPT FOR STAR DESTROYER GIBS
-template stardestroyergib 
-{
-    class-id		    = "bfdescript"
-
-    // wont be serialised just for preloading
-    soundArray-field extraPreloadSounds
-    {
-    }
-
-    propid-field forceTriggerProp
-    {
-	default = ""
-	views = "basic setup"
-	tip = "set a propID to be force triggered in descript via descript function forceTriggerTriggered()"
-    }
-
-    script = " 
-    BTOP 
-    {
-	event init
-	{
-	    debugprintf(SECONDARY_EVENT_INIT)
-		
-	    if comparedmgstate( default )
-	    {
-		setdmgstate( damaged )
-		
-		makevisible_wc( BTOP, false )
-		makevisible_wc( B_GIB*, true )
-		makevisible_wc( B_broken*, false ) 
-
-		// debugprintf(EVENT_INIT_bfcapitalgib_EVENT_INIT)
-    //	    particleeffectimmediate(cap_ext_split, part2_explosion9,0)
-		//particleeffectimmediate(cs_main_exp, part2_explosion9,0)
-		particleeffectimmediate(cs_main_fire, DOF_GIB_FLAME_01,1)
-		particleeffectimmediate(cs_main_fire, DOF_GIB_FLAME_02,2)
-		particleeffectimmediate(cs_main_fire, DOF_GIB_FLAME_03,3)
-		particleeffectimmediate(cs_main_fire, DOF_GIB_FLAME_04,4)
-		particleeffectimmediate(cs_main_fire, DOF_GIB_FLAME_05,5)
-		particleeffectimmediate(cs_main_fire, DOF_GIB_FLAME_06,6)
-		particleeffectimmediate(cs_main_fire, DOF_GIB_FLAME_07,7)
-		particleeffectimmediate(cs_main_fire, DOF_GIB_FLAME_08,8)
-		particleeffectimmediate(cs_main_fire, DOF_GIB_FLAME_09,9)
-		particleeffectimmediate(cs_main_fire, DOF_GIB_FLAME_10,10)
-		particleeffectseries(csi_exp_large, 50 , 1.0, DOF_GIB_EXPLODE, 0)
-		// gibeffect(mun_ptrail, 1, 100.0, 0, 0)
-		//particleeffectdelayed(mun_explo, 30.0,0,0)
-	    }
-	    setcollisiondelayhack(5) //because it also switches off gravity and resistance on next gibste
-	    
-	}
-	
-	event damage
-	{
-	    //particleeffectseries(  imp_explode,  3 , 1.0, 0, 0)
-	    debugprintf(SECONDARY_EVENT_DAMAGE)
-	}
-
-	//dont need to delete on zero health because the gib code has it in the health listener
-	event zerohealth
-	{
-	    debugprintf(SECONDARY_EVENT_ZEROHEALTH)
-	   
-     	    //explode the next gibs
-	    deleteprop()
-	}
-    }
-
-   "
-}
-
-template bfstardestroyerdescript : bfdescriptcomponent
-{
-    script = "
-        
-    //because some of our props think the BTop is being hit so we need a total wildcard for all of it
-
-    * 
-    {	
-	event init
-	{
-	    setdmgstate( normal )
-	    makevisible_wc( BTOP, true )
-	    makevisible_wc( B_broken*, false )
-	    makevisible_wc( B_GIB*, false )
-  	}
-
-	event damage //CHealthComponent
-	{
-	    //debugprintf(LARGEVEHICLE_EVENT_DAMAGE)
-	    
-	    if comparedmgstate( normal )
-	    {
-		if healthlessthan( 0.25 )  //a ratio
-		{
-		    debugprintf(LOTSOF_DAMAGE_STATE)
-		    setdmgstate( damaged )
-    		}
-	    }
-	    if comparedmgstate( damaged )
-	    {
-		//set off a series of explosions for any damage while it is low
-		//particleeffectseries(  imp_explode, 3, 1.0 ,0, 0)
-	    }
-
-	    debugprintf(damage)
-	}
-	
-	event die
-	{
-	    debugprintf(LARGEVEHICLE_LATENT_GIB_FUNCTION_DIE)
-	    
-	    cleargibextras()
-	    deleteprop()   
-	}
-	
-	    
-	event blowitup
-	{
-	    debugprintf(LARGEVEHICLE_LATENT_GIBS)
-	    
-	    setgibextras(1.0, 0, 0, 0)
-	    
-	    setcollisiondelayhack(30) //number of ticks to wait
-	    setartificialgravity(0.0, -2.0, 0.0)
-	    explode_wc_launch( B_GIB* , 25.0,  25.0, 0.01, stardestroyergib) //name of the gib, length of the force vector, life, angular velocity factor, name of the descript to use for the bits
-	    makevisible_wc( BTOP, false )
-	    makevisible_wc( B_detail*, false )
-
-	    playsound(frigate_explosion)
-	    playsound(frigate_stereo_boom)
-	
-	    latent(die, 5.0) 
-	    
-	    deleteprop()  
-
-	}
-
-	event bullethit
-	{
-	    //particleeffectnew( imp_explode, 0.0, 0.0, 0.0, $1.v,$2.v )
-	    
-	    //particleeffectnew( mun_explo, 0.0, 0.0, 0.0, $1.v,$2.v )
-	    
-	   // particleeffectnew( ship_sparks, 0.0, 0.0, 0.0, $1.v,$2.v)
-	}
-
-	event zerohealth
-	{
-	    debugprintf(LARGEVEHICLE_EVENT_zerohealth)
-
-        setdmgstate( damaged )            
-
-		debugprintf(SETTING_LATENT_GIB_FUNCTION)
-
-		//assuming zero health is reached when the platform hits it, try not to happen sooner
-
-		//either script this for a specific prop or, get the hit pos and dir and work it out
-		//for now all capital props will fall a bit and explode before they separate
-		setstaticpropvelocity(0.0, -10.0, 0.0)
-		setstaticproprotspeeds(-2.0 ,0.0, 1.0)
-	    
-		//particleeffectseries( imp_explode, 12 , 0.4, 0, 0)
-		//right now any player inside the prop is dying 
-		setdmgstate( moving ) //so it only sets latent once
-
-		//then do the usual code
-		latent(blowitup, 5.0) 
-	    }
-	/*	    
-	    if comparedmgstate( dead )
-	    {
-		debugprintf(SETTING_LATENT_DIE_FUNCTION)
-
-		latent(die, 3.0)
-		setdmgstate( latentdead ) 
-	    }
-	    */
-
-    }
-    
-    "
-}
+//
+//// Imperial Star Destroyer
+//
 
 template imp_stardestroyer : capitalshipprop //staticprop
 {
     obasset-field preloadhack
     {
-	    default = "props/turrets/cis_cruiser/cis_cruiser_turret"
+	default = "turrets/imp/imp_cruiser/imp_cruiser_turret/imp_cruiser_turret"
     }
 
     render
     {
-        model = "capital_ships/imp_stardestroyer_exterior"
-    }
+	model = "capital_ships/imp_stardestroyer_exterior"
 
+   	// LODS
+	detailCullDist = 700.f
+	numLods = 1
+	lodDist[] 
+	{ 1700.0 }
+    } 
+    
+    autoaimtarget
+    {
+	nameKey	= "STR_CAPITALSHIP_IMP_STARDESTROYER"
+    }
+    
     meta
     {
         canCreateInEditor  = 1
@@ -2085,7 +3088,18 @@ template imp_stardestroyer : capitalshipprop //staticprop
     }
 
     teamNum = 1
-      
+    
+    AnimComponentBF anim
+    {
+	animmap-field animmap 
+        { 
+	    default = "am_impstrdstrdth" 
+	}
+
+	animset = "am_impstrdstrdth"
+	startup = "deathanim"
+    }
+
     bfstardestroyerdescript descript
     {
     }
@@ -2116,50 +3130,70 @@ template imp_stardestroyer : capitalshipprop //staticprop
             }
         }
     }
-
-    draw_as_background_component background_map
-    {	
-        mapImage = "misctex/hud/imp_stardestroyer_outline"
-        mapImageName = "imp_stardestroyer_outline"
-        mapCentreDofName = "MAPCENTER"
-        isOverlayImage = "true"	
-
-        float mapTextureAreaDimensions []
-        {
-            1671.000000, 0.000000, 1671.000000
-        }
-
-        float mapWalkableAreaCentre []
-        {
-            0.000000, 0.000000, 0.000000
-        }
-
-        float mapWalkableAreaDimensions []
-        {
-            1671.000000, 0.000000, 1671.000000
-        }
-        isInSpace = "false"
-    }
+    
+    hudTextureName = "imp_stardestroyer_icon"
+    topOfVehicleInHudImage = 0.0390625f
+    bottomOfVehicleInHudImage = 0.9609375f
 }
 
-template imp_stardestroyer_damaged : imp_stardestroyer
-{
-    render
-    {
-        model = "capital_ships/imp_stardestroyer_exterior_damaged"
-    }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "impsdst_dam"
-        editorPath         = "bf/capitalships/imp"
-    }
-}
-
+// Imperial Star Destroyer - 6 Turrets
 template imp_sd_fewguns : imp_stardestroyer  //staticprop
 {
- 
+    anim = 42
+    descript = 42
+    
+    health 
+    {
+        healthComponentSettings = "k_healthComponentSetting_isInvincible|k_healthComponentSetting_isInvincibleToPlayerDmg|k_healthComponentSetting_doNotAttack"
+    }
+
+    attachedTurretsComponent_Green attachedProps
+    {
+        attached_props
+        {
+            string cruiserSentryGun_Green[] = 
+            {
+                "GUN2",
+                "GUN4",
+                "GUN5",
+                "GUN7",
+                "GUN10",
+                "GUN14",
+            }
+        }
+    }
+}
+
+// Imperial Star Destroyer - 0 Turrets
+template imp_stardestroyer_moving : imp_stardestroyer //staticprop
+{
+    
+    health 
+    {
+        healthComponentSettings = "k_healthComponentSetting_isInvincible|k_healthComponentSetting_isInvincibleToPlayerDmg|k_healthComponentSetting_doNotAttack"
+    }
+
+    attachedTurretsComponent_Green attachedProps
+    {
+        attached_props
+        {
+            string cruiserSentryGun_Green[] = 
+            {
+            }
+        }
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "impsdmoving"
+	editorPath         = "bf/capitalships/imp"
+    }
+}
+
+// Damaged Star Destroyer
+template imp_stardestroyer_damaged : imp_stardestroyer
+{
     attachedTurretsComponent_Green attachedProps
     {
         attached_props
@@ -2170,57 +3204,38 @@ template imp_sd_fewguns : imp_stardestroyer  //staticprop
                 "GUN2",
                 "GUN3",
                 "GUN4",
-  //              "GUN5",
-  //              "GUN6",
-  //              "GUN7",
-  //              "GUN8",
-  //              "GUN9",
-  //              "GUN10",
-  //              "GUN11",
-  //              "GUN12",
-  //              "GUN13",
-  //              "GUN14",
-  //              "GUN15",
-  //              "GUN16",
-  //              "GUN17"            
+                "GUN5",
+                "GUN6",
+                "GUN7",
+                "GUN8",
+                "GUN9",
+                "GUN10",
+                "GUN11",
+                "GUN12",
+                "GUN13",
+                "GUN14",
+                "GUN15",
+                "GUN16",
+                "GUN17",
+                "GUN18",
+                "GUN19",
+                "GUN20",
+                "GUN21"
             }
         }
     }
-}
-
-// STAR DESTROYER 60 SCALED LOD
-template imp_stardestroyer_60_scaled_lod : staticprop
-{
-    render
-    {
-        model = "capital_ships/imp_stardestroyer_exterior_60_scaled_lod"
-    }
-
+ 
     meta
     {
         canCreateInEditor  = 1
-        editorInstanceName = "impstrdst60"
+        editorInstanceName = "impsdst_dam"
         editorPath         = "bf/capitalships/imp"
     }
 }
 
-// STAR DESTROYER 30 SCALED LOD 
-template imp_stardestroyer_30_scaled_lod : staticprop
-{
-    render
-    {
-        model = "capital_ships/imp_stardestroyer_exterior_30_scaled_lod"
-    }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "impstrdst30"
-        editorPath         = "bf/capitalships/imp"
-    }
-}
-
-// Star Dreadnought (aka Super-Star Destroyer)
+//
+//// Star Dreadnought (aka Super-Star Destroyer)
+//
 template imp_superstardestroyer : staticprop
 {
     render
@@ -2228,6 +3243,11 @@ template imp_superstardestroyer : staticprop
 	model = "capital_ships/imp_superstardestroyer"
     }
 
+    physics
+    {
+	isMoveable		= "true"
+    }
+    
     meta
     {
 	canCreateInEditor  = 1
@@ -2236,15 +3256,36 @@ template imp_superstardestroyer : staticprop
     }
 }
 
-// CIS Droid Control Ship - EXTERIOR
+//
+//// CIS Droid Control Ship - EXTERIOR
+//
 template cis_droidcontrolship : capitalshipprop
 {
     render
     {
 	model = "capital_ships/cis/droidcontrolship/droidcontrolship_exterior"
+	detailCullDist = 1000.f
+	numLods = 0
+	lodDist[] 
+	{ 1700.0 }
     }
-
     teamNum = 1
+    
+    autoaimtarget
+    {
+        nameKey    = "STR_CAPITALSHIP_CIS_DROIDCONTROLSHIP"
+    }
+	
+    AnimComponentBF anim
+    {
+	animmap-field animmap 
+        { 
+	    default = "am_drdctrlshdth" 
+	}
+
+	animset = "am_drdctrlshdth"
+	startup = "deathAnim"
+    }
 
     meta
     {
@@ -2258,45 +3299,50 @@ template cis_droidcontrolship : capitalshipprop
 	//fullhealth	= 150.f //a test value - modified so ships can't be one hit killed.
 	fullhealth	= 1000.f
     }
+    timeStayingAlive = 3.0f
 
     bfdroidcommanddescript descript
     {
     }
-
-    draw_as_background_component background_map
-    {	
-	mapImage = "misctex/hud/cis_droidcommand_outline"
-    	mapImageName = "cis_droidcommand_outline"
-	isOverlayImage = "true"	
-
-	float mapTextureAreaDimensions []
-	{
-	    1536.000000, 0.000000, 1536.000000
-	}
     
-	float mapWalkableAreaCentre []
+ /*   attachedTurretsComponent attachedProps
+    {
+	attached_props
 	{
-	    0.000000, 0.000000, 0.000000
+	    string cruiserSentryGun_Mun[] = 
+	    {
+	    	"dcs_sidegun_1",
+		"dcs_sidegun_2",
+		"dcs_sidegun_3",
+		"dcs_sidegun_4",
+		"dcs_sidegun_5",
+		"dcs_sidegun_6",
+		"dcs_sidegun_7",
+		"dcs_sidegun_8",
+         	"dcs_sidegun_9",
+		"dcs_sidegun_10",
+		"dcs_sidegun_11",
+		"dcs_sidegun_12",
+		"dcs_sidegun_13",
+		"dcs_sidegun_14",
+		"dcs_sidegun_15",
+		"dcs_sidegun_16",
+		"dcs_sidegun_17",
+		"dcs_sidegun_18",
+		"dcs_sidegun_19",
+		"dcs_sidegun_20",
+		"dcs_sidegun_21",
+		"dcs_sidegun_22"
+	    }
 	}
+    }*/
 
-	float mapWalkableAreaDimensions []
-	{
-	    1536.000000, 0.000000, 1536.000000
-	}
-	isInSpace = "false"
-    }
+    timeStayingAlive = 3.0f
 }
 
 // CIS Droid Control Ship - LOD
-template cis_droidcontrolship_lod : staticprop
+template cis_droidcontrolship_lod : cis_droidcontrolship
 {
-    render
-    {
-	model = "capital_ships/cis/droidcontrolship/droidcontrolship_lod"
-    }
-
-    teamNum = 1
-
     meta
     {
 	canCreateInEditor  = 1
@@ -2305,80 +3351,40 @@ template cis_droidcontrolship_lod : staticprop
     }
 }
 
-// CIS Droid Control Ship - 60 Scaled LOD
-template cis_droidcontrolship_60_scaled_lod : staticprop
-{
-    render
-    {
-	model = "capital_ships/cis/droidcontrolship/droidcontrolship_60_scaled_lod"
-    }
-
-    teamNum = 1
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "ctrlshpsca60"
-	editorPath         = "bf/capitalships/cis"
-    }
-}
-
-// CIS Droid Control Ship - 30 Scaled LOD
-template cis_droidcontrolship_30_scaled_lod : staticprop
-{
-    render
-    {
-	model = "capital_ships/cis/droidcontrolship/droidcontrolship_30_scaled_lod"
-    }
-
-    teamNum = 1
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "ctrlshpsca30"
-	editorPath         = "bf/capitalships/cis"
-    }
-}
-
-// CIS Droid Control Ship blast door left
-template cis_dcs_blastdoor_left : staticprop
-{
-    render
-    {
-	model = "capital_ships/cis/droidcontrolship/blastdoor_left"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "ctrlshpdoorl"
-	editorPath         = "bf/doors/tat"
-    }
-}
-
-template cis_dcs_blastdoor_right : staticprop
-{
-    render
-    {
-	model = "capital_ships/cis/droidcontrolship/blastdoor_right"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "ctrlshpdoorr"
-	editorPath         = "bf/doors/tat"
-    }
-}
-
-// Acclamator
+//
+//// Acclamator
+//
 template rep_frigate_acclamator : capitalshipprop
 {
     obasset-field preloadhack
     {
-	default = "props/turrets/cis_cruiser/cis_cruiser_turret"
+	default = "turrets/rep/rep_cruiser/rep_cruiser_turret"
     }
+    obasset-field preloadhack2
+    {
+	default = "capital_ships/components/sensors"
+    }
+    obasset-field preloadhack3
+    {
+	default = "capital_ships/components/comms"
+    }
+    obasset-field preloadhack4
+    {
+	default = "capital_ships/components/life_support"
+    }
+    obasset-field preloadhack5
+    {
+	default = "capital_ships/components/scanners"
+    }
+    obasset-field preloadhack6
+    {
+	default = "capital_ships/components/aux_power"
+    }
+    obasset-field preloadhack7
+    {
+	default = "props/planet_cannons/capship/capship_cannon_barrel"
+    }
+
 
     teamNum = 0
 	
@@ -2387,34 +3393,55 @@ template rep_frigate_acclamator : capitalshipprop
 	
     }
    
-// LOCAL TO TEST INTERIOR EFFECTS - use F12 in game to test - F12 removes 2.0f from health value
-//    dmghealthcomponentbf health
-//    {
-//	fullhealth	= 27.1f //a test value - modified so ships can't be one hit killed.
-	//fullhealth	= 100.f
-//   }
-    
     autoaimtarget
     {
 	nameKey	= "STR_CAPITALSHIP_REP_ACCLAMATOR"
     }
+
+    AnimComponentBF anim
+    {
+	animmap-field animmap 
+        { 
+	    default = "am_repfrigatedth" 
+	}
+
+	animset = "am_repfrigatedth"
+	startup = "deathanim"
+    }
     
     string gunMoveDescs[] = 
     {
-	"bf_frig360_gun", // 14
-	"bf_inv360_gun", // 13
-	"bf_inv360_gun", // 12
-	"bf_inv360_gun", // 11
-	"bf_inv360_gun", // 10
-	"bf_inv360_gun", // 9
-	"bf_mAcc_gun", // 8
-	"bf_mAcc_gun", // 7
-	"bf_mAcc_gun", // 6
-	"bf_mAcc_gun", // 5
-	"bf_mAcc_gun", // 4
-	"bf_mAcc_gun", // 3
-	"bf_mAcc_gun", // 2
-	"bf_mAcc_gun" // 1
+	"bf_mAcc_tcgun", // 14
+//	"bf_mAcc_bcgun", // 13
+	"bf_mAcc_bgun", // 12
+	"bf_mAcc_bgun", // 11
+	"bf_mAcc_bgun", // 10
+	"bf_mAcc_bgun", // 9
+	"bf_mAcc_rgun", // 8
+	"bf_mAcc_rgun", // 7
+	"bf_mAcc_tgun", // 6
+	"bf_mAcc_tgun", // 5
+	"bf_mAcc_tgun", // 4
+	"bf_mAcc_tgun", // 3
+	"bf_mAcc_tgun", // 2
+	"bf_mAcc_tgun" // 1
+    }
+
+    float gunHudImagePositions[]
+    {
+	0.1f, 0.1f,
+	0.1f, 0.1f,
+	0.1f, 0.1f,
+	0.1f, 0.1f,
+	0.1f, 0.1f,
+	0.1f, 0.1f,
+	0.1f, 0.1f,
+	0.1f, 0.1f,
+	0.1f, 0.1f,
+	0.1f, 0.1f,
+	0.1f, 0.1f,
+	0.1f, 0.1f,
+	0.1f, 0.1f
     }
     
     attachedTurretsComponent attachedProps
@@ -2423,20 +3450,20 @@ template rep_frigate_acclamator : capitalshipprop
 	{
 	    string cruiserSentryGun_Acc[] = 
 	    {
-		"gun14",
-	        "gun13",
-		"gun12",
-		"gun11",
-		"gun10",
-	        "gun9",
-		"gun8",
-		"gun7",
-	        "gun6",
-	      	"gun5",
-	    	"gun4",
-		"gun3",
-		"gun2",
-	        "gun1"
+		"gun14", // Top centre turret - All Directions looking down from above the ship
+//	    "gun13", // Bottom centre turret
+		"gun12", // Bottom left rear group front turret
+		"gun11", // Bottom left rear group rear turret
+		"gun10", // Bottom right rear group rear turret
+	    "gun9", // Bottom right rear group front turret
+		"gun8", // Rear left turret
+		"gun7", // Rear right turret
+	    "gun6", // Top left rear group rear turret
+	    "gun5", // Top left rear group middle turret
+	    "gun4", // Top left rear group front turret
+		"gun3", // Top right rear group front turret
+		"gun2", // Top right rear group middle turret
+	    "gun1"  // Top right rear group rear turret
 	    }
 
 	    string capitalShipPart_sensors[] = {
@@ -2458,16 +3485,22 @@ template rep_frigate_acclamator : capitalshipprop
 	    string capitalShipPart_auxPower[] = {
 		"OBJECTIVE_5"
 	    }
+
+	    string capitalShipPart_ionCannon[] = 
+	    {
+		"CANNON"
+	    }
+
 	}
     }
    
     render
     {
 	model = "capital_ships/rep/rep_acclamator_ext"
-	detailCullDist = 2000.f
+	detailCullDist = 700.f
 	numLods = 1
 	lodDist[] 
-	{ 2000.0 }
+	{ 1000.0 }
     }
 
     meta
@@ -2477,273 +3510,29 @@ template rep_frigate_acclamator : capitalshipprop
 	editorPath         = "bf/capitalships/rep"
     }
 
-    draw_as_background_component background_map
-    {	
-	mapImage = "misctex/hud/rep_acclamator_outline"
-    	mapImageName = "rep_acclamator_outline"
-	isOverlayImage = "true"	
-
-	float mapTextureAreaDimensions []
-	{
-	    1536.000000, 0.000000, 1536.000000
-	}
-    
-	float mapWalkableAreaCentre []
-	{
-	    0.000000, 0.000000, 0.000000
-	}
-
-	float mapWalkableAreaDimensions []
-	{
-	    1536.000000, 0.000000, 1536.000000
-	}
-	isInSpace = "false"
-    }
-    hudTextureName = "rep_acclamator_outline"
+    hudTextureName = "guide_friendly_frigate_rep"
     topOfVehicleInHudImage = 0.01f
     bottomOfVehicleInHudImage = 0.99f
+    compassImage = "rep_acclamator_compass"
+    compassBorderImage = "rep_acclamator_compass_border"
+    compassHealthBarLeft = 0.0390625f
+    compassHealthBarRight = 0.9609375f
 }
 
-// Acclamator
-template rep_acc_noguns : rep_frigate_acclamator
+// Acclamator - 0 turrets
+template rep_frigate_acclamator_lod : rep_frigate_acclamator
 {
-    attachedTurretsComponent attachedProps
+    health 
     {
-        attached_props
-        {
-            string cruiserSentryGun[] = 
-            {
-//          "gun1",
-//                "gun2",
-//          "gun3",
-//          "gun4",
-//          "gun5",
-//                "gun6",
-//          "gun7",
-//          "gun8",
- //               "gun9",
- //               "gun10",
- //             "gun11",
-//          "gun12",
-//          "gun13",
-////                "gun14",
-//          "gun15",
-////          "gun16",
-//          "gun17",
-//          "gun18",
-//          "gun19",
-//          "gun20",
-//          "gun21"
-            }
-        }
+        healthComponentSettings = "k_healthComponentSetting_isInvincible|k_healthComponentSetting_isInvincibleToPlayerDmg|k_healthComponentSetting_doNotAttack"
     }
-}
 
-
-// Acclamator LOD
-template rep_frigate_acclamator_lod : staticprop
-{
-    render
-    {
-	model = "capital_ships/rep/rep_acclamator_ext_lod1"
-    }
+    useAttachedProps = "false"
 
     meta
     {
 	canCreateInEditor  = 1
 	editorInstanceName = "repfriglod"
-	editorPath         = "bf/capitalships/rep"
-    }
-}
-/*
-// Acclamator
-template rep_frigate_acclamator_hangar : capitalshipprop
-{
-    obasset-field preloadhack
-    {
-	default = "props/turrets/cis_cruiser/cis_cruiser_turret"
-    }
-
-    teamNum = 0
-
-    autoaimtarget
-    {
-	nameKey	= "STR_CAPITALSHIP_REP_ACCLAMATOR"
-    }
-    
-    attachedTurretsComponent attachedProps
-    {
-	attached_props
-	{
-	    string cruiserSentryGun[] = 
-	    {
-//		"lgun1",
-//	        "lgun2",
-//		"lgun3",
-//		"lgun4",
-//		"lgun5",
-//	        "lgun6",
-//		"lgun7",
-//		"lgun8",
-//	        "lgun9",
-//	      	"lgun10",
-//	    	"lgun11",
-//		"lgun12",
-//		"rgun1",
-//	        "rgun2",
-//		"rgun3",
-//		"rgun4",
-//		"rgun5",
-//	        "rgun6",
-//		"rgun7",
-//		"rgun8",
-//		"rgun9",
-//	        "rgun10",
-//	      	"rgun11",
-//	    	"rgun12",
-//		"frontgun",
-//		"left_topgun1",
-//		"left_topgun2",
-//		"left_topgun3",
-//		"left_topgun4",
-//		"left_topgun5",
-//		"left_topgun6",
-//		"left_topgun7",
-//		"left_topgun8",
-//		"right_topgun1",
-//		"right_topgun2",
-//		"right_topgun3",
-//		"right_topgun4",
-//		"right_topgun5",
-//		"right_topgun6",
-//		"right_topgun7",
-//		"right_topgun8",
-//		"left_bottomgun1",
-//		"left_bottomgun2",
-//		"left_bottomgun3",
-//		"left_bottomgun4",
-//		"left_bottomgun5",
-//		"left_bottomgun6",
-//		"left_bottomgun7",
-//		"right_bottomgun1",
-//		"right_bottomgun2",
-//		"right_bottomgun3",
-//		"right_bottomgun4",
-//		"right_bottomgun5",
-//		"right_bottomgun6",
-//		"right_bottomgun7",
-//		"podgun1",
-//		"podgun2"
-	    }
-	}
-    }
-
-    render
-    {
-	model = "capital_ships/rep/acclamator_hangar"
-	detailCullDist = 2000.f
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "repfrigh"
-	editorPath         = "bf/capitalships/rep"
-    }
-
-}
-*/
-// Reactor prop for the Acclamator
-template acclamator_reactor : bfshatteringstaticprop
-{
-    class-id = "ship reactor prop bf"
-
-    render
-    {
-	model = "capital_ships/rep/rep_acclamator_reactor"
-	castshadows = "true"
-	receiveshadows = "true"
-    }
-
-    autoAimTargetComponentBF autoaim
-    {
-        nameKey    = "STR_REACTOR_CORE"
-    }
-    
-    teamNum = 0
-
-    dmghealthcomponentbf health
-    {
-	fullhealth	= 5.f // Initial low health for testing
-    }
-
-    autoaimtarget
-    {
-        nameKey    = "STR_REACTOR_CORE"
-    } 
-    
-    vistableseercomp vtseer
-    {
-	checkPosOffset[]    {0.0f, 5.0f, 0.0f}
-    }
-    
-    guardablecomponent guardable
-    {
-    }
-
-    propid-field shipPropID
-    {
-        default = ""
-	views	= "basic setup"
-	tips	= "Prop ID of the associated capital ship"
-    }
-
-    bool-field destroyShipWhenDestroyed
-    {
-	default = "false"
-	views	= "basic setup"
-	tips	= "Should destroying the reactor blow up the ship?"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "repfrig_react"
-	editorPath         = "bf/props/capital_ships/reactors/rep"
-    }
-}
-
-// Reactor Prop for Acclamator
-template rep_acc_rcs : staticprop
-{
-    class-id = "ship reactor shield prop bf"
-
-    teamNum = 0
-
-    render
-    {
-	model = "capital_ships/rep/rep_acclamator_reactor_shield"
-    }
-
-    propid-field shipReactorPropID
-    {
-        default = ""
-	views	= "basic setup"
-	tips	= "Prop ID of the associated ship reactor"
-    }
-
-    bool-field protectReactor
-    {
-	default = "false"
-	views	= "basic setup"
-	tips	= "Should the shield prevent the reactor from being damaged?"
-    }
-
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "rep_acc_rcs"
 	editorPath         = "bf/capitalships/rep"
     }
 }
@@ -2756,23 +3545,83 @@ template reb_frigate_nebulon : capitalshipprop
 {
     obasset-field preloadhack
     {
-	    default = "props/turrets/cis_cruiser/cis_cruiser_turret"
+	    default = "turrets/reb/reb_cruiser/reb_cruiser_turret/reb_cruiser_turret"
     }
+    obasset-field preloadhack2
+    {
+	default = "capital_ships/components/sensors"
+    }
+    obasset-field preloadhack3
+    {
+	default = "capital_ships/components/comms"
+    }
+    obasset-field preloadhack4
+    {
+	default = "capital_ships/components/life_support"
+    }
+    obasset-field preloadhack5
+    {
+	default = "capital_ships/components/scanners"
+    }
+    obasset-field preloadhack6
+    {
+	default = "capital_ships/components/aux_power"
+    }
+    obasset-field preloadhack7
+    {
+	default = "props/planet_cannons/capship/capship_cannon_barrel"
+    }
+
     
     teamNum = 0
+
+    bfrebfrigatedescript descript
+    {
+    }
+
+    AnimComponentBF anim
+    {
+	animmap-field animmap 
+        { 
+	    default = "am_rebfrigatedth" 
+	}
+
+	animset = "am_rebfrigatedth"
+	startup = "deathanim"
+    }
 
     autoaimtarget
     {
 	    nameKey	= "STR_CAPITALSHIP_REB_NEBULON"
     }
 
-    attachedTurretsComponent_Blue attachedProps
+    string gunMoveDescs[] = 
+    {
+	"bf_mNeb_tblgun", // 2
+	"bf_mNeb_tblgun", // 3
+	"bf_mNeb_tblgun", // 4
+	"bf_mNeb_tblgun", // 5
+	"bf_mNeb_bgun", // 6
+	"bf_mNeb_bgun", // 7
+	"bf_mNeb_tblgun", // 8
+	"bf_mNeb_tblgun", // 9
+	"bf_mNeb_tblgun", // 10
+	"bf_mNeb_tblgun", // 11
+	"bf_mNeb_bgun", // 12
+	"bf_mNeb_bgun", // 13
+	"bf_mNeb_tblgun", // 14
+	"bf_mNeb_tblgun", // 15
+	"bf_mNeb_tfcgun"  // 16
+    }
+    
+    attachedTurretsComponent attachedProps
     {
         attached_props
         {
+	    
             string cruiserSentryGun_Blue[] = 
             {
-                "GUN1",
+		//"GUN1",
                 "GUN2",
                 "GUN3",
                 "GUN4",
@@ -2809,16 +3658,22 @@ template reb_frigate_nebulon : capitalshipprop
 	    string capitalShipPart_auxPower[] = {
 		"OBJECTIVE_5"
 	    }
+
+	    string capitalShipPart_ionCannon[] = 
+	    {
+		"CANNON"
+	    }
+
         }
     }    
     
     render
     {
         model = "capital_ships/reb/reb_nebulon_exterior"
-        detailCullDist = 2000.f
-        numLods = 0
+        detailCullDist = 700.f
+        numLods = 1
         lodDist[] 
-        { 2000.0 }
+        { 1000.0 }
     }
 
     meta
@@ -2828,186 +3683,104 @@ template reb_frigate_nebulon : capitalshipprop
         editorPath         = "bf/capitalships/reb"
     }
 
-    draw_as_background_component background_map
-    {	
-        mapImage = "misctex/hud/rep_acclamator_outline"
-        mapImageName = "rep_acclamator_outline"
-        isOverlayImage = "true"	
-
-        float mapTextureAreaDimensions []
-        {
-             1536.000000, 0.000000, 1536.000000
-        }
-
-        float mapWalkableAreaCentre []
-        {
-            0.000000, 0.000000, 0.000000
-        }
-
-        float mapWalkableAreaDimensions []
-        {
-            1536.000000, 0.000000, 1536.000000
-        }
-
-        isInSpace = "false"
-    }
+    hudTextureName = "guide_friendly_frigate_reb"
+    compassImage = "reb_nebulon_compass"
+    compassBorderImage = "reb_nebulon_compass_border"
+    compassHealthBarLeft = 0.0390625f
+    compassHealthBarRight = 0.9609375f
 }
 
-// Reactor Prop for Nebulon
-template reb_neb_rc : bfshatteringstaticprop
+// Rebel Nebulon - 6 Turrets
+template reb_frigate_few_guns : reb_frigate_nebulon
 {
-    class-id = "ship reactor prop bf"
+    anim = 42
+    descript = 42
 
-    render
+    health 
     {
-        model = "capital_ships/reb/reb_frigate_int/props/reb_nebulon_reactor"
-	castshadows = "true"
-	receiveshadows = "true"
+        healthComponentSettings = "k_healthComponentSetting_isInvincible|k_healthComponentSetting_isInvincibleToPlayerDmg|k_healthComponentSetting_doNotAttack"
     }
 
-    autoAimTargetComponentBF autoaim
+    attachedTurretsComponent attachedProps
     {
-        nameKey    = "STR_REACTOR_CORE"
-    }
-    
-    teamNum = 0
-
-    dmghealthcomponentbf health
-    {
-	fullhealth	= 5.f // Initial low health for testing
-    }
-
-    autoaimtarget
-    {
-        nameKey    = "STR_REACTOR_CORE"
+        attached_props
+        {
+            string cruiserSentryGun_Mun[] = 
+            {
+                "GUN1",
+                "GUN4",
+                "GUN6",
+                "GUN7",
+                "GUN12",
+                "GUN13"
+            }
+        }
     } 
-    
-    vistableseercomp vtseer
-    {
-	checkPosOffset[]    {0.0f, 5.0f, 0.0f}
-    }
-    
-    guardablecomponent guardable
-    {
-    }
+}
 
-    propid-field shipPropID
+// Rebel Nebulon - 0 Turrets
+template reb_frigate_moving : reb_frigate_nebulon //staticprop
+{
+    health 
     {
-        default = ""
-	views	= "basic setup"
-	tips	= "Prop ID of the associated capital ship"
+        healthComponentSettings = "k_healthComponentSetting_isInvincible|k_healthComponentSetting_isInvincibleToPlayerDmg|k_healthComponentSetting_doNotAttack"
     }
-
-    bool-field destroyShipWhenDestroyed
-    {
-	default = "false"
-	views	= "basic setup"
-	tips	= "Should destroying the reactor blow up the ship?"
-    }
+    
+    useAttachedProps = "false"
 
     meta
     {
 	canCreateInEditor  = 1
-	editorInstanceName = "reb_neb_rc"
+	editorInstanceName = "rebneblodmed"
 	editorPath         = "bf/capitalships/reb"
     }
 }
 
-// Reactor Prop for Nebulon
-template reb_neb_rcs : staticprop
-{
-    class-id = "ship reactor shield prop bf"
-
-    teamNum = 0
-
-    render
-    {
-	model = "capital_ships/reb/reb_frigate_int/props/reb_nebulon_reactor_shield"
-    }
-
-    propid-field shipReactorPropID
-    {
-        default = ""
-	views	= "basic setup"
-	tips	= "Prop ID of the associated ship reactor"
-    }
-
-    bool-field protectReactor
-    {
-	default = "false"
-	views	= "basic setup"
-	tips	= "Should the shield prevent the reactor from being damaged?"
-    }
-
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "reb_neb_rcs"
-	editorPath         = "bf/capitalships/reb"
-    }
-}
-
-// Tributary Transport Exterior
-template imp_tributary_transport : staticprop
-{
-    render
-    {
-	model = "bg/tributary_exterior"
-    }
-    
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "trib_transp"
-	editorPath         = "bf/capitalships/imp"
-    }
-}
-
-// Old Shipyard (Dathomir Space) EXTERIOR
-template imp_shipyard_ext : staticprop
-{
-    render
-    {
-	model = "bg/shipyard_exterior"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "shipyard_ext"
-	editorPath         = "bf/capitalships/imp"
-    }
-}
-
-// Old Shipyard (Dathomir Space) INTERIOR
-template imp_shipyard_int : staticprop
-{
-    render
-    {
-	model = "bg/shipyard_interior"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "shipyard_int"
-	editorPath         = "bf/capitalships/imp"
-    }
-}
-
-//Imperial Death Star
+//
+////Imperial Death Star
+//
 template imp_death_star : capitalshipprop
 {
+    teamNum = -1
+
     render
     {
 	model = "capital_ships/imp/imp_deathstar2/imp_deathstar2_v2"
     }
-   
+    
+    /* is this needed? 
+    autoaimtarget
+    {
+        nameKey    = "STR_CAPITALSHIP_IMP_DEATH_STAR"
+    }
+    */
+    /*
+    attachedTurretsComponent_Green attachedProps
+    {
+        attached_props
+        {
+            string cruiserSentryGun_Green[] = 
+            {
+                "GUN1",
+                "GUN2",
+                "GUN3",
+                "GUN4",
+                "GUN5",
+                "GUN6",
+                "GUN7",
+                "GUN8"
+            }
+        }
+    }
+    */ // guns commented out for time being until we decide whats going on in arcade AD
     bfdeathstardescript descript
     {
     }
-
+    
+    hudTextureName = "imp_deathstar2_icon"
+    topOfVehicleInHudImage = 0.0390625f
+    bottomOfVehicleInHudImage = 0.9609375f
+    
     meta
     {
 	canCreateInEditor  = 1
@@ -3015,6 +3788,7 @@ template imp_death_star : capitalshipprop
 	editorPath         = "bf/capitalships/imp"
     }
 }
+
 
 /* (this is a back up)
 //Imperial Death Star
@@ -3034,193 +3808,25 @@ template imp_death_star : staticprop
 }
 */
 
-template venatorgib 
-{
+//
+//// REPUBLIC VENATOR 
+//
 
-    class-id		    = "bfdescript"
-
-    // wont be serialised just for preloading
-    soundArray-field extraPreloadSounds
-    {
-    }
-
-    propid-field forceTriggerProp
-    {
-	default = ""
-	views = "basic setup"
-	tip = "set a propID to be force triggered in descript via descript function forceTriggerTriggered()"
-    }
-
-    script = " 
-    BTOP 
-    {
-	event init
-	{
-	    debugprintf(SECONDARY_EVENT_INIT)
-		
-	    if comparedmgstate( default )
-	    {
-		setdmgstate( damaged )
-		
-		makevisible_wc( BTOP, false )
-		makevisible_wc( B_GIB*, true )
-
-		// debugprintf(EVENT_INIT_bfcapitalgib_EVENT_INIT)
-		particleeffectimmediate(cs_main_exp, part2_explosion9,0)
-		particleeffectimmediate(cs_main_fire, part1_flame1,1)
-		particleeffectimmediate(cs_main_fire, part1_flame2,2)
-		particleeffectimmediate(cs_main_fire, part1_flame3,3)
-		particleeffectimmediate(cs_main_fire, part2_flame1,4)
-		particleeffectimmediate(cs_main_fire, part2_flame2,5)
-		particleeffectimmediate(cs_main_fire, part2_flame3,6)
-		particleeffectseries(cs_mini_exp, 50 , 1.0, panel_explosion, 0)
-		// gibeffect(mun_ptrail, 1, 100.0, 0, 0)
-		//particleeffectdelayed(mun_explo, 30.0,0,0)
-	    }
-	    setcollisiondelayhack(5) //because it also switches off gravity and resistance on next gibste
-	    
-	}
-	
-	event damage
-	{
-	    //particleeffectseries(  imp_explode,  3 , 1.0, 0, 0)
-	    debugprintf(SECONDARY_EVENT_DAMAGE)
-	}
-
-	//dont need to delete on zero health because the gib code has it in the health listener
-	event zerohealth
-	{
-	    debugprintf(SECONDARY_EVENT_ZEROHEALTH)
-	   
-     	    //explode the next gibs
-	    deleteprop()
-	}
-    }
-
-   "
-}
-
-
-//TOP LEVEL DESCRIPT FOR CAPITAL SHIPS
-//for props where the main gibs are called B_broken* these may or may not have their own gibs called B_Gib*
-template venatordescript : bfcapitalshipdescript
-{
-    script = "
-        
-    //because some of our props think the BTop is being hit so we need a total wildcard for all of it
-    * 
-    {	
-	event init
-	{
-	    setdmgstate( normal )
-	    makevisible_wc( BTOP, true )
-	    makevisible_wc( B_GIB*, false )
-   
-	    //debugprintf(LARGEVEHICLE_EVENT_INIT)
- 
-	    
-  	}
-
-	event damage //CHealthComponent
-	{
-	    //debugprintf(LARGEVEHICLE_EVENT_DAMAGE)
-	    
-	    if comparedmgstate( normal )
-	    {
-		if healthlessthan( 0.25 )  //a ratio
-		{
-		    debugprintf(LOTSOF_DAMAGE_STATE)
-		    setdmgstate( damaged )
-    		}
-	    }
-	    if comparedmgstate( damaged )
-	    {
-		//set off a series of explosions for any damage while it is low
-		//particleeffectseries(  imp_explode, 3, 1.0 ,0, 0)
-	    }
-
-	    debugprintf(damage)
-	}
-	
-	event die
-	{
-	    debugprintf(LARGEVEHICLE_LATENT_GIB_FUNCTION_DIE)
-	    
-	    cleargibextras()
-	    deleteprop()   
-	}
-	
-	    
-	event blowitup
-	{
-	    debugprintf(LARGEVEHICLE_LATENT_GIBS)
-	    
-	    setgibextras(1.0, 0, 0, 0)
-	    
-	    setcollisiondelayhack(30) //number of ticks to wait
-	    setartificialgravity(0.0, -2.0, 0.0)
-	    explode_wc_launch( B_GIB* , 25.0,  25.0, 0.01, venatorgib) //name of the gib, length of the force vector, life, angular velocity factor, name of the descript to use for the bits
-	   
-	    //make entire prop invisible and then delete it later
-	    makevisible_wc( BTOP, false )
-	    makevisible_wc( B_detail*, false ) //it is a bug / prop error that this needs doing - or were these bits supposed to be part of the gib?
-	
-	    playsound(frigate_explosion)
-	    playsound(frigate_stereo_boom)
-	
-	    latent(die, 5.0) 
-	    
-	    deleteprop()  
-
-	}
-
-	event bullethit
-	{
-	    //particleeffectnew( imp_explode, 0.0, 0.0, 0.0, $1.v,$2.v )
-	    
-	    //particleeffectnew( mun_explo, 0.0, 0.0, 0.0, $1.v,$2.v )
-	    
-	   // particleeffectnew( ship_sparks, 0.0, 0.0, 0.0, $1.v,$2.v)
-	}
-
-	event zerohealth
-	{
-	    debugprintf(LARGEVEHICLE_EVENT_zerohealth)
-
-        setdmgstate( damaged )            
-
-		debugprintf(SETTING_LATENT_GIB_FUNCTION)
-
-		//assuming zero health is reached when the platform hits it, try not to happen sooner
-
-		//either script this for a specific prop or, get the hit pos and dir and work it out
-		//for now all capital props will fall a bit and explode before they separate
-		setstaticpropvelocity(0.0, -10.0, 0.0)
-		setstaticproprotspeeds(-2.0 ,0.0, 1.0)
-	    
-		//particleeffectseries( imp_explode, 12 , 0.4, 0, 0)
-		//right now any player inside the prop is dying 
-		setdmgstate( moving ) //so it only sets latent once
-
-		//then do the usual code
-		latent(blowitup, 5.0) 
-	    }
-    }
-    
-    "
-}
 // Republic Venator Capital Ship
 template rep_venator : capitalshipprop
 {
     ticktype            = "k_tickAlways"
-    
+
+    teamNum = 0
+   
     render
     {
 	model = "capital_ships/rep/rep_cruiser_exterior"
+
+	detailCullDist = 700.f
 	numLods = 1
 	lodDist[] 
-	{ 2000.0 }
-
+	{ 900.0 }
     }
 
     meta
@@ -3239,7 +3845,7 @@ template rep_venator : capitalshipprop
     {
 	isMoveable		= "true"
     }
-
+    
     particleeffectcomponent effects
     {
 	particleEffectListDict
@@ -3313,179 +3919,134 @@ template rep_venator : capitalshipprop
 
     venatordescript descript
     {
-	
     }
 }
 
-
-template bfinterdictorgib 
+// Republic Venator - 6 turrets
+template rep_venator_few_guns : rep_venator  
 {
-
-    class-id		    = "bfdescript"
-
-    // wont be serialised just for preloading
-    soundArray-field extraPreloadSounds
+    obasset-field preloadhack
     {
+	default = "turrets/rep/rep_cruiser/rep_cruiser_turret"
     }
-
-    propid-field forceTriggerProp
-    {
-	default = ""
-	views = "basic setup"
-	tip = "set a propID to be force triggered in descript via descript function forceTriggerTriggered()"
-    }
-
-    script = " 
-    * 
-    {
-	event init
-	{
-	    debugprintf(SECONDARY_EVENT_INIT)
-	    //sub_explode_wc_launch( B_SUB_GIB*, subexplode,2.0 , 25.0, 25.0, 0.01, 0)
-		
-	    if comparedmgstate( default )
-	    {
-		setdmgstate( damaged )
-		
-		makevisible_wc( BTOP, false )
-		makevisible_wc( B_GIB*, true )
-		makevisible_wc( B_broken*, false ) 
-
-    //	    particleeffectimmediate(cap_ext_split, big_bang,0)
-		particleeffectimmediate(cs_main_exp, big_bang,0)
-		particleeffectimmediate(cs_main_fire, flames1,1)
-		particleeffectimmediate(cs_main_fire, flames6,2)
-		particleeffectimmediate(cs_main_fire, flames12,3)
-		particleeffectimmediate(cs_main_fire, flames18,4)
-		particleeffectimmediate(cs_main_fire, flames24,5)
-		particleeffectimmediate(cs_main_fire, flames30,6)
-		particleeffectimmediate(cs_main_fire, flames36,7)
-
-	    //    particleeffectseries(  cs_main_fire, 50 , 1.0, explosion, 0)
-		particleeffectseries(cs_mini_exp, 50 , 1.0, explosion, 0)
-	    }
-	    setcollisiondelayhack(5) //because it also switches off gravity and resistance on next gibste
-	}
-	
-	event damage
-	{
-	    debugprintf(SECONDARY_EVENT_DAMAGE)
-	}
-
-	//dont need to delete on zero health because the gib code has it in the health listener
-	event zerohealth
-	{
-	    debugprintf(SECONDARY_EVENT_ZEROHEALTH)
-	    deleteprop()
-	}
-    }
-
-   "
-}
-
-template bfinterdictordescript : bfdescriptcomponent
-{
-    script = "
-        
-    //because some of our props think the BTop is being hit so we need a total wildcard for all of it
-    BTOP
-    {
-	event init
-	{
-    	    particleeffectinternal( csi_exp_large , EXP_large,  64.0 )
-    	    particleeffectinternal( csi_exp_medium, EXP_medium, 16.0 )
-    	    particleeffectinternal( csi_exp_small , EXP_small,  8.0 )
-	}
-    }
-	
-
-    * 
-    {	
-	event init
-	{
-	    setdmgstate( normal )
-	    makevisible_wc( BTOP, true )
-	    makevisible_wc( B_GIB*, false )
-	    makevisible_wc( B_broken*, false )
-  	}
-
-	event damage //CHealthComponent
-	{
-	    if comparedmgstate( normal )
-	    {
-		if healthlessthan( 0.25 )  //a ratio
-		{
-		    debugprintf(LOTSOF_DAMAGE_STATE)
-		    setdmgstate( damaged )
-    		}
-	    }
-
-	    debugprintf(damage)
-	}
-	
-	event die
-	{
-	    debugprintf(LARGEVEHICLE_LATENT_GIB_FUNCTION_DIE)
-	    
-	    cleargibextras()
-	    deleteprop()   
-	}
-	
-	    
-	event blowitup
-	{
-	    debugprintf(LARGEVEHICLE_LATENT_GIBS)
-	    
-	    setgibextras(1.0, 0, 0, 0)
-	    
-	    setcollisiondelayhack(30) //number of ticks to wait
-	    setartificialgravity(0.0, -2.0, 0.0)
-	    explode_wc_launch( B_GIB* , 50.0,  25.0, 0.02, bfinterdictorgib) //name of the gib, length of the force vector, life, angular velocity factor, name of the descript to use for the bits
-	    playsound(frigate_explosion)
-	    playsound(frigate_stereo_boom)
-
-	    makevisible_wc( BTOP, false )
-	    latent(die, 5.0) 
-	    
-	    deleteprop()  
-	}
-
-	event zerohealth
-	{
-	    debugprintf(LARGEVEHICLE_EVENT_zerohealth)
-		
-	    setdmgstate( damaged )
     
-	    debugprintf(SETTING_LATENT_GIB_FUNCTION)
+    health 
+    {
+        healthComponentSettings = "k_healthComponentSetting_isInvincible|k_healthComponentSetting_isInvincibleToPlayerDmg|k_healthComponentSetting_doNotAttack"
+    }
 
-    	    setstaticpropvelocity(0.0, -10.0, 0.0)
-	    setstaticproprotspeeds(-2.0 ,0.0, 1.0)
-	    
-    	    setdmgstate( moving ) //so it only sets latent once
-		
-    	    latent(blowitup, 5.0) 
+    anim = 42
+    descript = 42
+    
+    attachedTurretsComponent attachedProps
+    {
+	attached_props
+	{
+	    string cruiserSentryGun_Acc[] = 
+	    {
+		//"gun23",
+		//"gun18",
+		"gun15",
+		"gun2",
+		"gun8",
+		"gun7",
+		"gun5",
+		//"gun3",
+		//"gun1"  // too many attached props if enabled.
+	    }
 	}
     }
     
-    "
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "repvenfewguns"
+	editorPath         = "bf/capitalships/rep"
+    }
 }
 
-//////////Imperial InterDirctor
+// Republic Venator - 0 turrets
+template rep_frigate_venator_lod : rep_venator
+{
+    
+    health 
+    {
+        healthComponentSettings = "k_healthComponentSetting_isInvincible|k_healthComponentSetting_isInvincibleToPlayerDmg|k_healthComponentSetting_doNotAttack"
+    }
+
+    attachedTurretsComponent attachedProps
+    {
+	attached_props
+	{
+	    string cruiserSentryGun_Acc[] = 
+	    {
+	    }
+	}
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "repvenfriglod"
+	editorPath         = "bf/capitalships/rep"
+    }
+}
+
+////
+//////////Imperial Interdictor
+////
+
 template imp_interdictor : capitalshipprop
 {
     obasset-field preloadhack
     {
-	    default = "props/turrets/cis_cruiser/cis_cruiser_turret"
+	    default = "turrets/imp/imp_cruiser/imp_cruiser_turret/imp_cruiser_turret"
     }
-    
-    render
+    obasset-field preloadhack2
     {
-	model = "capital_ships/imp/imp_interdictor_exterior"
+	default = "capital_ships/components/sensors"
+    }
+    obasset-field preloadhack3
+    {
+	default = "capital_ships/components/comms"
+    }
+    obasset-field preloadhack4
+    {
+	default = "capital_ships/components/life_support"
+    }
+    obasset-field preloadhack5
+    {
+	default = "capital_ships/components/scanners"
+    }
+    obasset-field preloadhack6
+    {
+	default = "capital_ships/components/aux_power"
+    }
+    obasset-field preloadhack7
+    {
+	default = "props/planet_cannons/capship/capship_cannon_barrel"
     }
 
+    
     bfinterdictordescript descript
     {
     
+    }
+    
+    autoaimtarget
+    {
+        nameKey    = "STR_CAPITALSHIP_IMP_INTERDICTOR"
+    } 
+    
+    AnimComponentBF anim
+    {
+	animmap-field animmap 
+	{ 
+	    default = "am_impfrigatedth" 
+	}
+
+	animset = "am_impfrigatedth"
+	startup = "deathanim"
     }
 
 // LOCAL TO TEST INTERIOR EFFECTS - use F12 in game to test - F12 removes 2.0f from health value
@@ -3496,16 +4057,35 @@ template imp_interdictor : capitalshipprop
 //   }
     
     teamNum = 1
-    
-    attachedTurretsComponent_Green attachedProps
+    string gunMoveDescs[] = 
+    {
+	"bf_mInt_tcgun", // 1
+//	"bf_mInt_blgun", // 2
+//	"bf_mInt_tlgun", // 3
+	"bf_mInt_tlgun", // 4
+	"bf_mInt_tlgun", // 5
+	"bf_mInt_blgun", // 6
+	"bf_mInt_brgun", // 7
+	"bf_mInt_tlgun", // 8
+	"bf_mInt_trgun", // 9
+	"bf_mInt_tcgun", // 10
+	"bf_mInt_brgun", // 11
+//    "bf_mInt_brgun", // 12
+	"bf_mInt_trgun", // 13
+	"bf_mInt_trgun", // 14
+    "bf_mInt_blgun", // 15
+//	"bf_mInt_trgun" // 16
+    }    
+    attachedTurretsComponent attachedProps
     {
         attached_props
         {
-            string cruiserSentryGun_Green[] = 
+            
+	    string cruiserSentryGun_Green[] = 
             {
                 "GUN1",
-                "GUN2",
-                "GUN3",
+//                "GUN2",
+//                "GUN3",
                 "GUN4",
                 "GUN5",
                 "GUN6",
@@ -3514,11 +4094,11 @@ template imp_interdictor : capitalshipprop
                 "GUN9",
                 "GUN10",
                 "GUN11",
-                "GUN12",
+//                "GUN12",
                 "GUN13",
                 "GUN14",
                 "GUN15",
-                "GUN16"                
+//                "GUN16"                
             }
 
 	    string capitalShipPart_sensors[] = {
@@ -3540,8 +4120,29 @@ template imp_interdictor : capitalshipprop
 	    string capitalShipPart_auxPower[] = {
 		"OBJECTIVE_5"
 	    }
+
+	    string capitalShipPart_ionCannon[] = 
+	    {
+		"CANNON"
+	    }
+
         }        
-    }        
+    }      
+    
+    render
+    {
+	model = "capital_ships/imp/imp_interdictor_exterior"
+	detailCullDist = 800.f
+	numLods = 1
+	lodDist[] 
+	{ 1000.0 }
+    }
+
+    hudTextureName = "guide_friendly_frigate_imp"
+    compassImage = "imp_interdictor_compass"
+    compassBorderImage = "imp_interdictor_compass_border"
+    compassHealthBarLeft = 0.0390625f
+    compassHealthBarRight = 0.9609375f
     
     meta
     {
@@ -3551,14 +4152,17 @@ template imp_interdictor : capitalshipprop
     }
 }
 
-// Updated Interdictor exterior (will replace the one above soon)
-template imp_intrdc_ext : staticprop
+// Imperial Interdictor - 0 turrets
+template imp_intrdc_ext : imp_interdictor //staticprop
 {
-    render
+
+    health 
     {
-	model = "capital_ships/imp/imp_interdictor_exterior"
+        healthComponentSettings = "k_healthComponentSetting_isInvincible|k_healthComponentSetting_isInvincibleToPlayerDmg|k_healthComponentSetting_doNotAttack"
     }
 
+    useAttachedProps = "false"
+    
     meta
     {
 	canCreateInEditor  = 1
@@ -3567,117 +4171,35 @@ template imp_intrdc_ext : staticprop
     }
 }
 
+////
+////// REBEL MON CALAMARI
+////
 
-// Reactor Prop and shield for Interdictor
-template imp_int_rc : bfshatteringstaticprop
-{
-    class-id = "ship reactor prop bf"
-
-    render
-    {
-        model = "capital_ships/imp/imp_frigate_int/props/imp_interdictor_reactor"
-	castshadows = "true"
-	receiveshadows = "true"
-    }
-
-    autoAimTargetComponentBF autoaim
-    {
-        nameKey    = "STR_REACTOR_CORE"
-    }
-    
-    teamNum = 1
-
-    dmghealthcomponentbf health
-    {
-	fullhealth	= 5.f // Initial low health for testing
-    }
-
-    autoaimtarget
-    {
-        nameKey    = "STR_REACTOR_CORE"
-    } 
-    
-    vistableseercomp vtseer
-    {
-	checkPosOffset[]    {0.0f, 5.0f, 0.0f}
-    }
-    
-    guardablecomponent guardable
-    {
-    }
-
-    propid-field shipPropID
-    {
-        default = ""
-	views	= "basic setup"
-	tips	= "Prop ID of the associated capital ship"
-    }
-
-    bool-field destroyShipWhenDestroyed
-    {
-	default = "false"
-	views	= "basic setup"
-	tips	= "Should destroying the reactor blow up the ship?"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "imp_int_rc"
-	editorPath         = "bf/capitalships/imp"
-    }
-}
-
-template imp_int_rcs : staticprop
-{
-    class-id = "ship reactor shield prop bf"
-
-    teamNum = 1
-
-    render
-    {
-	model = "capital_ships/imp/imp_frigate_int/props/imp_interdictor_reactor_shield"
-    }
-
-    propid-field shipReactorPropID
-    {
-        default = ""
-	views	= "basic setup"
-	tips	= "Prop ID of the associated ship reactor"
-    }
-
-    bool-field protectReactor
-    {
-	default = "false"
-	views	= "basic setup"
-	tips	= "Should the shield prevent the reactor from being damaged?"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "imp_int_rcs"
-	editorPath         = "bf/capitalships/imp"
-    }
-}
-
-
-//////////Rebel Mon Calamari
 template reb_mon_calamari : capitalshipprop
 {
     obasset-field preloadhack
     {
-	    default = "props/turrets/cis_cruiser/cis_cruiser_turret"
+	    default = "turrets/reb/reb_cruiser/reb_cruiser_turret/reb_cruiser_turret"
     }
-    
+           
     render
     {
     	model = "capital_ships/reb/reb_mcalamari_cruiser_exterior"
-    }
 
+	detailCullDist = 700.f
+	numLods = 1
+	lodDist[] 
+	{ 1000.0, 1700.0 }
+    }
+    
+    autoaimtarget
+    {
+        nameKey    = "STR_CAPITALSHIP_REB_CALAMARI"
+    }
+    
     teamNum = 0
             
-    attachedTurretsComponent_Blue attachedProps
+    attachedTurretsComponent attachedProps
     {
         attached_props
         {
@@ -3711,17 +4233,44 @@ template reb_mon_calamari : capitalshipprop
     }
 }
 
+// Rebel Mon Calamari - 0 Turrets
+template reb_mon_calamari_moving : reb_mon_calamari
+{
+    health 
+    {
+        healthComponentSettings = "k_healthComponentSetting_isInvincible|k_healthComponentSetting_isInvincibleToPlayerDmg|k_healthComponentSetting_doNotAttack"
+    }
+    
+    attachedTurretsComponent attachedProps
+    {
+        attached_props
+        {
+            string cruiserSentryGun_Blue[] = 
+            {
+            }
+        }
+    }    
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "moncalmoving"
+	editorPath         = "bf/capitalships/reb"
+    }
+}
 
 // Rebellion Medium Tranport GR-75
 template reb_trans : capitalshipprop
 {   
+    teamNum = 0
+
     render
     {
 		model = "vehicles/reb/reb_medium_transport"
-		numLods = 2
+		numLods = 0
 		lodDist[] 
 		{ 
-			40.0, 90.0 
+			150.0, 300.0 
 		}       
     }
 
@@ -3743,53 +4292,11 @@ template reb_trans : capitalshipprop
     }
 }
 
-/*
-template rep_venator : capitalshipprop
-{
-//    obasset-field preloadhack
-//    {
-//	    default = "props/turrets/rep/rep_cruiser/rep_cruiser_turret"
-//	    default = "props/turrets/cis_cruiser/cis_cruiser_turret"	    
-//    }
-    
-    render
-    {
-    	model = "capital_ships/rep/rep_cruiser_exterior"
-    }
-
-    teamNum = 0
-            
-    attachedTurretsComponent_Blue attachedProps
-    {
-        attached_props
-        {
-            string cruiserSentryGun_Blue[] = 
-            {
-//                "gun1",
-//                "gun2",
-//                "gun3",
-//                "gun4",
-//                "gun5",
-//                "gun6",
-//                "gun7",
-//                "gun8",
-//                "gun9",
-//                "gun10",
-            }
-        }
-    }    
-    
-    meta
-    {
-	canCreateInEditor  = 1
-    	editorInstanceName = "rep_venator"
-    	editorPath         = "bf/capitalships/rep"
-    }
-}
-*/
-
+// Imperial Tributary Ship
 template imp_tributary_transport_capship : capitalshipprop
 {   
+    teamNum = 1
+
     render
     {
 		model = "bg/tributary_exterior"   
@@ -3809,10 +4316,802 @@ template imp_tributary_transport_capship : capitalshipprop
     {
     }
 
+    timeStayingAlive = 0.0f
+
     meta
     {
 		canCreateInEditor  = 1
     	editorInstanceName = "trib_capship"
 	    editorPath         = "bf/capitalships/imp"
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////
+//		    Assault Objective Capital Ships			//
+// ** These are the summoned capital ships used in Instant Action **	//
+//////////////////////////////////////////////////////////////////////////
+
+// Summoned Star Destroyer
+template isd_AO : staticprop
+{
+    ticktype = "k_tickAlways"
+    teamNum = 1
+
+    render
+    {
+	model = "capital_ships/imp_stardestroyer_exterior"
+	
+	detailCullDist = 700.f
+	numLods = 1
+	lodDist[] 
+	{ 1700.0 }
+    }
+ 
+    physics
+    {
+	isMoveable		= "true"
+    }
+    
+    attachedTurretsComponent attachedProps
+    {
+        attached_props
+        {
+            string aoISD_Turret[] = 
+            {
+                "SUMMONGUN1",
+                "SUMMONGUN2",
+                "SUMMONGUN3",
+                "SUMMONGUN4",
+                "SUMMONGUN5",
+                "SUMMONGUN6",
+                "SUMMONGUN7",
+                "SUMMONGUN8"
+            }
+        }
+    }    
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "isdAO"
+	editorPath         = "bf/capitalships/assault objective"
+    }
+}
+
+// Summoned Mon Calamari
+template mcal_AO : staticprop
+{
+    ticktype = "k_tickAlways"
+    teamNum = 0
+
+    render
+    {
+	model = "capital_ships/reb/reb_mcalamari_cruiser_exterior"
+
+	detailCullDist = 700.f
+	numLods = 0
+	lodDist[] 
+	{ 1000.0 }
+    }
+
+    physics
+    {
+	isMoveable		= "true"
+    }
+    
+    attachedTurretsComponent attachedProps
+    {
+        attached_props
+        {
+            string aoMonC_Turret[] = 
+            {
+                "SUMMONGUN1",
+                "SUMMONGUN2",
+                "SUMMONGUN3",
+                "SUMMONGUN4",
+                "SUMMONGUN5",
+                "SUMMONGUN6",
+                "SUMMONGUN7",
+                "SUMMONGUN8"
+            }
+        }
+    }    
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "mcalAO"
+	editorPath         = "bf/capitalships/assault objective"
+    }
+}
+
+// Summoned CIS Cruiser
+template invh_AO : staticprop
+{
+    ticktype = "k_tickAlways"
+    teamNum = 1
+
+    render
+    {
+	model = "capital_ships/cis_cruiser_exterior"
+
+	detailCullDist = 1000.f
+	numLods = 0
+	lodDist[] 
+	{ 1000.0 }
+    }
+ 
+    physics
+    {
+	isMoveable		= "true"
+    }
+
+    particleeffectcomponent effects
+    {
+	particleEffectListDict
+	{
+	    // Three large thrusters
+	    particleEffectElement fx_element_00
+	    { 
+		effectName = "cs_thruster6"
+		dofName = "THRUSTER1"
+		enableEffect = "true"
+	    }
+	    particleEffectElement fx_element_01
+	    { 
+		effectName = "cs_thruster6"
+		dofName = "THRUSTER2"
+		enableEffect = "true"
+	    }
+	    particleEffectElement fx_element_02
+	    { 
+		effectName = "cs_thruster6"
+		dofName = "THRUSTER3"
+		enableEffect = "true"
+	    }
+	    // Four small thrusters
+	    particleEffectElement fx_element_03
+	    { 
+		effectName = "cs_thruster5"
+		dofName = "THRUSTER4"
+		enableEffect = "true"
+	    }
+	    particleEffectElement fx_element_04
+	    { 
+		effectName = "cs_thruster5"
+		dofName = "THRUSTER5"
+		enableEffect = "true"
+	    }
+	    particleEffectElement fx_element_05
+	    { 
+		effectName = "cs_thruster5"
+		dofName = "THRUSTER6"
+		enableEffect = "true"
+	    }
+	    particleEffectElement fx_element_06
+	    { 
+		effectName = "cs_thruster5"
+		dofName = "THRUSTER7"
+		enableEffect = "true"
+	    }
+	}
+    }
+
+    attachedTurretsComponent attachedProps
+    {
+        attached_props
+        {
+            string aoInvH_Turret[] = 
+            {
+                "SUMMONGUN1",
+                "SUMMONGUN2",
+                "SUMMONGUN3",
+                "SUMMONGUN4",
+                "SUMMONGUN5",
+                "SUMMONGUN6",
+                "SUMMONGUN7",
+                "SUMMONGUN8"
+            }
+        }
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "invhAO"
+	editorPath         = "bf/capitalships/assault objective"
+    }
+}
+
+// Summoned Republic Venator
+template ven_AO : staticprop
+{
+    ticktype = "k_tickAlways"
+    teamNum = 0
+
+    render
+    {
+	model = "capital_ships/rep/rep_cruiser_exterior"
+
+	detailCullDist = 700.f
+	numLods = 0
+	lodDist[] 
+	{ 1000.0 }
+    }
+
+    physics
+    {
+	isMoveable		= "true"
+    }
+    
+    particleeffectcomponent effects
+    {
+	particleEffectListDict
+	{
+	    // Four small thrusters
+	    particleEffectElement fx_element_00
+	    { 
+		effectName = "cs_thruster1"
+		dofName = "THRUSTER1"
+		enableEffect = "true"
+	    }
+	    particleEffectElement fx_element_01
+	    { 
+		effectName = "cs_thruster1"
+		dofName = "THRUSTER2"
+		enableEffect = "true"
+	    }
+	    particleEffectElement fx_element_02
+	    { 
+		effectName = "cs_thruster1"
+		dofName = "THRUSTER3"
+		enableEffect = "true"
+	    }
+	    particleEffectElement fx_element_03
+	    { 
+		effectName = "cs_thruster1"
+		dofName = "THRUSTER4"
+		enableEffect = "true"
+	    }
+	    // Two medium thrusters
+	    particleEffectElement fx_element_04
+	    { 
+		effectName = "cs_thruster2"
+		dofName = "THRUSTER5"
+		enableEffect = "true"
+	    }
+	    particleEffectElement fx_element_05
+	    { 
+		effectName = "cs_thruster2"
+		dofName = "THRUSTER6"
+		enableEffect = "true"
+	    }
+	    // Two smaller main thrusters
+	    particleEffectElement fx_element_06
+	    { 
+		effectName = "cs_thruster3"
+		dofName = "THRUSTER7"
+		enableEffect = "true"
+	    }
+	    particleEffectElement fx_element_07
+	    { 
+		effectName = "cs_thruster3"
+		dofName = "THRUSTER8"
+		enableEffect = "true"
+	    }
+	    // Two largest main thrusters
+	    particleEffectElement fx_element_08
+	    { 
+		effectName = "cs_thruster3"
+		dofName = "THRUSTER9"
+		enableEffect = "true"
+	    }
+	    particleEffectElement fx_element_09
+	    { 
+		effectName = "cs_thruster3"
+		dofName = "THRUSTER10"
+		enableEffect = "true"
+	    }
+	}
+    }
+
+    attachedTurretsComponent attachedProps
+    {
+        attached_props
+        {
+            string aoVen_Turret[] = 
+            {
+                "SUMMONGUN1",
+                "SUMMONGUN2",
+                "SUMMONGUN3",
+                "SUMMONGUN4",
+                "SUMMONGUN5",
+                "SUMMONGUN6",
+                "SUMMONGUN7",
+                "SUMMONGUN8"
+            }
+        }
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "venAO"
+	editorPath         = "bf/capitalships/assault objective"
+    }
+}
+
+//////////////////////////////////
+//  CAPITAL SHIP GIB PART PROPS	//
+//////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//**Templates below are for using the frigate gibs as space "flotsam"**///
+//**to break up space a little and make dogfighting a little more fun**///
+//////////////////////////////////////////////////////////////////////////
+
+// Star Destroyer Gibs
+
+template capitalshipdebrisfromimpstdgib1 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/imp_stardestroyer_exterior"
+	visibleParts = "B_SPLITPART_1;B_FILLPOLY_1"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "STDGib1"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+
+
+template capitalshipdebrisfromimpstdgib4 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/imp_stardestroyer_exterior"
+	visibleParts = "B_SPLITPART_4;B_FILLPOLY_4;B_DOOR"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "STDGib4"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromimpstdgib5 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/imp_stardestroyer_exterior"
+	visibleParts = "B_SPLITPART_5;B_FILLPOLY_5"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "STDGib5"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromimpstdgib6 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/imp_stardestroyer_exterior"
+	visibleParts = "B_SPLITPART_6;B_FILLPOLY_6"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "STDGib6"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+// Nebulon B Gibs
+
+template capitalshipdebrisfromrebnebgib1 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/reb/reb_nebulon_exterior"
+	visibleParts = "B_SPLITPART_1;B_FILLPOLY_1"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "NebGib1"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromrebnebgib2 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/reb/reb_nebulon_exterior"
+	visibleParts = "B_SPLITPART_2;B_FILLPOLY_2;B_DOOR"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "NebGib2"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromrebnebgib3 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/reb/reb_nebulon_exterior"
+	visibleParts = "B_SPLITPART_3;B_FILLPOLY_3"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "NebGib3"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromrebnebgib4 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/reb/reb_nebulon_exterior"
+	visibleParts = "B_SPLITPART_4;B_FILLPOLY_4"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "NebGib4"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromrebnebgib5 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/reb/reb_nebulon_exterior"
+	visibleParts = "B_SPLITPART_5;B_FILLPOLY_5"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "NebGib5"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromrebnebgib6 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/reb/reb_nebulon_exterior"
+	visibleParts = "B_SPLITPART_6;B_FILLPOLY_6"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "NebGib6"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+// cis Munificent gibs
+
+template capitalshipdebrisfromcismungib1 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/banking_clan_frigate/munificent/munificent_exterior"
+	visibleParts = "B_SPLITPART_1;B_FILLPOLY_1"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "MuniGib1"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromcismungib2 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/banking_clan_frigate/munificent/munificent_exterior"
+	visibleParts = "B_SPLITPART_2;B_FILLPOLY_2;B_DOOR"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "MuniGib2"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromcismungib3 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/banking_clan_frigate/munificent/munificent_exterior"
+	visibleParts = "B_SPLITPART_3;B_FILLPOLY_3;B_DOOR"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "MuniGib3"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromcismungib4 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/banking_clan_frigate/munificent/munificent_exterior"
+	visibleParts = "B_SPLITPART_4;B_FILLPOLY_4"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "MuniGib4"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromcismungib5 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/banking_clan_frigate/munificent/munificent_exterior"
+	visibleParts = "B_SPLITPART_5;B_FILLPOLY_5"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "MuniGib5"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromcismungib6 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/banking_clan_frigate/munificent/munificent_exterior"
+	visibleParts = "B_SPLITPART_6;B_FILLPOLY_6"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "MuniGib6"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromcismungib7 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/banking_clan_frigate/munificent/munificent_exterior"
+	visibleParts = "B_SPLITPART_7;B_FILLPOLY_7"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "MuniGib7"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromcismungib8 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/banking_clan_frigate/munificent/munificent_exterior"
+	visibleParts = "B_SPLITPART_8;B_FILLPOLY_8"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "MuniGib8"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+// Acclamator Gibs
+
+template capitalshipdebrisfromrepaccgib1 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/rep/rep_acclamator_ext"
+	visibleParts = "B_SPLITPART_1;B_FILLPOLY_1"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "AccGib1"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromrepaccgib2 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/rep/rep_acclamator_ext"
+	visibleParts = "B_SPLITPART_2;B_FILLPOLY_2"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "AccGib2"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromrepaccgib3 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/rep/rep_acclamator_ext"
+	visibleParts = "B_SPLITPART_3;B_FILLPOLY_3"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "AccGib3"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromrepaccgib4 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/rep/rep_acclamator_ext"
+	visibleParts = "B_SPLITPART_4;B_FILLPOLY_4;B_DOOR"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "AccGib4"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromrepaccgib5 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/rep/rep_acclamator_ext"
+	visibleParts = "B_SPLITPART_5;B_FILLPOLY_5;B_DOOR"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "AccGib5"
+	editorPath         = "bf/props/FrigGibs"
+    }
+}
+
+template capitalshipdebrisfromrepaccgib6 : staticprop
+{
+    physics
+    {
+	isMoveable = "true"
+    }
+    render
+    {
+	model = "capital_ships/rep/rep_acclamator_ext"
+	visibleParts = "B_SPLITPART_6;B_FILLPOLY_6"
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "AccGib6"
+	editorPath         = "bf/props/FrigGibs"
     }
 }

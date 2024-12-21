@@ -1,3 +1,3 @@
-gamestatsmgrTemplate gamestatsmgr
+/*gamestatsmgrTemplate gamestatsmgr
 {
-}
+}*/

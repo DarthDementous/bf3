@@ -6,18 +6,6 @@
 // before creating new ones. Cheers
 //
 
-// Tatooine local levels. 1-2 players
-/*levelselect tatooine
-{
-    resfile = "tat.res"
-    stringID = "STR_LEVELNAME_TATOOINE"
-    image = "misctex/frontend/levels/tatooine"
-    max-players = 1
-    flags = "k_lsLinux|k_lsWindows|k_lsPS3|k_ls360|k_lsLocal"
-    gamemodes = "k_noGameMode|k_conquestGameMode"
-}
-*/
-
 // TATOOINE ====================
 // Tatooine
 levelselect tatooine
@@ -27,24 +15,9 @@ levelselect tatooine
     image = "misctex/frontend/levels/tatooine"
     max-players = 2
     flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsPS3|k_ls360|k_lsLocal|k_lsNetworked"
-    gamemodes = "k_noGameMode|k_conquestGameMode"
+    gamemodes = "k_conquestGameMode"
+    mapsizes = "k_multiplayer_MaxPlayersGameMode|k_multiplayer_32PlayersGameMode"
 }
-
-
-// Tatooine Assault map
-levelselect tatooine_assault
-{
-    resfile = "tatooine/tatooine_assault.res"
-    stringID = "STR_LEVELNAME_TATOOINE" 
-    image = "misctex/frontend/levels/tatooine"
-    max-players = 2
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal"
-    num-npcs  = 20
-    num-npcs-wii  = 16
-    gamemodes = "k_assaultGameMode"
-    gameScene = "sc_tat_assault"
-}
-
 
 //Tatooine heroes vs villains
 levelselect tatooine_heroesVillains
@@ -53,7 +26,7 @@ levelselect tatooine_heroesVillains
     stringID = "STR_LEVELNAME_TATOOINE" 
     image = "misctex/frontend/levels/tatooine"
     max-players = 2
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal"
+    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal|k_lsNetworked"
     num-npcs  = 20
     num-npcs-wii  = 16
     gamemodes = "k_heroesVillainsGameMode"
@@ -67,8 +40,9 @@ levelselect tatooine_hunt
     stringID = "STR_LEVELNAME_TATOOINE"
     image = "misctex/frontend/levels/tatooine"
     max-players = 2
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal"
+    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal|k_lsNetworked"
     gamemodes = "k_huntGameMode"
+    era = "k_CloneWarsEra"
 }
 
 // CORUSCANT =================
@@ -79,28 +53,12 @@ levelselect coruscant
     stringID = "STR_LEVELNAME_CORUSCANT"
     image = "misctex/frontend/levels/coruscant"
     max-players = 1
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsLocal|k_lsPS3|k_ls360"
-    gamemodes = "k_noGameMode|k_conquestGameMode"
+    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsLocal|k_lsPS3|k_ls360|k_lsNetworked"
+    gamemodes = "k_conquestGameMode"
     era = "k_CloneWarsEra"
+    mapsizes = "k_multiplayer_MaxPlayersGameMode|k_multiplayer_32PlayersGameMode|k_multiplayer_SpaceMapGameMode"
+    gameScene = "sc_game_conquest"
 }
-
-
-// Updated Coruscant Assault map
-levelselect coruscant_assault
-{
-    resfile = "coruscant/coruscant_assault.res"
-    stringID = "STR_LEVELNAME_CORUSCANT"//COR_ASSAULT_MENUNAME" 
-    image = "misctex/frontend/levels/coruscant"
-    max-players = 1
-flags = ""
-//    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal"
-    num-npcs  = 20
-    num-npcs-wii  = 16
-    gamemodes = "k_assaultGameMode"
-    gameScene = "sc_coruscant_assault_update"
-    era = "k_CloneWarsEra"    
-}
-
 
 levelselect coruscant_hero
 {
@@ -108,7 +66,7 @@ levelselect coruscant_hero
     stringID = "STR_LEVELNAME_CORUSCANT" 
     image = "misctex/frontend/levels/coruscant"
     max-players = 1
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal"
+    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal|k_lsNetworked"
     num-npcs  = 20
     num-npcs-wii  = 16
     gamemodes = "k_heroesVillainsGameMode"
@@ -126,23 +84,6 @@ levelselect coruscant_trailer
     gamemodes = "k_noGameMode"
 }
 
-/*
-// Coruscant - 16 players Conquest
-levelselect coruscant_16player
-{
-    resfile = "cor_16player.res"
-    stringID = "STR_LEVELNAME_CORUSCANT_16PLAYER"
-    image = "misctex/frontend/levels/coruscant"
-//    min-players = 1
-    max-players = 1 //2
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsLocal"
-//    ai-alwaysScramble = "TRUE" 
-//    num-npcs          = 4
-    gamemodes = "k_conquestGameMode"
-}
-*/
-
-// CATO NEIMOIDIA ================
 // Cato Neimoidia Conquest
 levelselect cato
 {
@@ -150,9 +91,10 @@ levelselect cato
     stringID = "STR_LEVELNAME_CATO_NEIMOIDIA"
     image = "misctex/frontend/levels/catoneimoidia"
     max-players = 1
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal"
-    gamemodes = "k_noGameMode|k_conquestGameMode"
-    era = "k_CloneWarsEra"    
+    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal|k_lsNetworked"
+    gamemodes = "k_conquestGameMode"
+    era = "k_CloneWarsEra"
+    mapsizes = "k_multiplayer_MaxPlayersGameMode|k_multiplayer_32PlayersGameMode"
 }
 
 // DANTOOINE =====================
@@ -163,8 +105,9 @@ levelselect dantooine
     stringID = "STR_LEVELNAME_DANTOOINE"
     image = "misctex/frontend/levels/dantooine"
     max-players = 1
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsLocal|k_ls360"
-    gamemodes = "k_noGameMode|k_conquestGameMode"
+    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsPS3|k_ls360|k_lsLocal|k_lsNetworked"
+    gamemodes = "k_conquestGameMode"
+    mapsizes = "k_multiplayer_MaxPlayersGameMode|k_multiplayer_32PlayersGameMode"
 }
 
 levelselect dantooine_hunt
@@ -173,11 +116,10 @@ levelselect dantooine_hunt
     stringID = "STR_LEVELNAME_DANTOOINE"
     image = "misctex/frontend/levels/dantooine"
     max-players = 1
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsLocal|k_ls360"
+    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsPS3|k_ls360|k_lsLocal|k_lsNetworked"
     gamemodes = "k_huntGameMode"
+    era = "k_CloneWarsEra"
 }
-
-
 
 // DESOLATION STATION =============
 // Desolation 1 player local only
@@ -187,8 +129,9 @@ levelselect desolation
     stringID = "STR_LEVELNAME_DESOLATION"
     image = "misctex/frontend/levels/desolation"
     max-players = 1
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal"
-    gamemodes = "k_noGameMode|k_conquestGameMode"        
+    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal|k_lsNetworked"
+    gamemodes = "k_conquestGameMode"
+    mapsizes = "k_multiplayer_MaxPlayersGameMode|k_multiplayer_16PlayersGameMode|k_multiplayer_SpaceMapGameMode"    
 }
 
 // YAVIN IV =======================
@@ -199,8 +142,24 @@ levelselect yavin
     stringID = "STR_LEVELNAME_YAVIN"
     image = "misctex/frontend/levels/yaviniv"
     max-players = 1
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsPS3|k_ls360|k_lsLocal"
-    gamemodes = "k_noGameMode|k_conquestGameMode"
+    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsPS3|k_ls360|k_lsLocal|k_lsNetworked"
+    gamemodes = "k_conquestGameMode"
+    gameScene = "sc_yavin_conquest"
+    mapsizes = "k_multiplayer_MaxPlayersGameMode|k_multiplayer_32PlayersGameMode|k_multiplayer_SpaceMapGameMode"
+}
+
+//Yavin Heroes vs Villains
+levelselect yav_heroesVillains
+{
+    resfile = "yavin/yavin.res"
+    stringID = "STR_LEVELNAME_YAVIN" 
+    image = "misctex/frontend/levels/yaviniv"
+    max-players = 2
+    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal|k_lsNetworked"
+    num-npcs  = 20
+    num-npcs-wii  = 16
+    gamemodes = "k_heroesVillainsGameMode"
+    heroHealthShouldDepleteWithTime = "false"
 }
 
 // YAVIN IV =======================
@@ -224,27 +183,12 @@ levelselect hoth
     stringID = "STR_LEVELNAME_HOTH"
     image = "misctex/frontend/levels/hoth"
     max-players = 2
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal"
-    gamemodes = "k_noGameMode|k_conquestGameMode"
+    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal|k_lsNetworked"
+    gamemodes = "k_conquestGameMode"
     era = "k_GalacticCivilWarEra"	//you can now tailor each level select to a specific era. by default, both eras will be playable
+    gameScene = "sc_hoth_conquest"
+    mapsizes = "k_multiplayer_MaxPlayersGameMode|k_multiplayer_32PlayersGameMode"
 }
-
-
-// Hoth Assault
-levelselect hoth_ass
-{
-    resfile = "hoth/hoth_ass.res"
-    stringID = "STR_LEVELNAME_HOTH"
-    image = "misctex/frontend/levels/hoth"
-    max-players = 2
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal"
-    num-npcs  = 20
-    num-npcs-wii  = 16
-    gamemodes = "k_assaultGameMode"
-    gameScene = "sc_hoth_ass"    
-    era = "k_GalacticCivilWarEra"
-}
-
 
 // ENDOR ===========================
 // Endor 
@@ -254,10 +198,10 @@ levelselect endor
     stringID = "STR_LEVELNAME_ENDOR"
     image = "misctex/frontend/levels/endor"
     max-players = 1
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsPS3|k_ls360|k_lsLocal"
-//    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal"
-    gamemodes = "k_noGameMode|k_conquestGameMode"
+    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsPS3|k_ls360|k_lsLocal|k_lsNetworked"
+    gamemodes = "k_conquestGameMode"
     era = "k_GalacticCivilWarEra"
+    mapsizes = "k_multiplayer_MaxPlayersGameMode|k_multiplayer_32PlayersGameMode"
 }
 
 // Endor Hunt
@@ -267,27 +211,11 @@ levelselect endor_hunt
     stringID = "STR_LEVELNAME_ENDOR"
     image = "misctex/frontend/levels/endor"
     max-players = 2
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal"
+    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal|k_lsNetworked"
     gamemodes = "k_huntGameMode"
     era = "k_GalacticCivilWarEra"
 }
 
-// Endor Assault map
-levelselect endor_assault
-{
-    resfile = "endor/endor_assault.res"
-    stringID = "STR_LEVELNAME_ENDOR" 
-    image = "misctex/frontend/levels/endor"
-    max-players = 2
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal"
-    num-npcs  = 20
-    num-npcs-wii  = 16
-    gamemodes = "k_assaultGameMode"
-    gameScene = "sc_endor_assault"
-    era = "k_GalacticCivilWarEra"
-}
-
-// BESPIN ========================
 // Bespin Conquest
 levelselect bespin
 {
@@ -295,8 +223,9 @@ levelselect bespin
     stringID = "STR_LEVELNAME_BESPIN"
     image = "misctex/frontend/levels/bespin"
     max-players = 2
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsLocal|k_lsPS3|k_ls360"
-    gamemodes = "k_noGameMode|k_conquestGameMode"
+    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsLocal|k_lsPS3|k_ls360|k_lsNetworked"
+    gamemodes = "k_conquestGameMode"
+    mapsizes = "k_multiplayer_MaxPlayersGameMode|k_multiplayer_16PlayersGameMode"
     //era = "k_GalacticCivilWarEra"
 }
 
@@ -306,7 +235,7 @@ levelselect bespin_hunt
     stringID = "STR_LEVELNAME_BESPIN"
     image = "misctex/frontend/levels/bespin"
     max-players = 2
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsLocal|k_lsPS3|k_ls360"
+    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsLocal|k_lsPS3|k_ls360|k_lsNetworked"
     gamemodes = "k_huntGameMode"
     era = "k_GalacticCivilWarEra"
 }
@@ -318,7 +247,7 @@ levelselect bespin_heroesVillains
     stringID = "STR_LEVELNAME_BESPIN" 
     image = "misctex/frontend/levels/bespin"
     max-players = 2
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal"
+    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal|k_lsNetworked"
     num-npcs  = 20
     num-npcs-wii  = 16
     gamemodes = "k_heroesVillainsGameMode"
@@ -334,7 +263,8 @@ levelselect dathomir
     image = "misctex/frontend/levels/dathomir"
     max-players = 1
     flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsLocal|k_lsPS3|k_ls360|k_lsNetworked"
-    gamemodes = "k_noGameMode|k_conquestGameMode"
+    gamemodes = "k_conquestGameMode"
+    mapsizes = "k_multiplayer_MaxPlayersGameMode|k_multiplayer_32PlayersGameMode|k_multiplayer_SpaceMapGameMode"
 }
 
 // MUSTAFAR ========================
@@ -345,9 +275,10 @@ levelselect mustafar
     stringID = "STR_LEVELNAME_MUSTAFAR"
     image = "misctex/frontend/levels/mustafar"
     max-players = 1 //2
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal"
-    gamemodes = "k_noGameMode|k_conquestGameMode"
+    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal|k_lsNetworked"
+    gamemodes = "k_conquestGameMode"
     era = "k_CloneWarsEra|k_GalacticCivilWarEra"
+    mapsizes = "k_multiplayer_MaxPlayersGameMode|k_multiplayer_32PlayersGameMode"
 }
 
 levelselect mustafar_hero
@@ -356,58 +287,9 @@ levelselect mustafar_hero
     stringID = "STR_LEVELNAME_MUSTAFAR"
     image = "misctex/frontend/levels/mustafar"
     max-players = 1 //2
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal"
+    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal|k_lsNetworked"
     gamemodes = "k_heroesVillainsGameMode"
     era = "k_CloneWarsEra"
-}
-/
-/*
-levelselect mus_layout_new
-{
-    resfile = "mus/mus_layout_new.res"
-    stringID = "STR_LEVELNAME_MUSTAFAR_NEW"
-    image = "misctex/frontend/levels/mustafar"
-    max-players = 1 //2
-flags = ""
-//    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsLocal"
-    gamemodes = "k_noGameMode"//|k_conquestGameMode"
-}
-*/
-// Mustafar Conquest
-levelselect mustafar_conquest
-{
-    resfile = "mustafar/mustafar_conquest.res"
-    stringID = "STR_LEVELNAME_MUSTAFAR"
-    image = "misctex/frontend/levels/mustafar"
-    max-players = 1
-flags=""
-//    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal"
-    gamemodes = "k_conquestGameMode"        
-}
-
-//Mustafar Heroes Vs Villains
-levelselect mustafar_heroesVillains
-{
-    resfile = "mustafar/mustafar_h_vs_v.res"
-    stringID = "STR_LEVELNAME_MUSTAFAR" 
-    image = "misctex/frontend/levels/mustafar"
-    max-players = 1
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal"
-    num-npcs  = 20
-    num-npcs-wii  = 16
-    gamemodes = "k_heroesVillainsGameMode"
-    heroHealthShouldDepleteWithTime = "false"
-}
-
-// Mustafar Hunt
-levelselect mustafar_hunt
-{
-    resfile = "mustafar/mustafar_hunt.res"
-    stringID = "STR_LEVELNAME_MUSTAFAR"
-    image = "misctex/frontend/levels/mustafar"
-    max-players = 2
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal"
-    gamemodes = "k_huntGameMode"
 }
 
 // KASHYYYK =========================
@@ -418,47 +300,12 @@ levelselect kashyyyk
     stringID = "STR_LEVELNAME_KASHYYYK"
     image = "misctex/frontend/levels/kashyyyk"
     max-players = 1
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal"
+    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal|k_lsNetworked"
 //    flags = "k_lsLinux|k_lsWindows|k_lsLocal"
-    gamemodes = "k_noGameMode|k_conquestGameMode"
+    gamemodes = "k_conquestGameMode"
     era = "k_CloneWarsEra|k_GalacticCivilWarEra"
+    mapsizes = "k_multiplayer_MaxPlayersGameMode|k_multiplayer_16PlayersGameMode"
 }
-// DEATH STAR II =====================
-// Deathstar
-levelselect deathstar2
-{
-    resfile = "deathstar/deathstar.res"
-    stringID = "STR_LEVELNAME_DEATHSTAR2"
-    image = "misctex/frontend/levels/deathstar2"
-    max-players = 1
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsLocal|k_lsPS3|k_ls360"
-    gamemodes = "k_noGameMode"
-}
-
-
-levelselect deathstar_jediarena
-{
-    resfile = "deathstar/deathstar_jediarena.res"
-    stringID = "STR_LEVELNAME_DEATHSTAR_JA"
-    image = "misctex/frontend/levels/deathstar2"
-    max-players = 1
-    num-npcs = 1
-    num-npcs-wii = 1
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsWii|k_lsLocal|k_ls360"
-    //gamemodes = "k_noGameMode" //| k_jediArenaGameMode"        
-    gamemodes = "k_jediArenaGameMode"        
-}
-
-levelselect deathstar_jediarena_splitscreen
-{
-    resfile = "deathstar/deathstar_jediarena.res"
-    stringID = "STR_LEVELNAME_DEATHSTAR_JA"
-    image = "misctex/frontend/levels/deathstar2"
-    max-players = 2
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsWii|k_lsLocal"
-    gamemodes = "k_jediArenaGameMode"        
-}
-
 //Deathstar heroes vs villains
 levelselect deathstar_h_vs_v
 {
@@ -466,42 +313,15 @@ levelselect deathstar_h_vs_v
     stringID = "STR_LEVELNAME_DEATHSTAR2" 
     image = "misctex/frontend/levels/deathstar2"
     max-players = 1
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal"
+    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal|k_lsNetworked"
 //    num-npcs  = 16
  //   num-npcs-wii  = 16
-    gamemodes = "k_noGameMode|k_heroesVillainsGameMode"
+    gamemodes = "k_heroesVillainsGameMode"
     era = "k_GalacticCivilWarEra"
     heroHealthShouldDepleteWithTime = "false"
 }
 
 // CIS CRUISER ==========================
-/*
-levelselect jeditest
-{
-    stringID = "STR_LEVELNAME_JEDICOMBATTEST"
-    image = "misctex/frontend/levels/jedi"
-    resfile = "cruiser_conquest_jedi_test.res"
-    max-players = 2
-    num-npcs  = 20
-    flags = "k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal"
-//    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal"
-//gamemodes = "k_conquestGameMode"
-    gamemodes = "k_heroesVillainsGameMode"
-    heroHealthShouldDepleteWithTime = "false"
-}
-
-// CIS Cruiser Conquest match. 1-2 players REMOVE NO LONGER NEEDED.
-levelselect cruiserconquest
-{
-    resfile = "cruiser_conquest.res"
-    stringID = "STR_LEVELNAME_CRUISERCONQUEST"
-    image = "misctex/frontend/levels/invisiblehand"
-    max-players = 2
-//    num-npcs = 6
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360|k_lsLocal|k_lsNetworked"
-    gamemodes = "k_conquestGameMode"
-}
-*/
  
 // Star Destroyer Conquest
 levelselect star_destroyer_conquest
@@ -510,9 +330,10 @@ levelselect star_destroyer_conquest
     stringID = "STR_LEVELNAME_STARDESTROYER"
     image = "misctex/frontend/levels/stardestroyer"
     max-players = 2
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal"
-    gamemodes = "k_noGameMode|k_conquestGameMode"
+    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal|k_lsNetworked"
+    gamemodes = "k_conquestGameMode"
     era = "k_GalacticCivilWarEra"	//you can now tailor each level select to a specific era. by default, both eras will be playable
+    mapsizes = "k_multiplayer_32PlayersGameMode|k_multiplayer_16PlayersGameMode"
 }
 
 // Invisible Hand Conquest
@@ -522,9 +343,10 @@ levelselect invisible_hand
     stringID = "STR_LEVELNAME_INVISIBLE_HAND"
     image = "misctex/frontend/levels/invisiblehand" 
     max-players = 2
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal"
-    gamemodes = "k_noGameMode|k_conquestGameMode"
+    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal|k_lsNetworked"
+    gamemodes = "k_conquestGameMode"
     era = "k_CloneWarsEra"	//you can now tailor each level select to a specific era. by default, both eras will be playable
+    mapsizes = "k_multiplayer_32PlayersGameMode|k_multiplayer_16PlayersGameMode"
 }
 
 // Deathstar Conquest
@@ -534,69 +356,11 @@ levelselect deathstar_conquest
     stringID = "STR_LEVELNAME_DEATHSTAR2"
     image = "misctex/frontend/levels/deathstar2"
     max-players = 2
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal"
-    gamemodes = "k_noGameMode|k_conquestGameMode"
-    era = "k_GalacticCivilWarEra"	//you can now tailor each level select to a specific era. by default, both eras will be playable
-}
-
-/*
-levelselect cruiserconquest_net
-{
-    resfile = "cruiser_conquest_net.res"
-    stringID = "STR_LEVELNAME_CRUISERCONQUEST"
-    image = "misctex/frontend/levels/invisiblehand"
-    max-players = 2
-//    num-npcs = 6
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_ls360"
+    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal|k_lsNetworked"
     gamemodes = "k_conquestGameMode"
-}*/
-
-// STAR DESTROYER ==========================
-// Star Destroyer 1 player local only
-levelselect star_destroyer
-{
-    resfile = "star_destroyer.res"
-    stringID = "STR_LEVELNAME_STARDESTROYER"
-    image = "misctex/frontend/levels/stardestroyer"
-    max-players = 1
-flags = ""
-//    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsLocal"
+    era = "k_GalacticCivilWarEra"	//you can now tailor each level select to a specific era. by default, both eras will be playable
+    mapsizes = "k_multiplayer_32PlayersGameMode|k_multiplayer_16PlayersGameMode"
 }
-
-// FRIGATE AND CAPITAL SHIP TESTROOMS ===============
-// Deathstar
-levelselect deathstar_view
-{
-    resfile = "capitalships/deathstar.res"
-    stringID = "STR_LEVELNAME_DEATHSTAR2"
-    image = "misctex/frontend/levels/deathstar2"
-    max-players = 1 //2
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal"
-    gamemodes = "k_noGameMode"//|k_conquestGameMode"
-}
-
-// CIS Cruiser
-levelselect ciscruiser_view
-{
-    resfile = "capitalships/cis_cruiser.res"
-    stringID = "STR_CAPITALSHIP_CIS_CRUISER"
-    image = "misctex/frontend/levels/invisiblehand"
-    max-players = 1 //2
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal"
-    gamemodes = "k_noGameMode"//|k_conquestGameMode"
-}
-
-// Star Destroyer
-levelselect star_destroyer_view
-{
-    resfile = "capitalships/star_destroyer.res"
-    stringID = "STR_LEVELNAME_STARDESTROYER"
-    image = "misctex/frontend/levels/stardestroyer"
-    max-players = 1 //2
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_ls360|k_lsPS3|k_lsLocal"
-    gamemodes = "k_noGameMode"//|k_conquestGameMode"
-}
-
 // Damaged star destroyer
 levelselect damaged_star_dest
 {
@@ -686,70 +450,6 @@ levelselect controlship_view
 }
 
 // TEST ROOMS ==============================
-/*
-// Jedi Combat test 2 player local only
-levelselect jedi_combat
-{
-    resfile = "jedi_test.res"
-    stringID = "STR_LEVELNAME_JEDICOMBATTEST"
-    image = "misctex/frontend/levels/jedi"
-    min-players = 2
-    max-players = 2
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_lsLocal|k_ls360"
-}
-*/
-
-// Star Duels ;) 
-levelselect duel
-{
-    resfile = "duel.res"
-    stringID = "STR_LEVELNAME_DUEL"
-    image = "misctex/frontend/levels/duel"
-    min-players = 1
-    max-players = 1
-    num-npcs = 1
-    num-npcs-wii = 1
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_lsLocal|k_lsWii|k_ls360"
-    heroHealthShouldDepleteWithTime = "false"
-}
-
-levelselect duel_split
-{
-    resfile = "duel.res"
-    stringID = "STR_LEVELNAME_DUEL"
-    image = "misctex/frontend/levels/duel"
-    min-players = 2
-    max-players = 2
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_lsLocal|k_ls360"
-    heroHealthShouldDepleteWithTime = "false"
-}
-
-/*
-// Star Duels: Split Screen
-levelselect duel
-{
-    resfile = "duel_split.res"
-    stringID = "STR_LEVELNAME_DUEL"
-    image = "misctex/frontend/levels/jedivsclone"
-    min-players = 2
-    max-players = 2
-    flags = "k_lsPS3|k_lsLinux|k_lsWindows|k_lsLocal|k_ls360"
-}*/
-
-// Jedi vs Infantry test local only
-levelselect jedi_vs_infantry
-{
-    resfile = "jedi_infantry_test.res"
-    stringID = "STR_LEVELNAME_JEDIINFANTRYTEST"
-    image = "misctex/frontend/levels/jedivsclone"
-    min-players = 1
-    max-players = 1
-    num-npcs = 1
-    num-npcs-wii = 1
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_lsLocal|k_lsWii|k_ls360"
-    heroHealthShouldDepleteWithTime = "false" 
-}
-
 // Wii Anim Testroom
 levelselect anim_testroom_wii_ai
 {
@@ -761,38 +461,12 @@ levelselect anim_testroom_wii_ai
     flags = "k_lsWii|k_lsLocal|k_lsWii"
     heroHealthShouldDepleteWithTime = "false" 
 }
-
 // AI Test Room
 levelselect ai_testroom
 {
-    resfile = "testroom/testroom.res"
+    resfile = "testroom/testroom_ai.res"
     stringID = "STR_LEVELNAME_AITEST"
     image = "misctex/frontend/levels/jedi"
-    max-players = 1
-    num-npcs = 50
-    num-npcs-wii  = 32
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_lsLocal|k_ls360"
-}
-
-// Testroom Ambient
-levelselect testroom_ambient
-{
-    resfile = "testroom/testroom_ambient.res"
-    stringID = "STR_LEVELNAME_AMBIENT"
-    image = "misctex/frontend/levels/jedi"
-    max-players = 1
-    num-npcs = 50
-    num-npcs-wii  = 32
-    heroHealthShouldDepleteWithTime = "false"    
-    flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_lsLocal|k_ls360"
-}
-
-// Anim Test Room
-levelselect anim_testroom
-{
-    resfile = "testroom/mark_testworld.res"
-    stringID = "STR_LEVELNAME_ANIMTEST"
-    image = "misctex/frontend/levels/animation_testroom"
     max-players = 1
     flags = "k_lsWii|k_lsPS3|k_lsLinux|k_lsWindows|k_lsLocal|k_ls360"
 }
@@ -820,6 +494,28 @@ levelselect vehicle_handling_testroom
     gamemodes = "k_noGameMode"//|k_conquestGameMode"
 }
 
+// Vehicle Test Environment
+levelselect ground_vehicle_testroom
+{
+    resfile = "testroom/testroom_groundvehicles.res"
+    stringID = "STR_GR_VEHICLETEST"
+    image = "misctex/frontend/levels/animation_testroom"
+    max-players = 1
+    flags = "k_lsLinux|k_lsWindows|k_lsLocal|k_ls360|k_lsPS3"
+    gamemodes = "k_noGameMode"//|k_conquestGameMode"
+}
+
+// Vehicle Test Environment
+levelselect flying_vehicle_testroom
+{
+    resfile = "testroom/testroom_flyingvehicles.res"
+    stringID = "STR_FLY_VEHICLETEST"
+    image = "misctex/frontend/levels/animation_testroom"
+    max-players = 1
+    flags = "k_lsLinux|k_lsWindows|k_lsLocal|k_ls360|k_lsPS3"
+    gamemodes = "k_noGameMode"//|k_conquestGameMode"
+}
+
 // Weapon Test Environment
 levelselect weapon_testroom
 {
@@ -832,36 +528,51 @@ levelselect weapon_testroom
     heroHealthShouldDepleteWithTime = "false"    
 }
 
-// Rebel Mon Calamari 1 player local only
-//levelselect reb_mon_calamari
-//{
-//    resfile = "reb_mon_calamari.res"
-//    stringID = "STR_LEVELNAME_MON_CALAMARI"
-//    image = "misctex/frontend/levels/moncalamari_home1"
-//    max-players = 1
-//    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsLocal"
-//}
-
-// Rep Cruiser 1 player local only
-//levelselect rep_crusier_interior
-//{
-//    resfile = "rep_cruiser_interior.res"
-//    stringID = "STR_LEVELNAME_REP_CRUISER_INTERIOR"
-//    image = "misctex/frontend/levels/rep_venator"
-//    max-players = 1
-//    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsLocal"
-//}
-
-/*
-// Old Imperial Shipyard
-levelselect shipyard
+//AI Sequence TESTROOM
+levelselect ai_sequence_testroom
 {
-    resfile = "shipyard.res"
-    stringID = "STR_LEVELNAME_IMPERIALSHIPYARD"
-    image = "misctex/frontend/levels/shipyard"
+    resfile = "testroom/testroom_patrol.res"
+    stringID = "STR_LEVELNAME_AIACTION"
+    image = "misctex/frontend/levels/animation_testroom"
     max-players = 1
-    flags = "k_lsWii|k_lsLinux|k_lsWindows|k_lsLocal"
+    flags = "k_lsLinux|k_lsWindows|k_lsLocal|k_ls360|k_lsPS3"
+    gamemodes = "k_noGameMode"
+    heroHealthShouldDepleteWithTime = "false"    
 }
-*/
 
+// Animated Vehicle Test Environment
+levelselect walker_test
+{
+    resfile = "hoth/hoth_walkers.res"
+    stringID = "STR_LEVELNAME_WALKER_TEST"
+    image = "misctex/frontend/levels/animation_testroom"
+    max-players = 1
+    flags = "k_lsLinux|k_lsWindows|k_lsLocal|k_ls360|k_lsPS3"
+    gamemodes = "k_noGameMode"
+    heroHealthShouldDepleteWithTime = "false"    
+}
+
+// Weapon Test Environment
+levelselect testopolis
+{
+    resfile = "testroom/testopolis.res"
+    stringID = "STR_LEVELNAME_TESTOPOLIS"
+    image = "misctex/frontend/levels/animation_testroom"
+    max-players = 1
+    flags = "k_lsLinux|k_lsWindows|k_lsLocal|k_ls360|k_lsPS3"
+    gamemodes = "k_noGameMode"
+    heroHealthShouldDepleteWithTime = "false"    
+}
+
+// All Chars Testroom
+levelselect allchartest
+{
+    resfile = "testroom/testroom_allchars.res"
+    stringID = "STR_LEVELNAME_ALLCHRTST"
+    image = "misctex/frontend/levels/animation_testroom"
+    max-players = 1
+    flags = "k_lsLinux|k_lsWindows|k_lsLocal|k_ls360|k_lsPS3"
+    gamemodes = "k_noGameMode"
+    heroHealthShouldDepleteWithTime = "false"    
+}
 

@@ -10,7 +10,7 @@
 
 bulletmanagerTemplate bulletmanager
 {
-    class-id			=   "bf bullet mgr"
+    class-id			=   "bullet mgr"
 
     maxbullets			=   300
     maxHomingRockets		=   40
@@ -27,6 +27,4 @@ bulletmanagerTemplate bulletmanager
 
     //an ADDITIONAL hit effect to material mgr stuff because of the bullet type
     laserhitfx = "laserHit"
-
-    useHeightMultiplier = "true"
 }

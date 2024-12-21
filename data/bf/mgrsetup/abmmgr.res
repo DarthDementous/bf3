@@ -11,4 +11,5 @@ ABMMgr abmmgr
 
     //RS: number bumped up to avoid crash on coruscant as a temporary fix
     maxPrograms	    =	    122 //92
+    maxProgramsWii  =	    64 //92
 }

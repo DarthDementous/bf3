@@ -13,24 +13,8 @@ template volumeMix : soundmixer
     volume = 1.f
 }
 
-template rangeMix : soundmixer
-{
-    type = 3
-    range = 1.f
-}
 
-template fadeMix : soundmixer
-{
-    type = 4
-    fadeIn = 0.f
-    fadeOut = 0.f
-}
 
-template pitchMix : soundmixer
-{
-    type = 6
-    pitch = 1.f
-}
 
 template channelStripMix : soundmixer
 {
@@ -45,44 +29,9 @@ template channelStripMix : soundmixer
     filter = 1.f
 }
 
-template auxEffectMix : soundmixer
-{
-    type = 5
-    mixSubType = 4
-}
 
-template multiMix : soundmixer
-{
-    type = 7
-    mixers = ""
-    stem = ""
-}
 
-template filterMix : soundmixer
-{
-    type = 8
-    filter = 1.f
-    stem = ""
-}
 
-template filterRolloffMix : soundmixer
-{
-    type = 9
-    filterRolloff = 1.f
-    stem = ""
-}
 
-template reverbMix : soundmixer
-{
-    type = 10
-    stem = ""
-}
 
-template panMix : soundmixer
-{
-    type = 11
-    pan[] = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-	      1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
-    stem = ""
-}
     

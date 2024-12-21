@@ -6,7 +6,7 @@ template fp_jawa_pistol_static : staticfirstpersongun //animfirstpersongun
 {
     render
     {
- model = "weapon/misc/jawa_blaster/jawa_blaster_thirdperson"
+	model = "weapon/misc/jawa_blaster/jawa_blaster_thirdperson"
     }
 }
 
@@ -14,83 +14,34 @@ template fp_jawa_pistol_boned : animfirstpersongun
 {
     render
     {
- model = "weapon/misc/jawa_blaster/jawa_blaster"
+	model = "weapon/misc/jawa_blaster/jawa_blaster"
     }
 }
 
 template w_jawa_bp : gun
 {
-    dynamiclight light
-    {
- exponent    = 1.f
- rotspeed    = 0.f
- offset[]    { 0.4f, 0.f, 0.f }
- light-type  = "k_lightSpot"
- colour[]    {3.75f, 3.75f, 3.75f}
- angle     = 70.f
- enabled     = "false"
-    }
-
     guncomponent_linetest_bf gun
     {
 	gunAnimationGroup anims
 	{
-	    set		    	= "gunanims_e11"
-	    animmap	    = "animmap_e11"
-	    reactmap	    = "reactmap_e11"
+	    set      = "ga_rep_shotgun"
+	    reactmap = "reactmap_generic"
+	    animmap	    = "am_rshotgun"
+
 	}
 
-//	ubiks = "ubiks_clone" // UBIKS WILL NOT BE THIS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-	gunInfoFromMgr = "bfdc15BR"	
-
-	gunZoomComponent_noView zoom
-	{
-	}	
+	gunInfoFromMgr = "bfjawa_sgun"
 	
-	hasFirePos = "true"
-	firstPersonFireDof  = "SHOOTPOS"
-	firstPersonFireBone = "b_body"
-	firstPersonFireDir [] {0.f, 0.f, 1.f}
-	firstPersonFirePos [] {0.f, 0.05f, -0.30f}
-	thirdPersonFireDir[]   {0.f, 0.f, 1.f}
-	thirdPersonFirePos[]   {0.0f, 0.f, 0.30f}
-
-	hasLightPos = "true"
-	//hasLightPos = "false"
-	firstPersonLightBone = "b_body"
-	firstPersonLightDir [] {0.f, 0.f, 1.f}
-	firstPersonLightPos [] {0.f, 0.10f, -0.1f}
-	thirdPersonLightDir[]   {0.f, 0.f, 1.f}
-	thirdPersonLightPos[]   {0.0, 0.17, -0.40f}
-
-	hasParticleUpPos     = "true"
-	firstPersonParticleUpBone   = "b_body"
-	firstPersonParticleUpPos[]  {0.f, 0.05f, 0.40f}
-	firstPersonParticleUpDir[]  {0.f, 1.f, 0.f}
-	thirdPersonParticleUpPos[]  {0.0, 0.12, 0.16}
-	thirdPersonParticleUpDir[]  {0.f, 1.f, 0.f}
-
-	hasCartridgePos     = "true"
-	firstPersonCartridgeBone   = "b_body"
-	firstPersonCartridgePos[]  {0.f, 0.05f, 0.40f}
-	firstPersonCartridgeDir[]  {1.f, 0.f, 0.f}
-	thirdPersonCartridgePos[]  {0.0, 0.12, 0.f}
-	thirdPersonCartridgeDir[]  {1.f, 0.f, 0.f}
-
-	soundmap_npc     		= "sndmap_bsjawa"
-	soundmap_player 		= "sndmap_bsjawa"
-	firstperson       			= "fp_jawa_pistol_boned"
-	muzzleFlashEffect    	= "lImpHHMuz" //"empty" //"muzPistolaSide" //damn it i want no muzzle flash at all
-	ammoID        				= "o_ammo_e11_br"
-	weaponID       			= "o_gun_jawa_bp"
-	weaponType      			= "k_pistol"
-	muzzleFlash_lightColour[]     {0.5f, 0.6f, 1.f} 
+	soundmap     		= "sndmap_bsjawa"
+	firstperson       	= "fp_jawa_pistol_boned"
+	ammoID		    = "o_ammo_shotgun"
+	weaponID	    = "o_gun_jawa_bp" 
+	weaponType	    = "k_shotgun"
  
 	recoilComponent recoil
 	{
 	}
-    	}
+    }
 
     render
     {
@@ -98,20 +49,44 @@ template w_jawa_bp : gun
     }
 }
 
+// Ugnaught Shotgun
+template w_ugn_sgun : w_jawa_bp
+{
+   gun
+   {
+	anims
+	{
+	    animmap	= "am_rshotgun"
+	}
+       
+	gunInfoFromMgr	= "bfugn_sgun"
+	weaponID	= "o_ugn_sgun"
+   }
+}
+
 template o_gun_jawa_bp : inventoryObjectTypeWeapon 
 {
     details
     {
-	singular = "Jawa Pistol"
-	singularPrefix = "the"
+	singularStrHandle   = "STR_PRIMARYWEAPON_JAWA_BLASTER_PISTOL"
 	pickupTemplate_create = ""
     }
 
     specialData
     {
 	weaponID = "w_jawa_bp"
-	hudTextureName = "rep_dc17_pistol"
-	usesThisAmmo = "o_ammo_jawa"
+	hudTextureName = "misc_jawa_blaster"
+	hudTextureScale = 0.7f
+	usesThisAmmo = "o_ammo_shotgun"
 	isSelectableAsSidearm = 1
+    }
+}
+
+// Ugnaught Inventory Version
+template o_ugn_sgun : o_gun_jawa_bp
+{
+    specialData
+    {
+	weaponID    = "w_ugn_sgun"
     }
 }

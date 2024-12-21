@@ -1,5 +1,5 @@
 // vim: set syntax=c :
 
-glassManager glassmgr
+/*glassManager glassmgr
 {
-}
+}*/

@@ -1,9 +1,9 @@
 // vim: set syntax=c :
 
-template chrhits 
+/*template chrhits 
 {
     class-id	    = "ode chr hits"
-}
+}*/
 
 template chrFootstepComponent
 {
@@ -12,11 +12,6 @@ template chrFootstepComponent
     leftFootBoneName = "lankle"
     rightFootBoneName = "rankle"
     footsteptype = "k_MatStep_Standard"
-}
-
-template teamMemberComponent
-{
-    class-id	    = "team member component"
 }
 
 template chrNameComponent
@@ -36,10 +31,6 @@ template chranim
     enableTurnAnims   = "false"
     PlayUbiksBackwards= "false"
 
-    physicsbonechain bonechain
-    {
-    }
-
     ragdollphysics ragdoll 
     { 
     }
@@ -48,35 +39,35 @@ template chranim
 
     autoRecurseTemplateName-field animset_crouch
     {
-	default = "marineCrouch"
+	default = "" // not valid templates anymore "marineCrouch"
     }
     autoRecurseTemplateName-field animset_walk
     {
-	default = "mcpMrnWlkChamber"
+	default = "" // not valid templates anymore  "mcpMrnWlkChamber"
     }
     autoRecurseTemplateName-field animset_run
     {
-	default = "mcpMrnJogChamber"	
+	default = "" //not valid templates anymore "mcpMrnJogChamber"	
     }
     autoRecurseTemplateName-field animset_walk_aim
     {
-	default = "mcpMrnWlkSght"
+	default = "" // not valid templates anymore "mcpMrnWlkSght"
     }
     autoRecurseTemplateName-field animset_run_aim
     {
-	default = "mcpMrnJogSght"
+	default = "" // not valid templates anymore "mcpMrnJogSght"
     }
     autoRecurseTemplateName-field animset_sprint
     {
-	default = "marineSprint"
+	default = "" // not valid templates anymore "marineSprint"
     }
     autoRecurseTemplateName-field animset_swim
     {
-	default = "marineWalk"	// Override for chrs who need it!
+	default = "" // not valid templates anymore "marineWalk"	// Override for chrs who need it!
     }
     autoRecurseTemplateName-field animset_crawl
     {
-	default = "marineWalk"	// Override for chrs who need it!
+	default = "" // not valid templates anymore "marineWalk"	// Override for chrs who need it!
     }
 
     autoRecurseTemplateName-field animset_walk_unarmed	// optional - default to none
@@ -125,6 +116,12 @@ template chranim
     autoRecurseTemplateName-field animset_turn // optional - default to none
     {
     }
+
+    soundeventsystem sndeventsystem
+    {
+	definition = "sndevt_infantry"
+    }
+    
 }
 
 template chrmotor
@@ -138,15 +135,16 @@ template chrmotor
 
 template chrweapon
 {
-    flags		= "k_emitStims"
+    flags		= "k_emitStims|k_autoTurn"
     gunRaised		= "false"
     gunCurrentlyVisible	= "true"
     maxGrenadeThrowStrength = 20.f
     minGrenadeThrowStrength = 1.f
     primaryThrowWristBone   = "rwrist"
     secondaryThrowWristBone = "lwrist"
+    defaultLeftHand = "gun_l"
+    defaultRightHand = "normal_r"
     serialiseStartWeapon = "true"
-    autoTurn = "true"
 
     float recoilingKeep []	    { 0.0f, 0.0f, 0.0f }
 
@@ -213,12 +211,8 @@ template ChrInWater
     class-id = "physics movement chr in water component"
     
     radius  = 0.05f // Leg radius
-    lhip    = ""
-    lknee   = ""
-    lfoot   = ""
-    rhip    = ""
-    rknee   = ""
-    rfoot   = ""
+    lfoot   = "lankle"
+    rfoot   = "rankle"
     feetOffset = 0.0f
 }
 
@@ -226,15 +220,16 @@ template physicsmovement
 {
     class-id	= "physics movement component"
     enabled	= "true"
-    
+
     internalPhysics
     {
 	class-id = "physics movement physics"	// There are a few classes with this class-id, but which one
 						// is registered depends on the physics library being use
 
-	crouchHeight = 1.3f
-	standHeight = 1.85
-	capsuleRadius = 0.45f
+	crouchHeight = 1.45f
+	standHeight = 1.90f
+	capsuleRadius = 0.48f		// changing this value will affect camera and movement - don't do it without consulting someone
+	pushStrength = 20.0f
 	// crawlBoxFraction = 0.f
 	// canCrawl = "true"
 	
@@ -245,13 +240,15 @@ template physicsmovement
 	//   shouldn't be passable at all (that is already added for the slope debug rendering so you can rely
 	//   on it).
 	maxSlopeAngle = 52
-	slideSlopeAngle = 40
+	slideSlopeAngle = 37
 	
 	collisionClass="ai"	    // Default to the ai collision class
 	collisionIgnore=""	    // Don't initially ignore anything
+	collisionGroup = "world"
     }
     
     givesoncontactdamage = "false"
+    scaleinputbycollisions = "true"
 
     justLandedScaleMovement = 1.f
     justLandedScaleMovementSpeed = 1.f
@@ -280,6 +277,10 @@ template physicsmovement
     fallDamage_distanceForZeroDamage = 5.f
     fallDamage_distanceForMaxDamage = 20.f
     fallDamage_maxDamage = 1.0f
+    
+    // these will affect the amount of damage applied to player by collision with vehicles and other objects
+    collisionMinDamageImp	= 2.2f
+    collisionDamageMult		= 0.6f
 }
 
 // The player needs a different physics movement since it
@@ -289,6 +290,10 @@ template playerphysicsmovement : physicsmovement
     internalPhysics
     {
 	collisionClass="player"
+    }
+    // Turn on water effects for players only
+    ChrInWater chrInWater
+    {
     }
 }
 
@@ -302,48 +307,14 @@ template SimpleRemoteUser
     class-id	    = "remote license"
 }
 
-template SimpleGrappleAttachment
-{
-    class-id	    = "swinging license"
-}
-
 template SimpleCharacterCamera : baseCamera
 {
     class-id	= "Simple Character Camera"
 }
 
-template SimpleBlackBox
-{
-    class-id	= "black box"
-}
-
 template chrcoveroccupier
 {
     class-id	    = "ai cover occupier"
-}
-
-template privatecovermaintainer
-{
-    class-id	    = "private cover maintainer"
-}
-
-template animscommon
-{
-    angry		= "AN_fe_angry"
-    blank		= "AN_fe_blank"
-    grin		= "AN_fe_grin"
-    intense		= "AN_fe_intense"
-    reyebrowup		= "AN_fe_reyebrowup"
-    notquite		= "AN_fe_notquite"
-    scared		= "AN_fe_scared"
-    sceptical		= "AN_fe_sceptical"
-    smile		= "AN_fe_smile"
-    surprise		= "AN_fe_surprise"
-
-    blink		= "AN_fe_blink"
-    eyes		= "AN_fe_eyes"
-    brows		= "AN_fe_brows"
-    jaw			= "AN_fe_jaw"
 }
 
 template chrwhisker
@@ -365,7 +336,6 @@ template chrsteer
     acceleration    = "k_aist_acceleration"
     deceleration    = "k_aist_deceleration"
     turnrate	    = "k_aist_turnRate"
-    cautious	    = "false"
 
     // default whiskers; one ahead, one slightly to each side
     // TODO doesn't quite serialise properly, each element gets the template if they differ, rather than the list having the template
@@ -389,43 +359,9 @@ template chrsteer
     }
 }
 
-template chrobstaclecomponent : obstaclecomponent
-{
-    primitive	= "k_nmob_cylinder"
-    autosize    = "false"
-    useproppos  = "true"	    // centre around props position rather than the centre pos - again because of the bits poking outside of the chrs cylinder
-    float dimensions []		    // autosizing makes npcs too big, especially if they're aiming their guns or flailing their arms about - hardcode for now, possibly base of physics bounds later
-    {
-	0.4f, 0.4f, 1.8f
-    }
-}
-
 template chrDescriptionComponent
 {
     class-id	= "Chr description component"
-}
-
-template participantComponent
-{
-    class-id	= "participant component"
-}
-
-template chranimatedprop : prop
-{
-    class-id	    =	"chr animated prop"
-
-    obinstrenderer render
-    {
-    }
-    chranim anim
-    {
-    }
-    physicsmovement physics
-    {
-    }
-    chrDescriptionComponent chrDesc
-    {
-    }
 }
 
 template chrHitReact
@@ -452,27 +388,11 @@ template chrProjectileReactData : chrReactData
     slideWallDeath	= "d_slideWall"
     runningDamagedReact = ""
     runningShotgunDeath = ""
-    crippledFalltoknee	= "fbc_baseF"
-    crippledReact	= ""
-    turntofaceReact	= ""
 }
 
 template chrExplosionReactData : chrReactData
 {
     class-id = "chr explosion react data"
-}
-
-template chrMeleeReactData : chrReactData
-{
-    class-id = "chr melee react data"
-    turntofaceReact	= ""
-}
-
-
-template chrOnFireComponent
-{
-    class-id = "on fire component"
-    damagePerSec = 0.9f
 }
 
 template stageProp

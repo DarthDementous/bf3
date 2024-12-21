@@ -1,3 +1,5 @@
+// vim: set syntax=c :
+
 /******************************************************************************
 ** buttons.res
 ** 12/01/05
@@ -43,18 +45,11 @@ template ButtonComponent : BaseActivateComponent
     {
 	pos[] {0.f, 0.f, 1.f}
 	distance = 2.25f
+	howMuchNeedToLookAtTargetPos = 0.75f	// Need to be pretty accurate with look direction!
 	hudPromptStringHandle = "STR_ACTIVATEPROMPT_PUSH"
 	flags = "kActivatePointFlag_enabled"
     }
 
-    soundcomponent soundPlayer
-    {
-    }
-
-    soundmap-field soundmap
-    {
-	default = ""
-    }
 
     vmCore vmcomp
     {
@@ -83,17 +78,6 @@ template ToggleButtonComponent : ButtonComponent
     testString += "ToggleButtonComponent"
 }
 
-template LeverComponent : ButtonComponent
-{
-    class-id	= "lever component" 
-    
-    string-field type
-    {
-	default = "LEVER***"
-	views	= "basic setup"
-    }
-}
-
 template ButtonProp : prop
 {
     class-id	= "button prop"
@@ -108,26 +92,23 @@ template ButtonProp : prop
     {
     }
 
-/*
-    // No physics by default, because there's no way of NULLing this in subtemplates...
-    // Add this to any templates for which the button needs physics!
-
-    static_obinst_physics physics
+    dynamicNetworkComponent network
     {
     }
-*/
 
-    network
+    soundeventsystem sndeventsystem
     {
-	activeSendLimit = 0.1f
-	maxInactiveSendLimit = 2.f
-	inactiveMultiplier = 2.f
-	active = "true"
-	distanceToPlayer = 100.f
+        definition = "sndevt_buttonpress"
+    }
+
+    soundmap-field soundmap
+    {
+	default = "sndmap_button_press"
     }
 
     propflags |= "k_neverChangeBgRoomGroup"
 }
+
 
 template ToggleButtonSendActivateMsgProp : ButtonProp
 {
@@ -149,54 +130,6 @@ template ToggleButtonSendActivateMsgProp : ButtonProp
     {
     }
 }
-
-template TimedButtonComponent : ButtonComponent
-{
-    class-id	= "timed button component"
-
-    // why isn't state inside ButtonComponent
-    //string-field state
-    //{
-	//default = "false"
-	//views	= "basic setup"
-    //}
-
-    float-field wait
-    {
-	default = 5.0f
-	views	= "basic setup"
-    }
-	
-    // this field meta inheritance doesn't work yet
-    testVar
-    {
-	views	+= "timed_test"
-    }
-
-    testString += "TimedButtonComponent"
-}
-
-template TimedButtonSendActivateMsgProp : ButtonProp
-{
-    TimedButtonComponent button
-    {
-	sendMsgAction action
-	{
-	    msg
-	    {
-		// some sensible defaults
-		type	= "k_directMsg"
-		sendto	= ""
-		msg	= "k_msgActivate"
-	    }
-	}
-    }
-
-    static_obinst_physics physics
-    {
-    }
-}
-
 
 template TimedAutoResetButtonComponent : ButtonComponent
 {

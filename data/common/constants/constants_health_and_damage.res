@@ -96,26 +96,9 @@ k_meleeHighDamageThreshold = 10.0f
  *****************************/
 
 k_chrDamageScalarUndefined = 1.0f
-k_chrlimbdamagescalar	   = 0.8f
+k_chrlimbdamagescalar	   = 1.0f
 k_chrbodydamagescalar	   = 1.0f
-k_chrheaddamagescalar	   = 10.0f
-
-/*
-
-    These values are now in data/common/mgrsetup/guninfomgr.res along with a lot of
-    other gun values, all modifiable at runtime [TF]
-
-k_gun_sniper_dmg = 0.5f 
-k_gun_assaultrifle_dmg = 0.05f //0.05f
-k_gun_military_shotgun_dmg = 0.1f
-k_gun_rebel_shotgun_dmg = 0.1f
-k_gun_mp5_dmg = 0.1f
-k_gun_pistola_dmg = 0.2f
-k_gun_rebel_minigun_dmg = 0.1f
-k_gun_fixedgun_dmg = 0.1f
-k_gun_antiairgun_dmg = 0.1f
-k_gun_unused_dmg = -1.0f
-*/
+k_chrheaddamagescalar	   = 2.8f
 
 /*********************************
  * CRITICAL DAMAGE THRESHOLD - ie: headshot/neck hit tolerance

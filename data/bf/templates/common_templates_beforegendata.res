@@ -16,8 +16,6 @@
 #include "data\bf\menus\templates\fontstyles.res"
 #include "data\bf\templates\scenes.res"
 #include "data\bf\templates\scene_descriptors_bf.res"
-#include "data\bf\templates\sound_scenes_bf.res"
-#include "data\bf\templates\sounds.res"
 #include "data\bf\templates\fx.res"
 #include "data\bf\templates\buttons.res"
 #include "data\bf\templates\weapons_helper.res"
@@ -25,4 +23,6 @@
 #include "data\bf\templates\particles.res"
 #include "data\bf\templates\leveldefaults.res"
 #include "data\bf\templates\squadcontrol.res"
+
+#include "data\common\templates\worldeditor_defaults.res"
 

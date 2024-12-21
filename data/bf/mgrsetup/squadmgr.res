@@ -1,8 +1,8 @@
 // vim: set syntax=c :
 
-squadmgrTemplate squadmgr
+/*squadmgrTemplate squadmgr
 {
-}
+}*/
 
 squadronmgrTemplate squadronmgr
 {

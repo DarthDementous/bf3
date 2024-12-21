@@ -27,68 +27,35 @@ template fp_imp_rocket_launcher_boned : animfirstpersongun
 
 template w_imp_rlaun : gun
 {
-    dynamiclight light
-    {
-	exponent 	= 1.f
-	rotspeed    	= 0.f
-	offset[]    { 0.4f, 0.f, 0.f }
-	light-type  	= "k_lightSpot"
-	colour[]    {3.75f, 3.75f, 3.75f}
-	angle	    	= 70.f
-	enabled	    = "false"
-    }
-
     guncomponent_hominglauncher_bf gun
     {
+	autoRecurseTemplateName-field rocket
+	{
+	    default = "proj_infrocket"
+	}
+	
 	gunAnimationGroup anims
 	{
-	    set		    = "ga_rep_rocket"
+	    set		= "ga_rep_rocket"
 	    animmap	= "am_rrocket"
 	    reactmap	= "reactmap_e11"
 	}
 
 	gunInfoFromMgr = "bfimprl"
 
-	hasFirePos = "true"
-	firstPersonFireDof  = "SHOOTPOS_1"
-	firstPersonFireBone = "b_body"
-	firstPersonFireDir []	{0.f, 0.f, 1.f}
-	firstPersonFirePos []	{0.f, 0.05f, -0.30f}
-	thirdPersonFireDir[]   {0.f, 0.f, 1.f}
-	thirdPersonFirePos[]   {0.0, 0.12, 0.50}
-
-	hasLightPos = "true"
-//	hasLightPos = "false"
-	firstPersonLightBone = "b_body"
-	firstPersonLightDir []	{0.f, 0.f, 1.f}
-	firstPersonLightPos []	{0.f, 0.10f, -0.1f}
-	thirdPersonLightDir[]   {0.f, 0.f, 1.f}
-	thirdPersonLightPos[]   {0.0, 0.17, -0.40f}
-
-	hasParticleUpPos	    = "true"
-	firstPersonParticleUpBone   = "b_body"
-	firstPersonParticleUpPos[]  {0.f, 0.05f, 0.40f}
-	firstPersonParticleUpDir[]  {0.f, 1.f, 0.f}
-	thirdPersonParticleUpPos[]  {0.0, 0.12, 0.16}
-	thirdPersonParticleUpDir[]  {0.f, 1.f, 0.f}
-
-	hasCartridgePos	    = "true"
-	firstPersonCartridgeBone   = "b_body"
-	firstPersonCartridgePos[]  {0.f, 0.05f, 0.40f}
-	firstPersonCartridgeDir[]  {1.f, 0.f, 0.f}
-	thirdPersonCartridgePos[]  {0.0, 0.12, 0.f}
-	thirdPersonCartridgeDir[]  {1.f, 0.f, 0.f}
-
-	soundmap_npc	    =	"sndmap_emprl"
-	soundmap_player	=	"sndmap_emprlpla"
+	soundmap	    =	"sndmap_emprl"
 	firstperson	    		=	"fp_imp_rocket_launcher_boned"
-	muzzleFlashEffect   	= "muzRedLsr1"
 	ammoID		    		= "o_ammo_imp_rl"
 	weaponID	    		= "o_gun_imp_rl"
    	weaponType	    = "k_rocket"
 	
 	recoilComponent recoil
 	{
+	}
+
+	zoom
+	{
+     	    allowIronSightLockOn = "false"	    
 	}
     }
 
@@ -98,37 +65,144 @@ template w_imp_rlaun : gun
     }
 }
 
+// Upgraded Rocket Launcher With Increased Clip Size
+template w_imp_rlaun_v2 : w_imp_rlaun
+{
+    gun
+    {
+	weaponID	    = "o_gun_imp_rl_v2"
+	ammoID		    = "o_ammo_imp_rl_up" 
+    }
+}
+
+// Upgraded Rocket Launcher With Increased Reload Speed
+template w_imp_rlaun_up : w_imp_rlaun_v2
+{
+    gun
+    {
+	weaponID	    = "o_gun_imp_rl_up"
+	gunInfoFromMgr	    = "bfimprl_up"	
+	    
+	anims
+	{
+	    set		    = "ga_rep_rocket_up"
+	}
+    }
+}
+
+// Story version
+template w_imp_rlaun_s : w_imp_rlaun
+{
+    gun
+    {
+	weaponID	    = "o_gun_imp_rl_s"
+	
+	autoRecurseTemplateName-field rocket
+	{
+	    default = "proj_rocket_st"
+	}
+    }
+}
+
 template o_gun_imp_rl : inventoryObjectTypeWeapon 
 {
     details
     {
-        singular = "Minimag PTL Projectile Launcher"
-	singularPrefix = "a"
-	pickupTemplate_create = ""
+	singularStrHandle   = "STR_PRIMARYWEAPON_IMP_MM_PTL_LAUNCHER" 
+	pickupTemplate_create = "singlepickup_gun_imprl"
     }
 
     specialData
     {
-    weaponID 			= "w_imp_rlaun"
-	hudTextureName = "no_image" 	// no imp_ ?
-	usesThisAmmo 	= "o_ammo_imp_rl"				// should this be updated?
+	weaponID 	= "w_imp_rlaun"
+	hudTextureName  = "imp_rocketlauncher"
+	hudTextureScale = 0.7f
+	usesThisAmmo 	= "o_ammo_imp_rl" // should this be updated?
     }
+}
+
+// Upgraded Rocket Launcher Object - Increased clip size
+template o_gun_imp_rl_v2 : o_gun_imp_rl
+{
+    specialData
+    {
+        weaponID	= "w_imp_rlaun_v2"
+	usesThisAmmo 	= "o_ammo_imp_rl_up"
+    }
+}
+
+
+// Upgraded Rocket Launcher Object - Increased reload speed
+template o_gun_imp_rl_up : o_gun_imp_rl_v2
+{
+    specialData
+    {
+        weaponID = "w_imp_rlaun_up"
+    }
+}
+
+// Story version
+template o_gun_imp_rl_s : o_gun_imp_rl
+{
+    specialData
+    {
+        weaponID = "w_imp_rlaun_s"
+    }
+}
+
+template singlepickup_gun_imprl : simplePickupPropBF
+{
+
+    obinstrenderer render
+    {
+	model	    =	"weapon/imp/imp_minimag_ptl_thirdperson"
+    }
+    
+    objectType		= "o_gun_imp_rl"
+    activate
+    {
+	myNameStringHandle  = "STR_PRIMARYWEAPON_IMP_MM_PTL_LAUNCHER"
+    }
+ 
+    pickupComponentWeapon pickupComponent
+    {
+	pickupflags = "k_pickupNoNPC"
+
+	    inventoryComponentBF contents
+	    {
+		inventoryEntryBF entry0
+		{
+		    carryingobisfirstparam	= "true"
+			objectType		= "o_gun_imp_rl"
+		}
+
+		inventoryEntryBF entry1
+		{
+		    objectType		= "o_ammo_imp_rl"
+		    total			= 5
+		}
+
+	    }
+    }
+
+     meta
+    {
+	canCreateInEditor    = 1
+	    editorInstanceName   = "SP_imp_rl"
+	    editorPath	     = "bf/pickups/guns/imp"
+	    renderDictPath	     = "render"
+    }
+
 }
 
 template pickup_gun_imprl : kitPickupProp
 {
     class = "k_chrClassHeavyWeapons"
 	dropToFloor = "true"
-	editor-only-render
-	{
-	    model = "weapon/imp/imp_minimag_ptl_thirdperson"
-		visibleParts =  "BTOP;" 
-	}
 
     obinstrenderer render
     {
 	model = "weapon/imp/imp_minimag_ptl_thirdperson"
-	    visibleParts =  "BTOP;"
     }
 
     pickupComponent
@@ -154,7 +228,7 @@ template pickup_gun_imprl : kitPickupProp
 
 	    inventoryEntryBF entry2
 	    {
-		objectType = "o_thrml_det_v1"
+		objectType = "o_imp_thrml_det"
 		    total	= 5
 	    }
 
@@ -183,23 +257,10 @@ template pickup_gun_imprl : kitPickupProp
 
     }
 
-    SimpleActivate activate
-    {
-	activatable = "true"
-	    myNameStringHandle	    = "STR_ACTIVATENAME_INVENTORY"
-	    pointA
-	    {
-		hudPromptStringHandle   = "STR_ACTIVATEPROMPT_SWAP"
-		    activatedByPlayerInputMapperValue = "weaponReload"
-		    distance    = 1.0f
-	    }
-
-    }
-
 
     meta
     {
-	canCreateInEditor    = 1
+	canCreateInEditor    = 0
 	    editorInstanceName   = "P_imp_rl"
 	    editorPath	     = "bf/pickups/guns/imp"
 	    renderDictPath	     = "render"

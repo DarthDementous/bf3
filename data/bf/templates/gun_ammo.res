@@ -29,10 +29,36 @@ template o_ammo_e11_br : inventoryObjectTypeAmmo_bf
     details
     {
 	maxnum = 500
-        singular = "E11 Blaster Rifle charge"
         plural = "E11 Blaster Rifle charges"
     }
     
+    specialData
+    {
+	hudTextureName = "bullet_icon"
+    }
+}
+
+template o_ammo_bp : inventoryObjectTypeAmmo_bf
+{
+    details
+    {
+	maxnum = 500
+        plural = "Blaster Pistol charges"
+    }
+    
+    specialData
+    {
+	hudTextureName = "bullet_icon"
+    }
+}
+
+template o_ammo_e5blast : inventoryObjectTypeAmmo_bf
+{
+    details
+    {
+	maxnum = 500
+        plural = "E5 Blaster charges"
+    }
     specialData
     {
 	hudTextureName = "bullet_icon"
@@ -44,7 +70,6 @@ template o_ammo_shotgun : inventoryObjectTypeAmmo_bf
     details
     {
 	maxnum = 500
-        singular = "Shotgun Round"
         plural = "Shotgun Rounds"
     }
     
@@ -58,8 +83,7 @@ template o_ammo_rep_mg : inventoryObjectTypeAmmo_bf
 {
     details
     {
-	maxnum = 10000
-        singular = "Minigun Bullet"
+	maxnum = 400
         plural = "Minigun Bullets"
     }
     
@@ -74,7 +98,6 @@ template o_ammo_rep_gl : inventoryObjectTypeAmmo_bf
     details
     {
 	maxnum = 5
-        singular = "Grenade launcher grenade"
         plural = "Grenade launcher grendades"
     }    
     specialData
@@ -88,7 +111,6 @@ template o_ammo_scl : inventoryObjectTypeAmmo_bf
     details
     {
 	maxnum = 5
-        singular = "Sonic charge"
         plural = "Sonic charges"
     }    
     specialData
@@ -97,26 +119,42 @@ template o_ammo_scl : inventoryObjectTypeAmmo_bf
     }
 }
 
+// Arc Cutter Ammo
+template o_ammo_acutter : inventoryObjectTypeAmmo_bf 
+{
+    details
+    {
+	maxnum = 500
+	plural = "Arc Cutter charges"
+    }
+
+    specialData
+    {
+	hudTextureName = "bullet_icon"
+    }
+}
+
+// Fusion Cutter Ammo
+template o_ammo_fcutter : inventoryObjectTypeAmmo_bf 
+{
+    details
+    {
+	maxnum = 200
+        plural = "Fusion Cutter charges"
+    }
+
+    specialData
+    {
+	hudTextureName = "bullet_icon"
+    }
+}
+
+// Republic Rockets
 template o_ammo_rep_rl : inventoryObjectTypeAmmo_bf
 {
     details
     {
-	maxnum = 5
-        singular = "Republic rocket"
-        plural = "Republic rockets"
-    }
-    specialData
-    {
-	hudTextureName = "grenade_icon"
-    }    
-}
-
-template o_ammo_homingl : inventoryObjectTypeAmmo_bf
-{
-    details
-    {
-	maxnum = 5
-        singular = "Homing rocket"
+	maxnum = 4
         plural = "Homing rockets"
     }
     specialData
@@ -125,14 +163,78 @@ template o_ammo_homingl : inventoryObjectTypeAmmo_bf
     }    
 }
 
-// Battledroid Specfic
-template o_ammo_e11_br_b : o_ammo_e11_br
+// Republic Rockets Upgrade - Increased Ammo Count
+template o_ammo_rep_rl_up : o_ammo_rep_rl
 {
     details
     {
-	maxnum = 300
-        singular = "Droid Blaster Rifle charge"
+	maxnum = 6
     }
+}
+
+// Battledroid Rockets
+template o_ammo_sbd_wr : inventoryObjectTypeAmmo_bf
+{
+    details
+    {
+	maxnum = 4
+        plural = "Homing rockets"
+    }
+
+    specialData
+    {
+	hudTextureName = "grenade_icon"
+    }    
+}
+
+// Battledroid Rockets - Increased Ammo Count
+template o_ammo_sbd_wr_up : o_ammo_sbd_wr
+{
+    details
+    {
+	maxnum = 6
+    }
+}
+
+// Fett Wrist Rockets
+template o_ammo_ftt_wr : inventoryObjectTypeAmmo_bf
+{
+    details
+    {
+	maxnum = 4
+	plural = "Fett Wrist Rockets"
+    }
+    
+    specialData
+    {
+	hudTextureName = "bullet_icon"
+    }
+}
+
+// Battledroid Wrist Blaster
+template o_ammo_sbd_wb : inventoryObjectTypeAmmo_bf
+{
+    details
+    {
+	maxnum = 400
+        plural = "Minigun Bullets"
+    }
+    
+    specialData
+    {
+	hudTextureName = "bullet_icon"
+    }
+}
+
+// Battledroid Wrist Pistol
+template o_ammo_sbd_wp : inventoryObjectTypeAmmo_bf
+{
+    details
+    {
+	maxnum = 10000
+        plural = "Pistol Bullets"
+    }
+    
     specialData
     {
 	hudTextureName = "bullet_icon"
@@ -144,7 +246,6 @@ template o_ammo_jawa : o_ammo_e11_br
 {
     details
     {
-        singular = "Jawa Blaster Charge"
         plural = "Jawa Blaster Charges"
     }
 }
@@ -154,8 +255,7 @@ template o_ammo_reb_rl : inventoryObjectTypeAmmo_bf
 {
     details
     {
-	maxnum = 5
-        singular = "HH-15 rocket"
+	maxnum = 4
         plural = "HH-15 rockets"
     }
     specialData
@@ -164,20 +264,16 @@ template o_ammo_reb_rl : inventoryObjectTypeAmmo_bf
     }  
 }
 
-// Rebel E-17d Sniper Rifle Charges
-template o_ammo_reb_sr : inventoryObjectTypeAmmo_bf
+// Rebel HH-15 Rockets - Increased Ammo Count
+template o_ammo_reb_rl_up : o_ammo_reb_rl
 {
     details
     {
-	maxnum = 50
-        singular = "E-17d charge"
-        plural = "E-17d charges"
+	maxnum = 6
     }
-    specialData
-    {
-	hudTextureName = "bullet_icon"
-    } 
 }
+
+// Rebel E-17d Sniper Rifle Charges
 
 // DC15 Sniper Rifle Charges
 template o_ammo_dc15_sr : inventoryObjectTypeAmmo_bf
@@ -185,7 +281,6 @@ template o_ammo_dc15_sr : inventoryObjectTypeAmmo_bf
     details
     {
 	maxnum = 50
-        singular = "DC-15 sniper charge"
         plural = "DC-15 sniper charges"
     }
     specialData
@@ -200,7 +295,6 @@ template o_ammo_e5_sr : inventoryObjectTypeAmmo_bf
     details
     {
 	maxnum = 50
-        singular = "E-5s sniper charge"
         plural = "E-5s sniper charges"
     }
     specialData
@@ -215,7 +309,6 @@ template o_ammo_e11s_sr : inventoryObjectTypeAmmo_bf
     details
     {
 	maxnum = 50
-        singular = "E-11s sniper charge"
         plural = "E-11s sniper charges"
     }
     specialData
@@ -229,12 +322,42 @@ template o_ammo_imp_rl : inventoryObjectTypeAmmo_bf
 {
     details
     {
-	maxnum = 5
-        singular = "Minimag PTL Rocket"
+	maxnum = 4
         plural = "Minimag PTL Rockets"
     }
     specialData
     {
 	hudTextureName = "grenade_icon"	// not rocket?
     } 
+}
+
+// Imperial Minimag PTL Rockets - Increased Ammo Count
+template o_ammo_imp_rl_up : o_ammo_imp_rl
+{
+    details
+    {
+	maxnum = 6
+    }
+}
+
+template o_ammo_ewok : inventoryObjectTypeAmmo_bf
+{
+    details
+    {
+	maxnum = 1
+        plural = "Ewok Sticks"
+    }
+    specialData
+    {
+	hudTextureName = "bullet_icon"
+    } 
+}
+
+template o_ammo_blaster : inventoryObjectTypeAmmo 
+{
+    details
+    {
+	maxnum = 500
+        plural = "Blaster charges"
+    }
 }

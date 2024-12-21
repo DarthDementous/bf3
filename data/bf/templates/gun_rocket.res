@@ -20,6 +20,10 @@ template tickingRocketComponent : tickingProjectileComponent
 
 template weaponRocketProp : tickingphysicsprop
 {
+    soundeventsystem sndeventsystem
+    {
+	definition = "sndevt_rocket"
+    }
     render
     {
 	castshadows = "false"
@@ -30,6 +34,7 @@ template weaponRocketProp : tickingphysicsprop
     physics
     {
 	gravity	    = "false"
+	collidableQualityCritical = "true"
     }
 
     tickingRocketComponent tick
@@ -38,18 +43,9 @@ template weaponRocketProp : tickingphysicsprop
 
     detonatorcomponent detonator
     {
-//	particleEffect	    = "expRocket"
-	particleEffect	    = "rkt_default"
-	maxRad		    = 5.0f
-	speed		    = 10.0f
-	force		    = 10.0f
-	edgeForce	    = 0.1f
-	damageatcentre	    = 2.0f
-	damageradius	    = 5.0f
-
-	reactmap-field reactmap
+	explosion
 	{
-	    default = ""
+	    explosionInfo = "rocket"
 	}
     }
 }
@@ -65,8 +61,17 @@ template proj_rocket : weaponRocketProp
 	model	    =	"weapon/misc_rocket_projectile"
     }
 
+    detonator
+    {
+	explosion
+	{
+	    explosionInfo = "rocket" 
+	}
+    }
+    
     physics
     {
+    mayaphysics			= "false"
 	type	    = "k_physicsBox"
 	material    = "stel"
 	enabled	    = "true"
@@ -97,25 +102,16 @@ template proj_rocket : weaponRocketProp
 // Homing Rocket
 //---------------------------------------
 
-template tickingHomingRocketComponent : tickingRocketComponent
-{
-    class-id		= "Ticking homing component"
-    speed		= 200.f
-    acceleration	= 30.0f
-    timer		= 5.0f
-    trailEffect		= "homer"
-    explosion_soundid   = "explosion_large"
-    speedHitMultiplier  = 0.0f
-    timerHitMultiplier  = 0.0f
-    spin		= 0.f
-    actuallyDetonate 	= "true"	    // true: will detonate when finished; false: will just delete itself when finished
-    usedictangvel 	= "true" //which is zero by default
-    uselargeeffect 	= "false"
-  
-}
 
 template proj_homing : weaponRocketProp
 {
+    detonator
+    {
+	explosion
+	{
+	    explosionInfo = "homingrocket"	
+	}
+    }
     
     render
     {
@@ -124,6 +120,7 @@ template proj_homing : weaponRocketProp
 
     physics
     {
+    mayaphysics			= "false"
 	type	    = "k_physicsBox"
 	material    = "stel"
 	enabled	    = "true"
@@ -142,12 +139,12 @@ template proj_homing : weaponRocketProp
 
     tick
     {
-	timer	    = 7.0f
-	speed	    = 150.f
-
+	timer	    = 3.5f
+	speed	    = 500.f
+    
 	fallTimeBeforeExploding = 3.5f
 	trailOffset[] {0.0f, 0.f, 0.f}
-	trailEffect = "homer"
+	trailEffect = "homing_droid" // trailEffect = "homer"
 	startangvel [] { 0.0f, 0.0f, 0.0f }
 	usedictangvel = "true"
     }
@@ -162,11 +159,21 @@ template proj_homing : weaponRocketProp
 	    homingSettings	= "homingRocket"
 	    //targetPosition[] {0.0f,1000.0f,0.0f}
 	}
-
     }
-    
-
 }
+
+// Story Variant
+template proj_homing_st : proj_homing
+{
+    detonator
+    {
+	explosion
+	{
+	    explosionInfo = "homingrckt_st"	
+	}
+    }
+}
+
 
 //---------------------------------------
 // Infantry Rocket
@@ -174,7 +181,6 @@ template proj_homing : weaponRocketProp
 
 template proj_infrocket : weaponRocketProp
 {
-    
     render
     {
 	model	    =	"weapon/misc_rocket_projectile"
@@ -182,6 +188,7 @@ template proj_infrocket : weaponRocketProp
 
     physics
     {
+    mayaphysics			= "false"
 	type	    = "k_physicsBox"
 	material    = "stel"
 	enabled	    = "true"
@@ -200,13 +207,17 @@ template proj_infrocket : weaponRocketProp
 
     tick
     {
+	acceleration	= 60.0f 
+	
+	speed = 250.f //180.0f	// must be same as the bullet speed if its used as a bullet type, DUH!
+	timer = 10.0f
+
 	fallTimeBeforeExploding = 3.5f
 	trailOffset[] {0.0f, 0.f, 0.f}
-//	trailEffect = "trail_rocket"
-    trailEffect		= "mis_trail_ora"
+	trailEffect = "trail_rocket"
+//	trailEffect = "mis_trail_ora"
 	startangvel [] { 0.0f, 0.0f, 0.0f }
 	usedictangvel = "true"
-	timer = 10.0f
     }
     
     tickingComponentListComponent tickingComponentList
@@ -216,78 +227,38 @@ template proj_infrocket : weaponRocketProp
 	tickingHomingComponent homing
 	{
 	    enabled		= "false"
-	    homingSettings	= "homingRocket"
+	    homingSettings	= "homingInfRocket"
 	    //targetPosition[] {0.0f,1000.0f,0.0f}
 	}
 
     }
-    
 
+    // DEFAULT INFANTRY ROCKET VALUES USED FOR ALL FACTIONS
+    detonator
+    {
+	explosion
+	{
+	    explosionInfo = "infrocket"
+	}
+    }
 }
 
-//---------------------------------------
-// Heat Seeking Rocket
-//---------------------------------------
-
-template proj_hseeking : weaponRocketProp
+// Story version with reduced damage
+template proj_rocket_st : proj_infrocket
 {
-    
-    render
+    detonator
     {
-	model	    =	"weapon/misc_rocket_projectile"
-    }
-
-    physics
-    {
-	type	    = "k_physicsBox"
-	material    = "stel"
-	enabled	    = "true"
-	gravity     = "false"
-	thickness   = 0.f
-
-	float box-radius []
+	explosion
 	{
-	    0.03f, 0.03f, 0.25f
+	    explosionInfo = "infrocket_st"
 	}
     }
-
-    soundcomponent soundPlayer
-    {
-    }
-
-    tick
-    {
-	timer	= 7.000f
-	speed	= 150.0f    //must be same as the bullet speed if its used as a bullet type, DUH!
-	
-	fallTimeBeforeExploding = 3.5f
-	trailOffset[] {0.0f, 0.f, 0.f}
-	trailEffect = "heatSeeker"
-	startangvel [] { 0.0f, 30.0f, 0.0f }
-	usedictangvel = "true"
-	timer = 10.0f
-    }
-    
-    tickingComponentListComponent tickingComponentList
-    {
-	componentNamesList = "homing"
-	
-	tickingHomingComponent homing
-	{
-	    enabled		= "false"
-	    homingSettings	= "homingRocket"
-	    //targetPosition[] {0.0f,1000.0f,0.0f}
-	}
-
-    }
-    
-
 }
+
 
 //---------------------------------------
 // Energy Torpedo
 //---------------------------------------
-
 template proj_torpedo : weaponRocketProp
 {
     render
@@ -298,6 +269,7 @@ template proj_torpedo : weaponRocketProp
 
     physics
     {
+    mayaphysics			= "false"
 	type	    = "k_physicsBox"
 	material    = "stel"
 	enabled	    = "true"
@@ -328,18 +300,58 @@ template proj_torpedo : weaponRocketProp
 
     detonator
     {
-//	particleEffect	    = "expRocket"
-	particleEffect	    = "rkt_default"
-	maxRad		    = 5.0f
-	speed		    = 10.0f
-	force		    = 10.0f
-	edgeForce	    = 0.1f
-	damageatcentre	    = 2.0f
-	damageradius	    = 5.0f
-
-	reactmap-field reactmap
+	explosion
 	{
-	    default = ""
+	    explosionInfo = "torpedo"
+	}
+    }
+}
+
+//---------------------------------------
+// Spiralling Rocket
+//---------------------------------------
+
+template tickingSpiralComponent
+{
+    class-id		= "Ticking spiralling component"
+    spiralOutDistance	= 10.0f // The distance the rocket will travel before reaching the maximum spiral radius
+    spiralInDistance	= 10.0f	// The distance from the target when the rocket will start closing in its spiral radius back to zero
+    
+    spiralMaxRadius	= 2.0f  // The radius the rocket will orbit around when at maximum spiralness
+    spiralMinRadius	= 1.0f  // The radius the rocket will orbit around when at minimum spiralness
+    spiralRadiusWaveTime = 0.5f // The time in seconds the rocket will take bobbing between these radii
+
+    spiralMaxRotSpeed	= 360.0f // The maximum spiral rotation speed in degrees per second, from which a speed will be randomly selected
+    spiralMinRotSpeed	= 180.0f // The minimum spiral rotation speed in degrees per second, from which a speed will be randomly selected
+}
+
+template proj_spiral : proj_rocket
+{
+    tickingComponentListComponent tickingComponentList
+    {
+	componentNamesList = "spiral"
+	
+	tickingSpiralComponent spiral
+	{
+	}
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+// Jango/Boba Fett Wrist Rocket
+/////////////////////////////////////////////////////////////////////////////////
+template fett_rocket : proj_infrocket 
+{
+    tick
+    {
+	trailEffect = "trail_rocket"	// TODO Unique Trail Needed + Colour of Prop and Speed?
+    }
+    
+    detonator
+    {
+	explosion
+	{
+	    explosionInfo = "fett"
 	}
     }
 }
@@ -349,25 +361,32 @@ template proj_torpedo : weaponRocketProp
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //-------------------------------------------------------
-//  CIS AAT Turret Rocket
+// AAC Rocket
 //-------------------------------------------------------
-template aat_tur_rocket : proj_rocket
+template aac_rocket : proj_homing
 {
-    tick
-    {
-	timer	= 1.35f
-	speed	= 100.0f    //must be same as the bullet speed if its used as a bullet type, DUH!
-    }
-
     detonator
     {
-	maxRad		    = 5.0f	// Maximum Physics Radius Effect
-	speed		    = 10.0f	// Explosion Growth Speed
-	force		    = 10.0f	// Maximum Force
-	edgeForce	    = 0.1f	// Force Falloff
+	explosion
+	{
+	    explosionInfo = "aacrocket"
+	}
+    }
+
+    tick
+    {
+	speed	    = 300.0f
+    }
+
+    tickingComponentListComponent tickingComponentList
+    {
+	componentNamesList = "homing"
 	
-	damageatcentre	    = 2.0f	// Maximum Damage
-	damageradius	    = 5.0f	// Damage Radius and Falloff
+	tickingHomingComponent homing
+	{
+	    enabled		= "false"
+	    homingSettings	= "homingInfRocket"
+	}
     }
 }
 
@@ -378,205 +397,170 @@ template aat_tur_rocket : proj_rocket
 //-------------------------------------------------------
 //  Hailfire Rocket
 //-------------------------------------------------------
-template hail_rocket : proj_rocket
+template hail_rocket : proj_spiral
 {
-    tick
-    {
-	timer	= 1.35f
-	speed	= 100.0f    //must be same as the bullet speed if its used as a bullet type, DUH!
-    }
-
     detonator
     {
-	maxRad		    = 5.0f	// Maximum Physics Radius Effect
-	speed		    = 10.0f	// Explosion Growth Speed
-	force		    = 10.0f	// Maximum Force
-	edgeForce	    = 0.1f	// Force Falloff
-	
-	damageatcentre	    = 0.5f	// Maximum Damage
-	damageradius	    = 5.0f	// Damage Radius and Falloff
+	explosion
+	{
+	    explosionInfo = "hailrocket"
+	}
+    }
+
+    tick
+    {
+	trailEffect		= "mis_trail_prp"
     }
 }
 
 //-------------------------------------------------------
-// T4-B Rocket
+// AT-XR Rocket
 //-------------------------------------------------------
-template t4b_rocket : proj_rocket
+template atxr_rocket : proj_homing
 {
-    tick
-    {
-	timer	= 1.35f
-	speed	= 100.0f    //must be same as the bullet speed if its used as a bullet type, DUH!
-    }
-
     detonator
     {
-	maxRad		    = 5.0f	// Maximum Physics Radius Effect
-	speed		    = 10.0f	// Explosion Growth Speed
-	force		    = 10.0f	// Maximum Force
-	edgeForce	    = 0.1f	// Force Falloff
+	explosion
+	{
+	    explosionInfo = "atxrrocket"
+	}
+    }
+
+    tick
+    {
+	speed	    = 250.0f
+    }
+
+    tickingComponentListComponent tickingComponentList
+    {
+	componentNamesList = "homing"
 	
-	damageatcentre	    = 4.0f	// Maximum Damage
-	damageradius	    = 5.0f	// Damage Radius and Falloff
+	tickingHomingComponent homing
+	{
+	    enabled		= "false"
+	    homingSettings	= "homingInfRocket"
+	}
     }
 }
 
-//-------------------------------------------------------
-// AT-ST Rocket
-//-------------------------------------------------------
-template atst_rocket : proj_rocket
-{
-    tick
-    {
-	timer	= 1.35f
-	speed	= 100.0f    //must be same as the bullet speed if its used as a bullet type, DUH!
-    }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  TRANSPORT VEHICLES
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//-------------------------------------------------------
+//  AT-TE Main Gun
+//-------------------------------------------------------
+template atte_mainrocket : proj_rocket
+{
     detonator
     {
-	maxRad		    = 5.0f	// Maximum Physics Radius Effect
-	speed		    = 10.0f	// Explosion Growth Speed
-	force		    = 10.0f	// Maximum Force
-	edgeForce	    = 0.1f	// Force Falloff
-	
-	damageatcentre	    = 1.6f	// Maximum Damage
-	damageradius	    = 5.0f	// Damage Radius and Falloff
+	explosion
+	{
+	    explosionInfo = "atte_mainexp"
+	}
+    }
+
+    tick
+    {
+	speed	    = 600.0f
+	trailEffect = "aw_jetpack01"
+    }    
+}
+
+//-------------------------------------------------------
+//  AT-TE Secondary Rocket
+//-------------------------------------------------------
+template atte_rocket : proj_rocket
+{
+    detonator
+    {
+	explosion
+	{
+	    explosionInfo = "atte_secondexp"
+	}
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  JEDI FIGHTERS
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//-------------------------------------------------------
+//  Jedi Homing
+//-------------------------------------------------------
+template jedi_homing : proj_homing
+{
+    detonator
+    {	
+	explosion
+	{
+	    explosionInfo = "jedihoming"
+	}
+    }
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  SCOUT FIGHTERS
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //-------------------------------------------------------
-//  CIS Tri-fighter Homing
+//  Scout Fighter Homing Missles
 //-------------------------------------------------------
-template tri_homing : proj_homing
-{
-    detonator
-    {	
-	damageatcentre	    = 8.0f	// Maximum Damage
-    }
-}
-
-//-------------------------------------------------------
-//  REPUBLIC Starfighter Homing
-//-------------------------------------------------------
-template star_homing : proj_homing
-{
-    detonator
-    {	
-	damageatcentre	    = 7.2f	// Maximum Damage
-    }
-}
-
-//-------------------------------------------------------
-//  REBEL A-Wing Homing
-//-------------------------------------------------------
-template awing_homing : proj_homing
-{
-    detonator
-    {	
-	damageatcentre	    = 5.6f	// Maximum Damage
-    }
-}
-
-//-------------------------------------------------------
-//  IMPERIAL TIE Interceptor Homing
-//-------------------------------------------------------
-template inter_homing : proj_homing
-{
-    detonator
-    {	
-	damageatcentre	    = 6.4f	// Maximum Damage
-    }
-}
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//  MULTI-PURPOSE FIGHTER
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//-------------------------------------------------------
-//  CIS Droid Fighter Torpedo
-//-------------------------------------------------------
-template droid_torpedo : proj_torpedo
+template scout_homing : proj_homing
 {
     detonator
     {
-	damageatcentre = 4.0f	// Damage Radius and Falloff
+	explosion
+	{
+	    explosionInfo = "scouthoming"
+	}
     }
-}
-
-//-------------------------------------------------------
-//  REPUBLIC V-Wing Torpedo
-//-------------------------------------------------------
-template vwing_torpedo : proj_torpedo
-{
-    detonator
+   
+    tick
     {
-	damageatcentre = 2.0f	// Damage Radius and Falloff
+    	speed   = 600.0f
+	timer	= 3.0f
     }
-}
-
-//-------------------------------------------------------
-//  REBEL X-Wing
-//-------------------------------------------------------
-template xwing_torpedo : proj_torpedo
-{
-    detonator
-    {
-	damageatcentre = 5.0f	// Damage Radius and Falloff
-    }
-}
-
-//-------------------------------------------------------
-//  IMPERIAL TIE Fighter
-//-------------------------------------------------------
-template tfighter_trpd : proj_torpedo
-{
-    detonator
-    {
-	damageatcentre = 4.5f	// Damage Radius and Falloff
-    }
-}
+} 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  TROOP TRANSPORT
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //-------------------------------------------------------
-//  CIS DROID Gunship
+// Gunship Rockets
 //-------------------------------------------------------
-template gship_hseeking : proj_hseeking
+template gship_rocket : proj_rocket
 {
+    physics
+    {
+	speed	    = 450.0f
+	gravity	    = "true"
+    }
+
     detonator
     {
-	damageatcentre = 2.0f	// Damage Radius and Falloff
+	explosion
+	{
+	    explosionInfo = "gshiprocket"
+	}
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  TURRETS
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //-------------------------------------------------------
-//  REPUBLIC LAAT
+//  Anti Vehicle Turret
 //-------------------------------------------------------
-template laat_hseeking : proj_hseeking
+template anti_veh_rocket : proj_rocket
 {
     detonator
     {
-	damageatcentre = 2.5f	// Damage Radius and Falloff
+	explosion
+	{
+	    explosionInfo = "antivehrocket"	
+	}
     }
 }
-
-//-------------------------------------------------------
-//  IMPERIAL Shuttle
-//-------------------------------------------------------
-template imps_hseeking : proj_hseeking
-{
-    detonator
-    {
-	damageatcentre = 2.4f	// Damage Radius and Falloff
-    }
-}
-
-

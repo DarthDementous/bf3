@@ -8,11 +8,6 @@
 // Put all templates for menu fx in here and they will be included in 
 // the editor drop down list
 
-template defaultfrontendfxcomponent
-{
-    class-id	    = "gui fx component"
-    test	    = "test"
-}
 
 template frontendfxcomponent
 {

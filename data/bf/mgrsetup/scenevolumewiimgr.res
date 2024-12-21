@@ -1,0 +1,4 @@
+SceneVolumeWiiMgrTemplate SceneVolumeWiiMgr
+{
+
+}

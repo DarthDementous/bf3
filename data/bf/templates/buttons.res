@@ -1,3 +1,5 @@
+// vim: set syntax=c :
+
 // BF button templates
 
 template SimpleToggleButton1 : ToggleButtonSendActivateMsgProp
@@ -5,6 +7,11 @@ template SimpleToggleButton1 : ToggleButtonSendActivateMsgProp
     render
     {
 	model = "props/misc/buttons/misc_button"
+    }
+
+    static_obinst_physics physics
+    {
+	useRBs = "true"
     }
     
     meta
@@ -21,39 +28,6 @@ template SimpleToggleButton1 : ToggleButtonSendActivateMsgProp
 	    id = "PUSHHERE" // Makes us use our funky button-pushing gun
 	}
 	doPropLineTest = "false"
-    }
-}
-
-template SimpleOnePressButton : SimpleToggleButton1
-{
-    button
-    {
-	disableWhenActivated = "true"
-	doPropLineTest = "false"
-    }
-}
-
-template SimpleTimedButton1 : TimedButtonSendActivateMsgProp
-{
-    render
-    {
-	model = "props/misc/buttons/misc_button"
-    }
-
-    button
-    {
-	pointA
-	{
-	    id = "PUSHHERE" // Makes us use our funky button-pushing gun
-	}
-	doPropLineTest = "false"
-    }
-    
-    meta
-    {
-	canCreateInEditor   =	1
-	editorInstanceName  =	"timedBut1_"
-	editorPath = "common/generic/buttons"
     }
 }
 
@@ -98,7 +72,8 @@ template vmButtonBF : SimpleToggleButton1
     {
         VMActionComponent vmActionComp
         {
-            actionScript = "return gamemodeTriggerSimple(activatingPropRef, activatedPropRef);"        
+            actionScript = "// FILE: T@autogen/templates/buttons/vmbuttonbf.vms$
+return gamemodeTriggerSimple(activatingPropRef, activatedPropRef);"        
         }
         doPropLineTest = "false"
     }
@@ -119,16 +94,6 @@ template SimpleTimedAutoResetButtonWithVm : SimpleTimedAutoResetButton1
 	{
 	}
 	doPropLineTest = "false"
-    }
-}
-
-template EscapePodButton : SimpleTimedAutoResetButtonWithVm
-{
-    autoAimTargetComponentBF autoaim
-    {
-	playerTurnToFaceAutomatically	= "false"
-	playerBulletsAttractedToTarget	= "false"
-	nameKey				= "STR_BUTTON_ESCAPEPOD"
     }
 }
 
@@ -178,7 +143,7 @@ template REPScriptedEscapePodButton : ScriptedEscapePodButton
     {
 	action
 	{
-	    escapePodTemplate = "escapepod" // TODO: Change to Republic specific prop
+	    escapePodTemplate = "rep_escapepod" // TODO: Change to Republic specific prop
 	}
     }
 
@@ -226,13 +191,31 @@ template IMPScriptedEscapePodButton : ScriptedEscapePodButton
    }
 }
 
+template IMPScrEscPodBtnStory : ScriptedEscapePodButton
+{
+    button
+    {
+	action
+	{
+	    escapePodTemplate = "imp_escpod_st" 
+	}
+    }
+
+    meta
+    {
+	canCreateInEditor   = 1
+	editorInstanceName  = "IMPScEscPdBt"
+	editorPath	    = "bf/buttons"
+   }
+}
+
 template REBScriptedEscapePodButton : ScriptedEscapePodButton
 {
     button
     {
 	action
 	{
-	    escapePodTemplate = "imp_escapepod" // TODO: Change to Rebel specific prop
+	    escapePodTemplate = "reb_escapepod" // TODO: Change to Rebel specific prop
 	}
     }
 

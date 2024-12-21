@@ -7,7 +7,7 @@ template fp_rep_rocket_launcher_static : staticfirstpersongun //animfirstpersong
 {
     render
     {
-    model	= "weapon/rep/rep_rocket_launcher"
+    model	= "weapon/rep/rep_rocket_launcher_thirdperson"
     }
 }
 
@@ -21,19 +21,13 @@ template fp_rep_rocket_launcher_boned : animfirstpersongun
 
 template w_rep_rlaun : gun
 {
-    dynamiclight light
+    guncomponent_hominglauncher_bf gun
     {
-	exponent    = 1.f
-	rotspeed    = 0.f
-	offset[]    { 0.4f, 0.f, 0.f }
-	light-type  = "k_lightSpot"
-	colour[]    {3.75f, 3.75f, 3.75f}
-	angle	    = 70.f
-	enabled	    = "false"
-    }
-
-    guncomponent_rocketlauncher_bf gun 
-    {
+	autoRecurseTemplateName-field rocket
+	{
+	    default = "proj_infrocket"
+	}
+	
 	gunAnimationGroup anims
 	{
 	    set		    = "ga_rep_rocket"
@@ -43,52 +37,79 @@ template w_rep_rlaun : gun
 
 	gunInfoFromMgr = "bfreprl"	
 
-	hasFirePos = "true"
-	firstPersonFireDof  = "SHOOTPOS_1"
-	firstPersonFireBone = "b_body"
-	firstPersonFireDir []	{0.f, 0.f, 1.f}
-	firstPersonFirePos []	{0.f, 0.05f, -0.30f}
-	thirdPersonFireDir[]   {0.f, 0.f, 1.f}
-	thirdPersonFirePos[]   {0.0, 0.12, 0.50}
-
-	hasLightPos = "true"
-	firstPersonLightBone = "b_body"
-	firstPersonLightDir []	{0.f, 0.f, 1.f}
-	firstPersonLightPos []	{0.f, 0.10f, -0.1f}
-	thirdPersonLightDir[]   {0.f, 0.f, 1.f}
-	thirdPersonLightPos[]   {0.0, 0.17, -0.40f}
-
-	hasParticleUpPos	    = "true"
-	firstPersonParticleUpBone   = "b_body"
-	firstPersonParticleUpPos[]  {0.f, 0.05f, 0.40f}
-	firstPersonParticleUpDir[]  {0.f, 1.f, 0.f}
-	thirdPersonParticleUpPos[]  {0.0, 0.12, 0.16}
-	thirdPersonParticleUpDir[]  {0.f, 1.f, 0.f}
-
-	hasCartridgePos	    = "true"
-	firstPersonCartridgeBone   = "b_body"
-	firstPersonCartridgePos[]  {0.f, 0.05f, 0.40f}
-	firstPersonCartridgeDir[]  {1.f, 0.f, 0.f}
-	thirdPersonCartridgePos[]  {0.0, 0.12, 0.f}
-	thirdPersonCartridgeDir[]  {1.f, 0.f, 0.f}
-
-	soundmap_npc	    =	"sndmap_reprl"
-	soundmap_player	    =	"sndmap_reprlpla"
+	soundmap	    =	"sndmap_reprl"
 	firstperson	    =	"fp_rep_rocket_launcher_boned"
 	
-	muzzleFlashEffect   = ""
 	ammoID		    = "o_ammo_rep_rl"
-	weaponID	    = "o_gun_rep_rl"	
-   	weaponType	    = "k_rocket"
+	weaponID	    = "o_gun_rep_rl"
+	weaponType	= "k_rocket"
 	
 	recoilComponent recoil
 	{
+	}
+
+	zoom
+	{
+     	    allowIronSightLockOn = "false"	    
 	}
     }
 
     render
     {
-	model	    =	"weapon/rep/rep_rocket_launcher_thirdperson"
+	model	    =	"weapon/rep/rep_rocket_launcher_thirdperson"	// added _third
+
+        canBeHologram = "true"
+
+	hologramBaseSetup hologramSetup 
+	{
+	}
+    }
+}
+
+// Upgraded Rocket Launcher With Increased Clip Size
+template w_rep_rlaun_v2 : w_rep_rlaun
+{
+    gun
+    {
+	weaponID	    = "o_gun_rep_rl_v2"
+	ammoID		    = "o_ammo_rep_rl_up"
+    }
+}
+
+// Upgraded Rocket Launcher With Increased Reload Speed
+template w_rep_rlaun_up : w_rep_rlaun_v2
+{
+    gun
+    {
+	weaponID	    = "o_gun_rep_rl_up"
+	gunInfoFromMgr	    = "bfreprl_up"	
+	    
+	anims
+	{
+	    set		    = "ga_rep_rocket_up"
+	}
+    }
+}
+
+// Story Template
+template w_rep_rlaun_s : w_rep_rlaun
+{
+    gun
+    {
+	weaponID	    = "o_gun_rep_rl_s"
+
+	autoRecurseTemplateName-field rocket
+	{
+	    default = "proj_rocket_st"
+	}
+    }
+}
+
+template w_rl_trail : w_rep_rlaun
+{
+    gun
+    {
+	setMissileLockTime = 0.5f
     }
 }
 
@@ -96,33 +117,121 @@ template o_gun_rep_rl : inventoryObjectTypeWeapon
 {
     details
     {
-        singular = "Republic Rocket Launcher"
-	singularPrefix = "a"
-	pickupTemplate_create = ""		
+	singularStrHandle   = "STR_PRIMARYWEAPON_REPUBLIC_ROCKETLAUNCHER_SINGULAR"
+	pickupTemplate_create = "singlepickup_gun_reprl"		
     }
 
     specialData
     {
         weaponID = "w_rep_rlaun"
 	hudTextureName = "rep_rocket_launcher"
+	hudTextureScale = 0.7f
 	usesThisAmmo = "o_ammo_rep_rl"
     }
+}
+
+// Upgraded Rocket Launcher Object - Increased clip size
+template o_gun_rep_rl_v2 : o_gun_rep_rl
+{
+    specialData
+    {
+        weaponID	= "w_rep_rlaun_v2"
+	usesThisAmmo	= "o_ammo_rep_rl_up"
+    }
+}
+
+// Upgraded Rocket Launcher Object - Increased reload speed
+template o_gun_rep_rl_up : o_gun_rep_rl_v2
+{
+    specialData
+    {
+        weaponID = "w_rep_rlaun_up"
+    }
+}
+
+// Story version
+template o_gun_rep_rl_s : o_gun_rep_rl
+{
+    specialData
+    {
+        weaponID = "w_rep_rlaun_s"
+    }
+}
+
+/*
+// Upgraded Rocket Launcher Object With Double Rockets
+template o_gun_rep_rl_dd : o_gun_rep_rl_up
+{
+    specialData
+    {
+        weaponID = "w_rep_rlaun_dd"
+    }
+}
+*/
+
+template o_gun_rl_trail : o_gun_rep_rl
+{
+    specialData
+    {
+	weaponID = "w_rl_trail"
+    }
+}
+
+template singlepickup_gun_reprl : simplePickupPropBF
+{
+
+    obinstrenderer render
+    {
+	model = "weapon/rep/rep_rocket_launcher_static"
+    }
+
+    objectType		= "o_gun_rep_rl"
+    activate
+    {
+	myNameStringHandle  = "STR_PRIMARYWEAPON_REPUBLIC_ROCKETLAUNCHER_SINGULAR"
+    }
+    
+    pickupComponentWeapon pickupComponent
+    {
+	pickupflags = "k_pickupNoNPC|k_pickupNoAuto"
+	    contents
+	    {
+
+		ownerType = "bfChr"
+		    inventoryEntryBF entry0
+		    {
+			carryingobisfirstparam	= "true"
+			    objectType		= "o_gun_rep_rl"
+			    flags			= "k_inventoryFlags_restricted"
+		    }
+
+		inventoryEntryBF entry1
+		{
+		    carryingobisfirstparam	= "true"
+			objectType		= "o_ammo_rep_rl"
+			total			= 5
+		}
+	    }
+    }
+
+    meta
+    {
+	canCreateInEditor    = 1
+	    editorInstanceName   = "SP_reprl"
+	    editorPath	     = "bf/pickups/guns/rep"
+	    renderDictPath	     = "render"
+    }
+
 }
 
 template pickup_gun_reprl : kitPickupProp
 {
     class = "k_chrClassHeavyWeapons"
 	dropToFloor = "true"
-	editor-only-render
-	{
-	    model = "weapon/rep/rep_rocket_launcher_static"
-		visibleParts =  "BTOP;" 
-	}
 
     obinstrenderer render
     {
 		model = "weapon/rep/rep_rocket_launcher_static"
-	    visibleParts =  "BTOP;"
     }
 
     pickupComponent
@@ -148,7 +257,7 @@ template pickup_gun_reprl : kitPickupProp
 
 	    inventoryEntryBF entry2
 	    {
-		objectType = "o_thrml_det_v1"
+		objectType = "o_rep_thrml_det"
 		    total	= 5
 	    }
 
@@ -179,98 +288,9 @@ template pickup_gun_reprl : kitPickupProp
 
     meta
     {
-	canCreateInEditor    = 1
+	canCreateInEditor    = 0
 	    editorInstanceName   = "P_dc15reprl"
 	    editorPath	     = "bf/pickups/guns/rep"
 	    renderDictPath	     = "render"
-    }
-}
-
-template w_hominglaun : gun
-{
-    dynamiclight light
-    {
-	exponent    = 1.f
-	rotspeed    = 0.f
-	offset[]    { 0.4f, 0.f, 0.f }
-	light-type  = "k_lightSpot"
-	colour[]    {3.75f, 3.75f, 3.75f}
-	angle	    = 70.f
-	enabled	    = "false"
-    }
-
-    guncomponent_hominglauncher_bf gun //rocketlauncher
-    {
-	gunAnimationGroup anims
-	{
-	    set		    = "ga_rep_rocket"
-	    animmap	    = "am_rrocket"
-	    reactmap	    = "reactmap_generic"
-	}
-
-	gunInfoFromMgr = "bfreprl"	
-
-	hasFirePos = "true"
-	firstPersonFireDof  = "SHOOTPOS_1"
-	firstPersonFireBone = "B_gun"
-	firstPersonFireDir []	{0.f, 0.f, 1.f}
-	firstPersonFirePos []	{0.f, 0.05f, -0.30f}
-	thirdPersonFireDir[]   {0.f, 0.f, 1.f}
-	thirdPersonFirePos[]   {0.0, 0.12, 0.50}
-
-	hasLightPos = "true"
-	firstPersonLightBone = "B_gun"
-	firstPersonLightDir []	{0.f, 0.f, 1.f}
-	firstPersonLightPos []	{0.f, 0.10f, -0.1f}
-	thirdPersonLightDir[]   {0.f, 0.f, 1.f}
-	thirdPersonLightPos[]   {0.0, 0.17, -0.40f}
-
-	hasParticleUpPos	    = "true"
-	firstPersonParticleUpBone   = "B_gun"
-	firstPersonParticleUpPos[]  {0.f, 0.05f, 0.40f}
-	firstPersonParticleUpDir[]  {0.f, 1.f, 0.f}
-	thirdPersonParticleUpPos[]  {0.0, 0.12, 0.16}
-	thirdPersonParticleUpDir[]  {0.f, 1.f, 0.f}
-
-	hasCartridgePos	    = "true"
-	firstPersonCartridgeBone   = "B_gun"
-	firstPersonCartridgePos[]  {0.f, 0.05f, 0.40f}
-	firstPersonCartridgeDir[]  {1.f, 0.f, 0.f}
-	thirdPersonCartridgePos[]  {0.0, 0.12, 0.f}
-	thirdPersonCartridgeDir[]  {1.f, 0.f, 0.f}
-
-	soundmap_npc	    =	"sndmap_rl"
-	soundmap_player	    =	"sndmap_rlpla"
-	firstperson	    =	"fp_rep_rocket_launcher_boned"
-	
-	muzzleFlashEffect   = "" //"empty" //"muzPistolaSide" //damn it i want no muzzle flash at all
-	ammoID		    = "o_ammo_homingl"
-	weaponID	    = "o_gun_homingl"	
-	
-	recoilComponent recoil
-	{
-	}
-    }
-
-    render
-    {
-	model	    =	"weapon/rep/rep_rocket_launcher"	// added _third
-    }
-}
-
-template o_gun_homingl : inventoryObjectTypeWeapon 
-{
-    details
-    {
-        singular = "Homing Rocket Launcher"
-	singularPrefix = "a"
-	pickupTemplate_create = ""		
-    }
-
-    specialData
-    {
-        weaponID = "w_hominglaun"
-	hudTextureName = "rep_rocket_launcher"
-	usesThisAmmo = "o_ammo_homingl"
     }
 }

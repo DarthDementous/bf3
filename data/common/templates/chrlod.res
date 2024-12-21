@@ -23,7 +23,5 @@ template chrLodComponent
     radFar          = 999999.0f
     offScreenFiring = 999999.0f // Distance at which anim lods won't position gun in correct position so use body direction approximations
     offScreenMovementAndPhysics = 200.0f
-    distLODedGunTick	= 200.0f
-    distGunTick		= 500.0f
 }
 

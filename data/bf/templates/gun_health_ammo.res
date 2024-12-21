@@ -12,66 +12,41 @@ template repHealthPack : simplePickupProp
     obinstrenderer render
     {
         model = "weapon/rep/rep_ammo_health_dispenser"
+	castReflections ="true"	
     }
 
     pickupComponentHealth pickupComponent
     {
-	//collectSound = "pic_heal"
-	
-        contents
+	contents
         {
             inventoryEntry entry0
             {
                 objectType = "o_health_large"
-            }
+            } 
 	    inventoryEntry entry1
 	    {
-		objectType  = "o_ammo_e11_br"
-		total	    = 50
+		objectType = "o_replenish"
 	    }
-	    inventoryEntry entry2
-	    {
-		objectType  = "o_ammo_rep_gl"
-		total	    = 3
-	    }
-	    inventoryEntry entry3
-	    {
-		objectType  = "o_ammo_rep_rl"
-		total	    = 3
-	    }
-	    inventoryEntry entry4
-	    {
-		objectType  = "o_ammo_e5blast"
-		total	    = 100
-	    }
-	    inventoryEntry entry5
-	    {
-		objectType  = "o_thrml_det_v1"
-		total	    = 3
-	    }
-	    inventoryEntry entry6
-	    {
-		objectType	= "o_ammo_reb_rl"
-		total		= 3
-            }
 	}
+    }
+
+    soundmap = "sndmap_hlth"
+    soundeventsystem sndeventsystem
+    {
+	definition = "sndevt_health_ammo"
     }
 
     tickingProjectileComponent tick 
     {
-	class-id = "ammo drop"
+	class-id = "ammo drop bf"
 	spin	= 0.f
+	throwStrengthScale = 0.5f
+	throwArcScale = 1.2f
 	approxGrenadeRadius = 0.1f
+	//float hitNormal[] { 1.0f, 0.0f, 0.0f }
     }
 
     ticktype = "k_tickAlways"
-    
-    meta
-    {
-	canCreateInEditor    = 1
-	editorInstanceName   = "P_health"
-	editorPath	     = "bf/pickups/health"
-    }
 }
 
 // Inventory object
@@ -82,39 +57,74 @@ template pickupHealth_rb : repHealthPack
 
     odesimplephysics physics
     {
+    mayaphysics			= "false"
 	type	    = "k_physicsBox"
 	material    = "gren"
 	enabled	    = "true"
 
 	float box-radius []
 	{
-	    0.07f, 0.04f, 0.07f
+	    0.12f, 0.08f, 0.12f
 	}
 	//mayaphysics = "true"
 	ignoreWhenFindingFloor	=   "true"	
+	collidableQualityCritical = "true"
     }
 }
+
+/* --- auto commented out by commentOutTemplate
+template stry_healthPack : pickupHealth_rb
+{
+    tick
+    {
+	projectileState = "k_projectileState_stuckToBg"
+    }
+
+    meta
+    {
+	canCreateInEditor    = 1
+	editorInstanceName   = "healthPack"
+	editorPath	     = "bf/pickups/health"
+    }
+}
+*/ // --- auto commented out by commentOutTemplate
 
 template o_health_large : inventoryObjectTypeInstantHealth
 {
     details
     {
-        singular = "health pack"
-	singularPrefix = "a"
+	singularStrHandle = "STR_SECONDARYWEAPON_HEALTHPACK"
 	pickupTemplate_create = "pickupHealth_rb"
     }
 
     specialData
     {
-	fractionOfFullHealthToGive = 0.8f
+	fractionOfFullHealthToGive = 0.5f
     }
 }
 
-template o_gun_repHP : inventoryObjectTypeAmmoDrop
+template o_replenish : inventoryObjectTypeBasic
+{
+    specialData
+    {
+	class-id = "inventory object type - replenish inventory"
+    }
+    
+    details
+    {
+	singularStrHandle = "STR_SECONDARYWEAPON_HEALTHPACK"
+	pickupTemplate_create = "pickupHealth_rb"
+	maxnum = 1
+    }
+}
+
+
+
+template o_gun_repHP : inventoryObjectTypeDropableObject
 {
     details
     {
-	singular		= "health pack"
+	singularStrHandle = "STR_SECONDARYWEAPON_HEALTHPACK"
 	plural			= "health packs"
 	maxnum			= 5
 	pickupTemplate_create	= "pickupHealth_rb"
@@ -122,7 +132,11 @@ template o_gun_repHP : inventoryObjectTypeAmmoDrop
 
     specialData
     {
-	grenadeID	= "pickupHealth_rb"
+	grenadeID	    = "pickupHealth_rb"
+	hudTextureName	    = "rep_healthpack"
+	hudTextureScale	    = 0.88f
+	ammoHudTextureName  = "grenade_icon"
+	secondaryWeaponType = "healthPack"
     }
 }
 
@@ -130,11 +144,4 @@ template o_gun_repHP : inventoryObjectTypeAmmoDrop
 // First-person throwing animation
 // ===============================
 
-template fp_healthammo : animfirstpersongun
-{
-    render
-    {
-        model = "weapon/rep/rep_ammo_health_dispenser"
-    }
-}
 

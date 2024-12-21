@@ -29,17 +29,6 @@ template RemoteEvent
     }
 }
 
-template RemoteControl
-{
-    class-id = "remote control component"
-
-    bool-field npcsburstfire
-    {
-        default = "false"
-	views = "basic setup"
-	tip = "set to true to have npcs burst fire based on the values specifed in a guns info in the gun info mgr"
-    }
-}
 
 template RemoteBrain
 {
@@ -83,6 +72,20 @@ template RemoteBrain
 	views = "basic setup"
 	tip = "set to true to have npcs burst fire based on the values specifed in a guns info in the gun info mgr"
     }
+
+    bool-field lineTestForTargets
+    {
+        default = "false"
+	views = "basic setup"
+	tip = "true will make brain line test when looking for target, rechecks occasionally so targets out of view will eventuall be lost"
+    }
+
+    bool-field ignoreBGForTargets
+    {
+        default = "false"
+	views = "basic setup"
+	tip = "allows remotes to target props in different BGs"
+    }
 }
 
 template RemoteBrainSentryGun : RemoteBrain
@@ -90,10 +93,6 @@ template RemoteBrainSentryGun : RemoteBrain
 
 }
 
-template RemoteBrainCamera : RemoteBrain
-{
-    class-id = "remote brain" 
-}
 
 template RemoteStimSensorArc
 {
@@ -140,98 +139,7 @@ template RemoteCamera
 }
 */
 
-template animmap_rem
-{
-    u_hold_up		    = "AN_asr_noaim_f"
-    /*u_fxg_aim_ul  = "AN_fxg_r_ul"
-    u_fxg_aim_um = "AN_fxg_r_um"
-    u_fxg_aim_ur = "AN_fxg_r_ur"
-    u_fxg_aim_fl = "AN_fxg_r_fl"
-    u_fxg_aim_fm = "AN_fxg_r_fm"
-    u_fxg_aim_fr = "AN_fxg_r_fr"
-    u_fxg_aim_dl = "AN_fxg_r_dl"
-    u_fxg_aim_dm = "AN_fxg_r_dm"
-    u_fxg_aim_dr = "AN_fxg_r_dr"
 
-    u_fxg_fire_ul = "AN_fxg_f_ul"
-    u_fxg_fire_um = "AN_fxg_f_um"
-    u_fxg_fire_ur = "AN_fxg_f_ur"
-    u_fxg_fire_fl = "AN_fxg_f_fl"
-    u_fxg_fire_fm = "AN_fxg_f_fm"
-    u_fxg_fire_fr = "AN_fxg_f_fr"
-    u_fxg_fire_dl = "AN_fxg_f_dl"
-    u_fxg_fire_dm = "AN_fxg_f_dm"
-    u_fxg_fire_dr = "AN_fxg_f_dr"*/
-}
-
-template reactmap_rem
-{
-    //Overwrite hit reacts 
-    o_aiminghit		    = "rifl_a_hit"
-    o_aimingfrhit	    = "rifl_a_frhit" 
-    o_aimingflhit	    = "rifl_a_flhit"
-    o_aimingbhit	    = "rifl_a_bhit"
-    o_aimingblhit	    = "rifl_a_blhit"
-    o_noaimflhit	    = "rifl_na_flhit"
-    o_noaimfrhit	    = "rifl_na_frhit"
-    o_noaimhit		    = "rifl_na_hit"
-    o_noaimbrhit	    = "rifl_na_brhit"
-    o_noaimblhit	    = "rifl_na_blhit"
-    o_noaimbhit		    = "rifl_na_bhit"
-    //Full body hit reacts
-    fb_rupperleg	    = "rfb_rupperleg"
-    fb_rknee		    = "rfb_rknee"
-    fb_rankle		    = "rfb_rankle"
-    fb_lupperleg	    = "rfb_lupperleg"
-    fb_lknee		    = "rfb_lknee"
-    fb_lankle		    = "rfb_lankle"
-    fb_hips		    = "rfb_hips"
-    fb_waist		    = "rfb_waist"
-    fb_neck		    = "rfb_neck"
-    fb_head		    = "rfb_head"
-    fb_base		    = "rfb_base"
-    fb_rshoulder	    = "rfb_rshoulder"
-    fb_rupperarm	    = "rfb_rupperarm"
-    fb_rforearm		    = "rfb_rforearm"
-    fb_rwrist		    = "rfb_rwrist"
-    fb_lshoulder	    = "rfb_lshoulder"
-    fb_lupperarm	    = "rfb_lupperarm"
-    fb_lforearm		    = "rfb_lforearm"
-    fb_lwrist		    = "rfb_lwrist"
-    //Bullet Deaths
-    d_back		    = "rifl_d_back"    
-    d_run		    = "defaultrundeath" 
-    d_rupperleg		    = "rifl_d_rupperleg"
-    d_rknee		    = "rifl_d_rknee"
-    d_rankle		    = "rifl_d_rankle"
-    d_lupperleg		    = "rifl_d_lupperleg"
-    d_lknee		    = "rifl_d_lknee"
-    d_lankle		    = "rifl_d_lankle"
-    d_hips		    = "rifl_d_hips"
-    d_waist		    = "rifl_d_waist"
-    d_neck		    = "rifl_d_neck"
-    d_head		    = "rifl_d_head"
-    d_base		    = "rifl_d_base"
-    d_rshlderf		    = "rifl_d_rshlderf"
-    d_rshlderb		    = "rifl_d_rshlderb"    
-    d_rupperarm		    = "rifl_d_rupperarm"
-    d_rforearm		    = "rifl_d_rforearm"
-    d_rwrist		    = "rifl_d_rwrist"
-    d_lshlderf		    = "rifl_d_lshlderf"
-    d_lshlderb		    = "rifl_d_lshlderb"    
-    d_lupperarm		    = "rifl_d_lupperarm"
-    d_lforearm		    = "rifl_d_lforearm"
-    d_lwrist		    = "rifl_d_lwrist"
-    //Elaborate deaths
-    d_horBack		    = "rifl_d_horBack" 
-    d_horGut                = "rifl_d_horGut"  
-    d_horHam                = "rifl_d_horHam"  
-    d_horChst               = "rifl_d_horChst" 
-    d_horFrnt               = "rifl_d_horFrnt" 
-    d_horrible              = "rifl_d_horrible"
-    d_horLeft               = "rifl_d_horLeft" 
-    d_horRight              = "rifl_d_horRight"
-}
 
 template gunanims_rem
 {
@@ -308,113 +216,68 @@ template gunanims_rem
 	animation1 = "u_hold_up;-13.5"
 	animation2 = "u_hold_up;-81.7"
     }
-/*    gunUbiks ubiks_normal
-    {
-
-	autoExtractAngles="false"
-	
-		    
-	propRelative="true"			// makes the ubiks all prop relative, which means you don't need to have the back straight, but the ubiks will want to roughly match the underlying anims back rotations, otherwise there could be some model tearing (but the ubiks will still work)
-	allowExtraWaistTwist="false"
-	catWaist="false"
-
-	pivotOffset [] { 0.0f, 1.4f, 0.0f }	// prop pos relative pivot offset
-     
-    	/////////// 9 way grid /////////////////////
-	animationl1u1	= "u_fxg_aim_ul"
-	animationl1f	= "u_fxg_aim_fl"
-	animationl1d1	= "u_fxg_aim_dl"
-	animationfu1	= "u_fxg_aim_um"
-	animationff	= "u_fxg_aim_fm"
-	animationfd1	= "u_fxg_aim_dm"
-	animationr1u1	= "u_fxg_aim_ur"
-	animationr1f	= "u_fxg_aim_fr"
-	animationr1d1	= "u_fxg_aim_dr"
-	
-	manualGridAngleLD [] { -0.5f, -0.5f }
-	manualGridAngleFD [] { -0.5f, 0.f }
-	manualGridAngleRD [] { -0.5f, 0.5f }
-	manualGridAngleLF [] { 0.f, -0.5f }
-	manualGridAngleFF [] { 0.f, 0.f }
-	manualGridAngleRF [] { 0.f, 0.5f }
-	manualGridAngleLU [] { 0.5f, -0.5f }
-	manualGridAngleFU [] { 0.5f, 0.f }
-	manualGridAngleRU [] { 0.5f, 0.5f }
-
-	
-	/////////////////////////////////////////////
-    }
-
-    gunUbiks ubiks_fire
-    {
-	autoExtractAngles="false"
-	propRelative="true"			// makes the ubiks all prop relative, which means you don't need to have the back straight, but the ubiks will want to roughly match the underlying anims back rotations, otherwise there could be some model tearing (but the ubiks will still work)
-	allowExtraWaistTwist="false"
-	catWaist="false"
-
-	pivotOffset [] { 0.0f, 1.4f, 0.0f }	// prop pos relative pivot offset
-
-	/////////// 9 way grid /////////////////////
-	animationl1u1	= "u_fxg_fire_ul"
-	animationl1f	= "u_fxg_fire_fl"
-	animationl1d1	= "u_fxg_fire_dl"
-
-	animationfu1	= "u_fxg_fire_um"
-	animationff	= "u_fxg_fire_fm"
-	animationfd1	= "u_fxg_fire_dm"
-
-	animationr1u1	= "u_fxg_fire_ur"
-	animationr1f	= "u_fxg_fire_fr"
-	animationr1d1	= "u_fxg_fire_dr"
-	/////////////////////////////////////////////
-    }*/
+//    gunUbiks ubiks_normal
+//  {
+//
+//      autoExtractAngles="false"
+//      
+//      	    
+//      propRelative="true"			// makes the ubiks all prop relative, which means you don't need to have the back straight, but the ubiks will want to roughly match the underlying anims back rotations, otherwise there could be some model tearing (but the ubiks will still work)
+//      allowExtraWaistTwist="false"
+//      catWaist="false"
+//
+//      pivotOffset [] { 0.0f, 1.4f, 0.0f }	// prop pos relative pivot offset
+//   
+//  	/////////// 9 way grid /////////////////////
+//      animationl1u1	= "u_fxg_aim_ul"
+//      animationl1f	= "u_fxg_aim_fl"
+//      animationl1d1	= "u_fxg_aim_dl"
+//      animationfu1	= "u_fxg_aim_um"
+//      animationff	= "u_fxg_aim_fm"
+//      animationfd1	= "u_fxg_aim_dm"
+//      animationr1u1	= "u_fxg_aim_ur"
+//      animationr1f	= "u_fxg_aim_fr"
+//      animationr1d1	= "u_fxg_aim_dr"
+//      
+//      manualGridAngleLD [] { -0.5f, -0.5f }
+//      manualGridAngleFD [] { -0.5f, 0.f }
+//      manualGridAngleRD [] { -0.5f, 0.5f }
+//      manualGridAngleLF [] { 0.f, -0.5f }
+//      manualGridAngleFF [] { 0.f, 0.f }
+//      manualGridAngleRF [] { 0.f, 0.5f }
+//      manualGridAngleLU [] { 0.5f, -0.5f }
+//      manualGridAngleFU [] { 0.5f, 0.f }
+//      manualGridAngleRU [] { 0.5f, 0.5f }
+//
+//      
+//      /////////////////////////////////////////////
+//  }
+//
+//  gunUbiks ubiks_fire
+//  {
+//      autoExtractAngles="false"
+//      propRelative="true"			// makes the ubiks all prop relative, which means you don't need to have the back straight, but the ubiks will want to roughly match the underlying anims back rotations, otherwise there could be some model tearing (but the ubiks will still work)
+//      allowExtraWaistTwist="false"
+//      catWaist="false"
+//
+//      pivotOffset [] { 0.0f, 1.4f, 0.0f }	// prop pos relative pivot offset
+//
+//      /////////// 9 way grid /////////////////////
+//      animationl1u1	= "u_fxg_fire_ul"
+//      animationl1f	= "u_fxg_fire_fl"
+//      animationl1d1	= "u_fxg_fire_dl"
+//
+//      animationfu1	= "u_fxg_fire_um"
+//      animationff	= "u_fxg_fire_fm"
+//      animationfd1	= "u_fxg_fire_dm"
+//
+//      animationr1u1	= "u_fxg_fire_ur"
+//      animationr1f	= "u_fxg_fire_fr"
+//      animationr1d1	= "u_fxg_fire_dr"
+//      /////////////////////////////////////////////
+//  }
 }
   
-template RemoteGun
-{
-    class-id = "remote gun component"
-
-    swivelPartName         = ""
-    barrelPartName         = ""
-    barrelPivotDofName     = "" 
-    barrelShootPosDofName  = ""
-
-/*
-    // - no longer needed now seer components are used instead of line tests to determine if the gun can see its target
-    // leaves us with one place now to control the effective range of a remote, RemoteStimSensorArc's maxViewDist
-
-    float-field range
-    {
-	views	    = "basic setup"
-	tip	    = "Gun will only automatically fire on props which are within this distance (in metres)"
-	default     = 20.0f
-    }
-*/
-
-    guncomponent_linetest gunComponent
-    {
-	ammoID = ""
-
-	muzzleFlashEffect	= "empty"
-	emptyAnimChar = "N"
-	loweredAmount = 0.f
-
-	shootPhrase		= "######"
-	shootPhraseRestart	= 5
-	shootPhraseForceShots	= 3   
-   
-	canFire = "true"
-	
-	gunAnimationGroup anims
-	{
-	    set		    = "gunanims_rem"
-	    animmap	    = "animmap_rem"
-	    reactmap	    = "reactmap_rem"
-	}
-
-	state		    = "idle"
-    }
-}
 
 template remotePhysics
 {
@@ -435,68 +298,16 @@ template remoteMovingPhysics
     }
 }
 
-
-template SimplePhysics
-{
-    class-id = "simple physics component"
-
-    applyChrForceAtPoint = 0.0f
-    maxChrForceInherit = 0.0f
-    chrSlideOffAmount = 1.0f
-    explosionDamping = 0.5f;
-
-    mayaphysics = "true"
-    multibody = "true"
-
-    hirescol = "true"
-
-    canusegravgun = "false"
-
-    ignoreWhenFindingFloor = "false"
-
-    givesoncontactdamage = "false"
-
-    minMassPerPart = 1.0f
-    maxMassPerPart = 100.f
-    doCollisionNoises = "true"
-    storeStateInLocalSpace = "false"
-    gravity = "false"
-    enabled = "true"
-    float vel[] = {0.0f, 0.0f, 0.0f}
-    float angvel[] = {0.0f, 0.0f, 0.0f}
-
-    buoyancyScale = 1.0f
-    buoyancyLinDrag = 0.0f
-    buoyancyAngDrag = 0.0f 
-
-}
-
-
-
-
 template remoteMovingMatrix
 {
     class-id	= "remote moving component matrix"
     
     responsibleForSettingCharacterPos = "true"
+    responsibleForSettingCharacterElevation = "false"
 
     basePartNum = 0
     armPartNum = 1
     gunPartNum = 2
-
-    float-field maxTrackingSpeedOverride
-    {
-	default = -1.0f
-	tip	= "override for the remote's movement description's tracking speed, set to > 0.0 to override, set to -1.0 to use standard speed"
-	views	    = "basic setup"
-    }
-
-    float-field maxNormalSpeedOverride
-    {
-	default = -1.0f
-	tip	= "override for the remote's movement description's normal speed, set to > 0.0 to override, set to -1.0 to use standard speed"
-	views	    = "basic setup"
-    }
 
     aimOffsetFromXAxis[] {0.0, 0.0, 0.0}
 
@@ -508,6 +319,7 @@ template remoteMovingMatrix
 }
 
 template remoteMovingMatrix360 : remoteMovingMatrix
+
 {
     class-id	= "remote moving component matrix 360"
     
@@ -520,11 +332,24 @@ template remoteMovingMatrixBF : remoteMovingMatrix
 {
     class-id	= "remote moving component matrix bf"
     
+    vehicleTurret   = "true"
+
     // for collision data
+    
+    //physics = 42
+    
+    odesimplephysics physics
+    {
+        moveable = "true"
+        bodyMass = 10000        // must be high for damage reasons
+    }
+    
+    /*
     SimplePhysics physics
     {
 	moveable = "true"
     }
+    */
 }
 
 template remoteProp : prop
@@ -541,8 +366,7 @@ template remoteProp : prop
 	views = "basic setup"
     }
 
-    flags = "k_flag_canTrack|k_flag_idleSweepY|k_flag_canActivateDirectly"
-    driverAimOnWii = "false" 
+    flags = "k_flag_canTrack|k_flag_idleSweepY|k_flag_canActivateDirectly|k_flag_returnToRestDir"
 	
     movementDescription = "remote_gun"
     float startAngles [] = {0.0f, 0.0f}
@@ -555,12 +379,18 @@ template remoteProp : prop
     {
     }
 
+    dynamicNetworkComponent network
+    {
+    }
+
     int-field partnumLightIsBoundTo
     {
 	default = 0
 	tip = "the part that the light will be bound to"
 	views = "basic setup"
     }
+
+    animOffset[] = { 0.0f, 0.0f, 0.0f }
 }
 
 

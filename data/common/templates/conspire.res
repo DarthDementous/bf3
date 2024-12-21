@@ -22,8 +22,3 @@ template con_worlddesc
     actions {}
 }
 
-template con_probdesc
-{
-    string objects [] {}
-    string initialstate [] {}
-}

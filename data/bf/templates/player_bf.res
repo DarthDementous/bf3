@@ -1,42 +1,13 @@
 // vim: set syntax=c :
 
-// Subclass CChrPickupCollectorComponent if you want to limit number of weapons etc.
-// Don't just use the Haze component as it's likely to evolve in directions you don't
-// need - in fact, it probably already has, with the whole scavenging thing etc.
-//
-//template playerpickupcollectorbf
-//{
-//    class-id = "haze player pickup collector"    // 2 weapon maximum
-//    canScavenge = "false"
-//}
-
 template playerControlsComponentBF
 {
     class-id = "player controls component BF"
 }
 
-template bfphysicsmovement : playerphysicsmovement
+template playerAwarenessArrowsComponentBF
 {
-    //class-id = "bf ode physics movement"
-    class-id = "bf physics movement"
-
-//  Now using values from chr.res (fallDamage_distanceForZeroDamage, fallDamage_distanceForMaxDamage,
-//  fallDamage_maxDamage) to calculate these speeds.
-//
-//    fallSpeedDamageModifier = 0.05f	//The higher this is, the more damage you
-//					//  will take per m/s
-//    maxSafeFallSpeed	    = 15.0f	//The higher this is, the faster you can
-//					//  fall without taking damage
-
-    airResistance	    = 0.0f	//The higher this is, the lower your max
-					//  fall speed is. (vel^2)*airResistance
-					//  is the resistance
-}
-
-template bfProximityPowerComponent
-{
-    class-id = "proximity power component bf"
-    maxRange = 5.0f
+    class-id = "player awareness arrows component BF"
 }
 
 template specialActionComponentTemplate
@@ -47,8 +18,42 @@ template specialActionComponentTemplate
 template meleeComponentTemplate : specialActionComponentTemplate
 {
     class-id = "melee component bf"
-	
-    soundcomponent soundComponent{}    
+    	
+    soundcomponent soundComponent{}
+
+    soundeventsystem sndeventsystem
+    {
+	definition = "sndevt_null"
+    }
+
+    soundmap-field soundmap
+    {
+	default = "sndmap_null"
+    }
+
+    chrRetractWeaponInSprint = "false"	// This is probably only ever going to be true for Grievous
+    chrJumpsWhenAttacking = "false"	// This effects the way that attack anims are played, it should only be true for Yoda
+    chrHasRancorReactAnims = "true"
+
+    // The damage per-blade per-attack, on a basis of one hit per prop per blade per swing
+    slash_right_to_left_damage	= 0.20f
+    slash_left_to_right_damage	= 0.20f
+    slash_under_rl_damage	= 0.20f
+    slash_under_lr_damage	= 0.20f
+
+    swing_right_to_left_damage	= 0.20f
+    swing_left_to_right_damage	= 0.20f
+    under_right_to_left_damage	= 0.20f
+    under_left_to_right_damage	= 0.20f
+
+    overhead_attack_damage	= 0.35f
+    
+    spin_cw_attack_damage	= 0.20f
+
+    spin_ccw_attack_damage	= 0.35f
+    super_spin_attack_damage	= 0.40f
+
+    maxJumpVelocity		= 10.0f
 }
 
 template droidekaRollComponentTemplate : specialActionComponentTemplate
@@ -61,17 +66,19 @@ template jetpackComponentTemplate : specialActionComponentTemplate
     class-id = "jet pack component bf"
 
     maxTimeDelayToTriggerJump	= 0.5f	    			//The maximum time between jumping and pressing the trigger to ignite
-    maxFuelInSeconds			= 5.0f	    			//The total fuel
-    timeToRechargeInSeconds		= 11.0f	    			//The time it takes to recharge the fuel from empty to full
-    minFuelToStartJumpInSeconds	= 1.0f	    			//The minimum amount of fuel needed to start the jetpack
-    initialBoostTime			= 2.5f	    			//How long to boost for when the button	is pressed // 3 times previous 0.3f
-    initialBoostAcceleration[]	{3.0f, 24.0f, 0.0f}     //What direction & strength the acceleration should be in
-    // x has been added to attempt to PUSH the character forward, as with momentum
-    initialBoostFuelUsage		= 1.25f	    			//The number of seconds of fuel that are used the moment the jetpack is	ignited // 0.75f
-    fbAcceleration				= 10.0f	    			//Forward / backward acceleration
-    lrAcceleration				= 10.0f	    			//Left / Right acceleration
-    upAcceleration				= 9.0f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
-    dampening					= 0.35f	    			//0.11f	The higher this value is, the less inertia there is.
+    maxFuelInSeconds		= 7.5f	    			//The total fuel
+    timeToRechargeInSeconds	= 11.0f	    			//The time it takes to recharge the fuel from empty to full
+    minFuelToStartJumpInSeconds	= 0.5f	    			//The minimum amount of fuel needed to start the jetpack
+    initialBoostTime		= 0.5f	    			//How long to boost for when the button	is pressed // 3 times previous 0.3f
+    initialBoostAcceleration[]	{10.0f, 10.0f, 10.0f}		//Y = how much boost, X/Z = max thrust used for player input for initialBoostTime
+    initialBoostFuelUsage	= 0.25f	    			//The number of seconds of fuel that are used the moment the jetpack is	ignited // 0.75f
+    fbAcceleration		= 11.0f	    			//Forward / backward acceleration
+    lrAcceleration		= 11.0f	    			//Left / Right acceleration
+    upSpeedStationary		= 4.7f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upSpeedMoving		= 0.25f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upAcceleration		= 35.0f
+    dampening			= 0.35f	    			//0.11f	The higher this value is, the less inertia there is.
+    thrusterBone = "waist"
     soundmap-field soundmap
     {
 	default = "sndmap_jp_sounds"
@@ -82,25 +89,291 @@ template jetpackComponentTemplate : specialActionComponentTemplate
     }
 }
 
+template repengineerjetpackComponentTemplate : specialActionComponentTemplate
+{
+    class-id = "jet pack component bf"
+
+    maxTimeDelayToTriggerJump	= 0.5f	    			//The maximum time between jumping and pressing the trigger to ignite
+    maxFuelInSeconds		= 7.5f	    			//The total fuel
+    timeToRechargeInSeconds	= 11.0f	    			//The time it takes to recharge the fuel from empty to full
+    minFuelToStartJumpInSeconds	= 0.5f	    			//The minimum amount of fuel needed to start the jetpack
+    initialBoostTime		= 0.5f	    			//How long to boost for when the button	is pressed // 3 times previous 0.3f
+    initialBoostAcceleration[]	{10.0f, 10.0f, 10.0f}		//Y = how much boost, X/Z = max thrust used for player input for initialBoostTime
+    initialBoostFuelUsage	= 0.25f	    			//The number of seconds of fuel that are used the moment the jetpack is	ignited // 0.75f
+    fbAcceleration		= 11.0f	    			//Forward / backward acceleration
+    lrAcceleration		= 11.0f	    			//Left / Right acceleration
+    upSpeedStationary		= 4.7f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upSpeedMoving		= 0.25f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upAcceleration		= 35.0f
+    dampening			= 0.35f	    			//0.11f	The higher this value is, the less inertia there is.
+    thrusterBone = "waist"
+    soundmap-field soundmap
+    {
+	default = "sndmap_rep_jet"
+    }
+
+    soundcomponent soundComponent	// For playing sounds
+    {
+    }
+}
+
+template cisengineerjetpackComponentTemplate : specialActionComponentTemplate
+{
+    class-id = "jet pack component bf"
+
+    maxTimeDelayToTriggerJump	= 0.5f	    			//The maximum time between jumping and pressing the trigger to ignite
+    maxFuelInSeconds		= 7.5f	    			//The total fuel
+    timeToRechargeInSeconds	= 11.0f	    			//The time it takes to recharge the fuel from empty to full
+    minFuelToStartJumpInSeconds	= 0.5f	    			//The minimum amount of fuel needed to start the jetpack
+    initialBoostTime		= 0.5f	    			//How long to boost for when the button	is pressed // 3 times previous 0.3f
+    initialBoostAcceleration[]	{10.0f, 10.0f, 10.0f}		//Y = how much boost, X/Z = max thrust used for player input for initialBoostTime
+    initialBoostFuelUsage	= 0.25f	    			//The number of seconds of fuel that are used the moment the jetpack is	ignited // 0.75f
+    fbAcceleration		= 11.0f	    			//Forward / backward acceleration
+    lrAcceleration		= 11.0f	    			//Left / Right acceleration
+    upSpeedStationary		= 4.7f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upSpeedMoving		= 0.25f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upAcceleration		= 35.0f
+    dampening			= 0.35f	    			//0.11f	The higher this value is, the less inertia there is.
+    thrusterBone = "waist"
+    soundmap-field soundmap
+    {
+	default = "sndmap_cis_jet"
+    }
+
+    soundcomponent soundComponent	// For playing sounds
+    {
+    }
+}
+
+template empengineerjetpackComponentTemplate : specialActionComponentTemplate
+{
+    class-id = "jet pack component bf"
+
+    maxTimeDelayToTriggerJump	= 0.5f	    			//The maximum time between jumping and pressing the trigger to ignite
+    maxFuelInSeconds		= 7.5f	    			//The total fuel
+    timeToRechargeInSeconds	= 11.0f	    			//The time it takes to recharge the fuel from empty to full
+    minFuelToStartJumpInSeconds	= 0.5f	    			//The minimum amount of fuel needed to start the jetpack
+    initialBoostTime		= 0.5f	    			//How long to boost for when the button	is pressed // 3 times previous 0.3f
+    initialBoostAcceleration[]	{10.0f, 10.0f, 10.0f}		//Y = how much boost, X/Z = max thrust used for player input for initialBoostTime
+    initialBoostFuelUsage	= 0.25f	    			//The number of seconds of fuel that are used the moment the jetpack is	ignited // 0.75f
+    fbAcceleration		= 11.0f	    			//Forward / backward acceleration
+    lrAcceleration		= 11.0f	    			//Left / Right acceleration
+    upSpeedStationary		= 4.7f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upSpeedMoving		= 0.25f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upAcceleration		= 35.0f
+    dampening			= 0.35f	    			//0.11f	The higher this value is, the less inertia there is.
+    thrusterBone = "waist"
+    soundmap-field soundmap
+    {
+	default = "sndmap_emp_jet"
+    }
+
+    soundcomponent soundComponent	// For playing sounds
+    {
+    }
+}
+
+template rebengineerjetpackComponentTemplate : specialActionComponentTemplate
+{
+    class-id = "jet pack component bf"
+
+    maxTimeDelayToTriggerJump	= 0.5f	    			//The maximum time between jumping and pressing the trigger to ignite
+    maxFuelInSeconds		= 7.5f	    			//The total fuel
+    timeToRechargeInSeconds	= 11.0f	    			//The time it takes to recharge the fuel from empty to full
+    minFuelToStartJumpInSeconds	= 0.5f	    			//The minimum amount of fuel needed to start the jetpack
+    initialBoostTime		= 0.5f	    			//How long to boost for when the button	is pressed // 3 times previous 0.3f
+    initialBoostAcceleration[]	{10.0f, 10.0f, 10.0f}		//Y = how much boost, X/Z = max thrust used for player input for initialBoostTime
+    initialBoostFuelUsage	= 0.25f	    			//The number of seconds of fuel that are used the moment the jetpack is	ignited // 0.75f
+    fbAcceleration		= 11.0f	    			//Forward / backward acceleration
+    lrAcceleration		= 11.0f	    			//Left / Right acceleration
+    upSpeedStationary		= 4.7f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upSpeedMoving		= 0.25f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upAcceleration		= 35.0f
+    dampening			= 0.35f	    			//0.11f	The higher this value is, the less inertia there is.
+    thrusterBone = "waist"
+    soundmap-field soundmap
+    {
+	default = "sndmap_reb_jet"
+    }
+
+    soundcomponent soundComponent	// For playing sounds
+    {
+    }
+}
+
+template jangojetpackComponentTemplate : specialActionComponentTemplate
+{
+    class-id = "jet pack component bf"
+
+    maxTimeDelayToTriggerJump	= 0.5f	    			//The maximum time between jumping and pressing the trigger to ignite
+    maxFuelInSeconds		= 7.5f	    			//The total fuel
+    timeToRechargeInSeconds	= 11.0f	    			//The time it takes to recharge the fuel from empty to full
+    minFuelToStartJumpInSeconds	= 0.5f	    			//The minimum amount of fuel needed to start the jetpack
+    initialBoostTime		= 0.5f	    			//How long to boost for when the button	is pressed // 3 times previous 0.3f
+    initialBoostAcceleration[]	{10.0f, 10.0f, 10.0f}		//Y = how much boost, X/Z = max thrust used for player input for initialBoostTime
+    initialBoostFuelUsage	= 0.25f	    			//The number of seconds of fuel that are used the moment the jetpack is	ignited // 0.75f
+    fbAcceleration		= 11.0f	    			//Forward / backward acceleration
+    lrAcceleration		= 11.0f	    			//Left / Right acceleration
+    upSpeedStationary		= 4.7f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upSpeedMoving		= 0.25f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upAcceleration		= 35.0f
+    dampening			= 0.35f	    			//0.11f	The higher this value is, the less inertia there is.
+    thrusterBone = "waist"
+    soundmap-field soundmap
+    {
+	default = "sndmap_jangojet"
+    }
+
+    soundcomponent soundComponent	// For playing sounds
+    {
+    }
+}
+
+template bobajetpackComponentTemplate : specialActionComponentTemplate
+{
+    class-id = "jet pack component bf"
+
+    maxTimeDelayToTriggerJump	= 0.5f	    			//The maximum time between jumping and pressing the trigger to ignite
+    maxFuelInSeconds		= 7.5f	    			//The total fuel
+    timeToRechargeInSeconds	= 11.0f	    			//The time it takes to recharge the fuel from empty to full
+    minFuelToStartJumpInSeconds	= 0.5f	    			//The minimum amount of fuel needed to start the jetpack
+    initialBoostTime		= 0.5f	    			//How long to boost for when the button	is pressed // 3 times previous 0.3f
+    initialBoostAcceleration[]	{10.0f, 10.0f, 10.0f}		//Y = how much boost, X/Z = max thrust used for player input for initialBoostTime
+    initialBoostFuelUsage	= 0.25f	    			//The number of seconds of fuel that are used the moment the jetpack is	ignited // 0.75f
+    fbAcceleration		= 11.0f	    			//Forward / backward acceleration
+    lrAcceleration		= 11.0f	    			//Left / Right acceleration
+    upSpeedStationary		= 4.7f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upSpeedMoving		= 0.25f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upAcceleration		= 35.0f
+    dampening			= 0.35f	    			//0.11f	The higher this value is, the less inertia there is.
+    thrusterBone = "waist"
+    soundmap-field soundmap
+    {
+	default = "sndmap_bobajet"
+    }
+
+    soundcomponent soundComponent	// For playing sounds
+    {
+    }
+}
+
+template darktrooperjetpackComponentTemplate : specialActionComponentTemplate
+{
+    class-id = "jet pack component bf"
+
+    maxTimeDelayToTriggerJump	= 0.5f	    			//The maximum time between jumping and pressing the trigger to ignite
+    maxFuelInSeconds		= 7.5f	    			//The total fuel
+    timeToRechargeInSeconds	= 11.0f	    			//The time it takes to recharge the fuel from empty to full
+    minFuelToStartJumpInSeconds	= 0.5f	    			//The minimum amount of fuel needed to start the jetpack
+    initialBoostTime		= 0.5f	    			//How long to boost for when the button	is pressed // 3 times previous 0.3f
+    initialBoostAcceleration[]	{10.0f, 10.0f, 10.0f}		//Y = how much boost, X/Z = max thrust used for player input for initialBoostTime
+    initialBoostFuelUsage	= 0.25f	    			//The number of seconds of fuel that are used the moment the jetpack is	ignited // 0.75f
+    fbAcceleration		= 11.0f	    			//Forward / backward acceleration
+    lrAcceleration		= 11.0f	    			//Left / Right acceleration
+    upSpeedStationary		= 4.7f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upSpeedMoving		= 0.25f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upAcceleration		= 35.0f
+    dampening			= 0.35f	    			//0.11f	The higher this value is, the less inertia there is.
+    thrusterBone = "waist"
+    soundmap-field soundmap
+    {
+	default = "sndmap_darktrooperjet"
+    }
+
+    soundcomponent soundComponent	// For playing sounds
+    {
+    }
+}
+
+
+
+
+template skytrooperStuckOnJetpack : simplephysicsprop_nophysics
+{
+    obinstrenderer render
+    {
+	model = "characters/soldiers/skytrooper/skytrooper_jetpack"
+    }
+
+    //physics
+    //{
+    //	mayaphysics = "true"
+    //}
+    
+    healthcomponent health
+    {
+	class-id = "passthrough health component"
+    }
+
+    baseobflags = "k_baseobflag_dontNetworkSerialiseSave"
+}
+
+template skytrooperJetpackComponentTemplate : jetpackComponentTemplate
+{
+    class-id = "skytrooper jet pack component bf"
+
+    attachBone = "waist"
+    attachPropTemplate = "skytrooperStuckOnJetpack"
+    attached = "true"
+    actAsJumppack = "true"
+
+    initialBoostAcceleration[]	{0.0f, 2.0f, 40.0f} //5.0f, 25.0f
+    initialBoostFuelUsage	= 1.f	    			//The number of seconds of fuel that are used the moment the jetpack is	ignited // 0.75f
+
+    fuelUsedPerJump	= 7.5f
+    initialBoostTime	= 0.5f
+    fbAcceleration	= 0.1f
+    lrAcceleration	= 0.1f
+
+    minFuelToStartJumpInSeconds = 1.f
+    timeToRechargeInSeconds	= 6.f
+    maxFuelInSeconds	= 3.0f
+    soundmap  = "sndmap_skytrooperjet"
+    dampening = 0.08f
+}
+
+template x2JetpackComponentTemplate : skytrooperJetpackComponentTemplate
+{
+    attached = "false"
+    actAsJumppack = "false"
+
+    fuelUsedPerJump	= 7.5f
+    maxTimeDelayToTriggerJump	= 0.5f	    			//The maximum time between jumping and pressing the trigger to ignite
+    maxFuelInSeconds		= 7.5f	    			//The total fuel
+    timeToRechargeInSeconds	= 11.0f	    			//The time it takes to recharge the fuel from empty to full
+    minFuelToStartJumpInSeconds	= 0.5f	    			//The minimum amount of fuel needed to start the jetpack
+    initialBoostTime		= 0.5f	    			//How long to boost for when the button	is pressed // 3 times previous 0.3f
+    initialBoostAcceleration[]	{10.0f, 10.0f, 10.0f}		//Y = how much boost, X/Z = max thrust used for player input for initialBoostTime
+    initialBoostFuelUsage	= 0.25f	    			//The number of seconds of fuel that are used the moment the jetpack is	ignited // 0.75f
+    fbAcceleration		= 11.0f	    			//Forward / backward acceleration
+    lrAcceleration		= 11.0f	    			//Left / Right acceleration
+    upSpeedStationary		= 4.7f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upSpeedMoving		= 0.25f	    			//6.0f	Accleration up when holding down the boost button, non-BF2 jetpack only
+    upAcceleration		= 35.0f
+    dampening			= 0.35f	    			//0.11f	The higher this value is, the less inertia there is.
+}
+
+/* --- auto commented out by commentOutTemplate
 template jumppackComponentTemplate : jetpackComponentTemplate
 {
     class-id = "jump pack component bf"
     
-    initialBoostAcceleration[]	{0.0f, 10.5f, 12.0f}
+    initialBoostAcceleration[]	{0.0f, 8.0f, 25.0f} //5.0f, 25.0f
 
-    fuelUsedPerJump	= 2.0f
-    initialBoostTime	= 0.1f
-    fbAcceleration	= 1.0f
-    lrAcceleration	= 1.0f
+    fuelUsedPerJump	= 1.5f
+    initialBoostTime	= 0.5f //1f
+    fbAcceleration	= 0.1f
+    lrAcceleration	= 0.1f
 
-    minFuelToStartJumpInSeconds = 2.5f
-    timeToRechargeInSeconds	= 10.0f
-    maxFuelInSeconds	= 5.0f
+    minFuelToStartJumpInSeconds = 2.0f
+    timeToRechargeInSeconds	= 5.0f
+    maxFuelInSeconds	= 3.0f
 }
+*/ // --- auto commented out by commentOutTemplate
 
 template bfPlayerPersistantData : basePlayerPersistantData
 {
-    class-id		    = "player persistant data bf"
+//  class-id		    = "player persistant data bf"
 }
 
 template playerpickupcollectorbf
@@ -110,7 +383,7 @@ template playerpickupcollectorbf
 
 template bfPlayerOnFootComponent
 {
-    class-id = "bf player on foot component"
+    class-id = "player on foot component"
     specialAnimsName = "bfPlayerSpecialAnims"
 }
 
@@ -122,93 +395,83 @@ template republic_icon
 template camModifierMove
 {
     class-id = "movement camera modifier class"
-	
-    changeFovSpeed = 6.75f;
 
-    referenceBone1  = "lankle"		// first reference bone for shake calculation
-    referenceBone2  = "rankle"		// second    "       "   "    "       "
-    
-    flipX	    = "false"		// flip cam-movement along x-axis
-    flipY	    = "false"		// flip       "        "   y-axis
-    flipZ	    = "false"		// flip       "        "   z-axis
+    noiseAlpha	    = 150.0f		//In what follows "alpha" is the weight when the sum is formed. Typically it is 2, As this approaches 1 the function is noisier
+    noiseBeta	    = 150.0f		//Beta is the harmonic scaling/spacing, typically 2.
 
-    ignoreZ	    = "true"            // do not use any movement in z direction
+    pitchLimit	    = 0.0028f		//limit in radians
+    yawLimit	    = 0.001f		//these limits will look bad, it's much better to use alpha, beta and scale to get the randomness right!
 
-    scaleX	    = 0.2               // scale movement in x direction
-    scaleY	    = 0.1		//    "     "      " y     "
-    scaleZ	    = 1.0		//    "     "      " z     "
+    noiseScalePitchWalk = 0.0f		//what the perlin noise is scaled by
+    noiseScaleYawWalk   = 0.0f
 
+    noiseScalePitchSprint = 0.01f		//what the perlin noise is scaled by
+    noiseScaleYawSprint   = 0.01f
 
-    scaleYaw	    = 0.04
-    scalePitch	    = 0.03
-    scaleRoll	    = 1.0f 
+    shakeSpeedWalk   = 3.1415f		//speed of left right
+    shakeSpeedSprint = 12.5663f
 
-/* ORIGINAL VALUES
-    fovMax	    = 0.3
-    fovValue	    = 1.00
-    fovDamping    = 1.0 //0.30
-    flipFov	    = "true"
-    fovMoveAmount = 3.0
-    moveWithFov   = "false"
-*/
+    shakeScaleWalk   = 0.0f		//size of left right movement
+    shakeScaleSprint = 0.005f
 
-    // REVISED VALUES
-    fovMax	    = 0.5	
-    fovValue	    = 1.00
-    fovDamping	    = 3.0
-    flipFov	    = "false"
-    fovMoveAmount   = 5.5
-    moveWithFov	    = "false"
-    
-    damping	    = 0.95              // damping of cam-movement per second
-    rotDamping	    = 0.3		// damping of cam-rotation per second
-
-    rotation	    = 1.25 //0.25		// amount of rotation per frame around x and y axis 
-    rollCamera	    = 1.0 //0.5		// amount of rotation per frame around the z axis
-    rollMax	    = 0.115
-
-    minSpeed	    = 0.25		// minimum speed for applying cam shake
-
-    methodAdd	    = "true"		// true: incremental approach of moving the camera, false: directly use calculated translation to position the camera
-    scaleRot	    = "true"		// true: scale rotation with speed
-    rotateUP	    = "true"		// true: do rotate the cam up vector around z axis
-    scaleTotal	    = 0.15		// overall scale
-    useRandomNoise  = "true"
-    noiseMin	    = -0.1
-    noiseMax	    = 0.1
+    noiseSpeedWalk   = 0.0f
+    noiseSpeedSprint = 4.0f
 }
-
 
 template BFCharacterCamera : baseCamera
 {
     class-id	= "BF Character Camera"
 
-    float angoffset[]	{ 0.0f,  0.0f,  0.0f}
-//    float posoffset[]	{ 0.0f,  0.0f, -2.3f}
-//    float targetoffset[]{-0.2f,  0.2f,  0.0f}
-//    float lookfromsafe[]{-0.3f, -0.1f, -0.35f}
-    float posoffset[]	{ 0.0f,  0.0f, -1.1f}
-    float targetoffset[]{-0.6f,  0.0f,  0.0f}
-    float lookfromsafe[]{-0.3f, -0.2f, -0.3f}
-    float meleeoffset[] { 2.0f,  0.0f, -1.8f} 
-//    float sprintoffset[]{ 0.f, 0.f, 0.f }	    // No movement
-    float runoffset[]{ -0.35f, 0.0f, 0.0f }   // Sprint Camera 1
-    float sprintoffset[]{ -0.3f, -0.18f, 0.9f }   // Sprint Camera 1
-//    float sprintoffset[]{ -0.45f, -0.27f, 1.3f }  // Sprint Camera 2
-//    float sprintoffset[]{ -0.45f, -0.4f, 0.0f }   // Gears of War camera
-   
+    //posoffset - Centre rotation point of the camera
+    //targetoffset - offset relative to posoffset where the camera is positioned
+    //lookfromsafe - offset relative to posoffset where the camera moves towards if it collides (should in inside player collision capsule)
+
+    ///////////
+    // TYPE 1
+    ///////////
+    // BF2 CAM
+    blend
+    {
+        float posoffset[]	{ 0.0f,  0.2f, 0.7f}
+	float targetoffset[]    {-0.45f,  -0.25f,  -4.2f}
+	float lookfromsafe[]    {-0.4f, -0.15f, -0.35f}	//unused
+	float angoffset[]	{ 0.0f,  0.0f,  0.0f} //Changing the angle offset breaks the auto aim!
+	
+	turnspd		    = 5.f
+	radius              = 0.23f      // Collision Sphere Radius
+	minDistance         = 2.2f      // UNUSED
+	maxDistance         = 0.8f      // maximum distance away from posoffset that the camera can get
+	sphericalSpring     = 12.f      // Turning Spring
+	distanceSpring      = 30.0f      // Distance Spring
+	minTiltAngle        = -80.f     // World space limit (applied to the target position of the camera)
+	maxTiltAngle        = +80.f     // World space limit (applied to the target position of the camera)    
+    }
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  0.2f, 0.7f}
+    float targetoffset[]    {-0.5f,  -0.3f,  -2.2f}
+    float lookfromsafe[]    {-0.3f, -0.15f, -0.35f}
+    
+    float angoffset[]	    { 0.0f,  0.0f,  0.0f}
+
+    float meleeWeaponOffset[] { 0.3f, 0.2f, -2.2f}   //Offset applied when you have a melee weapon equipped
+    float meleeOffset[]	    { 0.0f,  1.0f, -4.5f}
+    float meleeDirOffset[]  { 0.0f, -0.2f, 0.0f }
+    
+    float sprintoffset[]    { -0.05f, -0.35f, -0.3f }   // Sprint Camera 1  // 0.15
+
+    chaseCamFOVScale	    = 0.75f	    // Player Camera FOV
+
     turnspd                     = 5.f
     radius                      = 0.23f      // Collision Sphere Radius
-    minDistance                 = 2.2f      // UNUSED
+    minDistance                 = 2.2f      // Unused
 
     maxDistance                 = 0.8f //0.4f      // maximum distance away from posoffset that the camera can get
 					    //	_DUE_TO_PLAYER_MOVEMENT_, this will NOT alter how it is affected
 					    //	by collisions
-					    //	
-    sphericalSpring             = 12.f      // Turning Spring
-    distanceSpring              = 1.8f      // Distance Spring
-    minTiltAngle                = -80.f     // World space limit (applied to the target position of the camera)
-    maxTiltAngle                = +80.f     // World space limit (applied to the target position of the camera)    
+    sphericalSpring             = 18.f      // Turning Spring
+    distanceSpring              = 30.0f      // Distance Spring
+    minTiltAngle                = -90.f     // Unused
+    maxTiltAngle                = 90.f     // Unused    
 
     animmap-field animmap
     {
@@ -216,96 +479,487 @@ template BFCharacterCamera : baseCamera
     }
     animset			= "BFCamAnims"
     
-    string walkanims[]	    { "walk1", "walk2"}
-    string runanims[]	    { "run1", "run2"}
-    string sprintanims[]    { "sprint1", "sprint2"}
+    string jumplandanims[]	{ "land1" }
+    string meleeswinganims[]	{ "swing1" }
+    string meleehitanims[]	{ "hit1" }
 
-    useShakeAnims		= "false"   // Set to "true" use camera-shake-anims
-    
-    camModifierMove   movementModifier	    // comment out or remove to not use calculated cam shake
+    camModifierMove   movementModifier
     {
     }
+   
+    leftRoll
+    {
+	LagK		= 0.4f	    // bigger value == bigger lag (max is 1.0f, min is 0.0f)
+	FadeK		= 2.0f	    // how fast to get out from this effect
+	AdditionaDist	= 0.25f	    // distance that will be added to camera during the roll
+	yLookAtOffset	= 0.7f	    // y offset from the prop position (feet) at which camera will look at
+	LerpCameraDir	= 0.5f	    // how much of the new lookAt direction will be aplied (0 - don't change the view dir, 1 - look directly at the player + yLookAtOffset)
+	MaxEffectTime	= 0.4f	    // how long should the lag effect be active
+    }
     
-    leftRollLagK			= 0.3f;//0.5f;    // bigger value == bigger lag (max is 1.0f, min is 0.0f)
-    leftRollFadeK			= 1.3f; //8f;	    // how fast to get out from this effect
-    leftRollAdditionaDist		= 2.0f; //2.8f;	    // distance that will be added to camera during the roll
-    leftRollyLookAtOffset		= 0.7f;	//1.1f;	    // y offset from the prop position (feet) at which camera will look at
-    leftRollLerpCameraDir		= 0.5f;	//0.8f	// how much of the new lookAt direction will be aplied (0 - don't change the view dir, 1 - look directly at the player + yLookAtOffset)
-    leftRollMaxEffectTime		= 0.4f //5f;		// how long should the lag effect be active
+    rightRoll
+    {
+	LagK		= 0.4f
+        FadeK		= 2.0f
+        AdditionaDist	= 0.25f
+        yLookAtOffset	= 0.7f
+        LerpCameraDir	= 0.5f
+        MaxEffectTime	= 0.4f
+    }
 
-    rightRollLagK			= 0.3f; //5f;
-    rightRollFadeK			= 1.3f; //0.8f;
-    rightRollAdditionaDist		= 2.0f; //2.9f;
-    rightRollyLookAtOffset		= 0.7f; //1.1f;
-    rightRollLerpCameraDir		= 0.5f; //0.8f;
-    rightRollMaxEffectTime		= 0.4f; //0.5f;
+    forwardRoll
+    {	
+	LagK		= 0.4f
+	FadeK		= 2.0f
+        AdditionaDist	= 0.0f
+	yLookAtOffset	= 0.8f
+        LerpCameraDir	= 0.75f
+        MaxEffectTime	= 0.4f
+    }
 
-    forwardRollLagK		= 0.4f;
-    forwardRollFadeK		= 1.0f;
-    forwardRollAdditionaDist	= 1.f;	// 2.0f
-    forwardRollyLookAtOffset	= 0.8f; //1.1f;
-    forwardRollLerpCameraDir	= 0.5f; //0.8f;
-    forwardRollMaxEffectTime	= 0.4f; //0.7f;
+    backwardRoll
+    {
+	LagK		= 0.2f
+	FadeK		= 1.5f
+	AdditionaDist	= 0.25f
+	yLookAtOffset	= 1.1f
+	LerpCameraDir	= 0.75f
+	MaxEffectTime	= 0.4f
+    }
 
-    backwardRollLagK		= 0.4f;
-    backwardRollFadeK		= 1.5f; //0.8f;
-    backwardRollAdditionaDist	= 2.0f; //2.8f;
-    backwardRollyLookAtOffset	= 1.1f;
-    backwardRollLerpCameraDir	= 0.8f;
-    backwardRollMaxEffectTime	= 0.4f; //7f;
+    jumpUp
+    {
+	LagK		= 0.15f
+	FadeK		= 1.0f
+	AdditionaDist	= 0.0f
+	yLookAtOffset	= 0.0f
+	LerpCameraDir	= 0.0f
+	MaxEffectTime	= 10000.0f
+    }
 
-    jumpLagK				= 0.15f;
-    jumpFadeK				= 1.0f;
-    jumpAdditionaDist		= 1.5f;
-    jumpyLookAtOffset		= 1.7f;
-    jumpLerpCameraDir		= 0.25f
-    jumpMaxEffectTime		= 10000.0f
+    jumpDown
+    {
+	LagK		= 0.15f
+	FadeK		= 1.0f
+	AdditionaDist	= 0.0f
+	yLookAtOffset	= 0.8f
+	LerpCameraDir	= 0.1f	//scaled by downward vel and k_playerCamera_jumpDownScale
+	MaxEffectTime	= 10000.0f
+    }
 
-    jetpackLagK				= 0.15f;
-    jetpackFadeK			= 1.0f;
-    jetpackAdditionaDist	= 1.5f;
-    jetpackyLookAtOffset	= 1.7f;
-    jetpackLerpCameraDir	= 0.25f
-    jetpackMaxEffectTime	= 10000.0f
+    jetpack
+    {
+	LagK		= 0.1f
+	FadeK		= 1.0f
+	AdditionaDist	= 0.0f
+	yLookAtOffset	= 0.7f
+	LerpCameraDir	= 0.25f
+	MaxEffectTime	= 10000.0f
+    }
 }
 
-template superBattledroidCamera : BFCharacterCamera
+template BFSmallChrCamera : BFCharacterCamera
 {
-    posoffset[]	    { 0.0f, 0.7f, -1.5f}
-    lookfromsafe[]  {-0.3f, 1.2f, -0.3f}
-    float forceEyeHeight[] { 0.9f }
 
-    maxDistance	    = 0.2
+    float meleeWeaponOffset[] {0.0f, 0.0f, 0.0f}
+    leftRoll
+    {
+	yLookAtOffset	= 1.1f;	    // y offset from the prop position (feet) at which camera will look at
+    }
+
+    rightRoll
+    {
+	yLookAtOffset	= 1.1f;
+    }
+
+    forwardRoll
+    {
+	yLookAtOffset	= 1.1f;
+    }
+
+    backwardRol
+    {
+	yLookAtOffset	= 1.1f;
+    }
 }
 
-template droidekaCamera : BFCharacterCamera
+template BFCharacterCameraDroid : BFCharacterCamera
 {
-    posoffset[]	    { 0.0f, 0.0f, -1.8f}   
+    float meleeWeaponOffset[] {0.0f, 0.0f, 0.0f}
+}
+
+template BFCharacterCameraG : BFCharacterCamera
+{
+    float meleeWeaponOffset[] {0.0f, 0.0f, 0.0f}
+}
+
+// Specialist trooper camera (needs dedicated lookfromsafe as he's leaning backwards)
+template specialistCloneCamera: BFCharacterCamera
+{
+    float lookfromsafe[]    {-0.3f, -0.25f, -0.45f}   
+    float meleeWeaponOffset[] {0.0f, 0.0f, 0.0f}
+
+    movementModifier
+    {
+	rotation    = 0.2f
+	rollCamera  = 0.5f
+    }
+}
+
+template leiaCamera: BFCharacterCamera
+{
+    // BF2 CAMERA
+    blend
+    {
+        float posoffset[]	{ 0.0f,  0.0f, 0.7f}
+	float targetoffset[]    {-0.4f,  -0.1f,  -4.2f}
+    }
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  0.0f, 0.7f}
+    float targetoffset[]    {-0.45f,  -0.18f,  -2.2f}
+    float lookfromsafe[]    {-0.4f, -0.15f, -0.35f}
+    
+    float meleeWeaponOffset[] {0.0f, 0.0f, 0.0f}
+    
+    float sprintoffset[]    { -0.05f, -0.3f, -0.3f }   // Sprint Camera 1  // 0.15
+}
+
+template padmeCamera: BFCharacterCamera
+{
+    // BF2 CAMERA
+    blend
+    {
+        float posoffset[]	{ 0.0f,  0.0f, 0.7f}
+	float targetoffset[]    {-0.4f,  -0.2f,  -4.2f}
+    }
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  0.0f, 0.7f}
+    float targetoffset[]    {-0.5f,  -0.3f,  -2.2f}
+    float lookfromsafe[]    {-0.4f, -0.15f, -0.35f}
+    float meleeWeaponOffset[] {0.0f, 0.0f, 0.0f}
+    
+    float sprintoffset[]    { -0.05f, -0.3f, -0.3f }   // Sprint Camera 1  // 0.15
+}
+
+template heavyWeaponCamera: BFCharacterCamera
+{
+    float lookfromsafe[]    {-0.2f, 0.1f, -0.45f}
+}
+
+template battledroidCamera : BFCharacterCameraDroid
+{
+    // BF2 CAM
+    blend
+    {
+	float targetoffset[]    {-0.4f,  -0.17f,  -4.6f}
+    }
+    // OVER SHOULDER CAMERA
+    float targetoffset[]    {-0.5f,  -0.22f,  -2.2f}
+    float lookfromsafe[]    {-0.35f, -0.1f, -0.35f}    
+}
+
+template superBattledroidCamera : BFCharacterCameraDroid
+{
+    // CENTRAL CAMERA
+    blend
+    {
+	float targetoffset[]    {-0.5f,  0.0f,  -4.2f}
+    }
+    // OVER SHOULDER CAMERA
+    float targetoffset[]    { -0.5f,  0.0f,  -2.2f}
+    float lookfromsafe[]    {-0.45f, 0.2f, -0.45f}
+}
+
+
+template droidekaCamera : BFCharacterCamera // since droideka has no matching bones, it won't shake when he rolls. This is actually preferred and deliberate.
+{
+    // BF2 CAM
+    blend
+    {
+        float posoffset[]	{ 0.0f,  0.0f, 0.7f}
+	float targetoffset[]    { 0.0f,  0.4f,  -6.0f}
+    }
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  0.0f, 0.7f}    
+    float targetoffset[]    { 0.0f,  0.3f,  -5.0f}
+    float sprintoffset[]    { 0.0f,  1.2f, 1.0f }
+    float lookfromsafe[]    { 0.0f, 0.0f, -0.35f}    
+
+    useEyeHeight		= 0.0f
 }
 
 template meleeCamera : BFCharacterCamera
 {
-    posoffset[]	    { 0.0f, 0.1f, -3.0f}
-    targetoffset[]  {-0.3f,  0.f,  0.f}
-    lookfromsafe[]{-0.3f, -0.2f, -0.3f}
+    // BF2 CAM
+    blend
+    {
+        float posoffset[]	{ 0.0f,  -0.2f, 0.7f}
+	float targetoffset[]    {-0.1f,  0.3f,  -6.5f}
+    }
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  -0.2f, 0.7f}    
+    float targetoffset[]    {-0.1f,  0.2f,  -5.0f}
+    float sprintoffset[]    { 0.0f, -0.8f, 1.4f }
+    float lookfromsafe[]    {-0.25f, -0.2f, -0.3f}
 
-    maxDistance                 = 0.4f      // maximum distance away from posoffset that the camera can get
-					    //	_DUE_TO_PLAYER_MOVEMENT_, this will NOT alter how it is affected
-					    //	by collisions
+    float meleeWeaponOffset[] {0.0f, 0.0f, 0.0f}
+    
+    useEyeHeight		= 0.0f
+
+    jumpUp
+    {
+	LagK		= 0.15f
+	FadeK		= 1.0f
+	AdditionaDist	= 0.0f
+	yLookAtOffset	= 0.0f
+	LerpCameraDir	= 0.0f
+	MaxEffectTime	= 10000.0f
+    }
+
+    jumpDown
+    {
+	LagK		= 0.15f
+	FadeK		= 1.0f
+	AdditionaDist	= 0.0f
+	yLookAtOffset	= 0.0f
+	LerpCameraDir	= 0.1f
+	MaxEffectTime	= 10000.0f
+    }
 }
 
-template yodaCamera : BFCharacterCamera
+template darthVaderCamera : meleeCamera
 {
-    posoffset[]	    { 0.0f, 0.15f, -2.0f}
-    targetoffset[]  {-0.3f,  -1.f,  0.f}
-//    angoffset[]	    {-0.75f, 0.f,  0.f}  // Currently doesn't do anything
-    float runoffset[]{ -0.35f, -1.2f, -1.5f }   // Sprint Camera 1
-    float sprintoffset[]{ -0.3f, -1.48f, -1.5f }   // Sprint Camera 1
+    // BF2 CAM
+    blend
+    {
+        float posoffset[]	{ 0.0f,  -0.2f, 0.7f}
+	float targetoffset[]    {-0.1f,  0.6f,  -6.0f}
+    }
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  -0.2f, 0.7f}    
+    float targetoffset[]    {-0.1f,  0.5f,  -5.5f}
+    float sprintoffset[]    { 0.0f, -0.6f, -0.3f }
+    float lookfromsafe[]    {-0.25f, 0.1f, -0.3f}   
+}
+
+template emperorCamera : meleeCamera
+{
+    // BF2 CAM
+    blend
+    {
+        float posoffset[]	{ 0.0f,  -0.6f, 0.7f}
+	float targetoffset[]    {-0.1f,  0.6f,  -6.0f}
+    }
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  -0.6f, 0.7f}    
+    float targetoffset[]    {-0.1f,  0.4f,  -5.5f}
+    float sprintoffset[]    { 0.0f, -0.2f, -0.3f }
+    float lookfromsafe[]    {-0.25f, -0.3f, -0.3f}   
+}
+
+// MagnaDroid Camera - Unused
+template meleeCameraDroid : BFCharacterCameraDroid
+{
+    float posoffset[]	    { 0.0f, 0.1f, 0.1f}
+    float targetoffset[]  {-0.1f,  0.f,  -3.f}
+    float runoffset[]	{ -0.1f, 0.0f, -3.0f }   // Run Camera 1    
+    float lookfromsafe[]{-0.5f, 0.0f, -0.3f}
+    float centretargetoffset[]{ 0.10f,  0.3f,  -2.8f}    
+    float sprintoffset[]{ -0.0f, -0.1f, -1.6f }   // Sprint Camera 1    
 
     maxDistance                 = 0.4f      // maximum distance away from posoffset that the camera can get
 					    //	_DUE_TO_PLAYER_MOVEMENT_, this will NOT alter how it is affected
 					    //	by collisions
 }
+
+template grievousCamera : BFCharacterCameraG
+{
+   // BF2 CAM
+    blend
+    {
+        float posoffset[]	{ 0.0f,  -0.2f, 0.7f}
+	float targetoffset[]    {-0.1f,  0.5f,  -6.5f}
+    }
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  -0.2f, 0.7f}    
+    float targetoffset[]    {-0.1f,  0.3f,  -5.0f}
+    float sprintoffset[]    { 0.0f, -0.8f, 1.4f }   // Sprint Camera 1  // 0.15
+    float lookfromsafe[]    {-0.3f, 0.0f, -0.35f}
+    
+    useEyeHeight		= 0.0f
+}
+
+template gunganCamera : BFCharacterCameraG
+{
+    // FAR CAMERA
+    blend
+    {
+        float posoffset[]	{ 0.0f,  0.3f, 0.7f}
+	float targetoffset[]    {-0.4f,  -0.2f,  -4.6f}
+    }
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  0.3f, 0.7f}
+    float targetoffset[]    {-0.5f,  -0.1f,  -2.2f}
+    float lookfromsafe[]    {-0.4f, 0.1f, -0.35f}
+}
+
+template durgeCamera : BFCharacterCamera
+{
+    // FAR CAMERA
+    blend
+    {
+        float posoffset[]	{ 0.0f,  0.3f, 0.7f}
+	float targetoffset[]    {-0.4f,  0.0f,  -4.6f}
+    }
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  0.3f, 0.7f}
+    float targetoffset[]    {-0.5f,  -0.1f,  -2.2f}
+    float lookfromsafe[]    {-0.4f, 0.1f, -0.35f}
+    float meleeWeaponOffset[] {0.0f, 0.0f, 0.0f}
+}
+
+template yodaCamera : BFSmallChrCamera // different feet/anklebones?
+{
+    // BF2 CAM
+    blend
+    {
+        float posoffset[]	{ 0.0f,  -0.8f, 0.7f}
+	float targetoffset[]    {-0.1f,  0.0f,  -4.0f}
+    }
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  -0.8f, 0.7f}    
+    float targetoffset[]    {-0.1f,  0.0f,  -3.0f}
+    float sprintoffset[]    { 0.0f, -0.2f, -0.5f }
+    float lookfromsafe[]    {-0.3f, -0.85f, -0.45f}    
+
+    useEyeHeight		= 0.0f    
+
+    jumpUp
+    {
+	LagK		= 0.15f
+	FadeK		= 1.0f
+	AdditionaDist	= 0.3f
+	yLookAtOffset	= -0.2f
+	LerpCameraDir	= 0.25f
+	MaxEffectTime	= 10000.0f
+    }
+}
+
+template ewokCamera : BFSmallChrCamera
+{
+   // BF2 CAM
+    blend
+    {
+        float posoffset[]	{ 0.0f,  -1.1f, 0.7f}
+	float targetoffset[]    {-0.3f,  0.4f,  -3.5f}
+    }
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  -1.1f, 0.7f}    
+    float targetoffset[]    {-0.3f,  0.3f,  -2.0f}
+    float sprintoffset[]    { 0.0f, -0.2f, -0.5f }
+
+    float lookfromsafe[]    {-0.4f, -1.0f, -0.35f}
+
+    useEyeHeight		= 0.0f
+}
+
+template jawaCamera : BFSmallChrCamera
+{
+   // BF2 CAM
+    blend
+    {
+        float posoffset[]	{ 0.0f,  -0.9f, 0.7f}
+	float targetoffset[]    {-0.3f,  0.4f,  -4.f}
+    }
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  -0.9f, 0.7f}    
+    float targetoffset[]    {-0.3f,  0.3f,  -2.0f}
+    float sprintoffset[]    { 0.0f, -0.3f, -0.3f }
+    
+    float lookfromsafe[]    {-0.4f, -0.7f, -0.35f}
+
+    useEyeHeight		= 0.0f
+}
+
+template ugnaughtCamera : BFSmallChrCamera
+{
+    // BF2 CAM
+    blend
+    {
+        float posoffset[]	{ 0.0f,  -1.1f, 0.7f}
+	float targetoffset[]    {-0.3f,  0.4f,  -3.5f}
+    }
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  -1.1f, 0.7f}    
+    float targetoffset[]    {-0.3f,  0.3f,  -2.0f}
+    float sprintoffset[]    { -0.05f, -0.3f, -0.3f }
+
+    float lookfromsafe[]    {-0.4f, -0.9f, -0.35f}
+
+    useEyeHeight		= 0.0f
+}
+
+template cheweyCamera : BFCharacterCamera
+{
+    // CENTRAL CAMERA
+    blend
+    {
+	float posoffset[]	{ 0.0f,  0.3f, 0.7f}	    	// JC same as Wookiee
+//	float targetoffset[]    {-0.5f,  0.1f,  -4.2f}
+	float targetoffset[]    {-0.5f,  -0.1f,  -4.2f}	// JC same as Wookiee
+    }
+
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  0.3f, 0.7f}        
+    float targetoffset[]    { -0.5f,  0.0f,  -2.2f}
+    float lookfromsafe[]    {-0.5f, 0.2f, -0.35f}
+    float meleeWeaponOffset[] {0.0f, 0.0f, 0.0f}
+}
+
+template wookieeGeneralCamera : BFCharacterCamera
+{
+    // CENTRAL CAMERA
+    blend
+    {
+        float posoffset[]	{ 0.0f,  0.3f, 0.7f}
+	float targetoffset[]    {-0.5f,  -0.15f,  -4.2f}
+    }
+
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  0.3f, 0.7f}        
+    float targetoffset[]    { -0.5f, -0.2f, -2.4f}
+    float lookfromsafe[]    {-0.3f, 0.1f, -0.55f}
+    float meleeWeaponOffset[] {0.0f, 0.0f, 0.0f}
+}
+
+// JC
+
+template darkTCamera : BFCharacterCamera
+{
+    // CENTRAL CAMERA
+    blend
+    {
+        float posoffset[]	{ 0.0f,  0.2f, 0.9f}
+	float targetoffset[]    {-0.6f,  0.2f,  -5.2f}
+    }
+
+    // OVER SHOULDER CAMERA
+    float posoffset[]	    { 0.0f,  0.9f, 0.4f}
+//    float targetoffset[]    { -0.8f, -0.4f, -2.8f}	// JC This is good
+    float targetoffset[]    { -0.75f, -0.42f, -2.8f}	// JC Test
+    float lookfromsafe[]    {-0.3f, 0.14f, -0.65f}
+    float meleeWeaponOffset[] {0.0f, 0.0f, 0.0f}
+    float sprintoffset[]    { -0.3f, -0.3f, -1.4f }
+
+//		    useEyeHeight		= 5.0f
+		    useEyeHeight		= 1.0f
+
+//	float sprintoffset[]    { -0.4f, -0.2f, -1.2f }	
+//    float sprintoffset[]{ -0.0f, -0.1f, -1.6f }   // Sprint Camera 1    // old magna
+
+}
+
+// JC
 
 template infantry_healthcomponent : healthcomponentbf
 {
@@ -314,68 +968,76 @@ template infantry_healthcomponent : healthcomponentbf
     overchargehealth			= 1.5f
     currenthealth			= 1.f
     healthComponentSettings		= "k_healthComponentSetting_isHealable"
-    rechargetime			= 4.f   // The amount of time before the health starts regenerating
-    increaserate			= 0.5f  // The amount of health regenerated per second.
-    overchargeHealthDecreaseRate	= 0.03f
-}
-
-template hero_health_component : healthcomponent
-{
-    class-id = "bf hero health component"
-    healthComponentSettings |= "k_healthComponentSetting_isHealable"
-    damagecomponentbf modifyReceivedDamage {}
+    rechargetime			= 7.f   // The amount of time before the health starts regenerating
+    increaserate			= 0.25f  // The amount of health regenerated per second.
+    overchargeHealthDecreaseRate	= 0.02f
+    absorbedDamageLimit			= 1.f
 }
 
 template soldier_healthcomponent : infantry_healthcomponent
 {
-    fullhealth		= 1.5f
-    currenthealth	= 1.5f
-    overchargehealth	= 2.0f
-    rechargetime	= 4.0f
+    fullhealth		= 1.6f
+    currenthealth	= 1.6f
+    overchargehealth	= 2.35f
+    absorbedDamageLimit	= 1.6f
+    
 }
 
 template heavy_healthcomponent : infantry_healthcomponent
 {
-    fullhealth		= 1.7f
-    currenthealth	= 1.7f
-    overchargehealth	= 2.2f
-    rechargetime	= 4.0f
+    fullhealth		= 1.4f
+    currenthealth	= 1.4f
+    overchargehealth	= 2.15f
+    absorbedDamageLimit	= 1.4f
 }
 
 template sniper_healthcomponent : infantry_healthcomponent
 {
-    fullhealth		= 1.4f
-    currenthealth	= 1.4f
-    overchargehealth	= 1.9f
-    rechargetime	= 4.0f
+    fullhealth		= 1.1f
+    currenthealth	= 1.1f
+    overchargehealth	= 1.85f
+    absorbedDamageLimit	= 1.1f
 }
 
 template engineer_healthcomponent : infantry_healthcomponent
 {
     fullhealth		= 1.5f
     currenthealth	= 1.5f
-    overchargehealth	= 2.0f
-    rechargetime	= 4.0f
+    overchargehealth	= 2.25f
+    absorbedDamageLimit	= 1.5f
 }
 
 template melee_healthcomponent : infantry_healthcomponent
 {
-    fullhealth		= 2.0f
-    currenthealth	= 2.0f
-    overchargehealth	= 2.5f
-    rechargetime	= 2.5f
+    fullhealth		= 1.7f
+    currenthealth	= 1.7f
+    overchargehealth	= 2.55f
+    absorbedDamageLimit	= 1.7f
 }
 
-template tier1hero_healthcomponent : hero_health_component
+template tier1hero_healthcomponent : infantry_healthcomponent
 {
     fullhealth		    = 5.f
     currenthealth	    = 5.f
+    overchargehealth	    = 6.f
+    absorbedDamageLimit	    = 5.f
 }
 
-template tier2hero_healthcomponent : hero_health_component
+// For Darth Vader / Emperor
+template slow_tier1hero_healthcomponent : infantry_healthcomponent
 {
-    fullhealth		    = 3.f
-    currenthealth	    = 3.f
+    fullhealth		    = 6.f
+    currenthealth	    = 6.f
+    overchargehealth	    = 7.f
+    absorbedDamageLimit	    = 6.f
+}
+
+template tier2hero_healthcomponent : infantry_healthcomponent
+{
+    fullhealth		    = 3.5f
+    currenthealth	    = 3.5f
+    overchargehealth	    = 4.5f
+    absorbedDamageLimit	    = 3.5f
 }
 
 template shield_render_component : obinstrenderer 
@@ -390,11 +1052,264 @@ template shield_health_component : infantry_healthcomponent
 {
     class-id = "shield health component - bf"
     shieldHealth = 2.0f
-    fullhealth = 1.0f
+    fullhealth = 1.5f
+    healthComponentSettings		= "k_healthComponentSetting_isHealable"
+    
+    increaserate			= 0.0f  // Don't allow health recharging
 
     shield_render_component shield
     {
     }
+}
+
+// =============================
+// STORY-ONLY HEALTH COMPONENTS
+// =============================
+
+// Player-only
+template player_healthcomponent_story : infantry_healthcomponent
+{
+    class-id = "health component player - bf"
+    fullhealth			    = 1.8f
+    currenthealth		    = 1.8f
+    overchargehealth		    = 2.3f
+    rechargetime		    = 6.f   // The amount of time before the health starts regenerating
+    increaserate		    = 0.5f  // The amount of health regenerated per second.
+    overchargeHealthDecreaseRate    = 0.05f
+    absorbedDamageLimit		    = 1.8f
+}
+
+template x2jedi_healthcomponent_story : infantry_healthcomponent
+{
+    fullhealth			    = 2.5f
+    currenthealth		    = 2.5f
+    overchargehealth		    = 3.0f
+    rechargetime		    = 6.f   // The amount of time before the health starts regenerating
+    increaserate		    = 0.5f  // The amount of health regenerated per second.
+    overchargeHealthDecreaseRate    = 0.05f
+    absorbedDamageLimit		    = 2.5f
+}
+
+// Ally Soldier (Squad - Ryder etc)
+template soldier_healthcomponent_friendly_story : infantry_healthcomponent
+{
+    fullhealth		= 1.5f
+    currenthealth	= 1.5f
+    overchargehealth	= 2.0f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 1.5f
+}
+
+// Ally Soldier (low health - for non player squad members like Dantooine Militia etc)
+template soldier_low_healthcomponent_friendly_story : infantry_healthcomponent
+{
+    fullhealth		= 0.8f
+    currenthealth	= 0.8f
+    overchargehealth	= 0.8f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 0.8f
+}
+
+// Ally Soldier (very low health - for guys designed to die quickly!)
+template soldier_verylow_healthcomponent_friendly_story : infantry_healthcomponent
+{
+    fullhealth		= 0.2f
+    currenthealth	= 0.2f
+    overchargehealth	= 0.2f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 0.2f
+}
+
+// Ally Heavy (Squad)
+template heavy_healthcomponent_friendly_story : infantry_healthcomponent
+{
+    fullhealth		= 1.8f
+    currenthealth	= 1.8f
+    overchargehealth	= 2.3f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 1.8f    
+}
+
+// Ally Heavy (low health - Dantooine Militia heavy trooper)
+template heavy_low_healthcomponent_friendly_story : infantry_healthcomponent
+{
+    fullhealth		= 1.0f
+    currenthealth	= 1.0f
+    overchargehealth	= 1.0f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 1.0f
+}
+
+// Ally Heavy (very low health - for guys designed to die quickly!)
+template heavy_verylow_healthcomponent_friendly_story : infantry_healthcomponent
+{
+    fullhealth		= 0.2f
+    currenthealth	= 0.2f
+    overchargehealth	= 0.2f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 0.2f
+}
+
+// Ally Sniper (Squad)
+template sniper_healthcomponent_friendly_story : infantry_healthcomponent
+{
+    fullhealth		= 1.4f
+    currenthealth	= 1.4f
+    overchargehealth	= 1.9f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 1.4f  
+}
+
+// Ally Sniper (low health)
+template sniper_low_healthcomponent_friendly_story : infantry_healthcomponent
+{
+    fullhealth		= 0.6f
+    currenthealth	= 0.6f
+    overchargehealth	= 0.6f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 0.6f    
+}
+
+// Ally Sniper (very low health - for guys designed to die quickly!)
+template sniper_verylow_healthcomponent_friendly_story : infantry_healthcomponent
+{
+    fullhealth		= 0.2f
+    currenthealth	= 0.2f
+    overchargehealth	= 0.2f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 0.2f
+}
+
+// Ally Engineer
+template engineer_healthcomponent_friendly_story : infantry_healthcomponent
+{
+    fullhealth		= 1.7f
+    currenthealth	= 1.7f
+    overchargehealth	= 2.1f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 1.7f  
+}
+
+// Ally Engineer (low health)
+template engineer_low_healthcomponent_friendly_story : infantry_healthcomponent
+{
+    fullhealth		= 0.9f
+    currenthealth	= 0.9f
+    overchargehealth	= 0.9f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 0.9f
+}
+
+// Ally Engineer (very low health - for guys designed to die quickly!)
+template engineer_verylow_healthcomponent_friendly_story : infantry_healthcomponent
+{
+    fullhealth		= 0.2f
+    currenthealth	= 0.2f
+    overchargehealth	= 0.2f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 0.2f
+}
+
+// Ewok (non guide version)
+/* --- auto commented out by commentOutTemplate
+template ewok_healthcomponent_friendly_story : infantry_healthcomponent
+{
+    fullhealth		= 0.5f
+    currenthealth	= 0.5f
+    overchargehealth	= 0.5f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 0.5f
+}
+*/ // --- auto commented out by commentOutTemplate
+
+// Ewok (Guide version)
+template ewok_guide_healthcomponent_friendly_story : infantry_healthcomponent
+{
+    fullhealth		= 1.0f
+    currenthealth	= 1.0f
+    overchargehealth	= 1.0f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 1.0f
+}
+
+// Wookiee Slave
+template wookiee_slave_healthcomponent_story : infantry_healthcomponent
+{
+    fullhealth		= 1.5f
+    currenthealth	= 1.5f
+    overchargehealth	= 1.5f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 1.5f
+}
+
+// Enemy Soldier
+template soldier_healthcomponent_enemy_story : infantry_healthcomponent
+{
+    fullhealth		= 0.4f
+    currenthealth	= 0.4f
+    overchargehealth	= 0.4f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 0.4f
+}
+
+// Enemy Heavy
+template heavy_healthcomponent_enemy_story : infantry_healthcomponent
+{
+    fullhealth		= 0.5f
+    currenthealth	= 0.5f
+    overchargehealth	= 0.5f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 0.5f
+}
+
+// Enemy Sniper
+template sniper_healthcomponent_enemy_story : infantry_healthcomponent
+{
+    fullhealth		= 0.3f
+    currenthealth	= 0.3f
+    overchargehealth	= 0.3f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 0.3f   
+}
+
+// Enemy Engineer
+template engineer_healthcomponent_enemy_story : infantry_healthcomponent
+{
+    fullhealth		= 0.3f
+    currenthealth	= 0.3f
+    overchargehealth	= 0.3f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 0.3f
+}
+
+// Enemy Tough Guy
+template toughguy_healthcomponent_enemy_story : infantry_healthcomponent
+{
+    fullhealth		= 0.8f
+    currenthealth	= 0.8f
+    overchargehealth	= 0.8f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 0.8f
+}
+
+// Dark Trooper
+template darktrooper_healthcomponent_story : infantry_healthcomponent
+{
+    fullhealth		= 1.7f
+    currenthealth	= 1.7f
+    overchargehealth	= 1.7f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 1.7f
+}
+
+// Enemy Hero
+template hero_healthcomponent_enemy_story : infantry_healthcomponent
+{
+    fullhealth		= 5.0f
+    currenthealth	= 5.0f
+    overchargehealth	= 5.0f
+    increaserate	= 0.0f
+    absorbedDamageLimit	= 5.0f  
 }
 
 template playerPainDisplay
@@ -442,36 +1357,55 @@ template playerPainDisplay_arc : playerPainDisplay
 {
     painTexture			=   "painArc"
 
-    painTextureMinSize		=   0.05f
-    painTextureMaxSize		=   0.05f
-    painTextureMinDist		=   0.1f
-    painTextureMaxDist		=   0.1f
+    painTextureMinSize		=   0.01f
+    painTextureMaxSize		=   0.01f
+    painTextureMinDist		=   0.2f
+    painTextureMaxDist		=   0.2f
+    painTextureVanishTime	=   0.75f
 
-    painTextureWidthRatio	=   2.0f;
+    painTextureWidthRatio	=   4.0f;
     painTexturePickRandomAngle	=   "false"
     painTextureSnapToCircle	=   "true"
+    painTextureSizeScaleAsFade	=   1.0f
 }
 
 template chrmovement_bf : chrmovement
 {
-    maxAngleUp	    =  1.1f //1.15f
-    maxAngleDown    = -0.95f
+    class-id		= "chr movement" 
+    maxAngleUp		=  1.1f //1.15f
+    maxAngleDown	= -0.95f
+    maxAngleUpSprint	= 0.2f
+    maxAngleDownSprint	= -0.3f
+    rotXSponge		= 0.2f
 }
 
-template playerpropbf_empty : playerprop
+template playerpropbf_empty : prop
 {
-    class-id	= "bf player prop"
+    class-id	= "player prop"
 
     soundmap-field announce_snds {default = ""}
     
-    currentInventoryGrenadeID = ""
+    propflags |= "k_protectFromBgDeletion|k_protectFromBgDeletion|k_blocksSpawning|k_explosionTest|k_aiDoAvoid"	    
     
-    anim
+    drawThesePartsWhileInFirstPerson = "-"
+    drawThesePartsWhileInFirstPersonNoGun = "-"
+    
+    deathState		    =   0	// Alive
+    deathTimer		    =	0.f
+
+    currentInventoryGrenadeID = ""
+    currentInventoryWeaponID = ""
+
+    chranim anim
     {
 	animmap-field animmap
 	{
 	    default = "cloneanimsbf"
 	}
+
+	UseUFDUbiks = "true"
+	disableUbiksDamping = "true"
+        ubiksWaistName = "waist"
 
 	animTree    = "anim_tree_test"
 	
@@ -481,6 +1415,29 @@ template playerpropbf_empty : playerprop
 	}
     }
 
+    simpleActivatorComponent	    activator		{  }
+    firstPersonSettingsComponent    firstPersonSettings	{  }
+    playerLeanComponent		    leanComponent	{  }
+    playerLateTickComponent	    lateTickComponent   {  }
+
+    chrcoveroccupier		    coverOccupier { }
+
+    chrvoice			    voice	        {  }
+    PersistantDataOwner		    persistantData      {  }
+    SimpleVehicleDriver		    vehicleDriver       {  }
+    SimpleRemoteUser		    remoteUser		{  }
+    chrvistableseercomp		    vtseer		{  }
+    inventoryComponent		    inventory		{  }
+    
+    soundcomponent soundComponent	// For playing sounds
+    {
+	fadeOutTime = 0.15f
+    }
+
+    projectileDamageScalarDefault projectileDamageScalar
+    {
+    }
+
     chrmovement_bf    movementHandler { }
 
     chrDescriptionComponent chrDescription
@@ -488,8 +1445,7 @@ template playerpropbf_empty : playerprop
 	chrDescriptionID = "infantry"
     }
 
-//  squadActionSelectorComponent    squadActionSelector { }
-    bfphysicsmovement		    move
+    playerphysicsmovement move
     { 
 	justLandedScaleMovement = 1.f
 	justLandedScaleMovementSpeed = -1.2f
@@ -497,36 +1453,32 @@ template playerpropbf_empty : playerprop
     }
     bfPlayerOnFootComponent	    onFoot {  }
     
-    tickingComponentListComponent tickingComponentList
+
+    infantry_healthcomponent health
     {
-	componentNamesList = "health;fx;eye"
-	clientExcludeList = "eye;"
-
-	infantry_healthcomponent health
-	{
-	    fullhealth	= 1.f
-	    //invincibilityChannel = "nodamage_player"
-	    currenthealth = 1.f
-	    healthComponentSettings |= "k_healthComponentSetting_isHealable"
-	}
-
-	fxcomponent fx
-	{
-	    highlight = 1;
-	}
-	
-	eyeComponent eye
-	{
-	}	
+	fullhealth	= 1.f
+	currenthealth = 1.f
+	healthComponentSettings |= "k_healthComponentSetting_isHealable"
+	class-id = "health component player - bf"
     }
 
-    PlayerMapComponent mapComponent
+    eyeComponent eye
     {
+    }	
+
+    charHitEffect = "hit_human" //default value (empty string)
+    
+    soundmap-field soundmap 
+    {
+	default = "sndmap_soundmapBF_base"
     }
 
-    soundmap = "sndmap_soundmapBF_base"
+    soundeventsystem sndeventsystem
+    {
+	definition = "sndevt_infantry"
+    }
 
-    playerBrain
+    basePlayerBrainComponent playerBrain
     {
 	autoAimTargetComponentBF autoaimtarget
 	{
@@ -534,13 +1486,17 @@ template playerpropbf_empty : playerprop
 	    playerBulletsAttractedToTarget	= "true"
 	    canOverrideSquadOrders		= "true"
 	    canBeLockedOnto			= "true"
-	    flags				= "k_autoAimBF_displayAsPointOfInterestOnHud|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud|k_autoAimBF_canBeLockedOnto|k_autoAimBF_canBeLockedOntoByGroundVehicle"
+	    isChr				= "true"
+	    isPlayer				= "true"
+	    flags				= "k_autoAimBF_displayAsPointOfInterestOnHud|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud|k_autoAimBF_doNotDrawOnHudInStoryMode|k_autoAimBF_displayAsPriorityRepair|k_autoAimBF_displaySeparatePoiIcon"
+	    minimap_flags			= "k_guiMapRenderPlayerIcon"
+    	    minimap_icon			= 10
 	}
     }
 
-    staminacomponent stamina
+    staminacomponent stamina	// affects rolls for standard infantry
     {
-	increaserate	    = 0.1f
+	increaserate	    = 0.65f
     }
 
     playerTargettingComponent playerTargetting
@@ -556,6 +1512,8 @@ template playerpropbf_empty : playerprop
     }
     
     playerControlsComponentBF	    controlsComponent   {  }
+
+    playerAwarenessArrowsComponentBF	    awarenessArrowsComponent	{  }
 
     inputTweakerGroup inputTweaker
     {
@@ -588,55 +1546,64 @@ template playerpropbf_empty : playerprop
 	}
     }
     
-    weaponHandler
+    chrweapon weaponHandler
     {
 	class-id = "chr weapon bf"
+	maxGrenadeThrowStrength = 24.f  //	reduced from 40.f as it was considered too powerful  
+	minGrenadeThrowStrength = 4.f
+	serialiseStartWeapon = "false"
 	additionalInaccuracyPerMetresPerSecond = 0.0f
 	gunRaised = "true"
-	currGrenadeTemplate = "thermal_det_v1"
-	currGrenadeInvName  = "o_thrml_det_v1"
+	currGrenadeTemplate = "rep_thermal_det"
+	currGrenadeInvName  = "o_rep_thrml_det"
 	startweapon = ""
     }
 
     /// maybe....
     currentStateName	    =	"stateOnFoot"
+
     playerStates
     {
+	statePreDeath	    {	class-id    =	"player state - predeath"	}
 	stateDriving	    {	class-id    =	"player state - driving"		    }
 	stateOnFoot	    {	class-id    =	"bf player state - on foot"		    }
 	stateRagdoll	    {   class-id    =	"player state - animated ragdoll"	    }
-	stateLiveRagdoll    {   class-id    =	"bf player state - live anim ragdoll"	    }
 	//stateCorpse	    {   class-id    =	"player state - animated death"	}
 	stateCorpse	    {   class-id    =	"player state - animated ragdoll"	    }
 	stateRemote	    {   class-id    =	"player state - using remote"		    }
 	statePassenger	    {   class-id    =	"player state - passenger"		    }    
 	stateJetpack	    {	class-id    =	"bf player state - jetpack"		    }
-	statePhysicsFalling {	class-id    =	"bf player state - physics falling"	    }
-	//stateJediCombat   {   class-id    =	"player state - jedi combat"		    }
-	stateIonCannon	    {	class-id    =	"player state -ion cannon"		    }	
 	stateDroidekaRoll   {   class-id    =   "bf player state - droideka roll"	    }
-	stateVehicleDroid	{	class-id	=   "player state - vehicle droid" }
     } 
 
     BFCharacterCamera camera { }
-    footsteps
+    chrFootstepComponent footsteps
     {
 	leftFootBoneName = "lankle"
 	rightFootBoneName = "rankle"
     }
 
-    bfProximityPowerComponent proximity_power
-    {
-    }
-    
     outsidePlayAreaPrompt = "STR_VEHICLEPROMPTS_OUTSIDEPLAYAREA"
     outsideTimerPrompt = "STR_VEHICLEPROMPTS_OUTSIDETIMER"
+
+    // temp -will eventually be "no_image"
+    healthHudImage_standing = "no_image"	    //"playerinfo_health_standing"
+    healthHudImage_crouching = "no_image"	    //"playerinfo_health_crouching"
+
+    overchargeHealthHudImage_standing = "no_image"  //"playerinfo_overcharge_standing"
+    overchargeHealthHudImage_crouching = "no_image" //"playerinfo_overcharge_crouching"
+
+    topOfPlayerInHudImage_standing = 0.0f	    //0.03906f
+    topOfPlayerInHudImage_crouching = 0.0f	    //0.171875f
+    
+    bottomOfPlayerInHudImage_standing = 1.0f	    //0.96094f
+    bottomOfPlayerInHudImage_crouching = 1.0f	    //0.96094f
+
+    iconKey = "no_image"
+
+    dynamicNetworkComponent network { }
 }
 
-template faction_component
-{
-    class-id = "faction component bf"
-}
 
 template ChrAbilityModifierComponentBF
 {
@@ -657,10 +1624,11 @@ template soldier_playerpropbf_empty : infantry_playerpropbf_empty
 	{
 	chrDescriptionID = "infantry"
 	}
-    tickingComponentList
-    {
-	soldier_healthcomponent health {}
-    }
+	soldier_healthcomponent health 
+	{
+	class-id = "health component player - bf"
+	    difficultyMgrDamageModifierID = "dam_plyr"
+	}
 }
 
 template heavyweapons_playerpropbf_empty : infantry_playerpropbf_empty
@@ -670,10 +1638,11 @@ template heavyweapons_playerpropbf_empty : infantry_playerpropbf_empty
 	{
 	chrDescriptionID = "heavy"
 	}
-    tickingComponentList
-    {
-	heavy_healthcomponent health {}
-    }
+	heavy_healthcomponent health 
+	{
+	class-id = "health component player - bf"
+	    difficultyMgrDamageModifierID = "dam_plyr"
+	}
 }
 
 template sniper_playerpropbf_empty : infantry_playerpropbf_empty
@@ -683,10 +1652,11 @@ template sniper_playerpropbf_empty : infantry_playerpropbf_empty
 	{
 	chrDescriptionID = "sniper"
 	}
-    tickingComponentList
-    {
-	sniper_healthcomponent health {}
-    }
+	sniper_healthcomponent health 
+	{
+	class-id = "health component player - bf"
+	    difficultyMgrDamageModifierID = "dam_plyr"
+	}
 }
 
 template support_playerpropbf_empty : infantry_playerpropbf_empty
@@ -696,32 +1666,58 @@ template support_playerpropbf_empty : infantry_playerpropbf_empty
 	{
 	chrDescriptionID = "support"
 	}
-    tickingComponentList
-    {
-	engineer_healthcomponent health {}
-    }
+	engineer_healthcomponent health 
+	{
+	class-id = "health component player - bf"
+	    difficultyMgrDamageModifierID = "dam_plyr"
+	}
+
+    regenVehicleAmount = 0.005f;	//approx fraction per second
 }
 
 template melee_playerpropbf_empty : infantry_playerpropbf_empty
 {
-    class = "k_chrClassMelee"
+    class = "k_chrClassSpecialist"
 	chrDescription
 	{
 	chrDescriptionID = "melee"
 	}
-    tickingComponentList
-    {
-	melee_healthcomponent health {}
-    }
+	melee_healthcomponent health 
+	{
+	class-id = "health component player - bf"
+	    difficultyMgrDamageModifierID = "dam_plyr"
+	}
 }
 
 template tier1hero_playerpropbf_empty : playerpropbf_empty
 {
-    class = "k_chrClassHeroTier1"
-    tickingComponentList
+    sndeventsystem
     {
-	 tier1hero_healthcomponent health {}
+	definition = "sndevt_jedi"
     }
+
+    stamina	// aka Force Power Bar
+    {
+	increaserate	    = 0.25f
+    }
+
+    move
+    {
+	    internalPhysics
+	    {
+		    pushStrength = 40.0f	// Increasing pushStrength of tier1heroes
+	    }
+	fallDamage_distanceForZeroDamage    = 30.f
+	fallDamage_distanceForMaxDamage	    = 55.f
+    }
+    
+    soundmap = "sndmap_jedi"
+    class = "k_chrClassHeroTier1"
+	 tier1hero_healthcomponent health 
+	 {
+	class-id = "health component player - bf"
+	     difficultyMgrDamageModifierID = "dam_plyr"
+	 }
 
     anim
     {
@@ -729,13 +1725,73 @@ template tier1hero_playerpropbf_empty : playerpropbf_empty
     }
 }
 
+template slow_tier1hero_playerpropbf_empty : tier1hero_playerpropbf_empty
+{
+    slow_tier1hero_healthcomponent health 
+    {
+	class-id = "health component player - bf"
+         difficultyMgrDamageModifierID = "dam_plyr"
+    }
+}
+
 template tier2hero_playerpropbf_empty : playerpropbf_empty
 {
-    class = "k_chrClassHeroTier2"
-    tickingComponentList
+    sndeventsystem
     {
-	 tier2hero_healthcomponent health {}
-    }	
+	definition = "sndevt_infantry"
+    }
+
+    move
+    {
+	internalPhysics
+	{
+	    pushStrength = 30.0f	// Increasing pushStrength of tier2heroes
+	}
+    }
+
+    class = "k_chrClassHeroTier2"
+
+    tier2hero_healthcomponent health 
+    {
+	class-id = "health component player - bf"
+	difficultyMgrDamageModifierID = "dam_plyr"
+    }
+}
+
+// ===============================
+// SPECIAL STORY HEALTH TEMPLATES
+// ===============================
+
+// Standard template
+template playerpropbf_empty_story : playerpropbf_empty
+{
+    playerpickupcollectorbf collector {}
+
+    ChrAbilityModifierComponentBF chrAbilityModifierComponent {}
+
+    class   = "k_chrClassSoldier"
+    chrDescription
+    {
+	chrDescriptionID = "infantry"
+    }
+    
+	player_healthcomponent_story health 
+	{
+	    difficultyMgrDamageModifierID = "dam_plyr"
+	}
+}
+
+// Jedi template
+template x2jedi_playerpropbf_empty_story : tier1hero_playerpropbf_empty
+{
+    playerpickupcollectorbf collector {}    
+    
+    ChrAbilityModifierComponentBF chrAbilityModifierComponent {}
+
+	 x2jedi_healthcomponent_story health 
+	 {
+	     difficultyMgrDamageModifierID = "dam_plyr"
+	 }
 }
 
 template playerSpawnerBF : playerSpawnerBase
@@ -757,15 +1813,36 @@ template playerSpawnerBF : playerSpawnerBase
 	editorInstanceName	= "playerSpawn"
     }
 
-    // the spawners need to exist before the player spawns in so that they can be listed on the spawn menu
-    network
-    {
-        networkflags = "k_syncWithBg"
-    }
+    propflags |= "k_doNotRegisterWithTeam"
+
     nameKey = "STR_UNNAMED_SPAWNER"
 }
 
-template REPPlayerSpawner : playerSpawnerBF
+template InitialPlayerSpawner : prop
+{
+    class-id = "initial spawner prop"
+
+    propflags |= "k_doNotRegisterWithTeam"
+    isAllowedNetworkComponent = "false"
+
+    float-field randomOffset
+    {
+	default	= 0.5f
+	tip	= "Players are spawned within this many metres of the centre of this player spawner"
+	views	= "basic setup"
+    }
+
+    editor_PS_render editor-only-render
+    {	
+    }
+
+    meta
+    {
+	canCreateInEditor = 0
+    }
+}
+
+template Team0PlayerSpawner : InitialPlayerSpawner
 {
     teamNum = 0
 
@@ -773,11 +1850,11 @@ template REPPlayerSpawner : playerSpawnerBF
     {
 	canCreateInEditor	= 1
 	editorPath		= "bf/events"
-	editorInstanceName	= "REPPlayerSp"
+	editorInstanceName	= "Tm0PlayerSp"
     }
 }
 
-template CISPlayerSpawner : playerSpawnerBF
+template Team1PlayerSpawner : InitialPlayerSpawner
 {
     teamNum = 1
 
@@ -785,7 +1862,7 @@ template CISPlayerSpawner : playerSpawnerBF
     {
 	canCreateInEditor	= 1
 	editorPath		= "bf/events"
-	editorInstanceName	= "CISPlayerSp"
+	editorInstanceName	= "Tm1PlayerSp"
     }
 }
 
@@ -842,7 +1919,109 @@ template bfPlayerSpecialAnims
 	startFrac		    = 0.15f
 	flags			    = "k_playerSpecialAnimFlag_shouldBlockFire|k_playerSpecialAnimFlag_gravityEnabled|k_playerSpecialAnimFlag_allowRotate"
     }
-    
+
+    // ferroda anim for rancor
+    playerSpecialAnim ferroda_block
+    {
+	animationNameInMap	    = "ferroda_block"
+	animationPlaySpeed	    = 1.0f //0.65f
+	animationTweenInTime	    = 0.05f
+	animationTweenOutTime	    = 0.15f //0.2f
+	controlsReturnOverTime	    = 0.2f //0.1f
+	numRollsRight		    = 0
+	flags			    = "k_playerSpecialAnimFlag_shouldBlockFire|k_playerSpecialAnimFlag_gravityEnabled|k_playerSpecialAnimFlag_allowRotate"
+    }
+
+
+    // ferroda anim for rancor
+    playerSpecialAnim rollback_out
+    {
+	animationNameInMap	    = "rollback_out"
+	animationPlaySpeed	    = 1.0f //0.65f
+	animationTweenInTime	    = 0.0f
+	//animationTweenInTime	    = 0.05f
+	animationTweenOutTime	    = 0.15f
+	controlsReturnOverTime	    = 0.2f //0.1f
+	numRollsRight		    = 0
+	flags			    = "k_playerSpecialAnimFlag_shouldBlockFire|k_playerSpecialAnimFlag_gravityEnabled|k_playerSpecialAnimFlag_allowRotate"
+    }
+
+    // ferroda anim for rancor
+    playerSpecialAnim rollback_loop
+    {
+	animationNameInMap	    = "rollback_loop"
+	animationPlaySpeed	    = 1.0f //0.65f
+	animationTweenInTime	    = 0.0f
+	//animationTweenInTime	    = 0.05f
+	animationTweenOutTime	    = 0.0f
+	//animationTweenOutTime	    = 0.15f //0.2f
+	controlsReturnOverTime	    = 0.2f //0.1f
+	numRollsRight		    = 0
+	flags			    = "k_playerSpecialAnimFlag_shouldBlockFire|k_playerSpecialAnimFlag_gravityEnabled|k_playerSpecialAnimFlag_allowRotate"
+    }
+
+    // ferroda anim for rancor
+    playerSpecialAnim rollback_into
+    {
+	animationNameInMap	    = "rollback_into"
+	animationPlaySpeed	    = 1.0f //0.65f
+	animationTweenInTime	    = 0.0f
+	//animationTweenInTime	    = 0.05f
+	animationTweenOutTime	    = 0.2f
+	//animationTweenOutTime	    = 0.15f //0.2f
+	controlsReturnOverTime	    = 0.2f //0.1f
+	numRollsRight		    = 0
+	flags			    = "k_playerSpecialAnimFlag_shouldBlockFire|k_playerSpecialAnimFlag_gravityEnabled|k_playerSpecialAnimFlag_allowRotate"
+    }
+
+    // ferroda anim for rancor
+    playerSpecialAnim ferroda_hit_frwd
+    {
+	animationNameInMap	    = "ferroda_hit_frwd"
+	animationPlaySpeed	    = 1.0f //0.65f
+	animationTweenInTime	    = 0.05f
+	animationTweenOutTime	    = 0.15f //0.2f
+	controlsReturnOverTime	    = 0.2f //0.1f
+	numRollsRight		    = 0
+	flags			    = "k_playerSpecialAnimFlag_shouldBlockFire|k_playerSpecialAnimFlag_gravityEnabled|k_playerSpecialAnimFlag_allowRotate"
+    }
+
+    // ferroda anim for rancor
+    playerSpecialAnim ferroda_hit_back
+    {
+	animationNameInMap	    = "ferroda_hit_back"
+	animationPlaySpeed	    = 1.0f //0.65f
+	animationTweenInTime	    = 0.05f
+	animationTweenOutTime	    = 0.15f //0.2f
+	controlsReturnOverTime	    = 0.2f //0.1f
+	numRollsRight		    = 0
+	flags			    = "k_playerSpecialAnimFlag_shouldBlockFire|k_playerSpecialAnimFlag_gravityEnabled|k_playerSpecialAnimFlag_allowRotate"
+    }
+
+    // ferroda anim for rancor
+    playerSpecialAnim hit_hi_l_sh_npc
+    {
+	animationNameInMap	    = "hit_hi_l_sh_npc"
+	animationPlaySpeed	    = 1.0f //0.65f
+	animationTweenInTime	    = 0.05f
+	animationTweenOutTime	    = 0.15f //0.2f
+	controlsReturnOverTime	    = 0.2f //0.1f
+	numRollsRight		    = 0
+	flags			    = "k_playerSpecialAnimFlag_shouldBlockFire|k_playerSpecialAnimFlag_gravityEnabled|k_playerSpecialAnimFlag_allowRotate"
+    }
+
+    // ferroda anim for rancor
+    playerSpecialAnim hit_hi_r_sh_npc
+    {
+	animationNameInMap	    = "hit_hi_r_sh_npc"
+	animationPlaySpeed	    = 1.0f //0.65f
+	animationTweenInTime	    = 0.05f
+	animationTweenOutTime	    = 0.15f //0.2f
+	controlsReturnOverTime	    = 0.2f //0.1f
+	numRollsRight		    = 0
+	flags			    = "k_playerSpecialAnimFlag_shouldBlockFire|k_playerSpecialAnimFlag_gravityEnabled|k_playerSpecialAnimFlag_allowRotate"
+    }
+
     // New backward roll specific to Battlefront
     playerSpecialAnim standRollBack
     {
@@ -898,7 +2077,7 @@ template bfPlayerSpecialAnims
 	animationNameInMap	    = "vault_1m"
 	animationTweenInTime	    = 0.05f
 	animationTweenOutTime	    = 0.2f
-	flags			    = ""
+	
 
         getCameraPosFromChrHeadAmount   =	0.3f
 	getCameraRotFromChrHeadAmount   =	0.3f
@@ -941,31 +2120,49 @@ template jediPlayerSpecialAnims : bfPlayerSpecialAnims
     {
 	animationNameInMap	    = "block"
 	controlsReturnOverTime	    = 0.05f
-	flags			    = ""
+	
+    }
+    
+    playerSpecialAnim mb_wii_mid
+    {
+	animationNameInMap	    = "mb_wii_mid"
+	
+    }
+   
+    playerSpecialAnim mb_wii_right
+    {
+	animationNameInMap	    = "mb_wii_right"
+	
+    }
+   
+    playerSpecialAnim mb_wii_left
+    {
+	animationNameInMap	    = "mb_wii_left"
+	
     }
     
     playerSpecialAnim hitminor 
     {
 	animationNameInMap	    = "hitminor"
-        flags			    = ""
+        
     }
 
     playerSpecialAnim stumbleback
     {
 	animationNameInMap	    = "stumbleback"
-	flags			    = ""
+	
     }
 
     playerSpecialAnim m_lock_win
     {
 	animationNameInMap	    = "m_lock_win"
-	flags			    = ""
+	
     }
 
     playerSpecialAnim m_lock_lose
     {
 	animationNameInMap	    = "m_lock_lose"
-	flags			    = ""
+	
     }
     
     playerSpecialAnim ma_over
@@ -973,368 +2170,527 @@ template jediPlayerSpecialAnims : bfPlayerSpecialAnims
 	animationNameInMap	    = "ma_over"
 	animationTweenOutTime	    = 0.1f
 	animationTweenInTime	    = 0.1f
-	flags			    = ""
+	
     }
     
     playerSpecialAnim ma_cw_spin
     {
 	animationNameInMap	    = "ma_cw_spin"
+	animationTweenOutTime	    = 0.1f
 	controlsReturnOverTime	    = 0.1f
-	flags			    = ""
+	
     }
     
     playerSpecialAnim ma_ccw_spin
     {
 	animationNameInMap	    = "ma_ccw_spin"
+	animationTweenOutTime	    = 0.1f
 	controlsReturnOverTime	    = 0.1f
-	flags			    = ""
+	
     }
     
     playerSpecialAnim ma_l2l
     {
 	animationNameInMap	    = "ma_l2l"
 	controlsReturnOverTime	    = 0.1f
-	flags			    = ""
+	
     }
     
     playerSpecialAnim ma_l2r
     {
 	animationNameInMap	    = "ma_l2r"
+	animationTweenOutTime	    = 0.1f
 	controlsReturnOverTime	    = 0.1f
-	flags			    = ""
+	
     }
     
     playerSpecialAnim ma_r2l
     {
 	animationNameInMap	    = "ma_r2l"
+	animationTweenOutTime	    = 0.1f
 	controlsReturnOverTime	    = 0.1f
-	flags			    = ""
+	
     }
-    
+       
     playerSpecialAnim ma_r2r
     {
 	animationNameInMap	    = "ma_r2r"
 	controlsReturnOverTime	    = 0.1f
-	flags			    = ""
+	
     }
-    
+
+    playerSpecialAnim ma_jump
+    {
+	animationNameInMap	    = "ma_jump"
+	animationTweenOutTime	    = 0.1f
+	controlsReturnOverTime	    = 0.1f
+	
+    }
+
+    playerSpecialAnim ma_under_r2l
+    {
+	animationNameInMap	    = "ma_under_r2l"
+	animationTweenOutTime	    = 0.1f
+	controlsReturnOverTime	    = 0.1f
+	
+    }
+
+    playerSpecialAnim ma_under_l2r
+    {
+	animationNameInMap	    = "ma_under_l2r"
+	animationTweenOutTime	    = 0.1f
+	controlsReturnOverTime	    = 0.1f
+	
+    }
+
+
     playerSpecialAnim ma_flourish
     {
 	animationNameInMap	    = "ma_flourish"
 	controlsReturnOverTime	    = 0.1f
-	flags			    = ""
+	
     }
     
     playerSpecialAnim mb_ready
     {
 	animationNameInMap	    = "mb_ready"
 	controlsReturnOverTime	    = 0.1f
-	flags			    = ""
+	
     }
     
     playerSpecialAnim mb_left
     {
 	animationNameInMap	    = "mb_left"
 	controlsReturnOverTime	    = 0.1f
-	flags			    = ""
-    }
+	
+	startFracWii		    = 0.2f
+	animationTweenInTimeWii	    = 0.05f
+    }    
     
     playerSpecialAnim mb_right
     {
 	animationNameInMap	    = "mb_right"
 	controlsReturnOverTime	    = 0.1f
-	flags			    = ""
+	
+	startFracWii		    = 0.2f
+	animationTweenInTimeWii	    = 0.05f
     }
     
     playerSpecialAnim mb_over
     {
 	animationNameInMap	    = "mb_over"
 	controlsReturnOverTime	    = 0.1f
-	flags			    = ""
+	
+	startFracWii		    = 0.2f
+	animationTweenInTimeWii	    = 0.05f
     }
 
     playerSpecialAnim mb_under
     {
 	animationNameInMap	    = "mb_under"
 	controlsReturnOverTime	    = 0.1f
-	flags			    = ""
+	
+	startFracWii		    = 0.2f
+	animationTweenInTimeWii	    = 0.05f
+    }
+
+    playerSpecialAnim mb_blaster_fire
+    {
+	animationNameInMap	    = "mb_blaster_fire"
+	controlsReturnOverTime	    = 0.1f
+	
     }
 
     playerSpecialAnim mbr_over
     {
 	animationNameInMap	    = "mbr_over"
 	controlsReturnOverTime	    = 0.1f
-	flags			    = ""
+	
     }
 
     playerSpecialAnim mbr_left
     {
 	animationNameInMap	    = "mbr_left"
 	controlsReturnOverTime	    = 0.1f
-	flags			    = ""
+	
     }
 
     playerSpecialAnim mbr_right
     {
 	animationNameInMap	    = "mbr_right"
 	controlsReturnOverTime	    = 0.1f
-	flags			    = ""
+	
     }
 
-
-
-
-    
-/*    playerSpecialAnim cmb1a1
+    playerSpecialAnim mbr_under
     {
-	animationNameInMap	    = "cmb1a1"
-	animationTweenOutTime	    = 0.00f
-	animationTweenInTime	    = 0.00f
-	flags			    = ""
-    }
-    
-    playerSpecialAnim cmb1ts1
-    {
-	animationNameInMap	    = "cmb1ts1"
-	animationTweenOutTime	    = 0.10f
-	animationTweenInTime	    = 0.00f
-	flags			    = ""
-    }
-    
-    playerSpecialAnim cmb1a2
-    {
-	animationNameInMap	    = "cmb1a2"
-	animationTweenOutTime	    = 0.00f
-	animationTweenInTime	    = 0.00f
-	flags			    = ""
-    }
-    
-    playerSpecialAnim cmb1ts2
-    {
-	animationNameInMap	    = "cmb1ts2"
-	animationTweenOutTime	    = 0.10f
-	animationTweenInTime	    = 0.00f
-	flags			    = ""
-    }
-    
-    playerSpecialAnim cmb1a3
-    {
-	animationNameInMap	    = "cmb1a3"
-	animationTweenOutTime	    = 0.00f
-	animationTweenInTime	    = 0.00f
-	flags			    = ""
-    }
-    
-    playerSpecialAnim cmb1ts3
-    {
-	animationNameInMap	    = "cmb1ts3"
-	animationTweenOutTime	    = 0.10f
-	animationTweenInTime	    = 0.00f
-	flags			    = ""
-    }
-    
-    playerSpecialAnim cmb1a4
-    {
-	animationNameInMap	    = "cmb1a4"
-	animationTweenOutTime	    = 0.00f
-	animationTweenInTime	    = 0.00f
-	flags			    = ""
-    }
-    
-    playerSpecialAnim cmb1ts4
-    {
-	animationNameInMap	    = "cmb1ts4"
-	animationTweenOutTime	    = 0.10f
-	animationTweenInTime	    = 0.00f
-	flags			    = ""
-    }
-    playerSpecialAnim cmb1a5
-    {
-	animationNameInMap	    = "cmb1a5"
-	animationTweenOutTime	    = 0.00f
-	animationTweenInTime	    = 0.00f
-	flags			    = ""
-    }
-    
-    playerSpecialAnim cmb1ts5
-    {
-	animationNameInMap	    = "cmb1ts5"
-	animationTweenOutTime	    = 0.10f
-	animationTweenInTime	    = 0.00f
-	flags			    = ""
-    }
-    playerSpecialAnim cmb1a6
-    {
-	animationNameInMap	    = "cmb1a6"
-	animationTweenOutTime	    = 0.00f
-	animationTweenInTime	    = 0.00f
-	flags			    = ""
-    }
-    
-    playerSpecialAnim cmb1ts6
-    {
-	animationNameInMap	    = "cmb1ts6"
-	animationTweenOutTime	    = 0.10f
-	animationTweenInTime	    = 0.00f
-	flags			    = ""
-    }
-    playerSpecialAnim cmb1a7
-    {
-	animationNameInMap	    = "cmb1a7"
-	animationTweenOutTime	    = 0.00f
-	animationTweenInTime	    = 0.00f
-	flags			    = ""
-    }
-    
-    playerSpecialAnim cmb1ts7
-    {
-	animationNameInMap	    = "cmb1ts7"
-	animationTweenOutTime	    = 0.10f
-	animationTweenInTime	    = 0.00f
-	flags			    = ""
-    }
-    playerSpecialAnim cmb1a8
-    {
-	animationNameInMap	    = "cmb1a8"
-	animationTweenOutTime	    = 0.10f
-	animationTweenInTime	    = 0.00f
-	flags			    = ""
-    }
-    
-    playerSpecialAnim atk_rtlf1_t
-    {
-	animationNameInMap	    = "atk_rtlf1_t"
-	animationTweenOutTime	    = 0.25f
-	animationTweenInTime	    = 0.25f
-	flags			    = ""
-    }
-    
-    playerSpecialAnim atk_rtlf1_b
-    {
-	animationNameInMap	    = "atk_rtlf1_b"
-	animationTweenOutTime	    = 0.25f
-	animationTweenInTime	    = 0.25f
-	flags			    = ""
-    }
-    
-    playerSpecialAnim atk_rtlf1_h
-    {
-	animationNameInMap	    = "atk_rtlf1_h"
-	animationTweenOutTime	    = 0.25f
-	animationTweenInTime	    = 0.25f
-	flags			    = ""
-    }
-    
-    playerSpecialAnim atk_jump
-    {
-	animationNameInMap	    = "atk_jump"
-	flags			    = ""
+	animationNameInMap	    = "mbr_under"
+	controlsReturnOverTime	    = 0.1f
+	
     }
 
-    playerSpecialAnim atk_jumpup
+    playerSpecialAnim mar_over
     {
-	animationNameInMap	    = "atk_jumpup"
-	flags			    = ""
+	animationNameInMap	    = "mar_over"
+	controlsReturnOverTime	    = 0.1f
+	
+    }
+
+    playerSpecialAnim mar_left
+    {
+	animationNameInMap	    = "mar_left"
+	controlsReturnOverTime	    = 0.1f
+	
+    }
+
+    playerSpecialAnim mar_right
+    {
+	animationNameInMap	    = "mar_right"
+	controlsReturnOverTime	    = 0.1f
+	
+    }
+
+    playerSpecialAnim mar_under_right
+    {
+	animationNameInMap	    = "mar_under_right"
+	controlsReturnOverTime	    = 0.1f
+	
+    }
+
+    playerSpecialAnim mar_under_left
+    {
+	animationNameInMap	    = "mar_under_left"
+	controlsReturnOverTime	    = 0.1f
+	
+    }
+
+    playerSpecialAnim m_saber_on
+    {
+	animationNameInMap	    = "m_saber_on"
+	controlsReturnOverTime	    = 0.1f
+	
+    }
+
+    playerSpecialAnim m_saber_off
+    {
+	animationNameInMap	    = "m_saber_off"
+	controlsReturnOverTime	    = 0.1f
+	
+    }
+
+    playerSpecialAnim mb_blaster_left
+    {
+	animationNameInMap	    = "mb_blaster_left"
+	controlsReturnOverTime	    = 0.1f
+	
+    }
+
+    playerSpecialAnim mb_blaster_right
+    {
+	animationNameInMap	    = "mb_blaster_right"
+	controlsReturnOverTime	    = 0.1f
+	
+    }
+
+    playerSpecialAnim mb_blaster_up
+    {
+	animationNameInMap	    = "mb_blaster_up"
+	controlsReturnOverTime	    = 0.1f
+	
+    }
+
+    playerSpecialAnim mb_blaster_down
+    {
+	animationNameInMap	    = "mb_blaster_down"
     }
     
-    playerSpecialAnim atk_land
+//    playerSpecialAnim cmb1a1
+//  {
+//      animationNameInMap	    = "cmb1a1"
+//      animationTweenOutTime	    = 0.00f
+//      animationTweenInTime	    = 0.00f
+//      
+//  }
+//  
+//  playerSpecialAnim cmb1ts1
+//  {
+//      animationNameInMap	    = "cmb1ts1"
+//      animationTweenOutTime	    = 0.10f
+//      animationTweenInTime	    = 0.00f
+//      
+//  }
+//  
+//  playerSpecialAnim cmb1a2
+//  {
+//      animationNameInMap	    = "cmb1a2"
+//      animationTweenOutTime	    = 0.00f
+//      animationTweenInTime	    = 0.00f
+//      
+//  }
+//  
+//  playerSpecialAnim cmb1ts2
+//  {
+//      animationNameInMap	    = "cmb1ts2"
+//      animationTweenOutTime	    = 0.10f
+//      animationTweenInTime	    = 0.00f
+//      
+//  }
+//  
+//  playerSpecialAnim cmb1a3
+//  {
+//      animationNameInMap	    = "cmb1a3"
+//      animationTweenOutTime	    = 0.00f
+//      animationTweenInTime	    = 0.00f
+//      
+//  }
+//  
+//  playerSpecialAnim cmb1ts3
+//  {
+//      animationNameInMap	    = "cmb1ts3"
+//      animationTweenOutTime	    = 0.10f
+//      animationTweenInTime	    = 0.00f
+//      
+//  }
+//  
+//  playerSpecialAnim cmb1a4
+//  {
+//      animationNameInMap	    = "cmb1a4"
+//      animationTweenOutTime	    = 0.00f
+//      animationTweenInTime	    = 0.00f
+//      
+//  }
+//  
+//  playerSpecialAnim cmb1ts4
+//  {
+//      animationNameInMap	    = "cmb1ts4"
+//      animationTweenOutTime	    = 0.10f
+//      animationTweenInTime	    = 0.00f
+//      
+//  }
+//  playerSpecialAnim cmb1a5
+//  {
+//      animationNameInMap	    = "cmb1a5"
+//      animationTweenOutTime	    = 0.00f
+//      animationTweenInTime	    = 0.00f
+//      
+//  }
+//  
+//  playerSpecialAnim cmb1ts5
+//  {
+//      animationNameInMap	    = "cmb1ts5"
+//      animationTweenOutTime	    = 0.10f
+//      animationTweenInTime	    = 0.00f
+//      
+//  }
+//  playerSpecialAnim cmb1a6
+//  {
+//      animationNameInMap	    = "cmb1a6"
+//      animationTweenOutTime	    = 0.00f
+//      animationTweenInTime	    = 0.00f
+//      
+//  }
+//  
+//  playerSpecialAnim cmb1ts6
+//  {
+//      animationNameInMap	    = "cmb1ts6"
+//      animationTweenOutTime	    = 0.10f
+//      animationTweenInTime	    = 0.00f
+//      
+//  }
+//  playerSpecialAnim cmb1a7
+//  {
+//      animationNameInMap	    = "cmb1a7"
+//      animationTweenOutTime	    = 0.00f
+//      animationTweenInTime	    = 0.00f
+//      
+//  }
+//  
+//  playerSpecialAnim cmb1ts7
+//  {
+//      animationNameInMap	    = "cmb1ts7"
+//      animationTweenOutTime	    = 0.10f
+//      animationTweenInTime	    = 0.00f
+//      
+//  }
+//  playerSpecialAnim cmb1a8
+//  {
+//      animationNameInMap	    = "cmb1a8"
+//      animationTweenOutTime	    = 0.10f
+//      animationTweenInTime	    = 0.00f
+//      
+//  }
+//  
+//  playerSpecialAnim atk_rtlf1_t
+//  {
+//      animationNameInMap	    = "atk_rtlf1_t"
+//      animationTweenOutTime	    = 0.25f
+//      animationTweenInTime	    = 0.25f
+//      
+//  }
+//  
+//  playerSpecialAnim atk_rtlf1_b
+//  {
+//      animationNameInMap	    = "atk_rtlf1_b"
+//      animationTweenOutTime	    = 0.25f
+//      animationTweenInTime	    = 0.25f
+//      
+//  }
+//  
+//  playerSpecialAnim atk_rtlf1_h
+//  {
+//      animationNameInMap	    = "atk_rtlf1_h"
+//      animationTweenOutTime	    = 0.25f
+//      animationTweenInTime	    = 0.25f
+//      
+//  }
+//  
+//  playerSpecialAnim atk_jump
+//  {
+//      animationNameInMap	    = "atk_jump"
+//      
+//  }
+//
+//  playerSpecialAnim atk_jumpup
+//  {
+//      animationNameInMap	    = "atk_jumpup"
+//      
+//  }
+//  
+//  playerSpecialAnim atk_land
+//  {
+//      animationNameInMap	    = "landAttack"
+//      animationTweenOutTime	    = 0.25f
+//      animationTweenInTime	    = 0.25f
+//      
+//  }
+//
+//  playerSpecialAnim atk_spin360cc
+//  {
+//      animationNameInMap	    = "atk_spin360cc"
+//      
+//      animationTweenOutTime	    = 0.1f
+//      animationTweenInTime	    = 0.1f
+//  }
+//
+//  playerSpecialAnim block_idle
+//  {
+//      animationNameInMap	    = "block_idle"
+//      
+//  }
+//
+//  playerSpecialAnim block_left
+//  {
+//      animationNameInMap	    = "block_left"
+//      
+//  }
+//
+//  playerSpecialAnim block_leftto
+//  {
+//      animationNameInMap	    = "block_leftto"
+//      
+//  }
+//  
+//  playerSpecialAnim block_lffrm
+//  {
+//      animationNameInMap	    = "block_lffrm"
+//      
+//  }
+//
+//  playerSpecialAnim left_cntr1 
+//  {
+//      animationNameInMap	    = "left_cntr1"
+//      
+//  }
+//
+//  playerSpecialAnim block_right
+//  {
+//      animationNameInMap	    = "block_right"
+//      
+//  }
+//
+//  playerSpecialAnim block_rightto
+//  {
+//      animationNameInMap	    = "block_rightto"
+//      
+//  }
+//
+//  playerSpecialAnim block_rtfrm
+//  {
+//      animationNameInMap	    = "block_rtfrm"
+//      
+//  }
+//  playerSpecialAnim right_cntr1
+//  {
+//      animationNameInMap	    = "right_cntr1"
+//      
+//  }
+//
+//  playerSpecialAnim block_over
+//  {
+//      animationNameInMap	    = "block_over"
+//      
+//  }
+//  
+//  playerSpecialAnim block_overto
+//  {
+//      animationNameInMap	    = "block_overto"
+//      
+//  }
+//  
+//  playerSpecialAnim block_ovfrm
+//  {
+//      animationNameInMap	    = "block_ovfrm"
+//      
+//  }
+//  
+//  playerSpecialAnim over_cntr1
+//  {
+//      animationNameInMap	    = "over_cntr1"
+//      
+//  }
+   
+    playerSpecialAnim m_charge_ready
     {
-	animationNameInMap	    = "landAttack"
-	animationTweenOutTime	    = 0.25f
-	animationTweenInTime	    = 0.25f
-	flags			    = ""
+	animationNameInMap	    = "m_charge_ready"
+	
     }
 
-    playerSpecialAnim atk_spin360cc
+    playerSpecialAnim m_charge_to
     {
-	animationNameInMap	    = "atk_spin360cc"
-	flags			    = ""
-	animationTweenOutTime	    = 0.1f
-	animationTweenInTime	    = 0.1f
+	animationNameInMap	    = "m_charge_to"
+	
     }
 
-    playerSpecialAnim block_idle
+    playerSpecialAnim m_charging_up
     {
-	animationNameInMap	    = "block_idle"
-	flags			    = ""
+	animationNameInMap	    = "m_charging_up"
+	
     }
 
-    playerSpecialAnim block_left
+     playerSpecialAnim m_jump_stab_to
     {
-	animationNameInMap	    = "block_left"
-	flags			    = ""
+	animationNameInMap	    = "m_jump_stab_to"
+	controlsReturnOverTime	    = 0.1f
+	
     }
 
-    playerSpecialAnim block_leftto
+    playerSpecialAnim m_jump_stab_loop
     {
-	animationNameInMap	    = "block_leftto"
-	flags			    = ""
-    }
-    
-    playerSpecialAnim block_lffrm
-    {
-	animationNameInMap	    = "block_lffrm"
-	flags			    = ""
+	animationNameInMap	    = "m_jump_stab_loop"
+	controlsReturnOverTime	    = 0.1f
+	
     }
 
-    playerSpecialAnim left_cntr1 
+    playerSpecialAnim m_jump_stab_land
     {
-	animationNameInMap	    = "left_cntr1"
-	flags			    = ""
+	animationNameInMap	    = "m_jump_stab_land"
+	controlsReturnOverTime	    = 0.1f
+	
     }
 
-    playerSpecialAnim block_right
-    {
-	animationNameInMap	    = "block_right"
-	flags			    = ""
-    }
-
-    playerSpecialAnim block_rightto
-    {
-	animationNameInMap	    = "block_rightto"
-	flags			    = ""
-    }
-
-    playerSpecialAnim block_rtfrm
-    {
-	animationNameInMap	    = "block_rtfrm"
-	flags			    = ""
-    }
-    playerSpecialAnim right_cntr1
-    {
-	animationNameInMap	    = "right_cntr1"
-	flags			    = ""
-    }
-
-    playerSpecialAnim block_over
-    {
-	animationNameInMap	    = "block_over"
-	flags			    = ""
-    }
-    
-    playerSpecialAnim block_overto
-    {
-	animationNameInMap	    = "block_overto"
-	flags			    = ""
-    }
-    
-    playerSpecialAnim block_ovfrm
-    {
-	animationNameInMap	    = "block_ovfrm"
-	flags			    = ""
-    }
-    
-    playerSpecialAnim over_cntr1
-    {
-	animationNameInMap	    = "over_cntr1"
-	flags			    = ""
-    }*/
-
-    // I'm very sorry if this breaks anything. mcarpenter
-    // Was hit_recoil; changed to m_hit_recoil
     playerSpecialAnim m_hit_recoil
     {
 	animationNameInMap	    = "m_hit_recoil"
-	flags			    = ""
+	
     }
 }

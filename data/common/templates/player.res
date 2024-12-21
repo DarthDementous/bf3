@@ -28,17 +28,9 @@ template simpleActivatorComponent
     class-id		    = "simple activator component"
 }
 
-template scoringComponent
-{
-    class-id		    = "scoring component"
-}
-
 template basePlayerPersistantData
 {
     class-id		    = "player persistant data"
-    scoringComponent scoring	// Probably doesn't want to be here by default.
-    {				// Maybe should create it if we start a arcade match
-    }
 }
 
 template PersistantDataOwner
@@ -46,23 +38,8 @@ template PersistantDataOwner
     class-id	= "player persistant data owner component"
 }
 
-template playerpickupcollectorG6
-{
-    class-id = "chr pickup collector"
-}
 
-template playerwhisker
-{
-    class-id	    = "npc whisker"
-    length	    = 2.f
-    radius	    = 0.5f		    // Character radius
-    dir		    = 0.f		    // Straight ahead
-    float offset []  {0.f, 0.f, 0.f}
-}
 
-template playersteer : chrsteer
-{
-}
 
 template firstPersonSettingsComponent
 {
@@ -72,18 +49,10 @@ template firstPersonSettingsComponent
 	default = ""
 	permLevelOb = "true"
     }
+    canBeCloaked    = "false" // material overrides for effect shaders
+    canBeHologram   = "false"
 }
 
-template playersteernone
-{
-    class-id	    = "npc steer"
-    
-    numwhiskers	    = 0
-    
-    playerwhisker whiskers []
-    {
-    }
-}
 
 template staminacomponent
 {
@@ -91,15 +60,6 @@ template staminacomponent
     currentstamina	    = 1.f
     fullstamina		    = 1.f
     increaserate	    = 0.1f
-}
-
-template playerweapon : chrweapon
-{
-    class-id = "player weapon component"
-    maxGrenadeThrowStrength = 24.f  //	reduced from 40.f as it was considered too powerful 
-				    //  
-    minGrenadeThrowStrength = 8.f
-    serialiseStartWeapon = "false"
 }
 
 template playerSpecialAnim
@@ -123,10 +83,12 @@ template playerSpecialAnim
     injurePropInFront_distanceAway  = -1.f
     injurePropInFront_time	    = -1.f
 
-    customCameraHeight_height	    =	0.f
-    customCameraHeight_amount	    =	0.f
+    customCameraHeight_height	    =	0.15f
+    customCameraHeight_amount	    =	0.15f
     getCameraPosFromChrHeadAmount   =	0.f
     getCameraRotFromChrHeadAmount   =	0.f
+    
+    flags = ""
 }
 
 template playerLeanComponent
@@ -145,113 +107,11 @@ template basePlayerBrainComponent
     class-id = "base player brain component"
 }
 
-template playerprop : prop
-{
-    class-id	= "player prop"
-
-    propflags |= "k_protectFromBgDeletion"	    // stop all player props from being deleted when backgrounds these props are in are being removed
-    propflags |= "k_protectFromLevelChangeDeletion" // " " 
-    propflags |= "k_blocksSpawning"		    // stops stuff spawning when a player is stood there
-
-// TODO: #if !GOLD_VERSION or equivalent
-
-    autoRecurseTemplateName-field autoLoadAllGuns	{ default = "allGunsInventory"	    }
-    autoRecurseTemplateName-field autoLoadAllAmmo	{ default = "allAmmoInventory"	    }
-    autoRecurseTemplateName-field autoLoadAllGrenades	{ default = "allGrenadesInventory"  }
-
-// TODO: #endif
-
-    basePlayerBrainComponent playerBrain { }
-
-    currentInventoryWeaponID = ""
-
-    simpleActivatorComponent	    activator		{  }
-    firstPersonSettingsComponent    firstPersonSettings	{  }
-    chrFootstepComponent	    footsteps		{  }
-    playerLeanComponent		    leanComponent	{  }
-    playerLateTickComponent	    lateTickComponent   {  }
-
-    chrcoveroccupier		    coverOccupier
-    {
-//	flags = "k_cvrocc_useCoverPosAsToShootPos"
-    }
-
-    chrobstaclecomponent	    obstacle		{  }
-    privatecovermaintainer	    coverMaintainer	{  }    // this will automatically create cover pads - or more specifically line of fire pads (cover pads with no cover) - whereever the player wanders
-    chrvoice			    voice	        {  }
-    playerweapon		    weaponHandler	{  }
-    chrmovement			    movementHandler     {  }
-    playerphysicsmovement	    move	        {  }
-    PersistantDataOwner		    persistantData      {  }
-    participantComponent	    participant		{  }
-    SimpleCharacterCamera	    camera		{  }
-    SimpleVehicleDriver		    vehicleDriver       {  }
-    SimpleRemoteUser		    remoteUser		{  }
-    chrvistableseercomp		    vtseer		{  }
-    planningInventory		    inventory		{  }
-
-
-    nav
-    {
-	class-id    = "npc nav"
-	terrain_profile = 0
-    }
-    //////////////////////
-    
-    soundmap-field soundmap
-    {
-	default = ""
-    }
-
-    soundcomponent soundComponent	// For playing sounds
-    {
-	fadeOutTime = 0.15f
-    }
-
-    chranim anim
-    {
-	animmap-field animmap
-	{
-	    default = ""
-	}
-
-	UseUFDUbiks = "true"
-	disableUbiksDamping = "true"
-        ubiksWaistName = "waist"
-    }
-
-    drawThesePartsWhileInFirstPerson = "B_lowerbody;B_accessories_legs"
-    drawThesePartsWhileInFirstPersonNoGun = "B_lowerbody;B_accessories_legs;B_upperbody;B_accessories"
-    
-    currentStateName	    =	"stateOnFoot"
-
-    deathState		    =   0	// Alive
-    deathTimer		    =	0.f
-
-    //=======================================================
-    // States
-    //=======================================================
-
-    playerStates
-    {
-	stateDriving	    {	class-id    =	"player state - driving"	}
-	stateOnFoot	    {	class-id    =	"player state - on foot"	}
-	stateRagdoll	    {   class-id    =	"player state - corpse"		}
-	statePreDeath	    {	class-id    =	"player state - predeath"	}
-	stateCorpse	    {   class-id    =	"player state - animated ragdoll"}
-	stateRemote	    {   class-id    =	"player state - using remote"	}
-	statePassenger	    {   class-id    =	"player state - passenger"	}    
-	stateVehicleCorpse  {   class-id    =	"player state - vehicle corpse"	}    
-    }
-
-    snapshotsPerSecond = 10.f
-}
-
-//*****************************************************************************
 template editorcameraprop : prop 
 {
     class-id	= "editor camera prop"
     EditorCameraComponent camera { }
+    isAllowedNetworkComponent = "false"
 }
 
 template playerSpawnerBase : prop
@@ -300,16 +160,32 @@ template playerSpawnerBase : prop
 
 	eventTargetList playerSpawned
 	{
+		eventTarget targets []
+		{
+		}
 	}
 
 	eventTargetList activateSpawner
 	{
+		eventTarget targets  []
+		{
+		}
 	}
     }
 
     simpleGroupieComponent groupieComponent
     {
     }
+
+    staticNetworkComponent network
+    {
+	// the spawners need to exist before the player spawns in so that they can be listed on the spawn menu
+	networkflags = "k_syncWithBg"
+    }
 }
 
-
+/* --- auto commented out by commentOutTemplate
+template achievement
+{
+}
+*/ // --- auto commented out by commentOutTemplate

@@ -1,8 +1,74 @@
 // vim: set syntax=c :
 
-template hudMessageAction_bf : hudMessageAction
+
+template csgTriggerNPC : baseTrigger
 {
-    message_type = "test_objective_message"
+    class-id = "csg trigger"
+
+    triggerIteratorNPCs iterator
+    {
+	mode = "k_whileSet"
+    }
+}
+
+template zoneTriggerNPC : baseTrigger
+{
+    class-id = "zone trigger"
+
+    zone-field zone
+    {
+	default = ""
+	views = "basic setup"
+    }
+
+    triggerIteratorNPCs iterator
+    {
+	mode = "k_whileSet"
+    }
+}
+
+template obbTriggerNPC : baseTrigger
+{
+    class-id = "obb trigger"
+
+    triggerIteratorNPCs iterator
+    {
+	mode = "k_whileSet"
+    }
+}
+
+template TriggerEventNPC : event
+{
+    editable-template-field trigger
+    {
+	csgTriggerNPC default
+	{
+	}
+
+	otheroptions []
+	{
+	    "csgTriggerNPC",
+	    "obbTriggerNPC",
+	    "zoneTriggerNPC"
+	}
+
+	views = "basic setup"
+    }
+
+    meta
+    {
+	canCreateInEditor = 0
+    }
+}
+
+template ActOnPropTriggerEventNPC : TriggerEventNPC
+{
+    class-id = "event act on prop prop"
+
+    meta
+    {
+	canCreateInEditor = 0
+    }
 }
 
 template AIUseJetpackAction : action
@@ -13,11 +79,12 @@ template AIUseJetpackAction : action
 
 template AIJetpackPath : SplinePath
 {
-    numPoints = -1;
+    numPoints = 0;
     useLookAt = "false"
+    colourTailSegments = "false"
 }
 
-template AIUseJetpack : ActOnPropTriggerEvent
+template AIUseJetpack : ActOnPropTriggerEventNPC
 {
     class-id = "ai use jetpack prop bf"
     
@@ -54,11 +121,11 @@ template AIUseJetpack : ActOnPropTriggerEvent
    
     meta
     {
-	canCreateInEditor   = 1
-	editorPath	    = "bf/ai"
-	editorInstanceName  = "AIUseJetpack"
-	editorGroupPath	    = "AI Use Jetpack"
-    editorTickWhenSelected = "false"    
+	canCreateInEditor	= 1
+	editorPath		= "bf/ai"
+	editorInstanceName	= "AIUseJetpack"
+	editorGroupPath		= "AI Use Jetpack"
+	editorTickWhenSelected	= "false"    
     }
 }
 
@@ -92,30 +159,57 @@ template ShipScriptedSplineProp : prop
 {
     class-id = "flying vehicle scripted spline prop"
     ticktype = "k_tickAlways"
+    enabled  = "true"
 
-    int-field speed
+    propflags = "k_protectFromVolumeDeletion"
+
+    bool-field loops
     {
-	default = 1;
-	tip     = "0 = Breaks applied, 1 = Normal speed, 2 = Accelerator applied"
-	views   = "basic setup"
+	default = "false"
+	tip = "Does The Spline Loop"
+	views = "basic setup"
+    }
+
+    bool-field callback
+    {
+	default = "false"
+	tip = "Does The Spline Do Callbacks"
+	views = "basic setup"
+    }
+
+    bool-field deleteAtEnd
+    {
+	default = "false"
+	tip = "Does The Spline Delete The Prop At The End?"
+	views = "basic setup"
+    }
+
+    bool-field absoluteSpeedValues
+    {
+	default = "false"
+	top = "If true, the speed values on each point represent absolute speeds. If false, they represent percentages of the ships maximum speed"
+	views = "basic setup"
     }
 
     SplinePath path
-    {
-	numPoints = 0
-	useLookAt = "false"
+    {	
     }
     
     editor_S_render editor-only-render
     {
     }
+
+    isAllowedNetworkComponent = "false"
+    checkPointLoadFromOriginalSetup = "true"
+
+    playerReleaseSegment = -1
+
    
     meta
     {
 	canCreateInEditor  = 1
 	editorPath	   = "bf/ai"
 	editorInstanceName  = "shipspline"
-	editorGroupPath = "Ship Scripted Spline Paths"
     }
 }
 
@@ -154,6 +248,49 @@ template ShipStrafingSplineProp : ShipScriptedSplineProp
     }
 }
 
+template LandingPadProp : ShipScriptedSplineProp
+{
+    class-id = "landing pad prop"
+
+    enabled = "true"
+
+    flags-field landingPadFlags
+    {
+	enumtype = "CLandingPadProp_Flags"
+	default = ""
+	views = "basic setup"
+    }
+
+    horizontalFlightStartSegment = -1	// If this is set to zero or above, the ship will start flying horizontally when this segment is reached during landing
+    facingCheckPoint = -1		// If this is set to zero or above, this point will be used for the "Is the player facing this landing pad?" check for the auto-land prompt rather than the prop position
+
+    string-field groupTag
+    {
+	default = ""
+	views = "basic setup"
+	tip = "Give a group of related landing pads the same group ID to limit the selection of landing pads for player auto-land, ie: all the pads on one side of the cis hangar, all the pads in the tatooine landing bay, etc."
+    }
+
+    editor_t_render editor-only-render
+    {
+	castshadows = "false"
+	receiveshadows = "false"
+    }
+  
+    staticNetworkComponent network
+    {
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorPath	   = "bf/ai"
+	editorInstanceName  = "LandPadProp"
+	editorGroupPath = "Landing Pads"
+	editorTickWhenSelected = "false"
+    }
+}
+
 template VMTrigBF : ActOnPropTriggerEvent
 {
     trigger
@@ -163,39 +300,13 @@ template VMTrigBF : ActOnPropTriggerEvent
     
     VMActionOnProp action
     {
-        propHasEnteredTriggerScript = "gamemodeTriggerSimple(triggerPropRef, getPlayerPropRefFromID(GetPlayerId()));"
-        triggerTriggeredScript = "gamemodeTriggerSimple(triggerPropRef, getPlayerPropRefFromID(GetPlayerId()));"
-    }
-    
-    event
-    {
-        trigger
-        {
-            eventTarget targets []
-            {
-            }
-        }
+        deleted = "true"
 
-        exit
-        {
-            eventTarget targets []
-            {
-            }
-        }
-
-        disable
-        {
-            eventTarget targets []
-            {
-            }
-        }
-
-        enable
-        {
-            eventTarget targets []
-            {
-            }
-        }
+	triggerTriggeredScript = "// FILE: T@autogen/templates/events/vmtrigbf.vms$
+	gamemodeTriggerSimple(triggerPropRef, getPlayerPropRefFromID(GetPlayerId()));"
+        propIsInsideTriggerScript = "// FILE: T@autogen/templates/events/vmtrigbf.vms$
+	gamemodeTriggerSimple(triggerPropRef, getPlayerPropRefFromID(GetPlayerId()));"
+   
     }
 
     meta
@@ -205,5 +316,82 @@ template VMTrigBF : ActOnPropTriggerEvent
     	editorInstanceName  = "vmTrig"
     }
 
+}
+
+template AIActionVolumePropBF : prop
+{
+    class-id = "ai action volume prop bf"
+    ticktype = "k_tickAlways"
+    
+    flags-field actions
+    {
+	enumtype    = "CAIActionVolumePropBF_actions"
+	default	    = ""
+	views	    = "basic setup"
+    }
+
+    staticNetworkComponent network
+    {
+    }
+
+    editable-template-field trigger
+    {
+	obbTrigger default
+	{
+	}
+
+	// csgTrigger is not invited to the party - too expensive to calculate distance.
+	otheroptions []
+	{
+	    "obbTrigger",
+	    "zoneTrigger"
+	}
+
+	views = "basic setup"
+    }
+
+    editor_t_render editor-only-render
+    {
+	castshadows	= "false"
+	receiveshadows	= "false"
+    }
+   
+    meta
+    {
+	canCreateInEditor	= 1
+	editorPath		= "bf/ai"
+	editorInstanceName	= "AIActionVol"
+	editorGroupPath		= "AI Action Volume Prop"
+	editorTickWhenSelected	= "false"
+    }
+}
+
+template BFNoSquadronVolume : VMActionOnPropEvent
+{
+    obbTrigger trigger
+    {
+        triggerIteratorVehicles iterator
+        {
+        }
+    }
+
+    action
+    {
+        propHasEnteredTriggerScript = "// FILE: T@autogen/templates/events/bfnosquadronvolume.vms$
+BFShipSetAllowedToJoinSquadron( thisPropRef, false );
+	BFAutoRoll( triggerPropRef, thisPropRef, true );"
+        propHasExitedTriggerScript = "// FILE: T@autogen/templates/events/bfnosquadronvolume.vms$
+BFShipSetAllowedToJoinSquadron( thisPropRef, true );
+	BFAutoRoll( triggerPropRef, thisPropRef, false );"
+    }
+
+    meta
+    {
+	canCreateInEditor	= 1
+	editorPath		= "bf/ai"
+	editorInstanceName	= "NoSquadronVol"
+	editorGroupPath		= "No Squadron Volumes"
+	editorTickWhenSelected	= "false"
+    }
 }
 

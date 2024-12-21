@@ -8,7 +8,8 @@ STR_FRONTEND_PROLOGUE
 	resfile = "tatooine/tat_training.res"
     	stringID = "STR_LEVELNAME_TATOOINE_TRAINING"
 	image = "misctex/frontend/levels/tatooine"
-        heroHealthShouldDepleteWithTime = "false"    
+        heroHealthShouldDepleteWithTime = "false"
+	soundKey = "story_training"	
     }
 }
 
@@ -20,6 +21,7 @@ STR_FRONTEND_ACT1
 	resfile = "tatooine/tatooine_story.res"
 	stringID = "STR_LEVELNAME_TATOOINE"
 	image = "misctex/frontend/levels/tatooine"
+	soundKey = "story_tatooine"
     }
     storylevel coruscant
     {
@@ -27,18 +29,21 @@ STR_FRONTEND_ACT1
 	stringID = "STR_LEVELNAME_CORUSCANT"
 	image = "misctex/frontend/levels/coruscant"
 	hascheckpoint = "false"
+	soundKey = "story_coruscant"
     }
     storylevel catoneim 
     {
 	resfile = "cato/cato_story.res"
 	stringID = "STR_LEVELNAME_CATO_NEIMOIDIA"
 	image = "misctex/frontend/levels/catoneimoidia"
+	soundKey = "story_catoneim"
    }
     storylevel dantooine
     {
 	resfile = "dantooine/dantooine_story.res"
 	stringID = "STR_LEVELNAME_DANTOOINE"
 	image = "misctex/frontend/levels/dantooine"
+	soundKey = "story_dantooine"
     }
 }
 
@@ -50,24 +55,28 @@ STR_FRONTEND_ACT2
 	resfile = "desolation/des_story.res"
 	stringID = "STR_LEVELNAME_DESOLATION"
 	image = "misctex/frontend/levels/desolation"
+	soundKey = "story_desolation"
     }
     storylevel yavin
     {
 	resfile = "yavin/yavin_story.res"
 	stringID = "STR_LEVELNAME_YAVIN"
 	image = "misctex/frontend/levels/yaviniv"
+	soundKey = "story_yavin"
     }
     storylevel hoth
     {
 	resfile = "hoth/hoth_story.res"
 	stringID = "STR_LEVELNAME_HOTH"
 	image = "misctex/frontend/levels/hoth"
+	soundKey = "story_hoth"
     }
     storylevel endor
     {
 	resfile = "endor/endor_story.res"
 	stringID = "STR_LEVELNAME_ENDOR"
 	image = "misctex/frontend/levels/endor"
+	soundKey = "story_endor"
     }
 }
 
@@ -79,25 +88,21 @@ STR_FRONTEND_ACT3
 	resfile = "bespin/bespin_story.res"
 	stringID = "STR_LEVELNAME_BESPIN"
 	image = "misctex/frontend/levels/bespin"
+	soundKey = "story_bespin"
     }
     storylevel dathomir
     {
 	resfile = "dathomir/dathomir_story.res"
 	stringID = "STR_LEVELNAME_DATHOMIR"
 	image = "misctex/frontend/levels/dathomir"
+	soundKey = "story_dathomir"
     }
     storylevel mustafar
     {
 	resfile = "mustafar/mustafar_story.res"
 	stringID = "STR_LEVELNAME_MUSTAFAR"
 	image = "misctex/frontend/levels/mustafar"
-    }
-    storylevel kashyyyk	    // How many Y's?!?!
-    {
-	resfile = "kashyyyk/kashyyyk_story.res"
-	stringID = "STR_LEVELNAME_KASHYYYK"
-	heroHealthShouldDepleteWithTime = "false"
-	image = "misctex/frontend/levels/kashyyyk"
+	soundKey = "story_mustafar"
     }
 }
 

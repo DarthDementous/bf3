@@ -5,23 +5,6 @@
 // ===============================
 
 
-template yav_temple : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yavin_temple"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavtemple"
-	editorPath         = "bf/props/yavin"
-    }
-}
 
 template yav_column : staticprop
 {
@@ -41,80 +24,29 @@ template yav_column : staticprop
     }
 }
 
-template yav_column2 : staticprop
+
+
+
+template yav_crate01 : staticprop
 {
-    obinstrenderer render
+    static_obinst_physics physics
     {
-	model = "props/yav/yav_column2"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavcolumn2"
-	editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_ruin_temple : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yav_ruin_temple"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavruintemple"
-	editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_ruin_tower : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yav_ruin_tower"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavruintower"
-	editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_crate01 : bfshatteringphysicsprop
-{
-    odesimplephysics physics
-    {
-    	mayaphysics = "true"
+		useRBs	    =	"true"
     }
       
     obinstrenderer render
     {
-	    model = "props/yav/yav_crate01"
+	model = "props/yav/yav_crate01"
        	numLods = 0//2
-	    //lodDist[] 
+	//lodDist[] 
     	//{ 30.0, 50.0 }
      }
 
     meta
     {
-	    canCreateInEditor  = 1
+	canCreateInEditor  = 1
     	editorInstanceName = "yavcrate01"
-	    editorPath         = "bf/props/yavin"
+	editorPath         = "bf/props/yavin"
     }
 }
 
@@ -126,8 +58,13 @@ template yav_crate02 : staticprop
    	numLods = 0//2
 	//lodDist[] 
 	//{ 30.0, 50.0 }
- }
-
+    }
+ 
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    
     meta
     {
 	canCreateInEditor  = 1
@@ -136,11 +73,314 @@ template yav_crate02 : staticprop
     }
 }
 
-template yav_full_bridge : staticprop
+//
+// Physics Props
+//
+
+// Block 1
+template yav_block_long : staticprop
 {
     obinstrenderer render
     {
-	model = "props/yav/yavin_full_bridge"
+	model = "props/yav/phys/yav_block_long"
+   	numLods = 0
+    }
+ 
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "yavblock1"
+	editorPath         = "bf/props/yavin/phys"
+    }
+}
+
+// Block 2
+template yav_block_short : staticprop
+{
+    obinstrenderer render
+    {
+	model = "props/yav/phys/yav_block_short"
+   	numLods = 0
+    }
+ 
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "yavblock2"
+	editorPath         = "bf/props/yavin/phys"
+    }
+}
+
+// Rock 1
+template yav_rock_flat1 : staticprop
+{
+    obinstrenderer render
+    {
+	model = "props/yav/phys/flatrock1"
+   	numLods = 0
+    }
+ 
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "yavrock1"
+	editorPath         = "bf/props/yavin/phys"
+    }
+}
+
+// Rock 2
+template yav_rock_flat2 : staticprop
+{
+    obinstrenderer render
+    {
+	model = "props/yav/phys/flatrock2"
+   	numLods = 0
+    }
+ 
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "yavrock2"
+	editorPath         = "bf/props/yavin/phys"
+    }
+}
+
+// Rock 3
+template yav_rock_flat3 : staticprop
+{
+    obinstrenderer render
+    {
+	model = "props/yav/phys/flatrock3"
+   	numLods = 0
+    }
+ 
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "yavrock3"
+	editorPath         = "bf/props/yavin/phys"
+    }
+}
+
+// Ladder
+template yav_ladder : staticprop
+{
+    obinstrenderer render
+    {
+	model = "props/yav/phys/ladder"
+   	numLods = 0
+    }
+ 
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "yavladder"
+	editorPath         = "bf/props/yavin/phys"
+    }
+}
+
+// Pillar
+template yav_pillar_phys : staticprop
+{
+    obinstrenderer render
+    {
+	model = "props/yav/phys/pillar"
+   	numLods = 0
+    }
+ 
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "yavpillar"
+	editorPath         = "bf/props/yavin/phys"
+    }
+}
+
+// Post
+template yav_post : staticprop
+{
+    obinstrenderer render
+    {
+	model = "props/yav/phys/post"
+   	numLods = 0
+    }
+ 
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "yavpost"
+	editorPath         = "bf/props/yavin/phys"
+    }
+}
+
+// Post Face
+template yav_post_face : staticprop
+{
+    obinstrenderer render
+    {
+	model = "props/yav/phys/post_face"
+   	numLods = 0
+    }
+ 
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "yavpostface"
+	editorPath         = "bf/props/yavin/phys"
+    }
+}
+
+// Post Face Cracked
+template yav_post_face_c : staticprop
+{
+    obinstrenderer render
+    {
+	model = "props/yav/phys/post_face_cracked"
+   	numLods = 0
+    }
+ 
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "yavpstfcecrk"
+	editorPath         = "bf/props/yavin/phys"
+    }
+}
+
+// Post Thin
+template yav_post_thin : staticprop
+{
+    obinstrenderer render
+    {
+	model = "props/yav/phys/post_thin"
+   	numLods = 0
+    }
+ 
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "yavpstthin"
+	editorPath         = "bf/props/yavin/phys"
+    }
+}
+
+
+//
+// Yavin Cover Props
+//
+
+// Crate Cover
+template yav_cover : staticprop
+{
+    obinstrenderer render
+    {
+	model = "yavin/props/yav_cover"
+   	numLods = 0
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "yavcover"
+	editorPath         = "bf/props/yavin"
+    }
+}
+
+// Crate Crouch
+template yav_crouch : staticprop
+{
+    obinstrenderer render
+    {
+	model = "yavin/props/yav_crouch"
+   	numLods = 0
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "yavcrouch"
+	editorPath         = "bf/props/yavin"
+    }
+}
+
+// Crate Stand
+template yav_stand : staticprop
+{
+    obinstrenderer render
+    {
+	model = "yavin/props/yav_stand"
+   	numLods = 0
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "yavstand"
+	editorPath         = "bf/props/yavin"
+    }
+}
+
+/* --- auto commented out by commentOutTemplate
+template rubblepath : staticprop
+{
+    obinstrenderer render
+    {
+	model = "props/yav/pathrubble"
    	numLods = 0//2
 	//lodDist[] 
 	//{ 30.0, 50.0 }
@@ -149,10 +389,12 @@ template yav_full_bridge : staticprop
     meta
     {
 	canCreateInEditor  = 1
-	editorInstanceName = "yavfullbridg"
+	editorInstanceName = "yavrubble"
 	editorPath         = "bf/props/yavin"
     }
 }
+*/ // --- auto commented out by commentOutTemplate
+
 
 template yav_walkway : staticprop
 {
@@ -172,23 +414,6 @@ template yav_walkway : staticprop
     }
 }
 
-template yav_walkway_2 : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yav_walkway_2"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavwalkway2"
-	editorPath         = "bf/props/yavin"
-    }
-}
 
 template yav_pillar : staticprop
 {
@@ -208,23 +433,6 @@ template yav_pillar : staticprop
     }
 }
 
-template yavin_springs : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yavin_springs"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavinsprings"
-	editorPath         = "bf/props/yavin"
-    }
-}
 
 template yav_broken_pillar : staticprop
 {
@@ -263,459 +471,34 @@ template yav_broken_steps : staticprop
 }
 
 
-template yav_broken_bridge : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yavin_broken_bridge"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavbrknbridg"
-	editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_temple_ruins : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yavin_temple_ruins"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavtemplruin"
-	editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_ruins : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yavin_ruins"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavruins"
-	editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_ruins_85 : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yavin_ruins_85"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavruins85"
-	editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_ruin_1 : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yav_ruin_1"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavruin1"
-	editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_ruin_2 : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yav_ruin_2"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavruin2"
-	editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_ruin_3 : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yav_ruin_3"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavruin3"
-	editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_ruin_4 : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yav_ruin_4"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavruin4"
-	editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_ruin_5 : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yav_ruin_5"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavruin5"
-	editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_ruin_6 : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yav_ruin_6"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavruin6"
-	editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_temple_prop2 : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yav_temple_prop2"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavtmpl2"
-	editorPath         = "bf/props/yavin"
-    }
-}
 
 
 
-template yav_walkway_85 : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yav_walkway_scale_85"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
 
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavwalkw85"
-	editorPath         = "bf/props/yavin"
-    }
-}
 
-template yav_pillar_85 : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/yav_pillar_scale_85"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
 
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavpill85"
-	editorPath         = "bf/props/yavin"
-    }
-}
 
-template yav_broken_pillar_85 : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/broken_pillar_scale_85"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
 
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavbrknp85"
-	editorPath         = "bf/props/yavin"
-    }
-}
 
-template yav_broken_steps_85 : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/yav/steps_scale_85"
-   	numLods = 0//2
-	//lodDist[] 
-	//{ 30.0, 50.0 }
- }
 
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "yavbrknst85"
-	editorPath         = "bf/props/yavin"
-    }
-}
+
+
+
+
+
+
 
 
 ///////// DEATH STAR JUNK ///////////
 
-template yav_deb_shell_a : staticprop
-{
-    obinstrenderer render
-    {
-    model = "deathstar2/props/debris_shell_a"
-       numLods = 0//2
-    //lodDist[]
-    //{ 30.0, 50.0 }
- }
 
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "shell_a"
-        editorPath         = "bf/props/yavin"
-    }
-}
 
-template yav_deb_shell_b : staticprop
-{
-    obinstrenderer render
-    {
-    model = "deathstar2/props/debris_shell_b"
-       numLods = 0//2
-    //lodDist[]
-    //{ 30.0, 50.0 }
- }
 
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "shell_b"
-        editorPath         = "bf/props/yavin"
-    }
-}
 
-template yav_deb_shell_c : staticprop
-{
-    obinstrenderer render
-    {
-    model = "deathstar2/props/debris_shell_c"
-       numLods = 0//2
-    //lodDist[]
-    //{ 30.0, 50.0 }
- }
 
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "shell_c"
-        editorPath         = "bf/props/yavin"
-    }
-}
 
-template yav_deb_hangar : staticprop
-{
-    obinstrenderer render
-    {
-    model = "deathstar2/props/debris_hangar"
-       numLods = 0//2
-    //lodDist[]
-    //{ 30.0, 50.0 }
- }
 
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "hangar"
-        editorPath         = "bf/props/yavin"
-    }
-}
 
-template yav_deb_trench : staticprop
-{
-    obinstrenderer render
-    {
-    model = "deathstar2/props/debris_trench"
-       numLods = 0//2
-    //lodDist[]
-    //{ 30.0, 50.0 }
- }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "trench"
-        editorPath         = "bf/props/yavin"
-    }
-}
-template yav_deb_floor_a : staticprop
-{
-    obinstrenderer render
-    {
-    model = "deathstar2/props/debris_floor_a"
-       numLods = 0//2
-    //lodDist[]
-    //{ 30.0, 50.0 }
- }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "floor_a"
-        editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_deb_floor_b : staticprop
-{
-    obinstrenderer render
-    {
-    model = "deathstar2/props/debris_floor_b"
-       numLods = 0//2
-    //lodDist[]
-    //{ 30.0, 50.0 }
- }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "floor_b"
-        editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_deb_junk_a : staticprop
-{
-    obinstrenderer render
-    {
-    model = "deathstar2/props/debris_junk_a"
-       numLods = 0//2
-    //lodDist[]
-    //{ 30.0, 50.0 }
- }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "junk_a"
-        editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_deb_junk_b : staticprop
-{
-    obinstrenderer render
-    {
-    model = "deathstar2/props/debris_junk_b"
-       numLods = 0//2
-    //lodDist[]
-    //{ 30.0, 50.0 }
- }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "junk_b"
-        editorPath         = "bf/props/yavin"
-    }
-}
-
-template yav_deb_junk_c : staticprop
-{
-    obinstrenderer render
-    {
-    model = "deathstar2/props/debris_junk_c"
-       numLods = 0//2
-    //lodDist[]
-    //{ 30.0, 50.0 }
- }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "junk_c"
-        editorPath         = "bf/props/yavin"
-    }
-}
 
 
 ////////////////////////////////////////////
@@ -724,77 +507,9 @@ template yav_deb_junk_c : staticprop
 //
 ////////////////////////////////////////////
 
-template yav_door_rubb : staticprop
-{
-    obinstrenderer render
-    {
-	model = "yavin/props/door_rubble"
-	numLods = 0//2
-    //lodDist[]
-    //{ 30.0, 50.0 }
- }
 
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "yavdoor_rubble"
-        editorPath         = "bf/props/yavin"
-    }
-}
 
-template yav_dstar_chunk : staticprop
-{
-    obinstrenderer render
-    {
-	model = "deathstar2/props/yav_deathstar_chunk"
-	numLods = 0//2
-    //lodDist[]
-    //{ 30.0, 50.0 }
- }
 
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "yav_dstar_chunk"
-        editorPath         = "bf/props/yavin"
-    }
-}
-
-template y_cvrprp_crouch : staticprop
-{
-    obinstrenderer render
-    {
-	model = "yavin/props/y_cvrprp_crouch"
-	numLods = 0//2
-    //lodDist[]
-    //{ 30.0, 50.0 }
- }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "y_cvrprp_crouch"
-        editorPath         = "bf/props/yavin"
-    }
-}
-
-template y_cvrprp_stand : staticprop
-{
-    obinstrenderer render
-    {
-	model = "yavin/props/y_cvrprp_stand"
-	numLods = 0//2
-    //lodDist[]
-    //{ 30.0, 50.0 }
- }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "y_cvrprp_stand"
-        editorPath         = "bf/props/yavin"
-    }
-}
 
 template y_cvrpr_trolly: staticprop
 {
@@ -814,59 +529,8 @@ template y_cvrpr_trolly: staticprop
     }
 }
 
-template y_cvrprp_truck : staticprop
-{
-    obinstrenderer render
-    {
-	model = "yavin/props/y_cvrprp_truck"
-	numLods = 0//2
-    //lodDist[]
-    //{ 30.0, 50.0 }
- }
 
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "y_cvrprp_truck"
-        editorPath         = "bf/props/yavin"
-    }
-}
 
-template y_cvrprp_crate : staticprop
-{
-    obinstrenderer render
-    {
-	model = "yavin/props/y_cvrprp_crate"
-	numLods = 0//2
-    //lodDist[]
-    //{ 30.0, 50.0 }
- }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "y_cvrprp_crate"
-        editorPath         = "bf/props/yavin"
-    }
-}
-
-template y_dstar_int: staticprop
-{
-    obinstrenderer render
-    {
-	model = "yavin/props/imp_deathstardebris_int"
-	numLods = 0//2
-	//lodDist[]
-	//{ 30.0, 50.0 }
-    }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "y_dstar_int"
-        editorPath         = "bf/props/yavin"
-    }
-}
 
 template y_dstar_ext: staticprop
 {
@@ -886,3 +550,34 @@ template y_dstar_ext: staticprop
     }
 }
 
+//COVER
+
+
+
+
+
+
+
+template yav_cloud_layer : staticprop
+{
+    render
+    {
+	model	    =	"backgrounds/yav/props/yav_cloud_layer"
+    }
+}
+
+template y_lookout : staticprop
+{
+    obinstrenderer render
+    {
+	model = "props/yav/lookout"
+	numLods = 0  //2
+	}
+
+    meta
+    {
+        canCreateInEditor  = 1
+        editorInstanceName = "y_lookout"
+        editorPath         = "bf/props/yav/"
+    }
+}

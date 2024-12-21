@@ -10,7 +10,11 @@ template tickingBombComponent : tickingProjectileComponent
     acceleration	    = -20.0f 
     timer		    = 15.0f
     trailEffect	    = "bomber"
-    explosion_soundid   = "explosion_large"
+    soundmap = "sndmap_gnd"
+    sndeventsystem
+    {
+	definition = "sndevt_grenade"
+    }
     speedHitMultiplier  = 0.0f
     timerHitMultiplier  = 0.0f
     spin		    = 0.f
@@ -19,50 +23,23 @@ template tickingBombComponent : tickingProjectileComponent
     uselargeeffect = "false"
 }
 
-template weaponBombProp : tickingphysicsprop
+template proj_bomb : tickingphysicsprop
 {
+    soundeventsystem sndeventsystem
+    {
+	definition = "sndevt_rocket"
+    }
+
     render
     {
 	castshadows = "false"
 	receiveshadows = "false"
+	model	    =	"weapon/misc_rocket_projectile"
     }
     
     physics
     {
-	air-resistance = 1.0f
-    }
-
-    tickingBombComponent tick
-    {
-    }
-
-    detonatorcomponent detonator
-    {
-//	particleEffect	    = "expRocket"
-	particleEffect	    = "rkt_default"
-	maxRad		    = 5.0f
-	speed		    = 10.0f
-	force		    = 10.0f
-	edgeForce	    = 0.1f
-	damageatcentre	    = 2.0f
-	damageradius	    = 5.0f
-
-	reactmap-field reactmap
-	{
-	    default = ""
-	}
-    }
-}
-
-template proj_bomb : weaponBombProp
-{
-    render
-    {
-	model	    =	"weapon/misc_rocket_projectile"
-    }
-
-    physics
-    {
+    mayaphysics			= "false"
 	type	    = "k_physicsSphere"
 	material    = "stel"
 	enabled	    = "true"
@@ -70,72 +47,44 @@ template proj_bomb : weaponBombProp
 	mass	    = 10.f
 	thickness   = 0.f
 	radius	    = 0.1f
-
-    }
-    
-    soundcomponent soundPlayer
-    {
+	air-resistance = 1.0f
     }
 
-    tick
+    tickingBombComponent tick
     {
-	speed		= 140.0f 
-	acceleration	= -30.0f 
+	speed		= 50.0f 
+	acceleration	= 30.0f 
 	timer		= 8.0f
-	fallTimeBeforeExploding = 15.5f 
+	fallTimeBeforeExploding = 0.f 
 	trailOffset[] {0.0f, 0.f, 0.f}
 	startangvel [] { 0.0f, 0.0f, 0.0f }
 	usedictangvel = "true"
+	dir[] {0.0f, -45.0f, 0.0f} 
+    }
+
+    detonatorcomponent detonator
+    {
+	explosion
+	{
+	    explosionInfo = "bomb"
+	}
     }
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//  FIGHTER BOMBERS
+//  BOMBERS
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //-------------------------------------------------------
-//  CIS Strike Bomber
+//  Bomber Bombs
 //-------------------------------------------------------
-template strike_bomb : proj_bomb
+template bomber_bomb : proj_bomb
 {
     detonator
-    {	
-	damageatcentre	    = 3.6f	// Maximum Damage
+    {
+	explosion
+	{
+	    explosionInfo = "bomber_bomb"
+	}
     }
 }
-
-//-------------------------------------------------------
-//  REPUBLIC ARC-170 Starfighter
-//-------------------------------------------------------
-template arc_bomb : proj_bomb
-{
-    detonator
-    {	
-	damageatcentre	    = 4.2f	// Maximum Damage
-    }
-}
-
-//-------------------------------------------------------
-//  REBEL Y-Wing
-//-------------------------------------------------------
-template ywing_bomb : proj_bomb
-{
-    detonator
-    {	
-	damageatcentre	    = 3.3f	// Maximum Damage
-    }
-}
-
-//-------------------------------------------------------
-//  IMPERIAL TIE Bomber
-//-------------------------------------------------------
-template tbomber_bomb : proj_bomb
-{
-    detonator
-    {	
-	damageatcentre	    = 5.0f	// Maximum Damage
-    }
-}
-
-

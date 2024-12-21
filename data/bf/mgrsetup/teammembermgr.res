@@ -1,8 +1,4 @@
-// vim: set syntax=c :
-/******************************************************************************
-** teammembermgr.res
-** 21/09/06
-******************************************************************************/
+/*// vim: set syntax=c :
 
 teamMemberManagerTemplate teamMemberMgr
 {
@@ -38,4 +34,4 @@ teamMemberManagerTemplate teamMemberMgr
 	}
     }
 	
-}
+}*/

@@ -1,6 +1,6 @@
-// vim: set syntax=c :
+/*// vim: set syntax=c :
 
 WeatherManagerTemplate WeatherManager
 {
     
-}
+}*/

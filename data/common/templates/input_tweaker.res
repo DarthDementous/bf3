@@ -24,13 +24,5 @@ template inputTweakerSlowTurn : inputTweakerBase
     class-id = "input tweaker - slow turn"
 }
 
-template inputTweakerSlowMove : inputTweakerBase
-{
-    class-id = "input tweaker - slow move"
-}
 
-template inputTweakerJitter : inputTweakerBase
-{
-    class-id = "input tweaker - jitter"
-}
 

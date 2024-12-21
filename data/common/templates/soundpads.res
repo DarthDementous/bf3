@@ -38,8 +38,13 @@ template soundpad : prop
 
     singleSound-field soundid
     {
-	default	= "bh_conc"
+	default	= "soundpad_placeholder"
     }
+
+    staticNetworkComponent network
+    {
+    }
+
     subType            = 1
 //    fadeRate           = 0.0f    	 // replaced by fadetimes
     fadeInTime	       = 0.0f

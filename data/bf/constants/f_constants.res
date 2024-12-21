@@ -23,30 +23,41 @@ k_memSettings_physicsPoolSize_xenon =  34603008 // 33MB
 k_memSettings_physicsPoolSize_wii   =         0
 
 // AW: Currently only obs are stored in resource pool (not bgs)
-k_memSettings_resourcePoolSize_cell	=   52914560 // 60MB
-k_memSettings_resourcePoolSize_pc	=   84643200 // 75MB
-k_memSettings_resourcePoolSize_editor	=   71680000 // 60MB
-k_memSettings_resourcePoolSize_xenon    =   31457280 // 30MB
+k_memSettings_resourcePoolSize_cell	=   96468992 // 91MB	// NOW ALSO DEFINED IN game/source/<project>/main/main<project>.cpp (change both!!!) MUST BE MULTIPLE OF 1MB
+k_memSettings_resourcePoolSize_pc	=   96420416 // ~ 85.8MB
+k_memSettings_resourcePoolSize_editor	=   100000000 // ~100MB
+k_memSettings_resourcePoolSize_xenon    =   94371840 // 90mb 95420416 // 91MB
 k_memSettings_resourcePoolSize_wii	=   15728640 // 15MB
 k_memSettings_resourceHeapAllocCount	=   5500	// enough for all obs, anims, res files etc that could be loaded at any one time
+
+//AM Alloc size for boot (resource heap is reallocated on level load)
+k_memSettings_resourcePoolSize_boot	    =   10485760 // 10MB  MUST BE A MULTIPLE OF 1MB !!
+k_memSettings_resourceHeapAllocCount_boot   =   100  // enough for all obs, anims, res files etc that could be loaded at any one time
 
 //
 
 k_vm_animSpeedMult = 1.0f  // change this to make anims in vm cutscenes play faster - useful to skip anims
 
-k_aimingLineTestLength						    = 1000.f
-k_autoAim_halfLockOnStrengthWhenTargetMovingThisSpeed		    = -1.f
-k_autoAim_dontLockOnWhenWithinThisManyRadiansOfTarget		    = 0.2f
-k_autoAim_amountOfMovementForFullAutoAim			    = 2.005f
-k_autoAim_amountOfRotationForFullAutoAim			    = 0.05f
-k_autoAim_autoFollow_applyWhenLineOfSightPassesThisCloseToTarget    = 5.f
-k_autoAim_magicBullets_applyWhenLineOfSightPassesThisCloseToTarget  = 0.2f	// Lock-on range
-k_autoAim_stickyAim_applyWhenLineOfSightPassesThisCloseToTarget	    = 1.1f
-k_autoAim_filterSpeed						    = 8.0f
-k_autoAim_followRate						    = 0.001f
-k_autoAim_reduceLockOnStrengthIfFurtherThanThis			    = 100.0f
-k_autoAim_reduceLockOnStrengthIfCloserThanThis			    = 1.0f
-k_autoAim_amountToAimAtIdeal					    = 0.5f
+k_aimingLineTestLength					    = 500.f
+k_wiiAimingLineTestLength				    = 200.f
+k_aimingLineTestLengthFrameIncreaseStep	    = 20.f
+k_autoAim_halfLockOnStrengthWhenTargetMovingThisSpeed	    = -1.f
+k_autoAim_dontLockOnWhenWithinThisManyRadiansOfTarget	    = 0.2f
+k_autoAim_amountOfMovementForFullAutoAim		    = 2.005f
+k_autoAim_amountOfRotationForFullAutoAim		    = 0.05f
+k_autoAim_autoFollowRange				    = 5.0f	// Distance from prop bounding sphere in metres
+
+k_autoAim_firingRange					    = 0.25f	// Distance from prop bounding sphere in metres, 'Chase' Lock-on red reticle size around the character
+k_autoAim_stickyAimRange				    = 3.0f	// Distance from prop bounding sphere in metres, Strafing Autoaim Size
+
+k_autoAim_filterSpeed					    = 8.0f	// 
+k_autoAim_followRate					    = 0.001f	// 
+k_autoAim_reduceLockOnStrengthIfFurtherThanThis		    = 100.0f	// 
+k_autoAim_reduceLockOnStrengthIfCloserThanThis		    = 1.0f	// 
+k_autoAim_amountToAimAtIdeal				    = 0.5f	// Waist to head ratio
+
+k_autoAim_getBestTargetRangeInDegrees			    = 30.f
+k_autoAim_lockonDotYScale				    = 0.2f
 
 k_vehicle_autoaim_cone_in_degrees   = 5.0f
 
@@ -65,12 +76,12 @@ k_ai_nectar_gfx_max_glow			= 2.0f
 k_ai_nectar_gfx_overdose_time_scale		= 2.5f
 
 k_ai_vistable_numUpdatesPerFrame		= 200
+k_ai_wiiVistable_numUpdatesPerFrame		= 20
 
 k_playerNearExplosion_shakeMaxTime		= 2.0f	    // default - will be overridden by value in chrdescription if player has one (it should)
 k_playerNearExplosion_shakeTranslate		= 0.010f    // default - will be overridden by value in chrdescription if player has one (it should)
 
 k_ai_npc_bullet_accuracy_scalar_default		= 0.4f	    // this is the npc bullet inaccuracy used in the base template for all npcs.
-k_ai_bullet_probhit_scalar			= 1.0f
 k_ai_bullet_std_spread_base_angle		= 0.0f	    // Fire all around the player when doing a deliberate near miss.
 k_ai_bullet_std_spread_vary_angle		= 180.0f
 k_ai_bullet_nearmiss_outer_rad_variation	= 0.0f
@@ -101,7 +112,7 @@ k_chrPhysics_inWaterFloatOffsetWhenMoveDown	= 0.40f
 k_chrPhysics_inWaterFloatOffsetWhenMoveUp	= 0.15f
 k_chrPhysics_inWaterSubmergeFlattenRate		= 0.15f
 
-k_chrPhysics_jumpDelay				= 0.033f
+k_chrPhysics_jumpDelay				= 0.001f //0.033f
 k_chrPhysics_noFootSphere			= 1
 
 // FIXME: Have to include these g5 framework (!!!) constants
@@ -125,6 +136,13 @@ k_footstepDecalsEnabled				= "false"
 k_vehFilterTippingVel = 15.0f
 k_vehFilterVertVel = 4.0f
 
+k_driverOffsetOverride	    = "false"
+k_driverOffsetOverrideX	    = 2.0f
+k_driverOffsetOverrideY	    = 0.0f
+k_driverOffsetOverrideZ	    = 0.0f
+
+k_storyModePlayerInVehicleModifier = 1.0f //0.125f - Previously damage to player is 8 times less when in a vehicle in story mode, no longer needed due to vehicle health regen
+
 //=======================================
 // -- FOR PLAYER MOVEMENT ANIMATIONS -- //
 k_playerMoveAnimTriggerSpeed_completeTransitionToWalk	=   0.2f    // default - will be overridden by value in chrdescription if player has one (it should)
@@ -135,7 +153,7 @@ k_playerMoveAnimTriggerSpeed_completeTransitionToSprint	=   7.9f    // default -
 // ------------------------------------ //
 
 // Sprint Camera
-k_playerCamera_sprintOffsetBlendFactor		= 0.15f
+k_playerCamera_sprintOffsetBlendFactor		= 1.3f //0.15f
 
 k_playerMove_disableProne = 1; // true or false.
 
@@ -192,7 +210,7 @@ k_ragdollAnimTransitionScalar = 1.0f
 k_ragdoll_ang_damp_factor     = 0.25f	// Make sure this is between 0.0 and 1.0
 
 k_ragdoll_geom_skin_width_f	= 0.9f	// Evolution rate of the skin-width (helps to stop popping). Make sure this is between 0.0 and 1.0
-k_ragdoll_explosion_factor	= 1.3f	// Multiply the explosion values by this
+k_ragdoll_explosion_factor	= 1.1f  // Multiply the explosion values by this
 
 k_firstPersonGun_tiltWhenStrafe_mult	    =	0.01f
 k_firstPersonGun_tiltWhenStrafe_max	    =	0.1f	// Clamp so it doesn't tilt tooo much
@@ -201,6 +219,7 @@ k_firstPersonGun_tiltWhenStrafe_max	    =	0.1f	// Clamp so it doesn't tilt tooo 
  * PLAYER PAIN RESPONSES
  **********************************/
 
+k_healthComponent_scaleDamageToMovingNPCs	    = 0.5f
 k_playerDeathFirstPerson_cameraTwistAngle	    = -30.f
 k_playerDeathFirstPerson_cameraTiltUpInitial	    = -0.15f
 k_playerDeathFirstPerson_cameraTiltUpEnd	    = 5.0f
@@ -221,16 +240,6 @@ k_moveActivateLookPosX	= 0.f
 k_moveActivateLookPosY	= 0.f
 k_moveActivateLookPosZ	= 0.f
 
-//================================================================
-// Splash Scene Gun trans values 
-//================================================================
-
-k_splashSceneGun_OffsetX = 0.16f
-k_splashSceneGun_OffsetY = -0.11f
-k_splashSceneGun_OffsetZ = 0.0f
-k_splashSceneGun_RotateX = 27
-k_splashSceneGun_RotateY = 90
-k_splashSceneGun_RotateZ = 180
 
 //--------------------------------------
 // Player grenade throwing
@@ -239,7 +248,8 @@ k_splashSceneGun_RotateZ = 180
 
 k_grenadeThrow_scaleStrength				= 1.0f	    // default - will be overridden by value in chrdescription if player has one (it should)
 k_grenadeThrow_strengthFractionWhenLookStraightAhead	= 0.5f	    // default - will be overridden by value in chrdescription if player has one (it should)
-k_grenadeThrow_rollGrenadeWhenAimingBelowThisAngle	= -35.f // degrees
+k_playerGrenadeMaxLockDist    				= 40.0f
+
 
 //------------------------------------------------------------------
 // stage
@@ -261,15 +271,17 @@ k_gui_target_resolution_y = 696
  ****************************/
 k_cMgrMaxCorpsesInGame	= 0
 k_cMgrMaxCorpseListSize = 10
+k_wiicMgrMaxCorpseListSize = 5
 
 
 k_allowMiscPreloads = "true"
 
-k_dontTurnInvIntoPickups = "true"
+k_dontTurnInvIntoPickups = "false"
 k_gunStoreMultipleWeapons = "true"
-k_gunRaiseLowerTimeInSeconds = 0.01f
+k_fillPickupsFromTemplate = "true"	
+k_gunRaiseLowerTimeInSeconds = 0.005f
+k_gunRaiseLowerTimeInSecondsSprint = 0.4f
 
-k_ai_stimOptimizations = "true"
 k_do_offscreen_movement_and_physics = "true"
 
 k_controller_button_scale			= 1.8f
@@ -278,12 +290,19 @@ k_controller_button_scale			= 1.8f
 // HUD
 //------------------------------------------------------------------
 
+// RETICULE
+k_playerReticule_centreDotSize			=   0.007f
+k_playerReticule_hightlightLerpTime		=   0.2f
+k_playerReticule_lockOnSize_y			=   0.010f
+k_playerReticule_lockOnTranslation_y		=   0.022f
+
+
 // Targetting icon stuff
 k_playerTargetInfoOverlay_size			=   0.1f
 k_playerTargetInfoOffscreen_size		=   0.06f
 
-k_HDCM_DamageMunger			    = 0.0000005f
-k_HDCM_DamageFracFromSpeed		    = 0.55f	    //1.0f-k_HDCM_DamageFracFromSpeed will be from velocity change
+k_HDCM_DamageMunger			    = 0.00000005f
+k_HDCM_DamageFracFromSpeed		    = 0.35f	    //1.0f-k_HDCM_DamageFracFromSpeed will be from velocity change
 
 k_collisionDamage_allowMultipleDamageForOneCollision = "false"
 k_collisionDamage_maxDamage			     = 5.f
@@ -313,6 +332,13 @@ k_remoteGunFirstPersonMergeWithPropEyeHeight	    = 0.4f
 
 k_remoteGunShipTargetMaxDistance		    = 1000.0f
 
+k_remote_sweepSlowDownTime			    = 0.5f
+k_remote_sweepSlowDownTimeInv			    = 2.0f
+k_remote_sweepMinTimeFraction			    = 0.5f
+k_remote_faceDirMinTime	    			    = 4.0f
+k_remote_faceDirMaxTime	    			    = 10.0f
+
+
 //================================================================
 // FACIAL ANIM
 //================================================================
@@ -324,9 +350,57 @@ k_animFacialHeadOffsetRotationY	    = 0.0f
 k_animFacialHeadOffsetRotationZ	    = 0.0f
 k_animHeadLookUsesShoulderBones	    = "false"
 
-// MINIGUN VALUES (Put here for dynamic tweaking, should probably go into minigun template instead)
+// MINIGUN VALUES
 
-k_minigun_barrel_rotate_point_x		=   0.0425f
-k_minigun_barrel_rotate_point_y		=   -0.09f
-k_minigun_barrel_rotate_point_z		=   0.0f
+k_minigun_barrel_rotate_point_x		= 0.126f
+k_minigun_barrel_rotate_point_y		= -0.0825f
+k_minigun_barrel_rotate_point_z		= 0.0f
+k_minigun_barrelSpinVibration_strength	= 0.02f //This is multiplied by the barrel speed (currently maxes out at 12, therefore max strength = 0.02 * 12 = 0.24)
+k_minigun_vibration_duration		= 0.1f
+k_minigun_firingVibration_strength	= 0.5f
+k_minigun_barrelSpinHeat_lerpStrength	= 0.75f
+
+k_allowShootFromCamPos = "false"
+k_projectile_reducedDetonationScale = 0.6f
+k_thirdperson_fireToAimBlendTime = 0.1f
+
+k_rocketLauncher_nearbyCollisionNoFire_maxDistance = 10.f
+k_rocketLauncher_nearbyCollisionNoFire_timeBeforeFireAllowed = 0.5f
+k_hitPosReticule_maxLinetestLength = 100.f
+
+//////////////////
+//
+// Hit Effect Scoring System
+//
+//////////////////
+
+k_hitEffectSize_splashRadiusLarge	= 1.5f
+
+//////////////////
+//
+// Laser Ricochet
+//
+//////////////////
+
+k_laserRicochet_speedMultiplier = 1.0f
+k_laserRicochet_damageMultiplier = 1.0f
+k_laserRicochet_maxNumberOfRicochets = 3
+k_laserRicochet_minContactAngleInDegrees = 15.f
+
+//////////////////
+//
+// Fusion Cutter Constants
+//
+//////////////////
+
+k_fusionCutter_basicEnergyRate = 0.05f			// How much energy it uses per second while having no target (20 seconds of use)
+k_fusionCutter_healingEnergyRate = 0.1f			// How much energy it uses per second while healing (10 seconds of use)
+k_fusionCutter_repairingEnergyRate = 0.1f               // How much energy it uses per second while repairing (10 seconds of use)
+k_fusionCutter_damagingEnergyRate = 0.2f		// How much energy it uses per second while damaging (5 seconds of use)
+k_fusionCutter_rechargeRate = 0.2f			// How much energy is regained per second (after the set delay)
+k_fusionCutter_lowEnergyAmount = 0.3f			// The minimum energy before the colour will start pulsing
+k_fusionCutter_lowEnergyAlternateColourSpeed = 10.0f	// The speed of the colour pulsing
+
+k_vehicleMount_getInTween = 0.0f
+k_vehicleMount_getOutTween = 0.0f
 

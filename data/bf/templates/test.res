@@ -5,6 +5,14 @@
 
 //Templates for temporary and test objects that will not be used in the final game.
 
+template wiilighttestprop : staticprop
+{
+    obinstrenderer render
+    {
+	model="bg/wiilighttestprop"
+    }
+}
+
 template stagefloor : staticprop
 {
     render
@@ -26,18 +34,6 @@ template mattest : staticprop
     }
 }
 
-template mmattest : staticprop
-{
-    render
-    {
-	model	    =	"misc/multmattest"
-    }
-    meta
-    {
-	canCreateInEditor   =	1
-	editorPath           = "common/test/material"
-    }
-}
 
 template lmmattest : staticprop
 {
@@ -52,44 +48,8 @@ template lmmattest : staticprop
     }
 }
 
-template emmattest : staticprop
-{
-    render
-    {
-	model	    =	"misc/testsoldier"
-    }
-    meta
-    {
-	canCreateInEditor   =	1
-	editorPath           = "common/test/material"
-    }
-}
 
-template fmmattest : staticprop
-{
-    render
-    {
-	model	    =	"misc/testhead"
-    }
-    meta
-    {
-	canCreateInEditor   =	1
-	editorPath           = "common/test/material"
-    }
-}
 
-template hmaptest: staticprop
-{
-    render
-    {
-	model	    =	"misc/landscapetest"
-    }
-    meta
-    {
-	canCreateInEditor   =	1
-	editorPath           = "common/test/misc"
-    }
-}
 
 template layer_test: staticprop
 {
@@ -104,7 +64,7 @@ template layer_test: staticprop
     }
 }
 
-template partenabler
+/*template partenabler
 {
     class-id	    =   "ticking part enable"
 }
@@ -114,7 +74,7 @@ template partenableprop : staticprop
     partenabler tick
     {
     }
-}
+}*/
 
 template cubemap_test : staticprop
 {

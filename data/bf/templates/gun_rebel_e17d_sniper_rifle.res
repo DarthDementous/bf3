@@ -6,95 +6,47 @@
 
 template fp_reb_sniper_rifle_static : staticfirstpersongun //animfirstpersongun
 {
-    render
+    cloakRenderComponent render
     {
- model = "weapon/reb/reb_e17d_sniperrifle_thirdperson"
+	model = "weapon/reb/reb_e17d_sniperrifle_thirdperson"
     }
 }
 
 template fp_reb_sniper_rifle_boned : animfirstpersongun
 {
-    render
+    cloakRenderComponent render
     {
- model = "weapon/reb/reb_e17d_sniperrifle_firstperson"
+	model = "weapon/reb/reb_e17d_sniperrifle_firstperson"
+	inherited-field model
+	{
+	    excludeWii = "true"
+	}
     }
 }
 
 template w_e17d_sr : cloakableGun
 {
-    dynamiclight light
-    {
- exponent    = 1.f
- rotspeed    = 0.f
- offset[]    { 0.4f, 0.f, 0.f }
- light-type  = "k_lightSpot"
- colour[]    {3.75f, 3.75f, 3.75f}
- angle     = 70.f
- enabled     = "false"
-    }
-
     guncomponent_linetest_bf gun
     {
 	gunAnimationGroup anims
 	{
-	    set		    = "ga_rep_sniper"
-
+	    set		    = "ga_bfweapon"
 	    animmap	    = "am_rsniper"
 	    reactmap	    = "reactmap_generic"
 	}
 
 	gunInfoFromMgr = "bfrebe17SR"	
 
-	//gunZoomComponent_withView zoom	// picture in picture
-//	gunZoomComponent_justChangeFov zoom	// nice 3rd person zoom in a little effect but locks aim stick. wtf is up wit that!?
-	//gunZoomComponent_noView zoom
-	zoom
+	gunZoomComponent_scope zoom
 	{
-//	    fadeInOutTime		= 0.25f
+     	    allowIronSightLockOn	= "false"
+	}
 
-	    scaleFovWhenActivated       = 0.2f
-	    scaleTurnSpeedWhenActivated = 0.2f
-     timeToZoomInAndOut  = 0.5f
-
-/*
-     gunZoomControl_manual control
-     {
-  timeToZoomIn  = 0.9f
-  timeToZoomOut  = 0.6f
-  zoomedInFullAmount = 0.02f
-  zoomedOutFullAmount = 0.75f
-     }
-*/
-
-/*
-     gunZoomControl_stages control
-     {
-  float zoomValues [] {0.2f, 0.05f}
-  transitionSpeed  = 1.f
-     }
-
-     zoomview
-     {
-  textureWidthFrac = 1.f
-  textureHeightFrac = 1.f
-  alphaTexture  = "misctex/hud/sniper_reticule"
-  afterTexture  = "misctex/hud/sniper_reticule"
-  stretchTextures  = "false"
-     }
-*/
- }
- 
- // RS: There are no sounds, currently, use 'blaster' sounds
-
-	soundmap_npc	    =	"sndmap_e17rfpla"
-	soundmap_player	=	"sndmap_e17rfpla" //"sndmap_sprf"
-	firstperson	    		=	"fp_reb_sniper_rifle_boned"
-	//muzzleFlashEffect   	= "muzfl_lz_red"
-	muzzleFlashEffect   	= "muzRedLsr1"
-	ammoID		    		= "o_ammo_dc15_sr" // Should be different to "usesThisAmmo = ?" as below?
-	weaponID	    		= "o_gun_e17d_sr"
-    weaponType	    	= "k_sniper"
-    muzzleFlash_lightColour[]     {0.5f, 0.6f, 1.f}	
+	soundmap		    = "sndmap_e17rf"
+	firstperson		    = "fp_reb_sniper_rifle_boned"
+	ammoID			    = "o_ammo_dc15_sr" // Should be different to "usesThisAmmo = ?" as below?
+	weaponID		    = "o_gun_e17d_sr"
+	weaponType		    = "k_sniper"
 	
 	recoilComponent recoil
 	{
@@ -104,6 +56,35 @@ template w_e17d_sr : cloakableGun
     render
     {
 	model	    =	"weapon/reb/reb_e17d_sniperrifle_thirdperson"
+	canBeHologram = "true"
+    }
+}
+
+// Upgraded Sniper Rifle With Reduced Reload Time
+template w_e17d_sr_up : w_e17d_sr
+{
+    gun
+    {
+	gunInfoFromMgr	= "bfrebe17SR_up"	
+	weaponID	= "o_gun_e17d_sr_up"
+    }
+}
+
+// IG88 Hero Sniper Rifle
+template w_e17d_sr_h : w_e17d_sr_up
+{
+    gun
+    {
+	gunInfoFromMgr	= "bfrebe17SR_h"	
+	weaponID	= "o_gun_e17d_sr_h"	
+
+	zoom
+	{
+	    allowIronSightLockOn	    = "false"
+	    scaleFovWhenActivated[]	    {0.3f, 0.1f}
+	    scaleTurnSpeedWhenActivated[]   {0.095, 0.07}
+	    scaleBreatheCycleWhenActivated  = 1.f
+	}
     }
 }
 
@@ -111,9 +92,8 @@ template o_gun_e17d_sr : inventoryObjectTypeWeapon
 {
     details
     {
-        singular = "E17d Sniper Rifle"
-	singularPrefix = "the"
-	pickupTemplate_create = ""
+	singularStrHandle   = "STR_PRIMARYWEAPON_REB_E17D_SNIPER"
+	pickupTemplate_create = "singlepickup_gun_e17dsr"
 	pickupTemplate_reuse = ""
     }
 
@@ -121,125 +101,76 @@ template o_gun_e17d_sr : inventoryObjectTypeWeapon
     {
         weaponID = "w_e17d_sr"
 	hudTextureName = "rep_dc15_sniper_rifle"
+	hudTextureScale = 0.7f
 	usesThisAmmo = "o_ammo_dc15_sr"
     }
 }
 
-
-// Object for battledroid
-template o_gun_e17d_sr_b : o_gun_e17d_sr
+// Upgraded Sniper Rifle Object With Reduced Reload Time
+template o_gun_e17d_sr_up : o_gun_e17d_sr
 {
     specialData
     {
-        weaponID = "w_e17d_sr_b"
+        weaponID = "w_e17d_sr_up"
     }
 }
 
-// Specific animation set for the battledroid
-template w_e17d_sr_b : w_e17d_sr  
+// IG88 Hero Sniper Rifle Object
+template o_gun_e17d_sr_h : o_gun_e17d_sr_up
 {
-    gun
+    details
     {
-	anims
-	{
-	    set		= "gunanims_dc15x_sr_b"
-	    animmap	= "animmap_dc15x_b"
-	    reactmap	= "reactmap_generic" 
-	}
+	singularStrHandle   = "STR_PRIMARYWEAPON_IG88_RIFLE"
+    }
 
-	ubiks = "ubiks_btldroid"
-
-	gunInfoFromMgr = "bfdc15SR_b"
-	muzzleFlashEffect   = "muzfl_lz_orng"
-    muzzleFlash_lightColour[]     {1.2f, 1.f, 0.5f}	
-
-	weaponID	    = "o_gun_e17d_sr_b"	
+    specialData
+    {
+        weaponID = "w_e17d_sr_h"
     }
 }
 
-template pickup_gun_e17dsr: kitPickupProp
+template singlepickup_gun_e17dsr : simplePickupPropBF
 {
-    class = "k_chrClassSniper"
-    dropToFloor = "true"
-    editor-only-render
-    {
-	model = "weapon/reb/reb_e17d_sniperrifle_thirdperson"
-	    visibleParts =  "BTOP;" 
-    }
 
     obinstrenderer render
     {
-	model = "weapon/reb/reb_e17d_sniperrifle_thirdperson"
-	    visibleParts =  "BTOP;"
+	model	    =	"weapon/reb/reb_e17d_sniperrifle_thirdperson"
     }
-
-    pickupComponent
+   
+    objectType		= "o_gun_e17d_sr"
+    activate
     {
-	    contents
-	    {
-		pickupkittemplate = "pickup_gun_e17dsr"
+	myNameStringHandle  = "STR_PRIMARYWEAPON_REB_E17D_SNIPER"
+    }
+ 
+    pickupComponentWeapon pickupComponent
+    {
+	pickupflags = "k_pickupNoNPC"
 
-		inventoryEntryBF entry0 
+	    inventoryComponentBF contents
+	    {
+		inventoryEntryBF entry0
 		{
-		    carryingobisfirstparam = "true"
-			objectType	       = "o_gun_e17d_sr"
+		    carryingobisfirstparam	= "true"
+			objectType		= "o_gun_e17d_sr"
 		}
 
 		inventoryEntryBF entry1
 		{
-		    objectType  = "o_gun_disrup_pist"
-			chrRankUnlockLevel	= "k_chrRank_sergeant"
+		    objectType		= "o_ammo_dc15_sr"
+			total			= 20
 		}
 
-		inventoryEntryBF entry2
-		{
-		    objectType  = "o_thrml_det_v1"
-			total	    = 5
-			chrRankUnlockLevel	= "k_chrRank_lieutenant"
-		}
-
-		inventoryEntryBF entry3
-		{
-		    objectType  = "o_gun_repDetPak"
-			total	    = 5
-			chrRankUnlockLevel	= "k_chrRank_lieutenant"
-		}
-
-		inventoryEntryBF entry4
-		{
-		    objectType  = "o_ammo_e11_br"
-			total	    = 500
-		}
-
-  inventoryEntryBF entry5
-  {
-      objectType  = "o_ammo_dc15_sr"
-   total     = 200
-  }
-     }
-
+	    }
     }
 
-    SimpleActivate activate
+     meta
     {
- activatable = "true"
-     myNameStringHandle     = "STR_ACTIVATENAME_INVENTORY"
-     pointA
-     {
-  hudPromptStringHandle   = "STR_ACTIVATEPROMPT_SWAP"
-      activatedByPlayerInputMapperValue = "weaponReload"
-      distance    = 1.0f
-     }
-
+	canCreateInEditor    = 1
+	    editorInstanceName   = "SP_e17dsniper"
+	    editorPath	     = "bf/pickups/guns/reb"
+	    renderDictPath	     = "render"
     }
 
-
-    meta
-    {
- canCreateInEditor    = 1
-     editorInstanceName   = "P_e17dsniper"
-     editorPath      = "bf/pickups/guns/reb"
-     renderDictPath      = "render"
-    }
 }
 

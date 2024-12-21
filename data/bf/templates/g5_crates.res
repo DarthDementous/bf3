@@ -110,7 +110,7 @@ template singledamagestatecrateprop : destructiblephysicsprop
 
 		    if comparedmgstate( can_break )
 		    {
-			particleeffect( dmg_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0 )
+			particleeffect( dmg_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false )
 			makevisible( $0.i, false )
 			makevisible_wc( B_DMG*, true ) // currently this has a problem: when you hide the B_Geom the prop loses any physical presence and drops through the floor.
 		//	creategibstime_wc( B_DMG*, $1.v, $2.v, -1.0 )
@@ -122,7 +122,7 @@ template singledamagestatecrateprop : destructiblephysicsprop
 	    {
 		if isvisible( $0.i )
 		{
-		    particleeffect( dmg_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0 )
+		    particleeffect( dmg_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false )
 		    makevisible( $0.i, false )
 		    //the above works now, test expolisions and make sure
 		    creategibstime_wc( B_DMG*, $1.v, $2.v, -1.0 ) 
@@ -192,7 +192,7 @@ template customdestructiblecrateprop1 : destructiblecrateprop
 
 		if lostmanyparts( B_Gib*, 2) // or event explosionhit for most things
 		{
-		    particleeffect( dmg_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0 ) //should probably always have some smoke before deleting a prop
+		    particleeffect( dmg_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false ) //should probably always have some smoke before deleting a prop
 		    explodevisibletime_wc( B_*, 0.1, 10.0 )
 		    makevisible_wc( B_*, false )
 		    deleteprop() //some examples dont use this
@@ -213,7 +213,6 @@ template customdestructiblecrateprop2 : destructiblecrateprop
 	{
 	    event bullethit
 	    {
-		electrify()
 	    }
 
 	}

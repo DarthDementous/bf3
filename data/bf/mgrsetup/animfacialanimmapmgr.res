@@ -4,7 +4,7 @@
 ** 11/06/07
 ******************************************************************************/
 
-FacialAnimMapManagerTemplate FacialAnimMapManager
+/*FacialAnimMapManagerTemplate FacialAnimMapManager
 {
 }
-
+*/

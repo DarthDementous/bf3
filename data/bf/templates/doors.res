@@ -1,50 +1,12 @@
 // vim: set syntax=c :
 
-// =====================
+// ---------------------
 // BFIII Door Templates
-// =====================
+// ---------------------
 
 // Deathstar door - LEFT SIDE
-template imp_deathstar_door_left : SimpleSlideDoor1 
-{
-    render
-    {
-	model	    = "doors/deathstar2/hangar_doors_left"
-    }
-    
-    door
-    {
-	soundmap = "sndmap_sndmapDoorLarge"
-    }
-
-    meta
-    {
-	canCreateInEditor   =	1
-	editorInstanceName  =	"dthstrdrlft"
-	editorPath	    =	"bf/doors/imp_bunker_left"
-    }
-}
 
 // Deathstar door - RIGHT SIDE
-template imp_deathstar_door_right : SimpleSlideDoor1 
-{
-    render
-    {
-	model	    = "doors/deathstar2/hangar_doors_right"
-    }
-    
-    door
-    {
-	soundmap = "sndmap_sndmapDoorLarge"
-    }
-
-    meta
-    {
-	canCreateInEditor   =	1
-	editorInstanceName  =	"dthstrdrrt"
-	editorPath	    =	"bf/doors/imp_bunker_right"
-    }
-}
 
 
 // Imperial bunker door - LEFT SIDE
@@ -57,7 +19,7 @@ template imp_bunker_door_left : SimpleSlideDoor1
     
     door
     {
-	soundmap = "sndmap_sndmapDoorLarge"
+	soundmap = "sndmap_door_impbunker"
     }
 
     meta
@@ -78,7 +40,7 @@ template imp_bunker_door_right : SimpleSlideDoor1
     
     door
     {
-	soundmap = "sndmap_sndmapDoorLarge"
+	soundmap = "sndmap_door_impbunker"
     }
 
     meta
@@ -100,7 +62,7 @@ template cis_droidcontrolship_blastdoor_left : SimpleSlideDoor1
     
     door
     {
-	soundmap = "sndmap_sndmapDoorLarge"
+	soundmap = "sndmap_door_cisblast"
     }
 
     meta
@@ -122,7 +84,7 @@ template cis_droidcontrolship_blastdoor_right : SimpleSlideDoor1
     
     door
     {
-	soundmap = "sndmap_sndmapDoorLarge"
+	soundmap = "sndmap_door_cisblast"
     }
 
     meta
@@ -133,17 +95,70 @@ template cis_droidcontrolship_blastdoor_right : SimpleSlideDoor1
     }
 }
 
+// CIS Droid Control Ship blast door left
+template cis_dcs_blastdoor_left : SimpleSlideDoor1
+{
+    render
+    {
+	model = "capital_ships/cis/droidcontrolship/blastdoor_left"
+    }
+    
+    door
+    {
+	soundmap = "sndmap_door_cisblast"
+        limit = 2.300000
+        openingSpeed = 3.500000
+        slideAxis []
+        {
+            0.000000, 0.000000, -1.000000  // used to work with 1 before latest syncfromsmurfette
+        }
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "ctrlshpdoorl"
+	editorPath         = "bf/doors/tat"
+    }
+}
+
+template cis_dcs_blastdoor_right : SimpleSlideDoor1
+{
+    render
+    {
+	model = "capital_ships/cis/droidcontrolship/blastdoor_right"
+    }
+    
+    door
+    {
+	soundmap = "sndmap_door_cisblast"
+        limit = 2.300000
+        openingSpeed = 3.500000
+        slideAxis []
+        {
+            0.000000, 0.000000, -1.000000  // used to work with 1 before latest syncfromsmurfette
+        }
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "ctrlshpdoorr"
+	editorPath         = "bf/doors/tat"
+    }
+}
+
 // CIS Cruiser Bridge Door - LEFT SIDE
 template cis_cruiser_bridgedoor_left : SimpleSlideDoor1 
 {
     render
     {
-	model	    = "doors/capital_ships/cis_cruiser_interior/cis_cruiser_bridgedoor_left"
+	model	    = "capitalships/cis/cis_cruiser_int/props/cis_cruiser_bridgedoor_left"
     }
     
     door
     {
-	soundmap = "sndmap_sndmapDoorLarge"
+	soundmap = "sndmap_door_cisbridge"
     }
 
     meta
@@ -159,12 +174,12 @@ template cis_cruiser_bridgedoor_right : SimpleSlideDoor1
 {
     render
     {
-	model	    = "doors/capital_ships/cis_cruiser_interior/cis_cruiser_bridgedoor_right"
+	model	    = "capitalships/cis/cis_cruiser_int/props/cis_cruiser_bridgedoor_right"
     }
     
     door
     {
-    soundmap = "sndmap_sndmapDoorLarge"
+    soundmap = "sndmap_door_cisbridge"
     }
     
     meta
@@ -179,12 +194,12 @@ template cis_cruiser_balconydoor : SimpleSlideDoor1
 {
     render
     {
-	model	    = "doors/capital_ships/cis_cruiser_interior/cis_cruiser_sniperdoor"
+	model	    = "capitalships/cis/cis_cruiser_int/props/cis_cruiser_sniperdoor"
     }
     
     door
     {
-	soundmap = "sndmap_sndmapDoorSmall"
+	soundmap = "sndmap_door_cisbalcony"
     }
     
     meta
@@ -199,12 +214,12 @@ template cis_cruiser_largedoor : SimpleSlideDoor1
 {
     render
     {
-	model	    = "doors/capital_ships/cis_cruiser_interior/cis_cruiser_largeverticaldoor"
+	model	    = "capitalships/cis/cis_cruiser_int/props/cis_cruiser_largeverticaldoor"
     }
     
     door
     {
-    	soundmap = "sndmap_sndmapDoorLarge"
+    	soundmap = "sndmap_door_cisbalcony"
         limit = 2.500000            
     }
     
@@ -220,12 +235,12 @@ template cis_cruiser_slidingdoorleft : SimpleSlideDoor1
 {
     render
     {
-	model	    = "doors/capital_ships/cis_cruiser_interior/cis_cruiser_slidingdoors_left"
+	model	    = "capitalships/cis/cis_cruiser_int/props/cis_cruiser_slidingdoors_left"
     }
     
     door
     {
-	soundmap = "sndmap_sndmapDoorLarge"
+	soundmap = "sndmap_door_cissliding"
     }
     
     meta
@@ -240,12 +255,12 @@ template cis_cruiser_slidingdoorright : SimpleSlideDoor1
 {
     render
     {
-	model	    = "doors/capital_ships/cis_cruiser_interior/cis_cruiser_slidingdoors_right"
+	model	    = "capitalships/cis/cis_cruiser_int/props/cis_cruiser_slidingdoors_right"
     }
     
     door
     {
-	soundmap = "sndmap_sndmapDoorLarge"
+	soundmap = "sndmap_door_cissliding"
     }
     
     meta
@@ -269,7 +284,7 @@ template tat_repbase_slidingdoorleft : SimpleSlideDoor1
     
     door
     {
-	soundmap = "sndmap_sndmapDoorLarge"
+	soundmap = "sndmap_door_tatooine_repbase"
     }
     
     meta
@@ -280,25 +295,6 @@ template tat_repbase_slidingdoorleft : SimpleSlideDoor1
     }
 }
 
-template tat_repbase_slidingdoorright : SimpleSlideDoor1 
-{
-    render
-    {
-	model	    =  "doors/tat/buildings/milbase_door_right"
-    }
-    
-    door
-    {
-	soundmap = "sndmap_sndmapDoorLarge"
-    }
-    
-    meta
-    {
-	canCreateInEditor   =	1
-	editorInstanceName  =	"tatrbdrr"
-	editorPath	    =	"bf/doors/tatooine/repbase"
-    }
-}
 
 // Imperial Star Destroyer Door A
 template isd_door_a : SimpleSlideDoor1 
@@ -306,7 +302,14 @@ template isd_door_a : SimpleSlideDoor1
     render
     {
 	model	    = "doors/capital_ships/imp_star_destroyer/isd_door_a"
+	castReflections ="true"
     }
+
+    door
+    {
+	soundmap = "sndmap_door_stardestroyer_regular"
+    }
+
 
     meta
     {
@@ -321,7 +324,12 @@ template isd_blast : SimpleSlideDoor1
 {
     render
     {
-	model	    = "capital_ships/imp/imp_stardestroyer_interior/blastdoor"
+	model = "capital_ships/imp/imp_stardestroyer_interior/blastdoor"
+    }
+
+    door
+    {
+	soundmap = "sndmap_door_stardestroyer_blast"
     }
 
     meta
@@ -345,6 +353,12 @@ template hotdoor_l : SimpleSlideDoor1
 		model	    = "doors/echo_base_door_left"
     }
     
+    door
+    {
+	soundmap = "sndmap_door_hoth"
+    }
+
+
     meta
     {
 		canCreateInEditor   =	1
@@ -360,6 +374,13 @@ template hothdoor_r : SimpleSlideDoor1
 		model	    = "doors/echo_base_door_right"
     }
     
+    door
+    {
+	soundmap = "sndmap_door_hoth"
+    }
+
+
+
     meta
     {
 		canCreateInEditor   =	1
@@ -373,80 +394,10 @@ template hothdoor_r : SimpleSlideDoor1
 //  Bespin
 //
 //////////////////////////
-template besdoor001 : SimpleSlideDoor1 
-{
-    render
-    {
-	model	    = "props/bes/door001"
-    }
-    
-    meta
-    {
-	canCreateInEditor   =	1
-	editorInstanceName  =	"bes_door_001"
-	editorPath	    =	"bf/doors/bespin"
-    }
-}
 
-template besdoor002 : SimpleSlideDoor1 
-{
-    render
-    {
-	model	    = "props/bes/door002"
-    }
-    
-    meta
-    {
-	canCreateInEditor   =	1
-	editorInstanceName  =	"bes_door_002"
-	editorPath	    =	"bf/doors/bespin"
-    }
-}
 
-template besdoor003 : SimpleSlideDoor1 
-{
-    render
-    {
-	model	    = "props/bes/door003"
-    }
-       
-    meta
-    {
-	canCreateInEditor   =	1
-	editorInstanceName  =	"bes_door_003"
-	editorPath	    =	"bf/doors/bespin"
-    }
-}
 
-template besdoor004 : SimpleSlideDoor1 
-{
-    render
-    {
-	model	    = "props/bes/door004"
-    }
 
-    meta
-    {
-	canCreateInEditor   =	1
-	editorInstanceName  =	"bes_door_004"
-	editorPath	    =	"bf/doors/bespin"
-    }
-}
-
-template besdoor005 : SimpleSlideDoor1 
-{
-    render
-    {
-	model	    = "props/bes/door005"
-    }
-    
-    meta
-    {
-	canCreateInEditor   =	1
-	editorInstanceName  =	"bes_door_005"
-	editorPath	    =	"bf/doors/bespin"
-    }
-}
 
 
 template bescelldoor : SimpleSlideDoor1 
@@ -455,6 +406,12 @@ template bescelldoor : SimpleSlideDoor1
     {
 	model	    = "props/bes/cell_door"
     }
+
+    door
+    {
+	soundmap = "sndmap_door_bespin_large"
+    }
+
 
     meta
     {
@@ -471,6 +428,13 @@ template besdorBigCrt : SimpleSlideDoor1
 	model	    = "props/bes/door_big_courtyard"
     }
     
+    door
+    {
+	soundmap = "sndmap_door_bespin_small"
+
+    }
+
+
     meta
     {
 	canCreateInEditor   =	1
@@ -486,6 +450,12 @@ template besdorAtoCF : SimpleSlideDoor1
 	model	    = "props/bes/door_a_to_cf"
     }
     
+    door
+    {
+	soundmap = "sndmap_door_bespin_large"
+    }
+
+
     meta
     {
 	canCreateInEditor   =	1
@@ -501,6 +471,13 @@ template besdorbalcny : SimpleSlideDoor1
 	model	    = "props/bes/door_balcony"
     }
     
+    door
+    {
+	soundmap = "sndmap_door_bespin_small"
+    }
+
+
+
     meta
     {
 	canCreateInEditor   =	1
@@ -516,10 +493,100 @@ template besdorCrtBig : SimpleSlideDoor1
 	model	    = "props/bes/door_court_big2"
     }
 
+    door
+    {
+	soundmap = "sndmap_door_bespin_large"
+    }
+
+
     meta
     {
 	canCreateInEditor   =	1
 	editorInstanceName  =	"besdorBigCrt"
+	editorPath	    =	"bf/doors/bespin"
+    }
+}
+
+template bescourtouter : SimpleSlideDoor1 
+{
+    render
+    {
+	model	    = "props/bes/door_big_court_outer"
+    }
+    
+    door
+    {
+	soundmap = "sndmap_door_bespin_large"
+    }
+
+
+    meta
+    {
+	canCreateInEditor   =	1
+	editorInstanceName  =	"bescrtOuter"
+	editorPath	    =	"bf/doors/bespin"
+    }
+}
+
+template bescourtinner : SimpleSlideDoor1 
+{
+    render
+    {
+	model	    = "props/bes/door_big_court_inner"
+    }
+    
+    door
+    {
+	soundmap = "sndmap_door_bespin_large"
+    }
+
+
+    meta
+    {
+	canCreateInEditor   =	1
+	editorInstanceName  =	"besCrtInner"
+	editorPath	    =	"bf/doors/bespin"
+    }
+}
+
+template bescarbfrz : SimpleSlideDoor1 
+{
+    render
+    {
+	model	    = "props/bes/new_carbon_freeze_door"
+    }
+    
+    door
+    {
+	soundmap = "sndmap_door_bespin_large"
+    }
+
+
+    meta
+    {
+	canCreateInEditor   =	1
+	editorInstanceName  =	"bescarbfrz"
+	editorPath	    =	"bf/doors/bespin"
+    }
+}
+
+template bescarbfrzscal : SimpleSlideDoor1 
+{
+    render
+    {
+	model	    = "props/bes/new_carbon_freeze_door_scaled"
+    }
+    
+    door
+    {
+	soundmap = "sndmap_door_bespin_large"
+    }
+
+
+    meta
+    {
+	canCreateInEditor   =	1
+	editorInstanceName  =	"bescarbfrzscal"
 	editorPath	    =	"bf/doors/bespin"
     }
 }
@@ -531,6 +598,12 @@ template besdorCourtToHall : SimpleSlideDoor1
 	model	    = "props/bes/door_court_to_hall"
     }
     
+    door
+    {
+	soundmap = "sndmap_door_bespin_large"
+    }
+
+
     meta
     {
 	canCreateInEditor   =	1
@@ -539,20 +612,6 @@ template besdorCourtToHall : SimpleSlideDoor1
     }
 }
 
-template besdorCrtLwr : SimpleSlideDoor1 
-{
-    render
-    {
-	model	    = "props/bes/door_court_to_lower"
-    }
-    
-    meta
-    {
-	canCreateInEditor   =	1
-	editorInstanceName  =	"besCrtLwr"
-	editorPath	    =	"bf/doors/bespin"
-    }
-}
 
 template besdorFurnToB : SimpleSlideDoor1 
 {
@@ -561,6 +620,12 @@ template besdorFurnToB : SimpleSlideDoor1
 	model	    = "props/bes/door_furn_to_b"
     }
     
+    door
+    {
+	soundmap = "sndmap_door_bespin_large"
+    }
+
+
     meta
     {
 	canCreateInEditor   =	1
@@ -576,6 +641,12 @@ template besdorLwrGen : SimpleSlideDoor1
 	model	    = "props/bes/door_lower_to_gen"
     }
     
+    door
+    {
+	soundmap = "sndmap_door_bespin_large"
+    }
+
+
     meta
     {
 	canCreateInEditor   =	1
@@ -590,7 +661,13 @@ template besdorLzrBig : SimpleSlideDoor1
     {
 	model	    = "props/bes/lazer_grid_large"
     }
-       
+    
+    door
+    {
+	soundmap = "sndmap_door_bespin_large"
+    }
+
+
     meta
     {
 	canCreateInEditor   =	1
@@ -631,6 +708,11 @@ template besdorLzrSml : SimpleSlideDoor1
 	model	    = "props/bes/lazer_grid_small"
     }
     
+    door
+    {
+	soundmap = "sndmap_door_bespin_large"
+    }
+
     meta
     {
 	canCreateInEditor   =	1
@@ -648,6 +730,7 @@ template besdorCarbonDown : SimpleSlideDoor1
     
     door
     {
+	soundmap = "sndmap_door_bespin_small"
 
     float-field openingIncrement	
     {
@@ -688,6 +771,12 @@ template desdoorleft : SimpleSlideDoor1
 	model	    = "props/des/sliding_doors_left"
     }
        
+    door
+    {
+	soundmap = "sndmap_door_impbunker"
+    }
+
+   
     meta
     {
 	canCreateInEditor   =	1
@@ -703,7 +792,12 @@ template desdoorright : SimpleSlideDoor1
 	model	    = "props/des/sliding_doors_right"
     }
     
-   
+    door
+    {
+	soundmap = "sndmap_door_impbunker"
+    }
+
+
     meta
     {
 	canCreateInEditor   =	1
@@ -719,6 +813,12 @@ template reddesdoorleft : SimpleSlideDoor1
 	model	    = "props/des/red_sliding_doors_left"
     }
     
+    door
+    {
+	soundmap = "sndmap_sndmapDoorLarge"
+    }
+
+
     meta
     {
 	canCreateInEditor   =	1
@@ -734,11 +834,72 @@ template reddesdoorright : SimpleSlideDoor1
 	model	    = "props/des/red_sliding_doors_right"
     }
     
+    door
+    {
+	soundmap = "sndmap_sndmapDoorLarge"
+    }
+
+
     meta
     {
 	canCreateInEditor   =	1
 	editorInstanceName  =	"reddoorright"
 	editorPath	    =	"bf/doors/desolation"
+    }
+}
+
+
+template glassdesdoorright : SimpleSlideDoor1 
+{
+    render
+    {
+		model	    = "props/des/sliding_doors_glass_right"
+    }
+    
+    door
+    {
+		soundmap = "sndmap_sndmapDoorLarge"
+        limit = 2.300000
+        openingSpeed = 3.500000
+        slideAxis []
+        {
+            1.000000, 0.000000, 0.000000  // used to work with 1 before latest syncfromsmurfette
+        }
+    }
+
+
+    meta
+    {
+		canCreateInEditor   =	1
+		editorInstanceName  =	"glassdoor_r_"
+		editorPath	    =	"bf/doors/desolation"
+    }
+}
+
+template glassdesdoorleft : SimpleSlideDoor1 
+{
+    render
+    {
+		model	    = "props/des/sliding_doors_glass_left"
+    }
+    
+    door
+    {
+		soundmap = "sndmap_sndmapDoorLarge"
+		limit = 2.300000
+        openingSpeed = 3.500000
+        slideAxis []
+        {
+            -1.000000, 0.000000, 0.000000 // used to work with -1 before latest syncfromsmurfette
+        }
+    }
+
+
+    meta
+    {
+		canCreateInEditor   =	1
+		editorInstanceName  =	"glassdoor_l_"
+		editorPath	    =	"bf/doors/desolation"
     }
 }
 
@@ -749,6 +910,12 @@ template descelldoor : SimpleSlideDoor1
 	model	    = "props/des/prison_doors"
     }
         
+    door
+    {
+	soundmap = "sndmap_door_death_cell"
+    }
+
+
     meta
     {
 	canCreateInEditor   =	1
@@ -764,6 +931,13 @@ template triblobbydoor : SimpleSlideDoor1
 	model	    = "props/des/trib_door"
     }
         
+    door
+    {
+	soundmap = "sndmap_sndmapDoorLarge"
+	flags = ""
+    }
+
+
     meta
     {
 	canCreateInEditor   =	1
@@ -779,6 +953,12 @@ template triblazerdoor : SimpleSlideDoor1
 	model	    = "props/des/lazer_door"
     }
         
+    door
+    {
+	soundmap = "sndmap_sndmapDoorLarge"
+    }
+
+
     meta
     {
 	canCreateInEditor   =	1
@@ -793,7 +973,13 @@ template bes_lpad_door : SimpleSlideDoor1
     {
 	model	    = "props/bes/door_landingpad"
     }
-    
+        
+    door
+    {
+	soundmap = "sndmap_sndmapDoorLarge"
+    }
+
+
     meta
     {
 	canCreateInEditor   =	1
@@ -813,7 +999,7 @@ template cor_south_left: SimpleSlideDoor1
     
     door
     {
-    	soundmap = "sndmap_sndmapDoorLarge"
+    	soundmap = "sndmap_door_corus_rough"
     }
     
     meta
@@ -833,7 +1019,7 @@ template cor_south_right: SimpleSlideDoor1
     
     door
     {
-    	soundmap = "sndmap_sndmapDoorLarge"
+    	soundmap = "sndmap_door_corus_rough"
     }
     
     meta
@@ -853,7 +1039,7 @@ template dat_impbase_left: SimpleSlideDoor1
     
     door
     {
-    	soundmap = "sndmap_sndmapDoorLarge"
+    	soundmap = "sndmap_door_impbunker"
     }
     
     meta
@@ -873,7 +1059,7 @@ template dat_impbase_right: SimpleSlideDoor1
     
     door
     {
-    	soundmap = "sndmap_sndmapDoorLarge"
+    	soundmap = "sndmap_door_impbunker"
     }
     
     meta
@@ -884,6 +1070,9 @@ template dat_impbase_right: SimpleSlideDoor1
     }
 }
 
+
+
+
 template dat_impbase_up: SimpleSlideDoor1 
 {
     render
@@ -893,7 +1082,7 @@ template dat_impbase_up: SimpleSlideDoor1
     
     door
     {
-    	soundmap = "sndmap_sndmapDoorLarge"
+    	soundmap = "sndmap_door_impbunker"
     }
     
     meta
@@ -904,6 +1093,27 @@ template dat_impbase_up: SimpleSlideDoor1
     }
 }
 
+template dan_city_gates: SimpleSlideDoor1 
+{
+    render
+    {
+	model = "props/dan/dan_door_destructable"
+	castshadows = "true"
+	receiveshadows = "true"
+    }
+    
+    door
+    {
+    	soundmap = "sndmap_door_impbunker"
+    }
+    
+    meta
+    {
+	canCreateInEditor   =	1
+	editorInstanceName  =	"dan_city_gates"
+	editorPath	    =	"bf/doors/dan"
+    }
+}
 
 template tat_millbase_left: SimpleSlideDoor1 
 {
@@ -914,7 +1124,7 @@ template tat_millbase_left: SimpleSlideDoor1
     
     door
     {
-    	soundmap = "sndmap_sndmapDoorLarge"
+    	soundmap = "sndmap_door_tat_hangar_left"
     }
     
     meta
@@ -934,7 +1144,7 @@ template tat_millbase_right: SimpleSlideDoor1
     
     door
     {
-    	soundmap = "sndmap_sndmapDoorLarge"
+    	soundmap = "sndmap_door_tat_hangar_right"
     }
     
     meta
@@ -945,108 +1155,53 @@ template tat_millbase_right: SimpleSlideDoor1
     }
 }
 
-template tat_millbase_curved: staticprop
+template tat_mil_tall_l: SimpleSlideDoor1 
 {
     render
     {
-	    model = "props/tat_v2/doors/milbase_curved_door"
+	    model = "props/tat_v2/doors/milbase_tall_door_left"
     }
     
     door
     {
-    	soundmap = "sndmap_sndmapDoorLarge"
+    	soundmap = "sndmap_door_tat_hangar_left"
     }
     
     meta
     {
 	canCreateInEditor   =	1
-	editorInstanceName  =	"tat_mil_c"
+	editorInstanceName  =	"tat_tall_l"
 	editorPath	    =	"bf/doors/tat"
     }
 }
 
-template tat_large_gate : animplayprop
+template tat_mil_tall_r: SimpleSlideDoor1 
 {
     render
     {
-        model     = "props/tat_v2/doors/gate_double"
-    }
-
-    meta
-    {
-        canCreateInEditor   = 1
-        editorInstanceName = "tat_gate_d"
-        editorPath         = "bf/doors/tat"
-    }
-
-    ticktype = "k_tickAlways"
-
-        tickinganimplay tick
-        {
-            state = "k_state_playonce"
-
-                animmap-field animmap
-                {
-                    //default = "animmap_dropship"
-                    default = ""
-                }
-        }  
-
-    vmCore vmcomponent
-    {
-    }
-    
-    physics
-    {
-    	isMoveable = "true"
-    }
-        
-    soundPlayAnimTagCallback animTagCallback
-    {
-    }
-
-}
-
-template kas_tree_door: SimpleSlideDoor1 
-{
-    render
-    {
-	    model = "doors/kas/kas_tree_door"
+	    model = "props/tat_v2/doors/milbase_tall_door_right"
     }
     
     door
     {
-        limit = 2.500000        
-    	soundmap = "sndmap_sndmapDoorLarge"
+    	soundmap = "sndmap_door_tat_hangar_right"
     }
     
     meta
     {
-    	canCreateInEditor   =	1
-    	editorInstanceName  =	"kas_tree_door"
-    	editorPath	    =	"bf/doors/kas"
+	canCreateInEditor   =	1
+	editorInstanceName  =	"tat_tall_r"
+	editorPath	    =	"bf/doors/tat"
     }
 }
+
+
 
 
 /////////////////////////////////////////////
 //	Cato
 ////////////////////////////////////////////
 
-template catCitadelDoor : SimpleSlideDoor1 
-{
-    render
-    {
-	    model	    = "props/cato/doors/citadel_door"
-    }
-    
-    meta
-    {
-    	canCreateInEditor   =	1
-    	editorInstanceName  =	"catCitadelDoor"
-    	editorPath	    =	"bf/doors/cato"
-    }
-}
 
 template catThroneDoor : SimpleSlideDoor1 
 {
@@ -1055,6 +1210,15 @@ template catThroneDoor : SimpleSlideDoor1
     	model	    = "props/cato/doors/throne_room_door"
     }
         
+    door
+    {
+	soundmap = "sndmap_door_cato_regular"
+        slideAxis []
+        {
+            0.000000, 0.000000, 1.000000
+        } 
+    }
+	
     meta
     {
 	    canCreateInEditor   =	1
@@ -1063,8 +1227,199 @@ template catThroneDoor : SimpleSlideDoor1
     }
 }
 
+template cat_citadel_main: SimpleSlideDoor1 
+{
+    render
+    {
+	    model = "props/cato/story/citadel_door1"
+    }
+    
+    door
+    {
+    	soundmap = "sndmap_door_cato_regular"
+        slideAxis []
+        {
+            0.000000, 0.000000, 1.000000
+        } 
+    }
+    
+    meta
+    {
+	canCreateInEditor   =	1
+	editorInstanceName  =	"cit_main"
+	editorPath	    =	"bf/doors/cato"
+    }
+}
+
+template cat_citadel_wing1: SimpleSlideDoor1 
+{
+    render
+    {
+	    model = "props/cato/story/citadel_door2"
+    }
+    
+    door
+    {
+    	soundmap = "sndmap_door_cato_regular"
+        slideAxis []
+        {
+            0.000000, 0.000000, -1.000000
+        } 
+    }
+    
+    meta
+    {
+	canCreateInEditor   =	1
+	editorInstanceName  =	"cit_wing1_"
+	editorPath	    =	"bf/doors/cato"
+    }
+}
+
+template cat_citadel_wing2: SimpleSlideDoor1 
+{
+    render
+    {
+	    model = "props/cato/story/citadel_door3"
+    }
+    
+    door
+    {
+    	soundmap = "sndmap_door_cato_regular"
+        slideAxis []
+        {
+            0.000000, 0.000000, 1.000000
+        } 
+    }
+    
+    meta
+    {
+	canCreateInEditor   =	1
+	editorInstanceName  =	"cit_wing2_"
+	editorPath	    =	"bf/doors/cato"
+    }
+}
+
+template cat_cita_small1: SimpleSlideDoor1 
+{
+    render
+    {
+	model = "props/cato/story/citadel_door_small1"
+    }
+    
+    door
+    {
+    	soundmap = "sndmap_door_cato_regular"
+        slideAxis []
+        {
+	    -1.000000, 0.000000, 0.000000
+        } 
+        openingSpeed = 1.00000
+    }
+    
+    meta
+    {
+	canCreateInEditor   =	1
+	editorInstanceName  =	"cit_small1_"
+	editorPath	    =	"bf/doors/cato"
+    }
+}
+
+template cat_cita_small2: SimpleSlideDoor1 
+{
+    render
+    {
+	model = "props/cato/story/citadel_door_small2"
+    }
+    
+    door
+    {
+    	soundmap = "sndmap_door_cato_regular"
+        slideAxis []
+        {
+            1.000000, 0.000000, 0.000000
+        } 
+        openingSpeed = 1.00000
+    }
+    
+    meta
+    {
+	canCreateInEditor   =	1
+	editorInstanceName  =	"cit_small2_"
+	editorPath	    =	"bf/doors/cato"
+    }
+}
+
+template cat_throne_small1: SimpleSlideDoor1 
+{
+    render
+    {
+	model = "props/cato/story/small_throne_door1"
+    }
+    
+    door
+    {
+    	soundmap = "sndmap_door_cato_regular"
+        slideAxis []
+        {
+            0.000000, 0.000000, 1.000000
+        } 
+    }
+    
+    meta
+    {
+	canCreateInEditor   =	1
+	editorInstanceName  =	"sml_thrn1_"
+	editorPath	    =	"bf/doors/cato"
+    }
+}
+
+template cat_throne_small2: SimpleSlideDoor1 
+{
+    render
+    {
+	model = "props/cato/story/small_throne_door2"
+    }
+    
+    door
+    {
+    	soundmap = "sndmap_door_cato_regular"
+        slideAxis []
+        {
+            0.000000, 0.000000, 1.000000
+        } 
+    }
+    
+    meta
+    {
+	canCreateInEditor   =	1
+	editorInstanceName  =	"sml_thrn2_"
+	editorPath	    =	"bf/doors/cato"
+    }
+}
+
+template cat_control_door: SimpleSlideDoor1 
+{
+    render
+    {
+	model = "props/cato/story/control_door"
+    }
+    
+    door
+    {
+    	soundmap = "sndmap_door_deathstar"
+    }
+    
+    meta
+    {
+	canCreateInEditor   =	1
+	editorInstanceName  =	"sml_thrn2_"
+	editorPath	    =	"bf/doors/cato"
+    }
+}
+
 
 // REB Nebulon Bridge Door
+
 template reb_nebulon_bridge_door : SimpleSlideDoor1 
 {
     render
@@ -1084,6 +1439,9 @@ template reb_nebulon_bridge_door : SimpleSlideDoor1
 	editorPath	    =	"bf/doors/reb_nebulon"
     }
 }
+
+// REB Nebulon Door Left
+// REB Nebulon Door Right
 
 // REB Acclamator Door
 template reb_acclamator_door1 : SimpleSlideDoor1 
@@ -1136,155 +1494,7 @@ template reb_acclamator_door2 : SimpleSlideDoor1
     }
 }
 
-template mus_door : SimpleSlideDoor1 
-{
-    render
-    {
-	    model = "props/mus/doors/mus_door"
-    }
-    
-    door
-    {
-        soundmap = "sndmap_sndmapDoorLarge"
-        limit = 2.500000
-        slideAxis []
-        {
-            0.000000, 1.000000, 0.000000
-        }        
-    }
-    
-    meta
-    {
-	    canCreateInEditor   =	1
-    	editorInstanceName  =	"mus_door"
-	    editorPath	    =	"bf/doors/mus"
-    }
-}
 
-template mus_door2 : SimpleSlideDoor1 
-{
-    render
-    {
-	    model = "props/mus/doors/mus_door2"
-    }
-    
-    door
-    {
-        soundmap = "sndmap_sndmapDoorLarge"
-        limit = 2.500000
-        slideAxis []
-        {
-            0.000000, 1.000000, 0.000000
-        }        
-    }
-    
-    meta
-    {
-	    canCreateInEditor   =	1
-    	editorInstanceName  =	"mus_door2"
-	    editorPath	    =	"bf/doors/mus"
-    }
-}
-
-template dan_slide_left : SimpleSlideDoor1
-{
-    render
-    {
-	model = "dan/props/dan_maindoor_l"
-    }
-
-    door
-    {
-        soundmap = "sndmap_sndmapDoorLarge"
-        limit = 2.500000
-        slideAxis []
-        {
-            -1.000000, 0.000000, 0.000000
-        }        
-    }
-    
-    meta
-    {
-	    canCreateInEditor   =	1
-	    editorInstanceName  =   "dan_door_left"
-	    editorPath	    =	    "bf/doors/dan"
-    }
-}
-
-template dan_slide_right : SimpleSlideDoor1
-{
-    render
-    {
-	model = "dan/props/dan_maindoor_r"
-    }
-
-    door
-    {
-        soundmap = "sndmap_sndmapDoorLarge"
-        limit = 2.500000
-        slideAxis []
-        {
-            1.000000, 0.000000, 0.000000
-        }        
-    }
-    
-    meta
-    {
-	    canCreateInEditor   =	1
-	    editorInstanceName  =   "dan_door_right"
-	    editorPath	    =	    "bf/doors/dan"
-    }
-}
-
-template dan_vill_r : SimpleSlideDoor1
-{
-    render
-    {
-	model = "dan/props/village_door_r"
-    }
-
-    door
-    {
-        soundmap = "sndmap_sndmapDoorLarge"
-        limit = 2.500000
-        slideAxis []
-        {
-            -1.000000, 0.000000, 0.000000
-        }        
-    }
-    
-    meta
-    {
-	    canCreateInEditor   =	1
-	    editorInstanceName  =   "dan_vill_rght"
-	    editorPath	    =	    "bf/doors/dan"
-    }
-}
-
-template dan_vill_l : SimpleSlideDoor1
-{
-    render
-    {
-	model = "dan/props/village_door_l"
-    }
-
-    door
-    {
-        soundmap = "sndmap_sndmapDoorLarge"
-        limit = 2.500000
-        slideAxis []
-        {
-            -1.000000, 0.000000, 0.000000
-        }        
-    }
-    
-    meta
-    {
-	    canCreateInEditor   =	1
-	    editorInstanceName  =   "dan_vill_lft"
-	    editorPath	    =	    "bf/doors/dan"
-    }
-}
 
 template death_cell_left : SimpleSlideDoor1
 {
@@ -1295,7 +1505,7 @@ template death_cell_left : SimpleSlideDoor1
 
     door
     {
-        soundmap = "sndmap_sndmapDoorLarge"
+        soundmap = "sndmap_door_death_cell"
         limit = 2.500000
         slideAxis []
         {
@@ -1320,7 +1530,7 @@ template death_cell_right : SimpleSlideDoor1
 
     door
     {
-        soundmap = "sndmap_sndmapDoorLarge"
+        soundmap = "sndmap_door_death_cell"
         limit = 2.500000
         slideAxis []
         {
@@ -1341,11 +1551,12 @@ template death_vertical_door : SimpleSlideDoor1
     render
     {
 	model = "doors/deathstar2/props/vertical_door"
+	castReflections ="true"
     }
 
     door
     {
-        soundmap = "sndmap_sndmapDoorLarge"
+        soundmap = "sndmap_door_deathstar"
         limit = 5.000000
         slideAxis []
         {
@@ -1366,11 +1577,12 @@ template death_hangar_right : SimpleSlideDoor1
     render
     {
 	model = "doors/deathstar2/props/hangar_doors_right"
+	castReflections ="true"
     }
 
     door
     {
-        soundmap = "sndmap_sndmapDoorLarge"
+        soundmap = "sndmap_door_deathstar"
         limit = 5.000000
         slideAxis []
         {
@@ -1391,11 +1603,12 @@ template death_hangar_left : SimpleSlideDoor1
     render
     {
 	model = "doors/deathstar2/props/hangar_doors_left"
+    castReflections ="true"
     }
 
     door
     {
-        soundmap = "sndmap_sndmapDoorLarge"
+        soundmap = "sndmap_door_deathstar"
         limit = 5.000000
         slideAxis []
         {
@@ -1512,3 +1725,179 @@ template yav_hangar_door_d : SimpleSlideDoor1
     }
 }
 
+template des_updown_door : SimpleSlideDoor1 
+{
+    render
+    {
+	    model = "props/des/up_down_doors"
+    }
+    
+    door
+    {
+        soundmap = "sndmap_sndmapDoorLarge"
+        limit = 2.7
+        slideAxis []
+        {
+            0.000000, 1.000000, 0.000000
+        }      
+        openingSpeed = 2.89
+        closingSpeed = 2.89       
+    }
+    
+    meta
+    {
+        canCreateInEditor  = 1
+        editorInstanceName = "desupdndoor"
+        editorPath         = "bf/props/des"
+    }
+}
+
+
+template des_hangar_door_l : SimpleSlideDoor1 
+{
+    render
+    {
+	    model = "props/des/hangar_doors_left"
+    }
+    
+    door
+    {
+        soundmap = "sndmap_sndmapDoorLarge"
+        limit = 2.4
+        slideAxis []
+        {
+            -1.000000, 0.000000, 0.000000
+        }      
+        openingSpeed = 2.89
+        closingSpeed = 2.89       
+    }
+    
+    meta
+    {
+        canCreateInEditor  = 1
+        editorInstanceName = "deshangdr_l"
+        editorPath         = "bf/props/des"
+    }
+}
+
+template des_hangar_door_r : SimpleSlideDoor1 
+{
+    render
+    {
+	    model = "props/des/hangar_doors_right"
+    }
+    
+    door
+    {
+        soundmap = "sndmap_sndmapDoorLarge"
+        limit = 2.4
+        slideAxis []
+        {
+            1.000000, 0.000000, 0.000000
+        }      
+        openingSpeed = 2.89 
+        closingSpeed = 2.89
+    }
+    
+    meta
+    {
+        canCreateInEditor  = 1
+        editorInstanceName = "deshangdr_r"
+        editorPath         = "bf/props/des"
+    }
+}
+
+template des_hangar_door_c : SimpleSlideDoor1 
+{
+    render
+    {
+	    model = "props/des/hangar_doors_center"
+    }
+    
+    door
+    {
+        soundmap = "sndmap_sndmapDoorLarge"
+        limit = 2.9
+        slideAxis []
+        {
+            0.000000, 1.000000, 0.000000
+        }        
+        openingSpeed = 3.500000
+        closingSpeed = 3.500000
+    }
+    
+    meta
+    {
+        canCreateInEditor  = 1
+        editorInstanceName = "deshangdr_c"
+        editorPath         = "bf/props/des"
+    }
+}
+//Coruscant Story apartment door
+
+template cor_app_door : SimpleSlideDoor1
+{
+    render
+    {
+	model = "cor/props/cor_app_door"
+
+    }
+    
+    door
+    {
+    	soundmap = "sndmap_door_cato_regular"
+        slideAxis []
+        {
+            0.000000, 1.000000, 0.000000
+        } 
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "app_door"
+	editorPath         = "bf/props/coruscant/streets"
+    }
+}
+template fdoor1: SimpleSlideDoor1
+{
+    render
+    {
+	model = "backgrounds/cor/props/front_door_1"
+    }
+    door
+    {
+    	soundmap = "sndmap_door_cato_regular"
+        slideAxis []
+        {
+            -2.000000, 0.000000, 0.000000
+        } 
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "fdoor1"
+	editorPath         = "bf/props/coruscant/streets"
+    }
+}
+template fdoor2: SimpleSlideDoor1
+{
+    render
+    {
+	model = "backgrounds/cor/props/front_door_2"
+    }
+    door
+    {
+    	soundmap = "sndmap_door_cato_regular"
+        slideAxis []
+        {
+            2.000000, 0.000000, 0.000000
+        } 
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "fdoor1"
+	editorPath         = "bf/props/coruscant/streets"
+    }
+}

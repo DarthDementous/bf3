@@ -32,14 +32,14 @@ mus_mus_story_ground_new_res_Barricade_Stand
         roomGroup = "BASE"
     }
 
-    barricadeHigh baricdeHigh3_
+    baricdeHigh3_
     {
-        pos []
+        float pos []
         {
             0.833305, 0.000000, -0.074783
         }
 
-        rot []
+        float rot []
         {
             0.000000, -85.980003, 0.000000
         }
@@ -52,14 +52,14 @@ mus_mus_story_ground_new_res_Barricade_Stand
 
 mus_mus_story_ground_new_res_Barricade_Crouch
 {
-    barricadeLow baricdeLow1_
+    baricdeLow1_
     {
-        pos []
+        float pos []
         {
             0.812195, 0.000000, 0.022179
         }
 
-        rot []
+        float rot []
         {
             0.000000, -90.680000, 0.000000
         }
@@ -102,14 +102,14 @@ mus_mus_story_ground_new_res_Barricade_Crouch
 
 mus_mus_story_ground_new_res_Barricade_Crouch_NOFLANK
 {
-    barricadeHigh baricdeHigh1_
+    baricdeHigh1_
     {
-        pos []
+        float pos []
         {
             -0.761913, 0.000000, 0.053204
         }
 
-        rot []
+        float rot []
         {
             0.000000, 90.000000, 0.000000
         }

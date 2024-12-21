@@ -24,7 +24,7 @@ ragdollmgrTemplate ragdollmgr
 		RagBone BaseHuman
 		{
 		    skel="base"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="base"		
 		    autopos2="waist"
 		    float extent[] = {0.4, 0.1, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
@@ -39,7 +39,7 @@ ragdollmgrTemplate ragdollmgr
 		RagBone UpperBodyHuman
 		{
 		    skel="waist"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="waist"		
 		    autopos2="neck"
 		    float extent[] = {0.4, 0.0, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
@@ -55,7 +55,7 @@ ragdollmgrTemplate ragdollmgr
 		{
 		    skel="head"
 		    //type="sphere"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="head"		
 		    float extent[] = {0.20, 0.3, 0.20}
 		    yoffset = -0.1f
@@ -66,7 +66,7 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LUpperArmHuman
 		{
 		    skel="lupperarm"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lupperarm"		
 		    autopos2="lforearm"
 		    float extent[] = {0.15, 0.0, 0.15}
@@ -78,7 +78,7 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LLowerArmHuman
 		{
 		    skel="lforearm"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lforearm"
 		    autopos2="lwrist"		
 		    float extent[] = {0.15, 0.1, 0.15}
@@ -91,7 +91,7 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LUpperLegHuman
 		{
 		    skel="lupperleg"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lupperleg"
 		    autopos2="lknee"		
 		    float extent[] = {0.22, 0.0, 0.22}
@@ -103,7 +103,7 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LLowerLegHuman
 		{
 		    skel="lknee"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lknee"		
 		    autopos2="lankle"
 		    float extent[] = {0.2, 0.0, 0.2}
@@ -122,6 +122,7 @@ ragdollmgrTemplate ragdollmgr
 	    //--------------------------------------------------------------------
 	    joints 
 	    {
+	    /*
 		// Central 
 		ragdollhingejoint WaistHuman
 		{
@@ -276,6 +277,7 @@ ragdollmgrTemplate ragdollmgr
 		ragdollhingejoint RElbowHuman { copyfrom = "LElbowHuman" }
 		ragdollhingejoint RHipHuman { copyfrom = "LHipHuman" }
 		ragdollhingejoint RKneeHuman { copyfrom = "LKneeHuman" }
+		*/
 	    }
 	    
 	    //----------------------------------------------------------------------------
@@ -331,13 +333,15 @@ ragdollmgrTemplate ragdollmgr
 		    type="obb"
 		    autopos1="base"		
 		    autopos2="waist"
-		    float extent[] = {0.4, 0.1, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    float extent[] = {0.32, 0.1, 0.2}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
 		    yoffset = -0.1f
-		    mass = 5.0f
+		    mass = 20.0f
 		    buoyancy = 1.3f
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		
 		RagBone UpperBodyBtl
@@ -346,48 +350,53 @@ ragdollmgrTemplate ragdollmgr
 		    type="obb"
 		    autopos1="waist"		
 		    autopos2="neck"
-		    float extent[] = {0.4, 0.0, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    float extent[] = {0.32, 0.0, 0.2}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    float offset[] = {0.0, 0.0, -0.05}
 		    yoffset = 0.0f
-		    mass = 5.0f
+		    mass = 20.0f
 		    buoyancy = 1.3f
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		
 		RagBone HeadBtl
 		{
 		    skel="head"
 		    //type="sphere"
-		    type="obb"
+		    type = "obb"
 		    autopos1="head"		
-		    float extent[] = {0.20, 0.3, 0.20}
+		    float extent[] = {0.23, 0.23, 0.28}
+		    float offset[] = {0.0, -0.06, 0.1}
 		    yoffset = -0.1f
-		    mass = 4.0f
+		    zoffset = 0.2f;
+		    mass = 8.0f
 		}
 			
 		// Left
 		RagBone LUpperArmBtl
 		{
 		    skel="larm"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="larm"		
 		    autopos2="lforearm"
 		    float extent[] = {0.15, 0.0, 0.15}
 		    yoffset = 0.05f
-		    mass = 8.0f
+		    mass = 3.0f
 		    yrot = -10.0f
 		}
 		
 		RagBone LLowerArmBtl
 		{
 		    skel="lforearm"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lforearm"
 		    autopos2="lhand"		
-		    float extent[] = {0.15, 0.1, 0.15}
+		    float extent[] = {0.15, 0.15, 0.15}
 		    yoffset = 0.05f
-		    mass = 6.0f
+		    mass = 3.0f
 		    buoyancy = 1.3f
 		    animFloorTest = "true"
 		}
@@ -395,11 +404,11 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LUpperLegBtl
 		{
 		    skel="lthigh"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lthigh"
 		    autopos2="lcalf"		
 		    float extent[] = {0.22, 0.0, 0.22}
-		    mass = 11.0f
+		    mass = 6.0f
 		    buoyancy = 1.1f
 
 		    yrot = +30.0f
@@ -407,11 +416,11 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LLowerLegBtl
 		{
 		    skel="lcalf"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lcalf"		
 		    autopos2="lfoot"
-		    float extent[] = {0.2, 0.0, 0.2}
-		    mass = 8.0f
+		    float extent[] = {0.2, 0.04, 0.2}
+		    mass = 4.0f
 		    buoyancy = 1.3f
 		    yrot = -30.0f
 		}
@@ -420,108 +429,93 @@ ragdollmgrTemplate ragdollmgr
 		RagBone RLowerArmBtl { copyfrom = "LLowerArmBtl" }
 		RagBone RUpperLegBtl { copyfrom = "LUpperLegBtl" }
 		RagBone RLowerLegBtl { copyfrom = "LLowerLegBtl" }
-	    
 		
 	    }
 	    //--------------------------------------------------------------------
 	    joints 
 	    {
 		// Central 
-		ragdollhingejoint WaistBtl
+		ragdollhkrdjoint WaistBtl
 		{
 		    bone0 = "BaseBtl"
 		    bone1 = "UpperBodyBtl"
 
 		    jointpos = "waist"
-		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
+		    float jointposoffset [] = {0.0f, -0.09, 0.01f}
 
-		    float axis [] = { 0.0f, 1.f, 0.f }
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 20.0f;
+		    float axis [] = { 0.0f, 1.0f, 0.0f }
+		    float planeAxis [] = { 1.0f, 0.0f, 0.0f }
 		    
-		    spring = 50.f
-		    damp = 100.f
-
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 0.01f
-		    motor_2_force_2 = 0.0f
+		    min		= 25.0f		// coneAngle
+		    swing1	= -10.0f	// planeMin		// unused for waist
+		    swing2	= 10.0f		// planeMax		// unused for waist
+		    twistMin= -5.0f
+		    twistMax= 5.0f
+		    
+		    randomchancetobreak = 0.20
 		}
-		ragdollhingejoint HeadBtl 
+		
+		ragdollhkrdjoint HeadBtl 
 		{
 		    bone0 = "UpperBodyBtl"
 		    bone1 = "HeadBtl"
 
 		    jointpos = "neck"
-		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
+		    float jointposoffset [] = {0.0f, 0.22f, -0.08f}
 
-		    float axis [] = { 1.0f, 0.f, 0.f }
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 35.0f;
-		    
-		    spring = 50.f
-		    damp = 100.f
+		    float axis [] = { 0.0f, 0.0f, 1.0f }
+		    float planeAxis [] = { 1.0f, 0.0f, 0.0f }
 
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 0.01f
-		    motor_2_force_2 = 0.0f
+		    min		= 20.0f		// coneAngle
+		    swing1	= -80.0f	// planeMin		// unused for head
+		    swing2	= 80.0f		// planeMax		// unused for head
+		    twistMin= -10.0f
+		    twistMax= 10.0f
 		    //type = "fixed"
+	    
+		    randomchancetobreak = 0.1
 		}
 		
 		// Left
-		ragdollhingejoint LShoulderBtl 
+		ragdollhkrdjoint LShoulderBtl 
 		{
 		    bone0 = "UpperBodyBtl"
 		    bone1 = "LUpperArmBtl"
 
-		    jointpos = "larm"
+		    jointpos = "larm" // "lupperarm" ?
 		    float jointposoffset [] = {0.f, 0.f, 0.02f}
 
-		    float axis [] = { 0.0f, 0.0f, 1.f }
-		    min = 75.f
-		    max = 28.f
-		    swing1 = 5.0f;
-		    swing2 = 5.0f;
-		    spring = 50.f
-		    damp = 50.f
+		    float axis [] = { 1.0f, 0.0f, 0.0f }
+		    float planeAxis [] = { 0.0f, 0.0f, 1.0f }
+		    float b1_axis [] = { 0.7f, -0.8f, 0.0f }
+		    float b1_planeAxis [] = { 0.0f, 0.0f, 1.0f }
+
+   		    min		= 85.0f		// coneAngle
+		    swing1	= 15.0f		// planeMin
+		    swing2	= 95.0f		// planeMax
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.0f
-		    
-		    motor_2_time = 0.5f	
-		    motor_2_force_1 = 0.1f
-		    motor_2_force_2 = 0.0f
+		    randomchancetobreak = 0.1
 		}
+		
 		ragdollhingejoint LElbowBtl 
 		{
 		    bone0 = "LUpperArmBtl"
 		    bone1 = "LLowerArmBtl"
 
 		    jointpos = "lforearm"
-		    float jointposoffset [] = {0.f, 0.f, -0.05f}
+		    float jointposoffset [] = {0.f, -0.03f, 0.0f}
 
-		    float axis [] = { 1.0f, +0.6f, 0.f }
-		    min = 1.0f
-		    max = +90.0f
-		    swing1 = 2.0f;
-		    spring = 20.f
-		    damp = 500.f
+		    float axis []		= { 1.0f,  +0.6f, 0.0f }
+		    float planeAxis []	= { -1.0f, -0.6f, 0.0f }
 		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.f
-		    
-		    //motor_2_time = 1.f	
-		    //motor_2_force_1 = 0.015f
-		    //motor_2_force_2 = 0.015f
-		    //type = "fixed"
+   		    min		= -90.0f	// hingeMin
+		    max		= 15.0f		// hingeMax
 		}
 		
-		ragdollhingejoint LHipBtl 
+		
+		ragdollhkrdjoint LHipBtl 
 		{
 		    bone0 = "BaseBtl"
 		    bone1 = "LUpperLegBtl"
@@ -529,25 +523,21 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "lthigh"
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 15.0f
-		    max = 100.0f
-		    swing1 = 15.0f
-		    swing2 = 15.0f
-		    spring = 100.f
-		    damp = 500.f
-		    
-		    //motor_1_time = 0.5f	
-		    //motor_1_spring = 1.f
-		    //motor_1_damp = 1.f	
-		    //motor_1_force = 0.1f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 10.f
-		    motor_2_force_2 = 0.f
-		   
+		    float axis []		= { 0.0f,  -1.0f, 0.75f }
+		    float planeAxis []	= { -1.0f, 0.0f, 0.0f }
+		    float b1_axis []	= { 0.0f,  -1.0f, 0.1f }
+		    //float b1_planeAxis [] = { -1.0f, 0.0f, 0.0f }
+
+   		    min		= 40.0f		// coneAngle
+		    swing1	= -20.0f	// planeMin
+		    swing2	= 5.0f		// planeMax
+		    twistMin= -5.0f		// twistMin
+		    twistMax= 5.0f		// twistMax
+
 		    //type = "fixed"
+		    randomchancetobreak = 0.04
 		}
+		
 		ragdollhingejoint LKneeBtl 
 		{
 		    bone0 = "LUpperLegBtl"
@@ -557,24 +547,12 @@ ragdollmgrTemplate ragdollmgr
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
 		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 70.0f
-		    max = 5.0f
-		    swing1 = 10.0f;
-		    swing2 = 10.0f;
-		    spring = 100.0f
-		    damp = 100.0f
-		    
-		    //motor_1_time = 0.0f	
-		    //motor_1_spring = 0.f
-		    //motor_1_damp = 0.f	
-		    //motor_1_force = 0.f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 2.0f
-		    motor_2_force_2 = 0.f
+		    float planeAxis []	= { -1.0f, +0.05f, 0.f }
 
-		    //type = "fixed"
+   		    min		= -5.0f	// hingeMin
+		    max		= 90.0f	// hingeMax
 		}
+		
 		// Right (auto-generated)
 		ragdollhingejoint RShoulderBtl { copyfrom = "LShoulderBtl" }
 		ragdollhingejoint RElbowBtl { copyfrom = "LElbowBtl" }
@@ -620,66 +598,75 @@ ragdollmgrTemplate ragdollmgr
 		RagBone BaseClone 
 		{
 		    skel="base"
+		    //type="cap" 
 		    type="obb"
 		    autopos1="base"		
 		    autopos2="waist"
-		    float extent[] = {0.4, 0.1, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    //float extent[] = {0.22, 0.1, 0.22}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    float extent[] = {0.34, 0.1, 0.23}
 		    yoffset = -0.1f
-		    mass = 5.0f
+		    mass = 25.0f
 		    buoyancy = 1.3f
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		
 		RagBone UpperBodyClone 
 		{
 		    skel="waist"
+		    //type="cap" 
 		    type="obb"
 		    autopos1="waist"		
 		    autopos2="neck"
-		    float extent[] = {0.4, 0.0, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    //float extent[] = {0.22, 0.0, 0.22}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    float extent[] = {0.40, 0.0, 0.23}
 		    yoffset = 0.0f
-		    mass = 5.0f
+		    mass = 25.0f
 		    buoyancy = 1.3f
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		
 		RagBone HeadClone 
 		{
 		    skel="head"
-		    //type="sphere"
-		    type="obb"
+		    type="sphere"
+		    //type="cap" //type="obb"
 		    autopos1="head"		
-		    float extent[] = {0.20, 0.3, 0.20}
-		    yoffset = -0.1f
-		    mass = 4.0f
+		    float extent[] = {0.19, 0.19, 0.19}
+		    yoffset = 0.0f
+		    mass = 7.0f
 		}
 			
 		// Left
 		RagBone LUpperArmClone 
 		{
 		    skel="lupperarm"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lupperarm"		
 		    autopos2="lforearm"
-		    float extent[] = {0.15, 0.0, 0.15}
-		    yoffset = 0.05f
-		    mass = 8.0f
+		    float extent[] = {0.2, -0.05, 0.2}
+		    float offset[] = {0.0, 0.05, 0.0}
+		    yoffset = 0.05f // 0.05f
+		    mass = 5.0f
 		    yrot = -10.0f
 		}
 		
 		RagBone LLowerArmClone 
 		{
 		    skel="lforearm"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lforearm"
 		    autopos2="lwrist"		
-		    float extent[] = {0.15, 0.1, 0.15}
-		    yoffset = 0.05f
-		    mass = 6.0f
+		    float extent[] = {0.17, 0.2, 0.17}
+		    yoffset = -0.05f
+		    mass = 3.5f
 		    buoyancy = 1.3f
 		    animFloorTest = "true"
 		}
@@ -687,11 +674,11 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LUpperLegClone 
 		{
 		    skel="lupperleg"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lupperleg"
 		    autopos2="llowerleg"		
 		    float extent[] = {0.22, 0.0, 0.22}
-		    mass = 11.0f
+		    mass = 9.0f
 		    buoyancy = 1.1f
 
 		    yrot = +30.0f
@@ -699,11 +686,11 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LLowerLegClone 
 		{
 		    skel="llowerleg"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="llowerleg"		
 		    autopos2="lankle"
-		    float extent[] = {0.2, 0.0, 0.2}
-		    mass = 8.0f
+		    float extent[] = {0.20, 0.05, 0.20}
+		    mass = 6.0f
 		    buoyancy = 1.3f
 		    yrot = -30.0f
 		}
@@ -718,8 +705,10 @@ ragdollmgrTemplate ragdollmgr
 	    //--------------------------------------------------------------------
 	    joints 
 	    {
-		// Central 
-		ragdollhingejoint WaistClone 
+	    
+		// Central
+		
+		ragdollhkrdjoint WaistClone 
 		{
 		    bone0 = "BaseClone"
 		    bone1 = "UpperBodyClone"
@@ -727,19 +716,17 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "waist"
 		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
 
-		    float axis [] = { 0.0f, 1.f, 0.f }
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 20.0f;
+		    float axis [] = { 0.0f, 0.0f, 1.0f }
+		    float planeAxis [] = { 0.0f, -1.0f, 0.0f }
 		    
-		    spring = 50.f
-		    damp = 100.f
-
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 0.01f
-		    motor_2_force_2 = 0.0f
+		    min		= 20.0f		// coneAngle
+		    swing1	= -90.0f	// planeMin		// unused for waist
+		    swing2	= 90.0f		// planeMax		// unused for waist
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		}
-		ragdollhingejoint HeadClone  
+		
+		ragdollhkrdjoint HeadClone  
 		{
 		    bone0 = "UpperBodyClone"
 		    bone1 = "HeadClone" 
@@ -747,46 +734,38 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "neck"
 		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
 
-		    float axis [] = { 1.0f, 0.f, 0.f }
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 35.0f;
-		    
-		    spring = 50.f
-		    damp = 100.f
+		    float axis [] = { 0.0f, 0.0f, 1.0f }
+		    float planeAxis [] = { 1.0f, 0.0f, 0.0f }
 
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 0.01f
-		    motor_2_force_2 = 0.0f
-		    //type = "fixed"
+		    min		= 20.0f		// coneAngle
+		    swing1	= -90.0f	// planeMin		// unused for head
+		    swing2	= 90.0f		// planeMax		// unused for head
+		    twistMin= -20.0f
+		    twistMax= 20.0f
 		}
 		
+		
 		// Left
-		ragdollhingejoint LShoulderClone 
+		ragdollhkrdjoint LShoulderClone 
 		{
 		    bone0 = "UpperBodyClone"
 		    bone1 = "LUpperArmClone"
 
 		    jointpos = "lupperarm"
-		    float jointposoffset [] = {0.f, 0.f, 0.02f}
+		    float jointposoffset [] = {0.0f, 0.05f, -0.0f}
 
-		    float axis [] = { 0.0f, 0.0f, 1.f }
-		    min = 75.f
-		    max = 28.f
-		    swing1 = 5.0f;
-		    swing2 = 5.0f;
-		    spring = 50.f
-		    damp = 50.f
-		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.0f
-		    
-		    motor_2_time = 0.5f	
-		    motor_2_force_1 = 0.1f
-		    motor_2_force_2 = 0.0f
+		    float axis [] = { 0.9f, -0.7f, 0.0f }
+		    float planeAxis [] = { 0.0f, 0.0f, 1.0f }
+		    float b1_axis [] = { 0.7f, -0.8f, 0.0f }
+		    float b1_planeAxis [] = { 0.0f, 0.0f, 1.0f }
+
+   		    min		= 85.0f		// coneAngle
+		    swing1	= -20.0f		// planeMin
+		    swing2	= 95.0f		// planeMax
+		    twistMin= -30.0f
+		    twistMax= 50.0f
 		}
+
 		ragdollhingejoint LElbowClone 
 		{
 		    bone0 = "LUpperArmClone"
@@ -795,25 +774,14 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "lforearm"
 		    float jointposoffset [] = {0.f, 0.f, -0.05f}
 
-		    float axis [] = { 1.0f, +0.6f, 0.f }
-		    min = 1.0f
-		    max = +90.0f
-		    swing1 = 2.0f;
-		    spring = 20.f
-		    damp = 500.f
+		    float axis []		= { 1.0f,  +0.6f, 0.0f }
+		    float planeAxis []	= { -1.0f, -0.6f, 0.0f }
 		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.f
-		    
-		    //motor_2_time = 1.f	
-		    //motor_2_force_1 = 0.015f
-		    //motor_2_force_2 = 0.015f
-		    //type = "fixed"
+   		    min		= -118.0f	// hingeMin
+		    max		= 20.0f		// hingeMax
 		}
 		
-		ragdollhingejoint LHipClone 
+		ragdollhkrdjoint LHipClone 
 		{
 		    bone0 = "BaseClone"
 		    bone1 = "LUpperLegClone"
@@ -821,25 +789,18 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "lupperleg"
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 15.0f
-		    max = 100.0f
-		    swing1 = 15.0f
-		    swing2 = 15.0f
-		    spring = 100.f
-		    damp = 500.f
-		    
-		    //motor_1_time = 0.5f	
-		    //motor_1_spring = 1.f
-		    //motor_1_damp = 1.f	
-		    //motor_1_force = 0.1f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 10.f
-		    motor_2_force_2 = 0.f
-		   
-		    //type = "fixed"
+		    float axis []		= { 0.0f,  -1.0f, 0.75f }
+		    float planeAxis []	= { -1.0f, 0.0f, 0.0f }
+		    float b1_axis []	= { 0.0f,  -1.0f, 0.1f }
+		    //float b1_planeAxis [] = { -1.0f, 0.0f, 0.0f }
+
+   		    min		= 40.0f		// coneAngle
+		    swing1	= -35.0f	// planeMin
+		    swing2	= 10.0f		// planeMax
+		    twistMin= -5.0f		// twistMin
+		    twistMax= 5.0f		// twistMax
 		}
+		
 		ragdollhingejoint LKneeClone 
 		{
 		    bone0 = "LUpperLegClone"
@@ -849,29 +810,18 @@ ragdollmgrTemplate ragdollmgr
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
 		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 70.0f
-		    max = 5.0f
-		    swing1 = 10.0f;
-		    swing2 = 10.0f;
-		    spring = 100.0f
-		    damp = 100.0f
-		    
-		    //motor_1_time = 0.0f	
-		    //motor_1_spring = 0.f
-		    //motor_1_damp = 0.f	
-		    //motor_1_force = 0.f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 2.0f
-		    motor_2_force_2 = 0.f
+		    float planeAxis []	= { -1.0f, +0.05f, 0.f }
 
-		    //type = "fixed"
+   		    min		= -5.0f	// hingeMin
+		    max		= 85.0f	// hingeMax
 		}
+		
 		// Right (auto-generated)
-		ragdollhingejoint RShoulderClone { copyfrom = "LShoulderClone" }
+		ragdollhkrdjoint  RShoulderClone { copyfrom = "LShoulderClone" }
 		ragdollhingejoint RElbowClone { copyfrom = "LElbowClone" }
-		ragdollhingejoint RHipClone { copyfrom = "LHipClone" }
+		ragdollhkrdjoint  RHipClone { copyfrom = "LHipClone" }
 		ragdollhingejoint RKneeClone { copyfrom = "LKneeClone" }
+		
 	    }
 	    
 	    //----------------------------------------------------------------------------
@@ -913,66 +863,60 @@ ragdollmgrTemplate ragdollmgr
 		RagBone BaseSpr
 		{
 		    skel="base"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="base"		
 		    autopos2="middle"
-		    float extent[] = {0.4, 0.1, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    float extent[] = {0.33, 0.1, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
 		    yoffset = -0.1f
-		    mass = 5.0f
+		    mass = 25.0f
 		    buoyancy = 1.3f
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		
 		RagBone UpperBodySpr
 		{
 		    skel="middle"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="middle"		
 		    autopos2="upperbody"
-		    float extent[] = {0.4, 0.0, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
-		    yoffset = 0.0f
-		    mass = 5.0f
+		    float extent[] = {0.33, 0.35, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    yoffset = 0.15f
+		    mass = 35.0f
 		    buoyancy = 1.3f
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
-	/*	
-		RagBone HeadSpr
-		{
-		    skel="head"
-		    //type="sphere"
-		    type="obb"
-		    autopos1="head"		
-		    float extent[] = {0.20, 0.3, 0.20}
-		    yoffset = -0.1f
-		    mass = 4.0f
-		}
-	*/		
+		
 		// Left
 		RagBone LUpperArmSpr
 		{
 		    skel="luparm"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="luparm"		
 		    autopos2="lforearm"
-		    float extent[] = {0.15, 0.0, 0.15}
-		    yoffset = 0.05f
-		    mass = 8.0f
+		    float extent[] = {0.22, 0.0, 0.22}
+		    yoffset = 0.0f
+		    mass = 5.0f
 		    yrot = -10.0f
+		    randomchancetobreak = 0.10
 		}
 		
 		RagBone LLowerArmSpr
 		{
 		    skel="lforearm"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lforearm"
 		    autopos2="lhand"		
-		    float extent[] = {0.15, 0.1, 0.15}
+		    float extent[] = {0.18, 0.15, 0.18}
 		    yoffset = 0.05f
-		    mass = 6.0f
+		    mass = 4.0f
 		    buoyancy = 1.3f
 		    animFloorTest = "true"
 		}
@@ -980,23 +924,24 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LUpperLegSpr
 		{
 		    skel="lthigh"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lthigh"
 		    autopos2="lcalf"		
 		    float extent[] = {0.22, 0.0, 0.22}
-		    mass = 11.0f
+		    mass = 8.0f
 		    buoyancy = 1.1f
 
 		    yrot = +30.0f
+		    randomchancetobreak = 0.05
 		}
 		RagBone LLowerLegSpr
 		{
 		    skel="lcalf"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lcalf"		
 		    autopos2="lfoot"
 		    float extent[] = {0.2, 0.0, 0.2}
-		    mass = 8.0f
+		    mass = 6.0f
 		    buoyancy = 1.3f
 		    yrot = -30.0f
 		}
@@ -1012,7 +957,7 @@ ragdollmgrTemplate ragdollmgr
 	    joints 
 	    {
 		// Central 
-		ragdollhingejoint WaistSpr
+		ragdollhkrdjoint WaistSpr
 		{
 		    bone0 = "BaseSpr"
 		    bone1 = "UpperBodySpr"
@@ -1020,17 +965,14 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "middle"
 		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
 
-		    float axis [] = { 0.0f, 1.f, 0.f }
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 20.0f;
+		    float axis [] = { 0.0f, 1.0f, 0.0f }
+		    float planeAxis [] = { 1.0f, 0.0f, 0.0f }
 		    
-		    spring = 50.f
-		    damp = 100.f
-
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 0.01f
-		    motor_2_force_2 = 0.0f
+		    min		= 25.0f		// coneAngle
+		    swing1	= -10.0f	// planeMin		// unused for waist
+		    swing2	= 10.0f		// planeMax		// unused for waist
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		}
 	/*	
 		ragdollhingejoint HeadSpr 
@@ -1057,7 +999,7 @@ ragdollmgrTemplate ragdollmgr
 	    */
 		
 		// Left
-		ragdollhingejoint LShoulderSpr 
+		ragdollhkrdjoint LShoulderSpr 
 		{
 		    bone0 = "UpperBodySpr"
 		    bone1 = "LUpperArmSpr"
@@ -1065,22 +1007,16 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "luparm"
 		    float jointposoffset [] = {0.f, 0.f, 0.02f}
 
-		    float axis [] = { 0.0f, 0.0f, 1.f }
-		    min = 75.f
-		    max = 28.f
-		    swing1 = 5.0f;
-		    swing2 = 5.0f;
-		    spring = 50.f
-		    damp = 50.f
-		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.0f
-		    
-		    motor_2_time = 0.5f	
-		    motor_2_force_1 = 0.1f
-		    motor_2_force_2 = 0.0f
+		    float axis [] = { 1.0f, 0.0f, 0.0f }
+		    float planeAxis [] = { 0.0f, 0.0f, 1.0f }
+		    float b1_axis [] = { 0.7f, -0.8f, 0.0f }
+		    float b1_planeAxis [] = { 0.0f, 0.0f, 1.0f }
+
+   		    min		= 95.0f		// coneAngle
+		    swing1	= 5.0f		// planeMin
+		    swing2	= 95.0f		// planeMax
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		}
 		ragdollhingejoint LElbowSpr 
 		{
@@ -1090,50 +1026,31 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "lforearm"
 		    float jointposoffset [] = {0.f, 0.f, -0.05f}
 
-		    float axis [] = { 1.0f, +0.6f, 0.f }
-		    min = 1.0f
-		    max = +90.0f
-		    swing1 = 2.0f;
-		    spring = 20.f
-		    damp = 500.f
+		    float axis []		= { 1.0f,  +0.6f, 0.0f }
+		    float planeAxis []	= { -1.0f, -0.6f, 0.0f }
 		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.f
-		    
-		    //motor_2_time = 1.f	
-		    //motor_2_force_1 = 0.015f
-		    //motor_2_force_2 = 0.015f
-		    //type = "fixed"
+   		    min		= -110.0f	// hingeMin
+		    max		= 15.0f		// hingeMax
 		}
 		
-		ragdollhingejoint LHipSpr 
+		ragdollhkrdjoint LHipSpr 
 		{
 		    bone0 = "BaseSpr"
 		    bone1 = "LUpperLegSpr"
 
 		    jointpos = "lthigh"
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
+			
+			float axis []		= { 0.0f,  -1.0f, 0.75f }
+		    float planeAxis []	= { -1.0f, 0.0f, 0.0f }
+		    float b1_axis []	= { 0.0f,  -1.0f, 0.1f }
+		    //float b1_planeAxis [] = { -1.0f, 0.0f, 0.0f }
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 15.0f
-		    max = 100.0f
-		    swing1 = 15.0f
-		    swing2 = 15.0f
-		    spring = 100.f
-		    damp = 500.f
-		    
-		    //motor_1_time = 0.5f	
-		    //motor_1_spring = 1.f
-		    //motor_1_damp = 1.f	
-		    //motor_1_force = 0.1f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 10.f
-		    motor_2_force_2 = 0.f
-		   
-		    //type = "fixed"
+   		    min		= 50.0f		// coneAngle
+		    swing1	= -35.0f	// planeMin
+		    swing2	= 10.0f		// planeMax
+		    twistMin= -5.0f		// twistMin
+		    twistMax= 5.0f		// twistMax
 		}
 		ragdollhingejoint LKneeSpr 
 		{
@@ -1144,22 +1061,11 @@ ragdollmgrTemplate ragdollmgr
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
 		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 70.0f
-		    max = 5.0f
-		    swing1 = 10.0f;
-		    swing2 = 10.0f;
-		    spring = 100.0f
-		    damp = 100.0f
-		    
-		    //motor_1_time = 0.0f	
-		    //motor_1_spring = 0.f
-		    //motor_1_damp = 0.f	
-		    //motor_1_force = 0.f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 2.0f
-		    motor_2_force_2 = 0.f
+		    float planeAxis []	= { -1.0f, +0.05f, 0.f }
 
+   		    min		= -10.0f	// hingeMin
+		    max		= 100.0f	// hingeMax
+		    
 		    //type = "fixed"
 		}
 		// Right (auto-generated)
@@ -1210,64 +1116,68 @@ ragdollmgrTemplate ragdollmgr
 		RagBone BaseSpr
 		{
 		    skel="base"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="base"		
-		    autopos2="mid_bot"
-		    float extent[] = {0.4, 0.1, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    autopos2="waist" //"mid_bot"
+		    float extent[] = {0.3, 0.1, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
 		    yoffset = -0.1f
-		    mass = 5.0f
+		    mass = 20.0f
 		    buoyancy = 1.3f
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		
 		RagBone UpperBodySpr
 		{
 		    skel="mid_bot"
-		    type="obb"
-		    autopos1="mid_bot"		
-		    autopos2="mid_top"
-		    float extent[] = {0.4, 0.0, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    type="cap" //type="obb"
+		    autopos1="waist" // "mid_bot"		
+		    autopos2="neck" // "mid_top"
+		    float extent[] = {0.3, 0.0, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
 		    yoffset = 0.0f
-		    mass = 5.0f
+		    mass = 30.0f
 		    buoyancy = 1.3f
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		RagBone HeadSpr
 		{
 		    skel="head"
-		    //type="sphere"
-		    type="obb"
+		    type="sphere"
+		    //type="cap" //type="obb"
 		    autopos1="head"		
 		    float extent[] = {0.20, 0.3, 0.20}
 		    yoffset = -0.1f
-		    mass = 4.0f
+		    mass = 9.0f
 		}
 		// Left
 		RagBone LUpperArmSpr
 		{
 		    skel="lupperarm"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lupperarm"		
 		    autopos2="lforearm"
-		    float extent[] = {0.15, 0.0, 0.15}
-		    yoffset = 0.05f
-		    mass = 8.0f
+		    float extent[] = {0.15, 0.1, 0.15}
+		    yoffset = -0.05f
+		    mass = 3.0f
 		    yrot = -10.0f
 		}
 		
 		RagBone LLowerArmSpr
 		{
 		    skel="lforearm"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lforearm"
 		    autopos2="lwrist"		
 		    float extent[] = {0.15, 0.1, 0.15}
 		    yoffset = 0.05f
-		    mass = 6.0f
+		    mass = 3.0f
 		    buoyancy = 1.3f
 		    animFloorTest = "true"
 		}
@@ -1275,11 +1185,11 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LUpperLegSpr
 		{
 		    skel="lupperleg"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lupperleg"
 		    autopos2="lknee"		
 		    float extent[] = {0.22, 0.0, 0.22}
-		    mass = 11.0f
+		    mass = 5.0f
 		    buoyancy = 1.1f
 
 		    yrot = +30.0f
@@ -1287,11 +1197,11 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LLowerLegSpr
 		{
 		    skel="lknee"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lknee"		
 		    autopos2="lankle"
-		    float extent[] = {0.2, 0.0, 0.2}
-		    mass = 8.0f
+		    float extent[] = {0.2, 0.08, 0.2}
+		    mass = 4.0f
 		    buoyancy = 1.3f
 		    yrot = -30.0f
 		}
@@ -1307,7 +1217,7 @@ ragdollmgrTemplate ragdollmgr
 	    joints 
 	    {
 		// Central 
-		ragdollhingejoint WaistSpr
+		ragdollhkrdjoint WaistSpr
 		{
 		    bone0 = "BaseSpr"
 		    bone1 = "UpperBodySpr"
@@ -1315,19 +1225,17 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "waist"
 		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
 
-		    float axis [] = { 0.0f, 1.f, 0.f }
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 20.0f;
+		    float axis [] = { 0.0f, 1.0f, 0.0f }
+		    float planeAxis [] = { 1.0f, 0.0f, 0.0f }
 		    
-		    spring = 50.f
-		    damp = 100.f
-
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 0.01f
-		    motor_2_force_2 = 0.0f
+		    min		= 25.0f		// coneAngle
+		    swing1	= -10.0f	// planeMin		// unused for waist
+		    swing2	= 10.0f		// planeMax		// unused for waist
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		}
-		ragdollhingejoint HeadSpr 
+		
+		ragdollhkrdjoint HeadSpr 
 		{
 		    bone0 = "UpperBodySpr"
 		    bone1 = "HeadSpr"
@@ -1335,22 +1243,18 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "neck"
 		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
 
-		    float axis [] = { 1.0f, 0.f, 0.f }
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 35.0f;
-		    
-		    spring = 50.f
-		    damp = 100.f
+		    float axis [] = { 0.0f, 0.0f, 1.0f }
+		    float planeAxis [] = { 1.0f, 0.0f, 0.0f }
 
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 0.01f
-		    motor_2_force_2 = 0.0f
-		    //type = "fixed"
+		    min		= 20.0f		// coneAngle
+		    swing1	= -80.0f	// planeMin		// unused for head
+		    swing2	= 80.0f		// planeMax		// unused for head
+		    twistMin= -10.0f
+		    twistMax= 10.0f
 		}
 		
 		// Left
-		ragdollhingejoint LShoulderSpr 
+		ragdollhkrdjoint LShoulderSpr 
 		{
 		    bone0 = "UpperBodySpr"
 		    bone1 = "LUpperArmSpr"
@@ -1358,23 +1262,18 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "lupperarm"
 		    float jointposoffset [] = {0.f, 0.f, 0.02f}
 
-		    float axis [] = { 0.0f, 0.0f, 1.f }
-		    min = 75.f
-		    max = 28.f
-		    swing1 = 5.0f;
-		    swing2 = 5.0f;
-		    spring = 50.f
-		    damp = 50.f
-		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.0f
-		    
-		    motor_2_time = 0.5f	
-		    motor_2_force_1 = 0.1f
-		    motor_2_force_2 = 0.0f
+		    float axis [] = { 1.0f, 0.0f, 0.0f }
+		    float planeAxis [] = { 0.0f, 0.0f, 1.0f }
+		    float b1_axis [] = { 0.7f, -0.8f, 0.0f }
+		    float b1_planeAxis [] = { 0.0f, 0.0f, 1.0f }
+
+   		    min		= 85.0f		// coneAngle
+		    swing1	= 5.0f		// planeMin
+		    swing2	= 95.0f		// planeMax
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		}
+		
 		ragdollhingejoint LElbowSpr 
 		{
 		    bone0 = "LUpperArmSpr"
@@ -1383,50 +1282,31 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "lforearm"
 		    float jointposoffset [] = {0.f, 0.f, -0.05f}
 
-		    float axis [] = { 1.0f, +0.6f, 0.f }
-		    min = 1.0f
-		    max = +90.0f
-		    swing1 = 2.0f;
-		    spring = 20.f
-		    damp = 500.f
+		    float axis []		= { 1.0f,  +0.6f, 0.0f }
+		    float planeAxis []	= { -1.0f, -0.6f, 0.0f }
 		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.f
-		    
-		    //motor_2_time = 1.f	
-		    //motor_2_force_1 = 0.015f
-		    //motor_2_force_2 = 0.015f
-		    //type = "fixed"
+   		    min		= -110.0f	// hingeMin
+		    max		= 15.0f		// hingeMax
 		}
 		
-		ragdollhingejoint LHipSpr 
+		ragdollhkrdjoint LHipSpr 
 		{
 		    bone0 = "BaseSpr"
 		    bone1 = "LUpperLegSpr"
 
 		    jointpos = "lupperleg"
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
+		    
+		    float axis []		= { 0.0f,  -1.0f, 0.75f }
+		    float planeAxis []	= { -1.0f, 0.0f, 0.0f }
+		    float b1_axis []	= { 0.0f,  -1.0f, 0.1f }
+		    //float b1_planeAxis [] = { -1.0f, 0.0f, 0.0f }
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 15.0f
-		    max = 100.0f
-		    swing1 = 15.0f
-		    swing2 = 15.0f
-		    spring = 100.f
-		    damp = 500.f
-		    
-		    //motor_1_time = 0.5f	
-		    //motor_1_spring = 1.f
-		    //motor_1_damp = 1.f	
-		    //motor_1_force = 0.1f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 10.f
-		    motor_2_force_2 = 0.f
-		   
-		    //type = "fixed"
+   		    min		= 50.0f		// coneAngle
+		    swing1	= -35.0f	// planeMin
+		    swing2	= 10.0f		// planeMax
+		    twistMin= -5.0f		// twistMin
+		    twistMax= 5.0f		// twistMax
 		}
 		ragdollhingejoint LKneeSpr 
 		{
@@ -1435,25 +1315,12 @@ ragdollmgrTemplate ragdollmgr
 
 		    jointpos = "lknee"
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
-
+		    
 		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 70.0f
-		    max = 5.0f
-		    swing1 = 10.0f;
-		    swing2 = 10.0f;
-		    spring = 100.0f
-		    damp = 100.0f
-		    
-		    //motor_1_time = 0.0f	
-		    //motor_1_spring = 0.f
-		    //motor_1_damp = 0.f	
-		    //motor_1_force = 0.f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 2.0f
-		    motor_2_force_2 = 0.f
+		    float planeAxis []	= { -1.0f, +0.05f, 0.f }
 
-		    //type = "fixed"
+   		    min		= -10.0f	// hingeMin
+		    max		= 100.0f	// hingeMax
 		}
 		// Right (auto-generated)
 		ragdollhingejoint RShoulderSpr { copyfrom = "LShoulderSpr" }
@@ -1494,388 +1361,522 @@ ragdollmgrTemplate ragdollmgr
 	    //--------------------------------------------------------------------
 	    class-id = "ragdoll info"
 
-	    root_bone = "BaseSpr"
+	    root_bone = "BaseDk"
 	    pinned = "Base_"
 	    pinnedtype="fixed"	// 'ball', 'fixed'
 	    
 	    //--------------------------------------------------------------------
 	    bones
 	    {
-		// Central
-		RagBone BaseSpr
-		{
-		    skel="base"
-		    type="obb"
-		    autopos1="base"		
-		    autopos2="spinejoint3"
-		    float extent[] = {0.4, 0.1, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
-		    yoffset = -0.1f
-		    mass = 2.0f
+			/*
+			RagBone BaseDk
+			{
+				skel="base"
+				type="obb"
+				autopos1="base"		
+				autopos2="spinejoint3"
+				float extent[] = {1.2, 0.8, 1.1}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+				yoffset = -0.3f
+				mass = 50.0f
 
-		    stopAnimTrigger = -1.f
-		    animFloorTest = "true"
-		}
-		
-		RagBone RightWingSpr
-		{
-		    skel="rightwing"
-		    type="obb"
-		    autopos1="base"
-		    autopos2="rightwing"	    
-		    float extent[] = {0.20, 0.3, 0.20}
-		    yoffset = -0.1f
-		    mass = 2.0f
-		}
-		RagBone LeftWingSpr
-		{
-		    skel="leftwing"
-		    type="obb"
-		    autopos1="base"
-		    autopos2="leftwing"	    
-		    float extent[] = {0.20, 0.3, 0.20}
-		    yoffset = -0.1f
-		    mass = 2.0f
-		}
+				stopAnimTrigger = -1.f
+				animFloorTest = "true"
+			}
+			*/
+		    
+			//////////////////////////////////////////////////////////////////////////
+			// BODY AND HEAD
+			RagBone BaseDk
+			{
+				skel="base"
+				type="cap" //type="obb"
+				autopos1="base"		
+				autopos2="spinejoint3"
+				float extent[] = {0.42, -0.05, 0.42}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+				yoffset = -0.15f
+				mass = 50.0f
+
+				stopAnimTrigger = -1.f
+				animFloorTest = "true"
 				
-		RagBone LeftUpperLegSpr
-		{
-		    skel="leftupperleg"
-		    type="obb"
-		    autopos1="base"
-		    autopos2="leftupperleg"		
-		    float extent[] = {0.15, 0.1, 0.15}
-		    yoffset = 0.05f
-		    mass = 2.0f
-		}
-		
-		RagBone RightUpperLegSpr
-		{
-		    skel="rightupperleg"
-		    type="obb"
-		    autopos1="base"
-		    autopos2="rightupperleg"		
-		    float extent[] = {0.22, 0.0, 0.22}
-		    mass = 2.0f
-		}
-		RagBone BackUpperLegSpr
-		{
-		    skel="backupperleg"
-		    type="obb"
-		    autopos1="base"		
-		    autopos2="backupperleg"
-		    float extent[] = {0.2, 0.0, 0.2}
-		    mass = 2.0f
-		} 
+				explosionForceMult = 2.0
+			}
+			//
+			RagBone Neck1Dk
+			{
+				skel="spinejoint3"
+				type="cap" //type="obb"
+				autopos1="spinejoint3"		
+				autopos2="neck"
+				float extent[] = {0.46, 0.0, 0.46}
+				mass = 30.0f
+			} 
+			//
+			RagBone Neck2Dk
+			{
+				skel="neck"
+				type="cap" //type="obb"
+				autopos1="neck"		
+				autopos2="head"
+				float extent[] = {0.25, 0.0, 0.25}
+				mass = 20.0f
+			} 	
+			//
+			RagBone HeadDk
+			{
+				skel="head"
+				type="cap" //type="obb"
+				autopos1="head"
+				autopos2="endhead"
+				float extent[] = {0.20, 0.0, 0.20}
+				//yoffset = -0.1f
+				mass = 10.0f
+			}
+			//////////////////////////////////////////////////////////////////////////
 
-		RagBone NeckSpr
-		{
-		    skel="neck"
-		    type="obb"
-		    autopos1="spinejoint3"		
-		    autopos2="neck"
-		    float extent[] = {0.2, 0.0, 0.2}
-		    mass = 2.0f
-		} 
-		RagBone HeadSpr
-		{
-		    skel="head"
-		    type="obb"
-		    autopos1="neck"		
-		    autopos2="head"
-		    float extent[] = {0.2, 0.0, 0.2}
-		    mass = 2.0f
-		} 
-		RagBone RightShoulderSpr 
-		{
-		    skel="rightshoulder"
-		    type="obb"
-		    autopos1="spinejoint3"		
-		    autopos2="rightshoulder"
-		    float extent[] = {0.2, 0.0, 0.2}
-		    mass = 2.0f
-		} 
-		RagBone LeftShoulderSpr
-		{
-		    skel="leftshoulder"
-		    type="obb"
-		    autopos1="spinejoint3"		
-		    autopos2="leftshoulder"
-		    float extent[] = {0.2, 0.0, 0.2}
-		    mass = 2.0f
-		} 
-		RagBone RightArmPitSpr 
-		{
-		    skel="rightarmpit"
-		    type="obb"
-		    autopos1="rightshoulder"		
-		    autopos2="rightarmpit"
-		    float extent[] = {0.2, 0.0, 0.2}
-		    mass = 2.0f
-		} 
-		RagBone LeftArmPitSpr
-		{
-		    skel="leftarmpit"
-		    type="obb"
-		    autopos1="leftshoulder"		
-		    autopos2="leftarmpit"
-		    float extent[] = {0.2, 0.0, 0.2}
-		    mass = 2.0f
-		} 
-		RagBone RightUpperArmSpr 
-		{
-		    skel="rightupperarm"
-		    type="obb"
-		    autopos1="rightarmpit"		
-		    autopos2="rightupperarm"
-		    float extent[] = {0.2, 0.0, 0.2}
-		    mass = 2.0f
-		} 
-		RagBone LeftUpperArmSpr
-		{
-		    skel="leftupperarm"
-		    type="obb"
-		    autopos1="leftarmpit"		
-		    autopos2="leftupperarm"
-		    float extent[] = {0.2, 0.0, 0.2}
-		    mass = 2.0f
-		} 	
+
+			//////////////////////////////////////////////////////////////////////////
+			// LEFT ARM		
+			RagBone LeftArm1Dk
+			{
+				skel="leftshoulder"
+				type="cap" //type="obb"
+				autopos1="leftshoulder"		
+				autopos2="leftarmpivot"
+				float extent[] = {0.2, 0.0, 0.2}
+				mass = 12.0f
+			} 
+			
+			RagBone LeftArm2Dk
+			{
+				skel="leftarmpivot"
+				type="cap" //type="obb"
+				autopos1="leftarmpivot"		
+				autopos2="leftwrist"
+				float extent[] = {0.2, 0.0, 0.2}
+				mass = 5.0f
+			}
+			
+			RagBone LeftArm3Dk
+			{
+				skel="leftwrist"
+				type="cap"
+				autopos1="leftwrist"		
+				autopos2="leftgun"
+				float extent[] = {0.2, 0.0, 0.2}
+				mass = 4.0f
+			}
+
+			RagBone LeftArm4Dk
+			{
+				skel="leftgun"
+				type="cap"
+				float posdelta[] = {0.0f, 0.09f, 0.59f}	
+				autopos1="leftgun"		
+				float extent[] = {0.17, 0.0, 0.17}
+				mass = 6.0f
+			}
+			//////////////////////////////////////////////////////////////////////////
+
+
+			//////////////////////////////////////////////////////////////////////////
+			// RIGHT ARM		
+			RagBone RightArm1Dk
+			{
+				skel="rightshoulder"
+				type="cap" //type="obb"
+				autopos1="rightshoulder"		
+				autopos2="rightarmpivot"
+				float extent[] = {0.2, 0.0, 0.2}
+				mass = 12.0f
+			} 
+			
+			RagBone RightArm2Dk
+			{
+				skel="rightarmpivot"
+				type="cap" //type="obb"
+				autopos1="rightarmpivot"		
+				autopos2="rightwrist"
+				float extent[] = {0.2, 0.0, 0.2}
+				mass = 5.0f
+			}
+			
+			RagBone RightArm3Dk
+			{
+				skel="rightwrist"
+				type="cap"
+				autopos1="rightwrist"		
+				autopos2="rightgun"
+				float extent[] = {0.2, 0.0, 0.2}
+				mass = 4.0f
+			}
+
+			RagBone RightArm4Dk
+			{
+				skel="rightgun"
+				type="cap"
+				float posdelta[] = {0.0f, 0.09f, 0.59f}	
+				autopos1="rightgun"		
+				float extent[] = {0.17, 0.0, 0.17}
+				mass = 6.0f
+			}
+			//////////////////////////////////////////////////////////////////////////
+			
+			//////////////////////////////////////////////////////////////////////////
+			// LEFT LEG
+			RagBone LeftLeg1Dk
+			{
+				skel="leftupperleg"
+				type="cap"
+				autopos1="leftupperleg"		
+				autopos2="leftlowerleg"
+				float extent[] = {0.2, 0.0, 0.2}
+				mass = 9.0f
+			}
+			//
+			RagBone LeftLeg2Dk
+			{
+				skel="leftlowerleg"
+				type="cap"
+				autopos1="leftlowerleg"	
+				float posdelta[] = {0.0f, -0.3f, 0.0f}		
+				float extent[] = {0.15, 0.0, 0.15}
+				mass = 6.0f
+			}
+			//////////////////////////////////////////////////////////////////////////
+	
+			//////////////////////////////////////////////////////////////////////////
+			// RIGHT LEG
+			RagBone RightLeg1Dk
+			{
+				skel="rightupperleg"
+				type="cap"
+				autopos1="rightupperleg"		
+				autopos2="rightlowerleg"
+				float extent[] = {0.2, 0.0, 0.2}
+				mass = 9.0f
+			}
+			//
+			RagBone RightLeg2Dk
+			{
+				skel="rightlowerleg"
+				type="cap"
+				autopos1="rightlowerleg"	
+				float posdelta[] = {0.0f, -0.3f, 0.0f}		
+				float extent[] = {0.15, 0.0, 0.15}
+				mass = 6.0f
+			}
+			//////////////////////////////////////////////////////////////////////////
+	
+			//////////////////////////////////////////////////////////////////////////
+			// BACK LEG
+			RagBone BackLeg1Dk
+			{
+				skel="backupperleg"
+				type="cap"
+				autopos1="backupperleg"		
+				autopos2="backlowerleg"
+				float extent[] = {0.2, 0.0, 0.2}
+				mass = 9.0f
+			}
+			//
+			RagBone BackLeg2Dk
+			{
+				skel="backlowerleg"
+				type="cap"
+				autopos1="backlowerleg"	
+				float posdelta[] = {0.0f, -0.3f, 0.0f}		
+				float extent[] = {0.15, 0.0, 0.15}
+				mass = 6.0f
+			}
+			//////////////////////////////////////////////////////////////////////////
 	    }
 	    //--------------------------------------------------------------------
 	    joints 
 	    {
-		// Central 
-		ragdollhingejoint Joint1
-		{
-		    bone0 = "BaseSpr"
-		    bone1 = "RightWingSpr"
+			//////////////////////////////////////////////////////////////////////////
+			// BODY AND HEAD
+	   		ragdollhingejoint BaseToNeck1
+			{
+				bone0 = "BaseDk"
+				bone1 = "Neck1Dk"
 
-		    jointpos = "rightwing"
-		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
+				jointpos = "spinejoint3"
+				float jointposoffset [] = { 0.0f, 0.0f, 0.0f }
 
-		    float axis [] = { 0.0f, 1.f, 0.f }
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 20.0f
-		    
-		    spring = 20.f
-		    damp = 50.f
-		}
-		ragdollhingejoint Joint2 
-		{
-		    bone0 = "BaseSpr"
-		    bone1 = "LeftWingSpr"
+				float axis [] = { 1.0f, 0.0f, 0.0f }
 
-		    jointpos = "leftwing"
-		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
+   				min		= -5.0f	// hingeMin
+				max		= 20.0f		// hingeMax
+			    
+				//type = "fixed"
+			}
+			//
+			ragdollhingejoint Neck1ToNeck2
+			{
+				bone0 = "Neck1Dk"
+				bone1 = "Neck2Dk"
+	  
+				jointpos = "neck"
+				float jointposoffset [] = { 0.0f, 0.0f, 0.0f }
 
-		    float axis [] = { 1.0f, 0.f, 0.f }
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 35.0f
-		    
-		    spring = 20.f
-		    damp = 50.f
-		}
-		
-		ragdollhingejoint Joint4 
-		{
-		    bone0 = "BaseSpr"
-		    bone1 = "LeftUpperLegSpr"
+				float axis [] = { 1.0f, 0.0f, 0.0f }
 
-		    jointpos = "leftupperleg"
-		    float jointposoffset [] = {0.f, 0.f, -0.05f}
+   				min		= -0.0f	// hingeMin
+				max		= 30.0f		// hingeMax
+			    
+				//type = "fixed"
+				randomchancetobreak = 0.15
+			}
+			//
+			ragdollhkrdjoint Neck2ToHead
+			{
+				bone0 = "Neck2Dk"
+				bone1 = "HeadDk"
 
-		    float axis [] = { 1.0f, +0.6f, 0.f }
-		    min = 1.0f
-		    max = +90.0f
-		    swing1 = 2.0f
-		    
-		    spring = 20.f
-		    damp = 50.f
-		}
-		
-		ragdollhingejoint Joint5 
-		{
-		    bone0 = "BaseSpr"
-		    bone1 = "RightUpperLegSpr"
+				jointpos = "head"
+				float jointposoffset [] = {0.0f, 0.05f, 0.0f}
 
-		    jointpos = "rightupperleg"
-		    float jointposoffset [] = {0.f, 0.f, 0.0f}
+				float axis [] = { 0.0f, 0.2f, 1.0f }
+				float planeAxis [] = { 1.0f, 0.0f, 0.0f }
+			    
+				min		= 35.0f		// coneAngle
+				swing1	= -90.0f	// planeMin		// unused for head
+				swing2	= 90.0f		// planeMax		// unused for head
+				twistMin= -10.0f
+				twistMax= 10.0f
+			}
+			//////////////////////////////////////////////////////////////////////////
+			
+			
+			//////////////////////////////////////////////////////////////////////////
+			// LEFT ARM
+			ragdollhkrdjoint LeftShoulder
+			{
+				bone0 = "Neck1Dk"
+				bone1 = "LeftArm1Dk"
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 15.0f
-		    max = 100.0f
-		    swing1 = 15.0f
-		    swing2 = 15.0f
-		    
-		    spring = 20.f
-		    damp = 50.f
-		}
-		ragdollhingejoint Joint6 
-		{
-		    bone0 = "BaseSpr"
-		    bone1 = "BackUpperLegSpr"
+				jointpos = "leftshoulder"
+				float jointposoffset [] = {0.0f, 0.0f, 0.0f}
 
-		    jointpos = "rear_leg_rotate"
-		    float jointposoffset [] = {0.f, 0.f, 0.0f}
+				float axis [] = { 1.0f, -0.4f, 0.3f }
+				float planeAxis [] = { 0.0f, 0.0f, 1.0f }
+				float b1_axis [] = { 1.0f, -0.4f, 0.3f }
+				float b1_planeAxis [] = { 0.0f, 0.0f, 1.0f }
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 70.0f
-		    max = 5.0f
-		    swing1 = 10.0f
-		    swing2 = 10.0f
-		    
-		    spring = 50.0f
-		    damp = 20.0f
-		}
+   				min		= 30.0f 	// coneAngle
+				swing1	= -10.0f		// planeMin
+				swing2	= 10.0f		// planeMax
+				twistMin= -10.0f
+				twistMax= 10.0f
+				randomchancetobreak = 0.15
+			}
+			//
+			ragdollhingejoint LeftElbow1
+			{
+				bone0 = "LeftArm1Dk"
+				bone1 = "LeftArm2Dk"
 
-		ragdollhingejoint Joint7
-		{
-		    bone0 = "BaseSpr"
-		    bone1 = "NeckSpr"
+				jointpos = "leftarmpivot"
+				float jointposoffset [] = { 0.0f, 0.0f, 0.0f }
 
-		    jointpos = "spinejoint3"
-		    float jointposoffset [] = {0.f, 0.f, 0.0f}
+				float axis []		= { -0.28f,  0.04f, 0.96f }
+			    
+   				min		= -40.0f		// hingeMin
+				max		= 10.0f			// hingeMax
+			}	
+			//
+			ragdollhingejoint LeftElbow2
+			{
+				bone0 = "LeftArm2Dk"
+				bone1 = "LeftArm3Dk"
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 70.0f
-		    max = 5.0f
-		    swing1 = 10.0f
-		    swing2 = 10.0f
-		    
-		    spring = 50.0f
-		    damp = 20.0f
-		}
+				jointpos = "leftwrist"
+				float jointposoffset [] = { 0.0f, 0.0f, 0.0f }
 
-		ragdollhingejoint Joint8
-		{
-		    bone0 = "BaseSpr"
-		    bone1 = "RightShoulderSpr"
+				float axis []		= { 0.94f,  -0.34f, 0.03f }
+			    
+   				min		= -45.0f		// hingeMin
+				max		= 15.0f			// hingeMax
+			}	
+			//
+			ragdollhingejoint LeftWrist
+			{
+				bone0 = "LeftArm3Dk"
+				bone1 = "LeftArm4Dk"
 
-		    jointpos = "spinejoint3"
-		    float jointposoffset [] = {0.f, 0.f, 0.0f}
+				jointpos = "leftgun"
+				float jointposoffset [] = { 0.0f, 0.0f, 0.0f }
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 70.0f
-		    max = 5.0f
-		    wing1 = 10.0f
-		    swing2 = 10.0f
-		    
-		    spring = 50.0f
-		    damp = 20.0f
-		}
+				float axis []		= { 0.94f,  -0.34f, 0.03f }
+			    
+   				min		= -40.0f		// hingeMin
+				max		= 10.0f			// hingeMax
+			}
+			//////////////////////////////////////////////////////////////////////////
+			
+			
+			//////////////////////////////////////////////////////////////////////////
+			// RIGHT ARM
+			ragdollhkrdjoint RightShoulder
+			{
+				bone0 = "Neck1Dk"
+				bone1 = "RightArm1Dk"
 
-		ragdollhingejoint Joint9
-		{
-		    bone0 = "BaseSpr"
-		    bone1 = "LeftShoulderSpr"
+				jointpos = "rightshoulder"
+				float jointposoffset [] = {0.0f, 0.0f, 0.0f}
 
-		    jointpos = "spinejoint3"
-		    float jointposoffset [] = {0.f, 0.f, 0.0f}
+				float axis [] = { -1.0f, -0.4f, 0.3f }
+				float planeAxis [] = { 0.0f, 0.0f, 1.0f }
+				float b1_axis [] = { -1.0f, -0.4f, 0.3f }
+				float b1_planeAxis [] = { 0.0f, 0.0f, 1.0f }
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 70.0f
-		    max = 5.0f
-		    swing1 = 10.0f
-		    swing2 = 10.0f
-		    
-		    spring = 50.0f
-		    damp = 20.0f
-		}
+   				min		= 30.0f 	// coneAngle
+				swing1	= -10.0f		// planeMin
+				swing2	= 10.0f		// planeMax
+				twistMin= -10.0f
+				twistMax= 10.0f
+				randomchancetobreak = 0.15
+			}
+			//
+			ragdollhingejoint RightElbow1
+			{
+				bone0 = "RightArm1Dk"
+				bone1 = "RightArm2Dk"
 
-		ragdollhingejoint Joint10
-		{
-		    bone0 = "NeckSpr"
-		    bone1 = "HeadSpr"
+				jointpos = "rightarmpivot"
+				float jointposoffset [] = { 0.0f, 0.0f, 0.0f }
 
-		    jointpos = "head"
-		    float jointposoffset [] = {0.f, 0.f, 0.0f}
+				float axis []		= { +0.28f,  0.04f, 0.96f }
+			    
+   				min		= -10.0f		// hingeMin
+				max		= 40.0f			// hingeMax
+			}	
+			//
+			ragdollhingejoint RightElbow2
+			{
+				bone0 = "RightArm2Dk"
+				bone1 = "RightArm3Dk"
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 70.0f
-		    max = 5.0f
-		    swing1 = 10.0f
-		    swing2 = 10.0f
-		    
-		    spring = 50.0f
-		    damp = 20.0f
-		}
+				jointpos = "rightwrist"
+				float jointposoffset [] = { 0.0f, 0.0f, 0.0f }
 
-		ragdollhingejoint Joint13
-		{
-		    bone0 = "RightShoulderSpr"
-		    bone1 = "RightArmPitSpr"
+				float axis []		= { -0.94f,  -0.34f, 0.03f }
+			    
+   				min		= -15.0f		// hingeMin
+				max		= 45.0f			// hingeMax
+			}	
+			//
+			ragdollhingejoint RightWrist
+			{
+				bone0 = "RightArm3Dk"
+				bone1 = "RightArm4Dk"
 
-		    jointpos = "rightarmpit"
-		    float jointposoffset [] = {0.f, 0.f, 0.0f}
+				jointpos = "rightgun"
+				float jointposoffset [] = { 0.0f, 0.0f, 0.0f }
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 70.0f
-		    max = 5.0f
-		    swing1 = 10.0f
-		    swing2 = 10.0f
-		    
-		    spring = 50.0f
-		    damp = 20.0f
-		}
+				float axis []		= { -0.94f,  -0.34f, 0.03f }
+			    
+   				min		= -10.0f		// hingeMin
+				max		= 40.0f			// hingeMax
+			}
+			//////////////////////////////////////////////////////////////////////////			
 
-		ragdollhingejoint Joint14
-		{
-		    bone0 = "LeftShoulderSpr"
-		    bone1 = "LeftArmPitSpr"
+			//////////////////////////////////////////////////////////////////////////
+			// LEFT LEG
+			ragdollhingejoint LeftKnee1
+			{
+				bone0 = "BaseDk"
+				bone1 = "LeftLeg1Dk"
 
-		    jointpos = "leftarmpit"
-		    float jointposoffset [] = {0.f, 0.f, 0.0f}
+				jointpos = "leftupperleg"
+				float jointposoffset [] = { 0.0f, 0.0f, 0.0f }
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 70.0f
-		    max = 5.0f
-		    swing1 = 10.0f
-		    swing2 = 10.0f
-		    
-		    spring = 50.0f
-		    damp = 20.0f
-		}
+				float axis []		= { 0.51f,  0.0f, -0.86f }
+			    
+   				min		= -30.0f		// hingeMin
+				max		= 55.0f			// hingeMax
+				randomchancetobreak = 0.10
+			}	
+			//
+			ragdollhingejoint LeftKnee2
+			{
+				bone0 = "LeftLeg1Dk"
+				bone1 = "LeftLeg2Dk"
 
-		ragdollhingejoint Joint15
-		{
-		    bone0 = "RightArmPitSpr"
-		    bone1 = "RightUpperArmSpr"
+				jointpos = "leftlowerleg"
+				float jointposoffset [] = { 0.0f, 0.0f, 0.0f }
 
-		    jointpos = "rightupperarm"
-		    float jointposoffset [] = {0.f, 0.f, 0.0f}
+				float axis []		= { 0.51f,  0.0f, -0.86f }
+			    
+   				min		= -25.0f		// hingeMin
+				max		= 50.0f			// hingeMax
+			}
+			//////////////////////////////////////////////////////////////////////////
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 70.0f
-		    max = 5.0f
-		    swing1 = 10.0f
-		    swing2 = 10.0f
-		    
-		    spring = 50.0f
-		    damp = 20.0f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 2.0f
-		    motor_2_force_2 = 0.f
-		}
+			//////////////////////////////////////////////////////////////////////////
+			// RIGHT LEG
+			ragdollhingejoint RightKnee1
+			{
+				bone0 = "BaseDk"
+				bone1 = "RightLeg1Dk"
 
-		ragdollhingejoint Joint16
-		{
-		    bone0 = "LeftArmPitSpr"
-		    bone1 = "LeftUpperArmSpr"
+				jointpos = "rightupperleg"
+				float jointposoffset [] = { 0.0f, 0.0f, 0.0f }
 
-		    jointpos = "leftupperarm"
-		    float jointposoffset [] = {0.f, 0.f, 0.0f}
+				float axis []		= { -0.51f,  0.0f, -0.86f }
+			    
+   				min		= -55.0f		// hingeMin
+				max		= 30.0f			// hingeMax
+				randomchancetobreak = 0.10
+			}	
+			//
+			ragdollhingejoint RightKnee2
+			{
+				bone0 = "RightLeg1Dk"
+				bone1 = "RightLeg2Dk"
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 70.0f
-		    max = 5.0f
-		    swing1 = 10.0f
-		    swing2 = 10.0f
-		    
-		    spring = 50.0f
-		    damp = 20.0f
-		}
+				jointpos = "rightlowerleg"
+				float jointposoffset [] = { 0.0f, 0.0f, 0.0f }
+
+				float axis []		= { -0.51f,  0.0f, -0.86f }
+			    
+   				min		= -50.0f		// hingeMin
+				max		= 25.0f			// hingeMax
+			}
+			//////////////////////////////////////////////////////////////////////////
+			
+			//////////////////////////////////////////////////////////////////////////
+			// BACK LEG
+			ragdollhingejoint BackKnee1
+			{
+				bone0 = "BaseDk"
+				bone1 = "BackLeg1Dk"
+
+				jointpos = "backupperleg"
+				float jointposoffset [] = { 0.0f, 0.0f, 0.0f }
+
+				float axis []		= { -1.0f,  0.0f, 0.0f }
+			    
+   				min		= -30.0f		// hingeMin
+				max		= 55.0f			// hingeMax
+				randomchancetobreak = 0.10
+			}	
+			//
+			ragdollhingejoint BackKnee2
+			{
+				bone0 = "BackLeg1Dk"
+				bone1 = "BackLeg2Dk"
+
+				jointpos = "backlowerleg"
+				float jointposoffset [] = { 0.0f, 0.0f, 0.0f }
+
+				float axis []		= { 1.0f,  0.0f, 0.0f }
+			    
+   				min		= -25.0f		// hingeMin
+				max		= 50.0f			// hingeMax
+			}
+			//////////////////////////////////////////////////////////////////////////
 	    }
 	    
 	    //----------------------------------------------------------------------------
@@ -1916,7 +1917,7 @@ ragdollmgrTemplate ragdollmgr
 		RagBone Base
 		{
 		    skel="base"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="base"		
 		    autopos2="waist"
 		    float extent[] = {0.4, 0.1, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
@@ -1926,12 +1927,14 @@ ragdollmgrTemplate ragdollmgr
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		
 		RagBone UpperBody
 		{
 		    skel="waist"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="waist"		
 		    autopos2="neck"
 		    float extent[] = {0.4, 0.0, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
@@ -1941,13 +1944,15 @@ ragdollmgrTemplate ragdollmgr
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		
 		RagBone Head 
 		{
 		    skel="head"
 		    //type="sphere"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="head"		
 		    float extent[] = {0.20, 0.3, 0.20}
 		    yoffset = -0.1f
@@ -1958,7 +1963,7 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LUpperArm
 		{
 		    skel="l_upper_arm"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_upper_arm"
 		    autopos2="l_lower_arm"
 		    float extent[] = {0.15, 0.0, 0.15}
@@ -1970,7 +1975,7 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LLowerArm
 		{
 		    skel="l_lower_arm"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_lower_arm"
 		    autopos2="l_wrist"		
 		    float extent[] = {0.15, 0.1, 0.15}
@@ -1983,7 +1988,7 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LUpperLeg
 		{
 		    skel="l_hip"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_hip"
 		    autopos2="l_knee"		
 		    float extent[] = {0.22, 0.0, 0.22}
@@ -1995,7 +2000,7 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LLowerLeg
 		{
 		    skel="l_knee"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_knee"		
 		    autopos2="l_ankle"
 		    float extent[] = {0.2, 0.0, 0.2}
@@ -2208,7 +2213,7 @@ ragdollmgrTemplate ragdollmgr
 		RagBone Base
 		{
 		    skel="base"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="base"		
 		    autopos2="waist"
 		    float extent[] = {0.4, 0.1, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
@@ -2218,12 +2223,14 @@ ragdollmgrTemplate ragdollmgr
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		
 		RagBone UpperBody
 		{
 		    skel="waist"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="waist"		
 		    autopos2="neck"
 		    float extent[] = {0.4, 0.0, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
@@ -2233,13 +2240,15 @@ ragdollmgrTemplate ragdollmgr
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		
 		RagBone Head 
 		{
 		    skel="head"
 		    //type="sphere"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="head"		
 		    float extent[] = {0.20, 0.3, 0.20}
 		    yoffset = -0.1f
@@ -2250,7 +2259,7 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LUpperArm
 		{
 		    skel="l_shoulder"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_shoulder"
 		    autopos2="l_elbow"
 		    float extent[] = {0.15, 0.0, 0.15}
@@ -2262,7 +2271,7 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LLowerArm
 		{
 		    skel="l_elbow"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_elbow"
 		    autopos2="l_wrist"		
 		    float extent[] = {0.15, 0.1, 0.15}
@@ -2275,7 +2284,7 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LUpperLeg
 		{
 		    skel="l_hip"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_hip"
 		    autopos2="l_knee"		
 		    float extent[] = {0.22, 0.0, 0.22}
@@ -2287,7 +2296,7 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LLowerLeg
 		{
 		    skel="l_knee"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_knee"		
 		    autopos2="l_ankle"
 		    float extent[] = {0.2, 0.0, 0.2}
@@ -2500,66 +2509,96 @@ ragdollmgrTemplate ragdollmgr
 		RagBone Base
 		{
 		    skel="base"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="base"		
 		    autopos2="waist"
 		    float extent[] = {0.4, 0.1, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
 		    yoffset = -0.1f
-		    mass = 5.0f
+		    mass = 20.0f
 		    buoyancy = 1.3f
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		
 		RagBone UpperBody
 		{
 		    skel="waist"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="waist"		
 		    autopos2="neck"
 		    float extent[] = {0.4, 0.0, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
 		    yoffset = 0.0f
-		    mass = 5.0f
+		    mass = 30.0f
 		    buoyancy = 1.3f
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		
 		RagBone Head 
 		{
 		    skel="head"
 		    //type="sphere"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="head"		
 		    float extent[] = {0.20, 0.3, 0.20}
 		    yoffset = -0.1f
-		    mass = 4.0f
+		    mass = 5.0f
 		}
 			
 		// Left
 		RagBone LUpperArm
 		{
-		    skel="l_shoulder"
-		    type="obb"
+		    skel="l_shoulder_front"
+		    type="cap" //type="obb"
 		    autopos1="l_shoulder_front"
 		    autopos2="l_elbow_front"
 		    float extent[] = {0.15, 0.0, 0.15}
 		    yoffset = 0.05f
-		    mass = 8.0f
+		    mass = 4.0f
 		    yrot = -10.0f
 		}
 		
 		RagBone LLowerArm
 		{
 		    skel="l_elbow_front"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_elbow_front"
-		    autopos2="l_wrist_front"		
-		    float extent[] = {0.15, 0.1, 0.15}
+		    autopos2="l_wrst_front"		
+		    float extent[] = {0.11, 0.1, 0.11}
 		    yoffset = 0.05f
-		    mass = 6.0f
+		    mass = 3.0f
+		    buoyancy = 1.3f
+		    animFloorTest = "true"
+		}
+		
+		// Left
+		RagBone LUpperArmRear
+		{
+		    skel="l_shoulder_rear"
+		    type="cap" //type="obb"
+		    autopos1="l_shoulder_rear"
+		    autopos2="l_elbow_rear"
+		    float extent[] = {0.15, 0.0, 0.15}
+		    yoffset = 0.05f
+		    mass = 4.0f
+		    yrot = -10.0f
+		}
+		
+		RagBone LLowerArmRear
+		{
+		    skel="l_elbow_rear"
+		    type="cap" //type="obb"
+		    autopos1="l_elbow_rear"
+		    autopos2="l_wrst_rear"		
+		    float extent[] = {0.11, 0.1, 0.11}
+		    yoffset = 0.05f
+		    mass = 3.0f
 		    buoyancy = 1.3f
 		    animFloorTest = "true"
 		}
@@ -2567,11 +2606,11 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LUpperLeg
 		{
 		    skel="l_hip"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_hip"
 		    autopos2="l_knee"		
 		    float extent[] = {0.22, 0.0, 0.22}
-		    mass = 11.0f
+		    mass = 5.0f
 		    buoyancy = 1.1f
 
 		    yrot = +30.0f
@@ -2579,17 +2618,19 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LLowerLeg
 		{
 		    skel="l_knee"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_knee"		
 		    autopos2="l_ankle"
-		    float extent[] = {0.2, 0.0, 0.2}
-		    mass = 8.0f
+		    float extent[] = {0.2, 0.08, 0.2}
+		    mass = 4.0f
 		    buoyancy = 1.3f
 		    yrot = -30.0f
 		}
 		// Right (auto-generated)
 		RagBone RUpperArm { copyfrom = "LUpperArm" }
 		RagBone RLowerArm { copyfrom = "LLowerArm" }
+		RagBone RUpperArmRear { copyfrom = "LUpperArmRear" }
+		RagBone RLowerArmRear { copyfrom = "LLowerArmRear" }
 		RagBone RUpperLeg { copyfrom = "LUpperLeg" }
 		RagBone RLowerLeg { copyfrom = "LLowerLeg" }
 	    
@@ -2599,7 +2640,7 @@ ragdollmgrTemplate ragdollmgr
 	    joints 
 	    {
 		// Central 
-		ragdollhingejoint Waist
+		ragdollhkrdjoint Waist
 		{
 		    bone0 = "Base"
 		    bone1 = "UpperBody"
@@ -2607,19 +2648,16 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "waist"
 		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
 
-		    float axis [] = { 0.0f, 1.f, 0.f }
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 20.0f;
+		    float axis [] = { 0.0f, 1.0f, 0.0f }
+		    float planeAxis [] = { 1.0f, 0.0f, 0.0f }
 		    
-		    spring = 50.f
-		    damp = 100.f
-
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 0.01f
-		    motor_2_force_2 = 0.0f
+		    min		= 25.0f		// coneAngle
+		    swing1	= -10.0f	// planeMin		// unused for waist
+		    swing2	= 10.0f		// planeMax		// unused for waist
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		}
-		ragdollhingejoint Head
+		ragdollhkrdjoint Head
 		{
 		    bone0 = "UpperBody"
 		    bone1 = "Head" 
@@ -2627,22 +2665,18 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "neck"
 		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
 
-		    float axis [] = { 1.0f, 0.f, 0.f }
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 35.0f;
-		    
-		    spring = 50.f
-		    damp = 100.f
+		    float axis [] = { 0.0f, 0.0f, 1.0f }
+		    float planeAxis [] = { 1.0f, 0.0f, 0.0f }
 
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 0.01f
-		    motor_2_force_2 = 0.0f
-		    //type = "fixed"
+		    min		= 20.0f		// coneAngle
+		    swing1	= -80.0f	// planeMin		// unused for head
+		    swing2	= 80.0f		// planeMax		// unused for head
+		    twistMin= -10.0f
+		    twistMax= 10.0f
 		}
 		
 		// Left
-		ragdollhingejoint LShoulder
+		ragdollhkrdjoint LShoulder
 		{
 		    bone0 = "UpperBody"
 		    bone1 = "LUpperArm"
@@ -2650,22 +2684,16 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "l_shoulder_front"
 		    float jointposoffset [] = {0.f, 0.f, 0.02f}
 
-		    float axis [] = { 0.0f, 0.0f, 1.f }
-		    min = 75.f
-		    max = 28.f
-		    swing1 = 5.0f;
-		    swing2 = 5.0f;
-		    spring = 50.f
-		    damp = 50.f
-		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.0f
-		    
-		    motor_2_time = 0.5f	
-		    motor_2_force_1 = 0.1f
-		    motor_2_force_2 = 0.0f
+		    float axis [] = { 1.0f, 0.0f, 0.0f }
+		    float planeAxis [] = { 0.0f, 0.0f, 1.0f }
+		    float b1_axis [] = { 0.7f, -0.8f, 0.0f }
+		    float b1_planeAxis [] = { 0.0f, 0.0f, 1.0f }
+
+   		    min		= 115.0f	// coneAngle
+		    swing1	= 5.0f		// planeMin
+		    swing2	= 95.0f		// planeMax
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		}
 		ragdollhingejoint LElbow
 		{
@@ -2675,25 +2703,51 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "l_elbow_front"
 		    float jointposoffset [] = {0.f, 0.f, -0.05f}
 
-		    float axis [] = { 1.0f, +0.6f, 0.f }
-		    min = 1.0f
-		    max = +90.0f
-		    swing1 = 2.0f;
-		    spring = 20.f
-		    damp = 500.f
+		    float axis []		= { 1.0f,  +0.6f, 0.0f }
+		    float planeAxis []	= { -1.0f, -0.6f, 0.0f }
 		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.f
-		    
-		    //motor_2_time = 1.f	
-		    //motor_2_force_1 = 0.015f
-		    //motor_2_force_2 = 0.015f
-		    //type = "fixed"
+   		    min		= -110.0f	// hingeMin
+		    max		= 15.0f		// hingeMax
 		}
-		
-		ragdollhingejoint LHip
+		ragdollhkrdjoint LShoulderRear
+		{
+		    bone0 = "UpperBody"
+		    bone1 = "LUpperArmRear"
+
+		    jointpos = "l_shoulder_rear"
+		    float jointposoffset [] = {0.f, 0.f, 0.02f}
+
+		    float axis [] = { 1.0f, 0.0f, 0.0f }
+		    float planeAxis [] = { 0.0f, 0.0f, 1.0f }
+		    float b1_axis [] = { 0.7f, -0.8f, 0.0f }
+		    float b1_planeAxis [] = { 0.0f, 0.0f, 1.0f }
+
+   		    min		= 115.0f	// coneAngle
+		    swing1	= 5.0f		// planeMin
+		    swing2	= 95.0f		// planeMax
+		    twistMin= -5.0f
+		    twistMax= 5.0f
+		}
+		ragdollhingejoint LElbowRear
+		{
+		    bone0 = "LUpperArmRear"
+		    bone1 = "LLowerArmRear"
+
+		    jointpos = "l_elbow_rear"
+		    float jointposoffset [] = {0.f, 0.f, -0.05f}
+
+		    float axis []		= { 1.0f,  +0.6f, 0.0f }
+		    float planeAxis []	= { -1.0f, -0.6f, 0.0f }
+		    
+   		    min		= -110.0f	// hingeMin
+		    max		= 15.0f		// hingeMax
+		}
+		ragdollignorecollisionsfakejoint LShoulderIgnoreCollFrontBack
+		{
+		    bone0 = "LUpperArm"
+		    bone1 = "LUpperArmRear"
+		}
+		ragdollhkrdjoint LHip
 		{
 		    bone0 = "Base"
 		    bone1 = "LUpperLeg"
@@ -2701,24 +2755,16 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "l_hip"
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 15.0f
-		    max = 100.0f
-		    swing1 = 15.0f
-		    swing2 = 15.0f
-		    spring = 100.f
-		    damp = 500.f
-		    
-		    //motor_1_time = 0.5f	
-		    //motor_1_spring = 1.f
-		    //motor_1_damp = 1.f	
-		    //motor_1_force = 0.1f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 10.f
-		    motor_2_force_2 = 0.f
-		   
-		    //type = "fixed"
+		    float axis []		= { 0.0f,  -1.0f, 0.75f }
+		    float planeAxis []	= { -1.0f, 0.0f, 0.0f }
+		    float b1_axis []	= { 0.0f,  -1.0f, 0.1f }
+		    //float b1_planeAxis [] = { -1.0f, 0.0f, 0.0f }
+
+   		    min		= 65.0f		// coneAngle
+		    swing1	= -45.0f	// planeMin
+		    swing2	= 10.0f		// planeMax
+		    twistMin= -10.0f		// twistMin
+		    twistMax= 10.0f		// twistMax
 		}
 		ragdollhingejoint LKnee
 		{
@@ -2729,27 +2775,17 @@ ragdollmgrTemplate ragdollmgr
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
 		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 70.0f
-		    max = 5.0f
-		    swing1 = 10.0f;
-		    swing2 = 10.0f;
-		    spring = 100.0f
-		    damp = 100.0f
-		    
-		    //motor_1_time = 0.0f	
-		    //motor_1_spring = 0.f
-		    //motor_1_damp = 0.f	
-		    //motor_1_force = 0.f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 2.0f
-		    motor_2_force_2 = 0.f
+		    float planeAxis []	= { -1.0f, +0.05f, 0.f }
 
-		    //type = "fixed"
+   		    min		= -10.0f	// hingeMin
+		    max		= 100.0f	// hingeMax
 		}
 		// Right (auto-generated)
 		ragdollhingejoint RShoulder { copyfrom = "LShoulder" }
 		ragdollhingejoint RElbow { copyfrom = "LElbow" }
+		ragdollhingejoint RShoulderRear { copyfrom = "LShoulderRear" }
+		ragdollhingejoint RElbowRear { copyfrom = "LElbowRear" }
+		ragdollignorecollisionsfakejoint RShoulderIgnoreCollFrontBack { copyfrom = "LShoulderIgnoreCollFrontBack" }
 		ragdollhingejoint RHip { copyfrom = "LHip" }
 		ragdollhingejoint RKnee { copyfrom = "LKnee" }
 	    }
@@ -2792,66 +2828,70 @@ ragdollmgrTemplate ragdollmgr
 		RagBone Base
 		{
 		    skel="base"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="base"		
 		    autopos2="waist"
-		    float extent[] = {0.4, 0.1, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
-		    yoffset = -0.1f
-		    mass = 5.0f
+		    float extent[] = {0.28, 0.0, 0.28}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    yoffset = -0.05f
+		    mass = 15.0f
 		    buoyancy = 1.3f
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		
 		RagBone UpperBody
 		{
 		    skel="waist"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="waist"		
 		    autopos2="neck"
-		    float extent[] = {0.4, 0.0, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    float extent[] = {0.28, 0.0, 0.28}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
 		    yoffset = 0.0f
-		    mass = 5.0f
+		    mass = 20.0f
 		    buoyancy = 1.3f
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		
 		RagBone Head 
 		{
 		    skel="head"
-		    //type="sphere"
-		    type="obb"
+		    type="sphere"
+		    //type="cap" //type="obb"
 		    autopos1="head"		
-		    float extent[] = {0.20, 0.3, 0.20}
-		    yoffset = -0.1f
-		    mass = 4.0f
+		    float extent[] = {0.20, 0.2, 0.20}
+		    yoffset = -0.05f
+		    mass = 6.0f
 		}
 			
 		// Left
 		RagBone LUpperArm
 		{
 		    skel="l_shoulder"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_shoulder"
 		    autopos2="l_lowerarm"
-		    float extent[] = {0.15, 0.0, 0.15}
+		    float extent[] = {0.13, 0.0, 0.13}
 		    yoffset = 0.05f
-		    mass = 8.0f
+		    mass = 2.0f
 		    yrot = -10.0f
 		}
 		
 		RagBone LLowerArm
 		{
 		    skel="l_lowerarm"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_lowerarm"
 		    autopos2="l_wrist"		
-		    float extent[] = {0.15, 0.1, 0.15}
+		    float extent[] = {0.12, 0.12, 0.12}
 		    yoffset = 0.05f
-		    mass = 6.0f
+		    mass = 2.0f
 		    buoyancy = 1.3f
 		    animFloorTest = "true"
 		}
@@ -2859,11 +2899,11 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LUpperLeg
 		{
 		    skel="l_hip"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_hip"
 		    autopos2="l_knee"		
-		    float extent[] = {0.22, 0.0, 0.22}
-		    mass = 11.0f
+		    float extent[] = {0.2, 0.0, 0.2}
+		    mass = 3.0f
 		    buoyancy = 1.1f
 
 		    yrot = +30.0f
@@ -2871,11 +2911,11 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LLowerLeg
 		{
 		    skel="l_knee"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_knee"		
 		    autopos2="l_ankle"
-		    float extent[] = {0.2, 0.0, 0.2}
-		    mass = 8.0f
+		    float extent[] = {0.15, 0.05, 0.15}
+		    mass = 2.0f
 		    buoyancy = 1.3f
 		    yrot = -30.0f
 		}
@@ -2891,7 +2931,7 @@ ragdollmgrTemplate ragdollmgr
 	    joints 
 	    {
 		// Central 
-		ragdollhingejoint Waist
+		ragdollhkrdjoint Waist
 		{
 		    bone0 = "Base"
 		    bone1 = "UpperBody"
@@ -2899,19 +2939,16 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "waist"
 		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
 
-		    float axis [] = { 0.0f, 1.f, 0.f }
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 20.0f;
+		    float axis [] = { 0.0f, 1.0f, 0.0f }
+		    float planeAxis [] = { 1.0f, 0.0f, 0.0f }
 		    
-		    spring = 50.f
-		    damp = 100.f
-
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 0.01f
-		    motor_2_force_2 = 0.0f
+		    min		= 25.0f		// coneAngle
+		    swing1	= -10.0f	// planeMin		// unused for waist
+		    swing2	= 10.0f		// planeMax		// unused for waist
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		}
-		ragdollhingejoint Head
+		ragdollhkrdjoint Head
 		{
 		    bone0 = "UpperBody"
 		    bone1 = "Head" 
@@ -2919,22 +2956,18 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "neck"
 		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
 
-		    float axis [] = { 1.0f, 0.f, 0.f }
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 35.0f;
-		    
-		    spring = 50.f
-		    damp = 100.f
+		    float axis [] = { 0.0f, 0.0f, 1.0f }
+		    float planeAxis [] = { 1.0f, 0.0f, 0.0f }
 
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 0.01f
-		    motor_2_force_2 = 0.0f
-		    //type = "fixed"
+		    min		= 20.0f		// coneAngle
+		    swing1	= -80.0f	// planeMin		// unused for head
+		    swing2	= 80.0f		// planeMax		// unused for head
+		    twistMin= -10.0f
+		    twistMax= 10.0f
 		}
 		
 		// Left
-		ragdollhingejoint LShoulder
+		ragdollhkrdjoint LShoulder
 		{
 		    bone0 = "UpperBody"
 		    bone1 = "LUpperArm"
@@ -2942,22 +2975,16 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "l_shoulder"
 		    float jointposoffset [] = {0.f, 0.f, 0.02f}
 
-		    float axis [] = { 0.0f, 0.0f, 1.f }
-		    min = 75.f
-		    max = 28.f
-		    swing1 = 5.0f;
-		    swing2 = 5.0f;
-		    spring = 50.f
-		    damp = 50.f
-		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.0f
-		    
-		    motor_2_time = 0.5f	
-		    motor_2_force_1 = 0.1f
-		    motor_2_force_2 = 0.0f
+		    float axis [] = { 1.0f, 0.0f, 0.0f }
+		    float planeAxis [] = { 0.0f, 0.0f, 1.0f }
+		    float b1_axis [] = { 0.7f, -0.8f, 0.0f }
+		    float b1_planeAxis [] = { 0.0f, 0.0f, 1.0f }
+
+   		    min		= 85.0f		// coneAngle
+		    swing1	= 5.0f		// planeMin
+		    swing2	= 95.0f		// planeMax
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		}
 		ragdollhingejoint LElbow
 		{
@@ -2967,25 +2994,14 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "l_lowerarm"
 		    float jointposoffset [] = {0.f, 0.f, -0.05f}
 
-		    float axis [] = { 1.0f, +0.6f, 0.f }
-		    min = 1.0f
-		    max = +90.0f
-		    swing1 = 2.0f;
-		    spring = 20.f
-		    damp = 500.f
+		    float axis []		= { 1.0f,  +0.6f, 0.0f }
+		    float planeAxis []	= { -1.0f, -0.6f, 0.0f }
 		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.f
-		    
-		    //motor_2_time = 1.f	
-		    //motor_2_force_1 = 0.015f
-		    //motor_2_force_2 = 0.015f
-		    //type = "fixed"
+   		    min		= -110.0f	// hingeMin
+		    max		= 15.0f		// hingeMax
 		}
 		
-		ragdollhingejoint LHip
+		ragdollhkrdjoint LHip
 		{
 		    bone0 = "Base"
 		    bone1 = "LUpperLeg"
@@ -2993,24 +3009,16 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "l_hip"
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 15.0f
-		    max = 100.0f
-		    swing1 = 15.0f
-		    swing2 = 15.0f
-		    spring = 100.f
-		    damp = 500.f
-		    
-		    //motor_1_time = 0.5f	
-		    //motor_1_spring = 1.f
-		    //motor_1_damp = 1.f	
-		    //motor_1_force = 0.1f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 10.f
-		    motor_2_force_2 = 0.f
-		   
-		    //type = "fixed"
+		    float axis []		= { 0.0f,  -1.0f, 0.75f }
+		    float planeAxis []	= { -1.0f, 0.0f, 0.0f }
+		    float b1_axis []	= { 0.0f,  -1.0f, 0.1f }
+		    //float b1_planeAxis [] = { -1.0f, 0.0f, 0.0f }
+
+   		    min		= 50.0f		// coneAngle
+		    swing1	= -35.0f	// planeMin
+		    swing2	= 10.0f		// planeMax
+		    twistMin= -5.0f		// twistMin
+		    twistMax= 5.0f		// twistMax
 		}
 		ragdollhingejoint LKnee
 		{
@@ -3021,28 +3029,15 @@ ragdollmgrTemplate ragdollmgr
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
 		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 70.0f
-		    max = 5.0f
-		    swing1 = 10.0f;
-		    swing2 = 10.0f;
-		    spring = 100.0f
-		    damp = 100.0f
-		    
-		    //motor_1_time = 0.0f	
-		    //motor_1_spring = 0.f
-		    //motor_1_damp = 0.f	
-		    //motor_1_force = 0.f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 2.0f
-		    motor_2_force_2 = 0.f
+		    float planeAxis []	= { -1.0f, +0.05f, 0.f }
 
-		    //type = "fixed"
+   		    min		= -10.0f	// hingeMin
+		    max		= 100.0f	// hingeMax
 		}
 		// Right (auto-generated)
-		ragdollhingejoint RShoulder { copyfrom = "LShoulder" }
+		ragdollhkrdjoint RShoulder { copyfrom = "LShoulder" }
 		ragdollhingejoint RElbow { copyfrom = "LElbow" }
-		ragdollhingejoint RHip { copyfrom = "LHip" }
+		ragdollhkrdjoint RHip { copyfrom = "LHip" }
 		ragdollhingejoint RKnee { copyfrom = "LKnee" }
 	    }
 	    
@@ -3084,66 +3079,70 @@ ragdollmgrTemplate ragdollmgr
 		RagBone Base
 		{
 		    skel="base"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="base"		
 		    autopos2="waist"
-		    float extent[] = {0.4, 0.1, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    float extent[] = {0.3, 0.1, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
 		    yoffset = -0.1f
-		    mass = 5.0f
+		    mass = 25.0f
 		    buoyancy = 1.3f
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		
 		RagBone UpperBody
 		{
 		    skel="waist"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="waist"		
 		    autopos2="neck_1"
-		    float extent[] = {0.4, 0.0, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    float extent[] = {0.3, 0.0, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
 		    yoffset = 0.0f
-		    mass = 5.0f
+		    mass = 25.0f
 		    buoyancy = 1.3f
 
 		    stopAnimTrigger = -1.f
 		    animFloorTest = "true"
+		    
+		    explosionForceMult = 2.0
 		}
 		
 		RagBone Head 
 		{
 		    skel="head"
 		    //type="sphere"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="head"		
 		    float extent[] = {0.20, 0.3, 0.20}
 		    yoffset = -0.1f
-		    mass = 4.0f
+		    mass = 8.0f
 		}
 			
 		// Left
 		RagBone LUpperArm
 		{
 		    skel="l_shoulder"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_shoulder"
 		    autopos2="l_elbow"
 		    float extent[] = {0.15, 0.0, 0.15}
 		    yoffset = 0.05f
-		    mass = 8.0f
+		    mass = 4.0f
 		    yrot = -10.0f
 		}
 		
 		RagBone LLowerArm
 		{
 		    skel="l_elbow"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_elbow"
 		    autopos2="l_wrist"		
 		    float extent[] = {0.15, 0.1, 0.15}
 		    yoffset = 0.05f
-		    mass = 6.0f
+		    mass = 4.0f
 		    buoyancy = 1.3f
 		    animFloorTest = "true"
 		}
@@ -3151,11 +3150,11 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LUpperLeg
 		{
 		    skel="l_hip"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_hip"
 		    autopos2="l_knee"		
 		    float extent[] = {0.22, 0.0, 0.22}
-		    mass = 11.0f
+		    mass = 6.0f
 		    buoyancy = 1.1f
 
 		    yrot = +30.0f
@@ -3163,11 +3162,11 @@ ragdollmgrTemplate ragdollmgr
 		RagBone LLowerLeg
 		{
 		    skel="l_knee"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="l_knee"		
 		    autopos2="l_ankle"
 		    float extent[] = {0.2, 0.0, 0.2}
-		    mass = 8.0f
+		    mass = 4.0f
 		    buoyancy = 1.3f
 		    yrot = -30.0f
 		}
@@ -3183,7 +3182,7 @@ ragdollmgrTemplate ragdollmgr
 	    joints 
 	    {
 		// Central 
-		ragdollhingejoint Waist
+		ragdollhkrdjoint Waist
 		{
 		    bone0 = "Base"
 		    bone1 = "UpperBody"
@@ -3191,19 +3190,16 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "waist"
 		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
 
-		    float axis [] = { 0.0f, 1.f, 0.f }
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 20.0f;
+		    float axis [] = { 0.0f, 0.0f, 1.0f }
+		    float planeAxis [] = { 0.0f, -1.0f, 0.0f }
 		    
-		    spring = 50.f
-		    damp = 100.f
-
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 0.01f
-		    motor_2_force_2 = 0.0f
+		    min		= 20.0f		// coneAngle
+		    swing1	= -90.0f	// planeMin		// unused for waist
+		    swing2	= 90.0f		// planeMax		// unused for waist
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		}
-		ragdollhingejoint Head
+		ragdollhkrdjoint Head
 		{
 		    bone0 = "UpperBody"
 		    bone1 = "Head" 
@@ -3211,22 +3207,19 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "neck_1"
 		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
 
-		    float axis [] = { 1.0f, 0.f, 0.f }
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 35.0f;
-		    
-		    spring = 50.f
-		    damp = 100.f
+		    float axis [] = { 0.0f, 0.0f, 1.0f }
+		    float planeAxis [] = { 1.0f, 0.0f, 0.0f }
 
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 0.01f
-		    motor_2_force_2 = 0.0f
+		    min		= 30.0f		// coneAngle
+		    swing1	= -90.0f	// planeMin		// unused for head
+		    swing2	= 90.0f		// planeMax		// unused for head
+		    twistMin= -15.0f
+		    twistMax= 15.0f
 		    //type = "fixed"
 		}
 		
 		// Left
-		ragdollhingejoint LShoulder
+		ragdollhkrdjoint LShoulder
 		{
 		    bone0 = "UpperBody"
 		    bone1 = "LUpperArm"
@@ -3234,22 +3227,16 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "l_shoulder"
 		    float jointposoffset [] = {0.f, 0.f, 0.02f}
 
-		    float axis [] = { 0.0f, 0.0f, 1.f }
-		    min = 75.f
-		    max = 28.f
-		    swing1 = 5.0f;
-		    swing2 = 5.0f;
-		    spring = 50.f
-		    damp = 50.f
-		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.0f
-		    
-		    motor_2_time = 0.5f	
-		    motor_2_force_1 = 0.1f
-		    motor_2_force_2 = 0.0f
+		    float axis [] = { 1.0f, 0.0f, 0.0f }
+		    float planeAxis [] = { 0.0f, 0.0f, 1.0f }
+		    float b1_axis [] = { 0.7f, -0.8f, 0.0f }
+		    float b1_planeAxis [] = { 0.0f, 0.0f, 1.0f }
+
+   		    min		= 95.0f		// coneAngle
+		    swing1	= 5.0f		// planeMin
+		    swing2	= 95.0f		// planeMax
+		    twistMin= -25.0f
+		    twistMax= 45.0f
 		}
 		ragdollhingejoint LElbow
 		{
@@ -3259,25 +3246,14 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "l_elbow"
 		    float jointposoffset [] = {0.f, 0.f, -0.05f}
 
-		    float axis [] = { 1.0f, +0.6f, 0.f }
-		    min = 1.0f
-		    max = +90.0f
-		    swing1 = 2.0f;
-		    spring = 20.f
-		    damp = 500.f
+		    float axis []		= { 1.0f,  +0.6f, 0.0f }
+		    float planeAxis []	= { -1.0f, -0.6f, 0.0f }
 		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.f
-		    
-		    //motor_2_time = 1.f	
-		    //motor_2_force_1 = 0.015f
-		    //motor_2_force_2 = 0.015f
-		    //type = "fixed"
+   		    min		= -110.0f	// hingeMin
+		    max		= 15.0f		// hingeMax
 		}
 		
-		ragdollhingejoint LHip
+		ragdollhkrdjoint LHip
 		{
 		    bone0 = "Base"
 		    bone1 = "LUpperLeg"
@@ -3285,24 +3261,16 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "l_hip"
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
-		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 15.0f
-		    max = 100.0f
-		    swing1 = 15.0f
-		    swing2 = 15.0f
-		    spring = 100.f
-		    damp = 500.f
-		    
-		    //motor_1_time = 0.5f	
-		    //motor_1_spring = 1.f
-		    //motor_1_damp = 1.f	
-		    //motor_1_force = 0.1f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 10.f
-		    motor_2_force_2 = 0.f
-		   
-		    //type = "fixed"
+		    float axis []		= { 0.0f,  -1.0f, 0.75f }
+		    float planeAxis []	= { -1.0f, 0.0f, 0.0f }
+		    float b1_axis []	= { 0.0f,  -1.0f, 0.1f }
+		    //float b1_planeAxis [] = { -1.0f, 0.0f, 0.0f }
+
+   		    min		= 50.0f		// coneAngle
+		    swing1	= -45.0f	// planeMin
+		    swing2	= 15.0f		// planeMax
+		    twistMin= -8.0f		// twistMin
+		    twistMax= 8.0f		// twistMax
 		}
 		ragdollhingejoint LKnee
 		{
@@ -3313,28 +3281,15 @@ ragdollmgrTemplate ragdollmgr
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
 		    float axis [] = { 1.0f, -0.05f, 0.f }
-		    min = 70.0f
-		    max = 5.0f
-		    swing1 = 10.0f;
-		    swing2 = 10.0f;
-		    spring = 100.0f
-		    damp = 100.0f
-		    
-		    //motor_1_time = 0.0f	
-		    //motor_1_spring = 0.f
-		    //motor_1_damp = 0.f	
-		    //motor_1_force = 0.f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 2.0f
-		    motor_2_force_2 = 0.f
+		    float planeAxis []	= { -1.0f, +0.05f, 0.f }
 
-		    //type = "fixed"
+   		    min		= -10.0f	// hingeMin
+		    max		= 100.0f	// hingeMax
 		}
 		// Right (auto-generated)
-		ragdollhingejoint RShoulder { copyfrom = "LShoulder" }
+		ragdollhkrdjoint RShoulder { copyfrom = "LShoulder" }
 		ragdollhingejoint RElbow { copyfrom = "LElbow" }
-		ragdollhingejoint RHip { copyfrom = "LHip" }
+		ragdollhkrdjoint RHip { copyfrom = "LHip" }
 		ragdollhingejoint RKnee { copyfrom = "LKnee" }
 	    }
 	    
@@ -3361,11 +3316,11 @@ ragdollmgrTemplate ragdollmgr
 	//      rancor1 - For the rancor
 	//================================================
 
-	//TODO - The rancor isn't working correctly. Have 
-	//       tried to make it as simple as possible and 
-	//	 it still doesn't work. Apparently a ragdoll
-	//	 editor is being made, so hopefully that can
-	//	 help!!!
+	// Rancor needs more love. To make it work multiple things need fixing, among others:
+	//  - naming of the bones must be standard, and that is NOT 'shoulderL' but 'l_shoulder'
+	//  so that autogenerate right side works.
+	//  - bones (should match rancor...)
+	//  - joints (not working at all currently...)
 	
 	ragdollinfo rancor1
 	{
@@ -3383,243 +3338,206 @@ ragdollmgrTemplate ragdollmgr
 		RagBone Base
 		{
 		    skel="base"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="base"		
 		    autopos2="belly"
-		    //float extent[] = {0.4, 0.1, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
-		 /*   float extent[] = {0.0, 0.0, 0.0} 
-		    yoffset = -0.1f
-		    mass = 5.0f
-
-		    stopAnimTrigger = -1.f
-		    animFloorTest = "true"
-		    */
+		    float extent[] = {2.6, 0.1, 2.6}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    yoffset = -0.25
+		    mass = 200.0f
 		}
 		
 		RagBone UpperBody
 		{
 		    skel="belly"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="belly"		
 		    autopos2="ribcage"
-		    //float extent[] = {0.4, 0.0, 0.3}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
-		/*    float extent[] = {0.0, 0.0, 0.0} 
-		    yoffset = 0.0f
-		    mass = 5.0f
-
-		    stopAnimTrigger = -1.f
-		    animFloorTest = "true"*/
+		    float extent[] = {2.6, 0.7, 2.6}	// NB: x and z extents are taken as read. If automeaure, then the final y-extent is extent.y += length from automeaure
+		    yoffset = 0.6
+			mass = 200.0f			
 		}
-	/*	
+
 		RagBone Head 
 		{
 		    skel="head"
-		    type="obb"
+		    type="sphere"
+		    //type="cap" //type="obb"
 		    autopos1="head"		
-		    //float extent[] = {0.20, 0.3, 0.20}
-		    float extent[] = {0.0, 0.0, 0.0}
-		    yoffset = -0.1f
-		    mass = 20.0f
+		    float extent[] = {2.0, 0.0, 2.0}
+		    yoffset = 0.6f
+		    mass = 50.0f
 		}
-		*/	
+		
 		// Left
+		
 		RagBone LUpperUpperArm
 		{
 		    skel="shoulderL"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="shoulderL"
 		    autopos2="upperarmL"
-		    //float extent[] = {0.15, 0.0, 0.15}
-		/*    float extent[] = {0.0, 0.0, 0.0}
-		    yoffset = 0.05f
-		    mass = 10.0f
-		    yrot = -10.0f*/
+		    float extent[] = {0.8, -0.5, 0.8}
+		    yoffset = 0.7f
+		    mass = 50
+		    //yrot = -10.0f
 		}
 
 		RagBone LUpperArm
 		{
 		    skel="upperarmL"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="upperarmL"
 		    autopos2="forearmL"
-		    //float extent[] = {0.15, 0.0, 0.15}
-	/*	    float extent[] = {0.0, 0.0, 0.0}
-		    yoffset = 0.05f
-		    mass = 10.0f
-		    yrot = -10.0f*/
+		    float extent[] = {1.3, 0.0, 1.3}
+		    mass = 50.0f
+		    //yrot = -10.0f
 		}
 		
 		RagBone LLowerArm
 		{
 		    skel="forearmL"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="forearmL"
 		    autopos2="palmL"		
-		    //float extent[] = {0.15, 0.1, 0.15}
-	/*	    float extent[] = {0.0, 0.0, 0.0}
-		    yoffset = 0.05f
-		    mass = 5.0f
-		    animFloorTest = "true"*/
+		    float extent[] = {1.1, 2.0, 1.1}
+		    mass = 50.0f
 		}
 		
 		RagBone LUpperLeg
 		{
 		    skel="upperlegL"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="upperlegL"
 		    autopos2="lowerlegL"		
-		    //float extent[] = {0.22, 0.0, 0.22}
-		/*    float extent[] = {0.0, 0.0, 0.0}
-		    mass = 5.0f*/
+		    float extent[] = {1.2, 0.0, 1.2}
+		    mass = 60.0f
 		}
 		RagBone LLowerLeg
 		{
 		    skel="lowerlegL"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="lowerlegL"		
 		    autopos2="footL"
-		    //float extent[] = {0.2, 0.0, 0.2}
-		 /*   float extent[] = {0.0, 0.0, 0.0}
-		    mass = 5.0f*/
+		    float extent[] = {1.2, 0.5, 1.2}
+			mass = 50.0f
 		}
-		
+
 		// Right
+		
 		RagBone RUpperUpperArm
 		{
 		    skel="shoulderR"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="shoulderR"
 		    autopos2="upperarmR"
-		    //float extent[] = {0.15, 0.0, 0.15}
-	/*	    float extent[] = {0.0, 0.0, 0.0}
-		    yoffset = 0.05f
-		    mass = 5.0f
-		    yrot = -10.0f*/
+		    float extent[] = {0.8, -0.5, 0.8}
+		    yoffset = 0.7f
+		    mass = 50
+		    //yrot = -10.0f
 		}
 
-		
 		RagBone RUpperArm
 		{
 		    skel="upperarmR"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="upperarmR"
 		    autopos2="forearmR"
-		    //float extent[] = {0.15, 0.0, 0.15}
-	/*	    float extent[] = {0.0, 0.0, 0.0}
-		    yoffset = 0.05f
-		    mass = 5.0f
-		    yrot = -10.0f*/
+		    float extent[] = {1.3, 0.0, 1.3}
+		    mass = 50.0f
+		    //yrot = -10.0f
 		}
 		
 		RagBone RLowerArm
 		{
 		    skel="forearmR"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="forearmR"
 		    autopos2="palmR"		
-		    //float extent[] = {0.15, 0.1, 0.15}
-		/*    float extent[] = {0.0, 0.0, 0.0}
-		    yoffset = 0.05f
-		    mass = 5.0f
-		    animFloorTest = "true"*/
+		    float extent[] = {1.1, 2.0, 1.1}
+		    mass = 50.0f
 		}
 		
 		RagBone RUpperLeg
 		{
 		    skel="upperlegR"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="upperlegR"
 		    autopos2="lowerlegR"		
-	/*	    //float extent[] = {0.22, 0.0, 0.22}
-		    float extent[] = {0.0, 0.0, 0.0}
-		    mass = 5.0f*/
+		    float extent[] = {1.2, 0.0, 1.2}
+		    mass = 60.0f
 		}
 		RagBone RLowerLeg
 		{
-		    skel="lowerlegL"
-		    type="obb"
-		    autopos1="lowerlegR"		
+		    skel="lowerlegR"
+		    type="cap" //type="obb"
+		    autopos1="lowerlegR"
 		    autopos2="footR"
-		    //float extent[] = {0.2, 0.0, 0.2}
-	/*	    float extent[] = {0.0, 0.0, 0.0}
-		    mass = 5.0f*/
-		} 
+		    float extent[] = {1.2, 0.5, 1.2}
+			mass = 50.0f
+		}
 
 		RagBone UpperTail
 		{
 		    skel="tailbase"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="tailbase"
 		    autopos2="tailtip"		
-		    //float extent[] = {0.22, 0.0, 0.22}
-	/*	    float extent[] = {0.25, 0.0, 0.25}	
-		    mass = 5.0f*/
+		    float extent[] = {0.5, 0.0, 0.5}
+		    mass = 40.0f
 		}
 
 		RagBone LowerTail 
 		{
 		    skel="tailtip"
-		    type="obb"
+		    type="cap" //type="obb"
 		    autopos1="tailtip"		
-		    //float extent[] = {0.20, 0.3, 0.20}
-		/*    float extent[] = {0.0, 0.0, 0.0}
-		    yoffset = -0.1f
-		    mass = 20.0f*/
-		}		
+		    float extent[] = {0.35, 1.0, 0.35}
+		    yoffset = -0.8f
+		    mass = 30.0f
+		}
 	    }
 	    //--------------------------------------------------------------------
 	    joints 
 	    {
 		// Central 
-		ragdollhingejoint Waist
+		ragdollhkrdjoint Waist
 		{
 		    bone0 = "Base"
 		    bone1 = "UpperBody"
 
 		    jointpos = "belly"
-		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
+		    float jointposoffset [] = {0.0f, 0.0f, 0.0f}
 
-		    float axis [] = { 0.0f, 1.f, 0.f }
-/*
-
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 20.0f;
+		    float axis [] = { 0.0f, 1.0f, 0.0f }
+		    float planeAxis [] = { 1.0f, 0.0f, 0.0f }
 		    
-		    spring = 50.f
-		    damp = 100.f
-
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 0.01f
-		    motor_2_force_2 = 0.0f
-*/
+		    min		= 25.0f		// coneAngle
+		    swing1	= -90.0f	// planeMin		// unused for waist
+		    swing2	= 90.0f		// planeMax		// unused for waist
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		}
-		/*
-		ragdollhingejoint Head
+		
+		ragdollhkrdjoint Head
 		{
 		    bone0 = "UpperBody"
 		    bone1 = "Head" 
 
 		    jointpos = "head"
-		    float jointposoffset [] = {0.0f, 0.05f, 0.0f}
-		    float axis [] = { 0.0f, 1.f, 0.f }
+		    float jointposoffset [] = {0.0f, 0.0f, 0.0f}
 
-		    min = -20.0f
-		    max = +20.0f
-		    swing1 = 35.0f;
-		    
-		    spring = 50.f
-		    damp = 100.f
+		    float axis [] = { 0.0f, 0.0f, 1.0f }
+		    float planeAxis [] = { 1.0f, 0.0f, 0.0f }
 
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 0.01f
-		    motor_2_force_2 = 0.0f
-		    //type = "fixed"
-
+		    min		= 20.0f		// coneAngle
+		    swing1	= -80.0f	// planeMin		// unused for head
+		    swing2	= 80.0f		// planeMax		// unused for head
+		    twistMin= -10.0f
+		    twistMax= 10.0f
 		}
-		*/
+		
 		// Left
-		ragdollhingejoint LShoulder
+		ragdollhkrdjoint LShoulder
 		{
 		    bone0 = "UpperBody"
 		    bone1 = "LUpperUpperArm"
@@ -3627,27 +3545,16 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "shoulderL"
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
-		    float axis [] = { 0.0f, 0.3f, 1.f }
-/*
-		    min = 75.f
-		    max = 28.f
-		    swing1 = 5.0f;
-		    swing2 = 5.0f;
-		    spring = 50.f
-		    damp = 50.f
-		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.0f
-		    
-		    motor_2_time = 0.5f	
-		    motor_2_force_1 = 0.1f
-		    motor_2_force_2 = 0.0f
-*/
+		    float axis [] = { 1.0f, 0.0f, 0.0f }
+		    float planeAxis [] = { 0.0f, 0.0f, 1.0f }
+
+   		    min		= 25.0f		// coneAngle
+		    swing1	= 85.0f		// planeMin
+		    swing2	= 85.0f		// planeMax
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		}
-		
-		ragdollhingejoint LShoulderElbow
+		ragdollhkrdjoint LShoulderElbow
 		{
 		    bone0 = "LUpperUpperArm"
 		    bone1 = "LUpperArm"
@@ -3655,26 +3562,15 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "upperarmL"
 		    float jointposoffset [] = {0.f, 0.f, 0.02f}
 		    
-		    float axis [] = { -1.0f, +0.5f, 0.f }
-/*
-		    min = 75.f
-		    max = 28.f
-		    swing1 = 5.0f;
-		    swing2 = 5.0f;
-		    spring = 50.f
-		    damp = 50.f
-		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.0f
-		    
-		    motor_2_time = 0.5f	
-		    motor_2_force_1 = 0.1f
-		    motor_2_force_2 = 0.0f
-*/
+		    float axis [] = { 1.0f, 0.0f, 0.0f }
+		    float planeAxis [] = { 0.0f, 0.0f, 1.0f }
+
+   		    min		= 75.0f		// coneAngle
+		    swing1	= 5.0f		// planeMin
+		    swing2	= 85.0f		// planeMax
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		}
-		
 		ragdollhingejoint LElbow
 		{
 		    bone0 = "LUpperArm"
@@ -3683,27 +3579,13 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "forearmL"
 		    float jointposoffset [] = {0.f, 0.f, -0.05f}
 
-		    float axis [] = { -1.0f, -0.5f, 0.f }
-		    /*
-		    min = 1.0f
-		    max = 10.0f		    
-		    swing1 = 2.0f;
-		    spring = 20.f
-		    damp = 500.f
+   		    float axis []		= { 1.0f,  +0.6f, 0.0f }
+		    float planeAxis []	= { -1.0f, -0.6f, 0.0f }
 		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.f
-		    
-		    //motor_2_time = 1.f	
-		    //motor_2_force_1 = 0.015f
-		    //motor_2_force_2 = 0.015f
-		    //type = "fixed"
-		    */
+   		    min		= -60.0f	// hingeMin
+		    max		= 65.0f		// hingeMax
 		}
-		
-		ragdollhingejoint LHip
+		ragdollhkrdjoint LHip
 		{
 		    bone0 = "Base"
 		    bone1 = "LUpperLeg"
@@ -3711,26 +3593,16 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "upperlegL"
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
-		    float axis [] = { 0.0f, -0.5f, 1.f }
-		    /*
-		    min = 15.0f
-		    max = 30.0f
-		    swing1 = 15.0f
-		    swing2 = 15.0f
-		    spring = 50.f
-		    damp = 500.f
-		    
-		    //motor_1_time = 0.5f	
-		    //motor_1_spring = 1.f
-		    //motor_1_damp = 1.f	
-		    //motor_1_force = 0.1f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 10.f
-		    motor_2_force_2 = 0.f
-		   
-		    //type = "fixed"
-		    */
+		    float axis []		= { 0.0f,  -1.0f, 0.75f }
+		    float planeAxis []	= { -1.0f, 0.0f, 0.0f }
+		    float b1_axis []	= { 0.0f,  -1.0f, 0.1f }
+		    //float b1_planeAxis [] = { -1.0f, 0.0f, 0.0f }
+
+   		    min		= 50.0f		// coneAngle
+		    swing1	= -35.0f	// planeMin
+		    swing2	= 10.0f		// planeMax
+		    twistMin= -5.0f		// twistMin
+		    twistMax= 5.0f		// twistMax
 		}
 		ragdollhingejoint LKnee
 		{
@@ -3740,30 +3612,15 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "lowerlegL"
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
-		    float axis [] = { 0.0f, -1.0f, 0.f }
-		    /*
-		    min = 10.0f
-		    max = 30.0f
-		    swing1 = 10.0f;
-		    swing2 = 10.0f;
-		    spring = 10.0f
-		    damp = 100.0f
-		    
-		    //motor_1_time = 0.0f	
-		    //motor_1_spring = 0.f
-		    //motor_1_damp = 0.f	
-		    //motor_1_force = 0.f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 2.0f
-		    motor_2_force_2 = 0.f
+		    float axis [] = { 1.0f, -0.05f, 0.f }
+		    float planeAxis []	= { -1.0f, +0.05f, 0.f }
 
-		    //type = "fixed"
-		    */
+   		    min		= -40.0f	// hingeMin
+		    max		= 100.0f	// hingeMax
 		}
-		
+
 		// Right
-		ragdollhingejoint RShoulder
+		ragdollhkrdjoint RShoulder
 		{
 		    bone0 = "UpperBody"
 		    bone1 = "RUpperUpperArm"
@@ -3771,54 +3628,32 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "shoulderR"
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
-		    float axis [] = { 0.0f, 0.3f, -1.f }
-		    /*
-		    min = 10.f
-		    max = 28.f
-		    swing1 = 5.0f;
-		    swing2 = 5.0f;
-		    spring = 50.f
-		    damp = 50.f
-		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.0f
-		    
-		    motor_2_time = 0.5f	
-		    motor_2_force_1 = 0.1f
-		    motor_2_force_2 = 0.0f
-		    */
+		    float axis [] = { -1.0f, 0.0f, 0.0f }
+		    float planeAxis [] = { -0.0f, 0.0f, 1.0f }
+
+   		    min		= 25.0f		// coneAngle
+		    swing1	= 85.0f		// planeMin
+		    swing2	= 85.0f		// planeMax
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		}
-		
-		ragdollhingejoint RShoulderElbow
+		ragdollhkrdjoint RShoulderElbow
 		{
 		    bone0 = "RUpperUpperArm"
 		    bone1 = "RUpperArm"
 
 		    jointpos = "upperarmR"
-		    float jointposoffset [] = {0.f, 0.f, 0.0f}
+		    float jointposoffset [] = {0.f, 0.f, 0.02f}
+		    
+		    float axis [] = { -1.0f, 0.0f, 0.0f }
+		    float planeAxis [] = { 0.0f, 0.0f, 1.0f }
 
-		    float axis [] = { 1.0f, -0.5f, 0.f }
-		    /*
-		    min = 10.f
-		    max = 28.f
-		    swing1 = 5.0f;
-		    swing2 = 5.0f;
-		    spring = 50.f
-		    damp = 50.f
-		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.0f
-		    
-		    motor_2_time = 0.5f	
-		    motor_2_force_1 = 0.1f
-		    motor_2_force_2 = 0.0f
-		    */
+   		    min		= 75.0f		// coneAngle
+		    swing1	= 5.0f		// planeMin
+		    swing2	= 85.0f		// planeMax
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		}
-		
 		ragdollhingejoint RElbow
 		{
 		    bone0 = "RUpperArm"
@@ -3827,27 +3662,13 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "forearmR"
 		    float jointposoffset [] = {0.f, 0.f, -0.05f}
 
-		    float axis [] = { 1.0f, -0.5f, 0.f }
-		    /*
-		    min = 1.0f
-		    max = +30.0f
-		    swing1 = 2.0f;
-		    spring = 20.f
-		    damp = 500.f
+   		    float axis []		= { -1.0f,  +0.6f, 0.0f }
+		    float planeAxis []	= { 1.0f, -0.6f, 0.0f }
 		    
-		    motor_1_time = 0.5f	
-		    motor_1_spring = 1.f
-		    motor_1_damp = 1.f	
-		    motor_1_force = 1.f
-		    
-		    //motor_2_time = 1.f	
-		    //motor_2_force_1 = 0.015f
-		    //motor_2_force_2 = 0.015f
-		    //type = "fixed"
-		    */
+   		    min		= -65.0f	// hingeMin
+		    max		= 60.0f		// hingeMax
 		}
-		
-		ragdollhingejoint RHip
+		ragdollhkrdjoint RHip
 		{
 		    bone0 = "Base"
 		    bone1 = "RUpperLeg"
@@ -3855,26 +3676,16 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "upperlegR"
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
-		    float axis [] = { 0.0f, -0.5f, -1.f }
-		    /*
-		    min = 15.0f
-		    max = 30.0f
-		    swing1 = 15.0f
-		    swing2 = 15.0f
-		    spring = 50.f
-		    damp = 500.f
-		    
-		    //motor_1_time = 0.5f	
-		    //motor_1_spring = 1.f
-		    //motor_1_damp = 1.f	
-		    //motor_1_force = 0.1f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 10.f
-		    motor_2_force_2 = 0.f
-		   
-		    //type = "fixed"
-		    */
+		    float axis []		= { 0.0f,  -1.0f, 0.75f }
+		    float planeAxis []	= { 1.0f, 0.0f, 0.0f }
+		    float b1_axis []	= { 0.0f,  -1.0f, 0.1f }
+		    //float b1_planeAxis [] = { 1.0f, 0.0f, 0.0f }
+
+   		    min		= 50.0f		// coneAngle
+		    swing1	= -35.0f	// planeMin
+		    swing2	= 10.0f		// planeMax
+		    twistMin= -5.0f		// twistMin
+		    twistMax= 5.0f		// twistMax
 		}
 		ragdollhingejoint RKnee
 		{
@@ -3884,30 +3695,21 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "lowerlegR"
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
-		    float axis [] = { 0.0f, -1.0f, 0.f }
-		    /*
-		    min = 10.0f
-		    max = 20.0f
-		    swing1 = 10.0f;
-		    swing2 = 10.0f;
-		    spring = 10.0f
-		    damp = 100.0f
-		    
-		    //motor_1_time = 0.0f	
-		    //motor_1_spring = 0.f
-		    //motor_1_damp = 0.f	
-		    //motor_1_force = 0.f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 2.0f
-		    motor_2_force_2 = 0.f
+		    float axis [] = { -1.0f, -0.05f, 0.f }
+		    float planeAxis []	= { 1.0f, +0.05f, 0.f }
 
-		    //type = "fixed"
-		    */
+   		    min		= -100.0f	// hingeMin
+		    max		= 40.0f	// hingeMax
 		}
+				
+		/*
+		---------------------------------------------------------------------
+		---------------------------------------------------------------------
+		---------------------------------------------------------------------
+		*/
 
 		//Tail
-		ragdollhingejoint UpperTail
+		ragdollhkrdjoint UpperTail
 		{
 		    bone0 = "Base"
 		    bone1 = "UpperTail"
@@ -3915,28 +3717,16 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "tailbase"
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
-		    float axis [] = { 0.0f, -1.0f, 0.f }
-		    /*
-		    min = 15.0f
-		    max = 30.0f
-		    swing1 = 15.0f
-		    swing2 = 15.0f
-		    spring = 50.f
-		    damp = 500.f
+		    float axis [] = { 0.0f, 1.0f, 0.0f }
+		    float planeAxis [] = { 1.0f, 0.0f, 0.0f }
 		    
-		    //motor_1_time = 0.5f	
-		    //motor_1_spring = 1.f
-		    //motor_1_damp = 1.f	
-		    //motor_1_force = 0.1f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 10.f
-		    motor_2_force_2 = 0.f
-		   
-		    //type = "fixed"
-		    */
+		    min		= 25.0f		// coneAngle
+		    swing1	= -90.0f	// planeMin		// unused for waist
+		    swing2	= 90.0f		// planeMax		// unused for waist
+		    twistMin= -5.0f
+		    twistMax= 5.0f
 		}
-		ragdollhingejoint LowerTail
+		ragdollhkrdjoint LowerTail
 		{
 		    bone0 = "UpperTail"
 		    bone1 = "LowerTail"
@@ -3944,27 +3734,16 @@ ragdollmgrTemplate ragdollmgr
 		    jointpos = "tailtip"
 		    float jointposoffset [] = {0.f, 0.f, 0.0f}
 
-		    float axis [] = { 0.0f, -1.0f, 0.f }
-		    /*
-		    min = 10.0f
-		    max = 20.0f
-		    swing1 = 10.0f;
-		    swing2 = 10.0f;
-		    spring = 10.0f
-		    damp = 100.0f
+		    float axis [] = { 0.0f, 1.0f, 0.0f }
+		    float planeAxis [] = { 1.0f, 0.0f, 0.0f }
 		    
-		    //motor_1_time = 0.0f	
-		    //motor_1_spring = 0.f
-		    //motor_1_damp = 0.f	
-		    //motor_1_force = 0.f
-		    
-		    motor_2_time = 1.f	
-		    motor_2_force_1 = 2.0f
-		    motor_2_force_2 = 0.f
-
-		    //type = "fixed"
-		    */
+		    min		= 25.0f		// coneAngle
+		    swing1	= -90.0f	// planeMin		// unused for waist
+		    swing2	= 90.0f		// planeMax		// unused for waist
+		    twistMin= -5.0f
+		    twistMax= 5.0f		    
 		}
+		
 	    }
 	    
 	    //----------------------------------------------------------------------------

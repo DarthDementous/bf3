@@ -1,3 +1,5 @@
+// vim: set syntax=c :
+
 // templates for CSG components etc
 // currently have an editor volume per editor type (nav, sound, trigger)
 // need to abandon this if we can and just have one
@@ -130,5 +132,10 @@ template csgDescription
 
     csgEditorVolume volumes[]
     {
+    }
+
+    editorDataComponent editordata
+    {
+
     }
 }

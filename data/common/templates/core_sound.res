@@ -1,3 +1,5 @@
+// vim: set syntax=c :
+
 template soundcomponent
 {
     class-id = "sound component"
@@ -5,19 +7,48 @@ template soundcomponent
     fadeOutTime = 0.33f
 }
 
-template soundWhileMovingComponent
+template soundparm
 {
-    class-id = "sound while moving component"
-
-    currentMovementSound    = ""  // Entry in prop's sound map
-
-    // Sensible defaults
-    pitchWhenSilent		    = 1.0f
-    pitchWhenFullVolume		    = 1.0f
-    maxVolume			    = 1.0f
-    fullVolumeWhenVelocityIsAbove   = 5.0f
-    silentWhenVelocityIsBelow	    = 0.5f
+    input = 0
+    output = 0
+    relationshipType = 0
+    minInput = 0.f
+    maxInput = 1.f
+    minOutput = 0.f
+    maxOutput = 1.f
 }
+
+template soundevent
+{
+    cueType = "SNDCUE_PLAY"
+}
+
+template soundcue
+{
+}
+
+template soundeventsystem
+{
+    class-id = "sound event system"
+    maxInstances = 64
+    definition = "" // NB: this must be overridden and valid
+}
+
+template soundcustominput
+{
+}
+
+template soundglobalinput
+{
+}
+
+template soundeventsystemdefinition
+{
+    addSystems []
+    {
+    }
+}
+
 
 template propSoundComponent
 {

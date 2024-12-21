@@ -121,6 +121,7 @@ template pickup_gadget_multipick_rb : pickup_gadget_multipick_fixed
 
     odesimplephysics physics
     {
+    mayaphysics			= "false"
 	type	    = "k_physicsBox"
 	material    = "stel"
 	enabled	    = "true"

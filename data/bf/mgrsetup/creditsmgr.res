@@ -1,6 +1,7 @@
 // vim: set syntax=c :
 
-CreditsManager
+CreditsMgr
 {
     class-id	    =	"credits mgr"
 }
+

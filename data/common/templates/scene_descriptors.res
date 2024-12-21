@@ -1,7 +1,12 @@
-// vim:set syntax=c:
+// vim: set syntax=c :
 
-template scene_descriptor
+template scene_descriptor : SceneVolumeData
 {
+    // DO NOT ADD ANY DATA HERE
+    // PUT ALL THE DATA INTO THE SceneVolumeData template
+/*
+    relativeDelay = 5.0
+
     // sun
     eastAngle		    = 20.0f
     spaceEastAngle		    = 20.0f
@@ -19,12 +24,14 @@ template scene_descriptor
     spaceSunIntensity	    = 2.0f
     occIntensity	    = 0.0f
     sunLightEnabled	    = "true" //
+    normmapIntensity	    = 1.0f
     // -- missing -- realTimeOfDay
     timeOfDay		    = 14.0f
     spaceTimeOfDay	    = 14.0f
     timeSunRise		    = 5.0f
     timeSunSet		    = 19.0f
     terrainLightmapScale    = 1.0f
+    terrainDrawOuterLayers  = "true"
     // sun flare
     flareRange		    = 28.0f
     flareScale		    = 22.0f
@@ -49,7 +56,7 @@ template scene_descriptor
     WiiSun2Col		    []{0.8f, 1.0f, 0.5f}
     WiiSun3Col		    []{0.8f, 1.0f, 0.5f}
     WiiSun4Col		    []{0.8f, 1.0f, 0.5f}
-    WiiSunSize		    []{0.06f, 0.05f, 0.05f, 0.1f}	//Sizes of suns.
+    WiiSunSize		    []{2000.0f, 1500.0f, 1800.0f, 1000.0f}  //Sizes of suns.
     WiiSunFilename	    = "misctex/terrain/sun"		//Sun texture filename.
 
     // Dust particle system
@@ -65,14 +72,60 @@ template scene_descriptor
     WeatherParticlesLifetime	    = 6.0f			//Particle lifetime.
     WeatherParticlesNumParticles    = 0				//Number of quads to draw. Recommended 4.
     WeatherParticlesTexture	    = "misctex/sand02"		//Particle texture.
+	
+    //Water shader variables for Wii:
+    Wii_waterEnabled		    = "false"			//Enable or disable the water shader.
+    Wii_waterUseUVs		    = "false"			//Use the water's UVs instead of automatically generatic values.
+    Wii_waterFlows		    = "true"			//Water flows in a specific direction.
+    Wii_waterDensity		    = 0.05f			//Density of the waves on the water surface.
+    Wii_waterDirection		    = 0.0f			//Direction of water flow (rotation around Y axis in radians, default is in negative x direction.
+    Wii_waterFade		    = 200			//Strength of fade effect on water surface light close to camera.
+    Wii_waterFadeScale		    = 2.7f			//Size of circle around camera where fade occurs.
+    Wii_waterHeight		    = 0.01f			//Height of waves (affects lighting and refraction).
+    Wii_waterLightIntensity	    = 100.0f			//Intensity on general lighting on water surface.
+    Wii_waterLightSharpness	    = 6.0f			//Sharpness of lighting on water surface.
+    Wii_waterAmbientLight	    = 0.0f			//Added ambient light to water surface (can be negative).
+    Wii_waterSpecDotSize	    = 0.5f			//Size of "sun reflection" - like specular.
+    Wii_waterSpecDotDist	    = 0.7f			//Distance of specular "sun reflection" from camera.
+    Wii_waterSpecDotWidth	    = 1.5f			//Shape of specular "sun reflection".
+    Wii_waterFlowSpeed		    []{0.1f, 0.02f}		//Speed of water flow.
+    Wii_WaterColour		    []{0.8f, 0.8f, 0.9f}	//Filter on refracted image.
+    Wii_WaterSpecColour		    []{1.0f, 1.0f, 1.0f}	//Colour of specular "sun reflection".
+
+    Wii_drawStars		    = "true"			//Should be set to false in levels with only a sky box when the default stars are not to be rendered.
+
+    Wii_foliageTex		    = "misctex/terrain/foliage"	//Foliage texture.
+
+    //Wii versions of filters:
+    Wii_monochrome		    = 0.0f
+    float Wii_addScr		    []{0.0f, 0.0f, 0.0f}
+    float Wii_addRgb		    []{0.0f, 0.0f, 0.0f}
+    float Wii_mulRgb		    []{1.0f, 1.0f, 1.0f}
+    float Wii_bloom		    []{1.0f, 1.0f, 1.0f, 0.0f}
+    Wii_bloomMode		    = 6					//0 = no bloom. 1-3 = normal blooms, 4-6 = "star" blooms.
+    Wii_bloomThreshold		    = 210				//Colour chanel threshold for bloom.
+    Wii_bloomScale		    = 3.0f				//Scale brightness of bloom. From 0.0f to 8.0f.
+    Wii_bloomBleed		    = 0.002f				//Bleed bloom outwards.
+    float Wii_fogDir		    []{1.0f, 0.0f, 0.0f}
+    float Wii_fog		    []{1.0f, 1.0f, 1.0f, 0.0f}
+    Wii_fogNear			    = 0.0f
+    Wii_fogFar			    = 500.0f
+    Wii_fogAdd			    = "false"
+    Wii_fogSky			    = "true"
+    Wii_fogNoiseAlphaStrength	    = 0.35f
+    Wii_fogNoiseAlphaRange	    = 0.15f
+    Wii_fogNoiseAlphaRamp	    = 1.5f
+    Wii_fogNoiseGrain		    = 15.0f
+    Wii_fogNoiseSpeed		    = 0.17f
+    float Wii_fogNoiseDir	    []{0.0f, 1.0f, 0.0f}
+    Wii_fogLow			    = 0.0f
+    Wii_fogHigh			    = 300.0f
+    Wii_fogType			    = 1
+    float Wii_fogHighCol	    []{0.11f, 0.11f, 0.23f, 1.0f}
 
     // filters
-    float bloom		    []{1.0f, 1.0f, 1.0f, 0.0f}
+    float bloomArr	    []{1.0f, 1.0f, 1.0f, 0.0f}
     bloomBleed		    = 0.1f
-    Wii_bloomMode	    = 6					//0 = no bloom. 1-3 = normal blooms, 4-6 = "star" blooms.
-    Wii_bloomThreshold	    = 210				//Colour chanel threshold for bloom.
-    Wii_bloomScale	    = 3.0f				//Scale brightness of bloom. From 0.5 to 4.0.
-    Wii_bloomBleed	    = 0.002f				//Bleed bloom outwards.
     float addScr	    []{0.0f, 0.0f, 0.0f}
     float addHsl	    []{0.0f, 0.0f, 0.0f}
     float addRgb	    []{0.0f, 0.0f, 0.0f}
@@ -115,6 +168,8 @@ template scene_descriptor
     fogDensity = 0.012
     fogAlpha = 0.0
     fogCubeMap = "misctex/cubemaps/blank_cubemap"
+//    fogNoiseAmount = 0.0
+//    fogColour []	{1.0f, 1.0f, 1.0f}
 
     heatAmount		    = 0.0f
     heatScale		    = 0.5f
@@ -122,6 +177,26 @@ template scene_descriptor
     heatNear		    = 1024.0f
     heatFar		    = 2048.0f
     heatMap		    = "misctex/generic/fill"
+    
+    // Falling snow effect
+    snowEnabled		    = "false"
+    snowEnabled			= "false"	// Enable falling snow effect
+    snowBlockSize		= 4.0f		// Dimensions of snow effect cube
+    snowNumBlocks		= 4		// Number of blocks in each dimension
+    snowNumParticles		= 64		// Total particles in each block (max 256)
+    snowParticleSizeMin		= 0.02f		// Minimum size of each particle
+    snowParticleSizeMax		= 0.04f		// Maximum size of each particle
+    snowGravity			= 2.0f		// Speed for particles to fall
+    snowWindSpeed		= 30.0f		// Maximum wind speed
+    float snowWindDir []    	{ -0.61f, 0.0f, -0.78f }
+    snowScreenHitRate		= 0.0135f
+    snowScreenFadeRate		= 0.93f
+    snowScreenParticleSizeMin	= 0.005f
+    snowScreenParticleSizeMax	= 0.0125f
+    snowScreenHitLowAngle	= 0.6f
+    snowScreenHitHighAngle	= 0.75f
+    snowScreenSpeedCtrl		= 0.25f
+    snowScreenWindCtrl		= 0.1f
     
     // Sand Effect
     Enable_Dust_Panels	    = "false"
@@ -241,10 +316,6 @@ template scene_descriptor
     Wii_hdrMinAdaptedLum	    = 0.1f	// Minimum multiplication
     Wii_hdrMaxAdaptedLumtat_atmos_fog	    = 3.9f	// Maximum multiplication
     Wii_hdrBloomThreshold	    = 0.9f	// Above this value gets blured and added back on
-    
-    // mist
-    float mistColour	    []{1.0f, 1.0f, 1.0f, 0.666f}
-    mistEnabled		    = "false"
 
     atmosEnabled    = 0;
     spaceLightEnabled    = 0;
@@ -267,6 +338,18 @@ template scene_descriptor
     float terrainMaterialSpecularPower[]
     {
 	2.0, 4.0, 9.0, 18.0        
+    }
+
+    // Specular intensity contrast
+    float terrainMaterialSpecularScale[]
+    {
+	1.0, 1.0, 1.0, 1.0
+    }
+
+    // Specular intensity offset
+    float terrainMaterialSpecularOffset[]
+    {
+	0.5, 0.5, 0.5, 0.5
     }
 
     // Incandescense for each of the four materials (for Lava)
@@ -297,11 +380,6 @@ template scene_descriptor
     foliageSunVisibilityOffset = 0.0
 
     fogNoiseAmount = 0.0
-
-    Wii_bloomMode=0
-    Wii_bloomThreshold=50
-    Wii_bloomScale=0.4
-    Wii_bloomFilter1Size=2
-    Wii_bloomFilter2Size=2
+*/
 }
 

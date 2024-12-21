@@ -2,7 +2,7 @@
 
 AnimManagerTemplate AnimManager
 {
-    class-id = "bf anim mgr"
-    maxAnimFiles = 3800
-    maxAnimInfos = 3950
+    maxAnimFiles = 2400
+    maxAnimInfos = 2420
+    maxConcurrentAnimStreams = 4
 }

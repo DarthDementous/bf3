@@ -18,17 +18,6 @@ template fp_cis_scharge_launcher_boned : animfirstpersongun
 
 template w_cis_sclaun : gun
 {
-    dynamiclight light
-    {
-	exponent    = 1.f
-	rotspeed    = 0.f
-	offset[]    { 0.4f, 0.f, 0.f }
-	light-type  = "k_lightSpot"
-	colour[]    {3.75f, 3.75f, 3.75f}
-	angle     = 70.f
-	enabled     = "false"
-    }
-
     guncomponent_schargelauncher_bf gun
     {
 	 gunAnimationGroup anims
@@ -39,17 +28,12 @@ template w_cis_sclaun : gun
 	}
 
 	gunInfoFromMgr 		= "bfcisgl"
-	soundmap_npc     	= "sndmap_cissc"//	soundmap_npc     = "sndmap_empsc"
-	soundmap_player 	= "sndmap_cissc"
-	firstperson       		= "fp_cis_scharge_launcher_boned"
-	muzzleFlashEffect   = "muzOraLsr1"
-	ammoID        			= "o_ammo_scl"
+	soundmap		= "sndmap_cissc"
+	firstperson       	= "fp_cis_scharge_launcher_boned"
+	ammoID        		= "o_ammo_scl"
 	weaponID       		= "o_gun_cis_scl"
 	weaponType     		= "k_explosive"
 	timeSinceFired	    	= 0.f
-	ubiks 						= "ubiks_btldroid"
-	attachBoneRight 		= "rforearm"
-	attachBoneLeft  		= "lforearm"
 
 	recoilComponent recoil
 	{
@@ -58,27 +42,36 @@ template w_cis_sclaun : gun
 
     render
     {
-	model	    =	"weapon/cis/cis_chargelauncher_thirdperson"
+	model = "weapon/cis/cis_chargelauncher_thirdperson"
     }
 }
 
-// Specific animation set for the battledroid
-template w_cis_sclaun_b : w_cis_sclaun
+// SONIC CHARGE LAUNCHER upgrade - Increased reload speed
+template w_cis_sclaunup : w_cis_sclaun
+{
+    gun
+    {
+	gunInfoFromMgr	= "bfcisglup"
+	weaponID	= "o_gun_cis_scl_up"
+    }
+}
+
+// Specific animation set for humans using it
+template w_cis_sclaun_h : w_cis_sclaun
 {
     gun
     {
 	anims
 	{
-	    set		= "ga_cis_sonic"
-	    animmap	= "am_cis_sonicchar"
-	    reactmap	= "reactmap_e11_b" 
+	    set		    = "ga_bfweapon"
+	    animmap	    = "am_rsonic"
+	    reactmap	    = "reactmap_generic"
 	}
+	
+	gunInfoFromMgr = "bfcisgl_h"
+	
+	weaponID       = "o_gun_cis_scl_h"
 
-	ubiks = "ubiks_btldroid"
-	gunInfoFromMgr = "bfrepgl_b"
-	weaponID       = "o_gun_cis_scl_b"
-	attachBoneRight = "rforearm"
-	attachBoneLeft  = "lforearm"
     }
 }
 
@@ -86,32 +79,78 @@ template o_gun_cis_scl : inventoryObjectTypeWeapon
 {
     details
     {
-	singular = "CIS Grenade Charge Launcher"
-	singularPrefix = "an"
-	pickupTemplate_create = ""  
+    	singularStrHandle   = "STR_PRIMARYWEAPON_CIS_SONIC_CHARGE_LAUNCHER" 
+	pickupTemplate_create = "singlepickup_gun_cisscharge"  
     }
 
     specialData
     {
 	weaponID = "w_cis_sclaun"
-	hudTextureName = "" // new texture??
+	hudTextureName = "cis_chargelauncher"
+	hudTextureScale = 0.7f
 	usesThisAmmo = "o_ammo_scl"
     }
 }
 
-template o_gun_cis_scl_b : inventoryObjectTypeWeapon 
+// SONIC CHARGE LAUNCHER upgrade - Increased reload speed
+template o_gun_cis_scl_up : o_gun_cis_scl
 {
-    details
-    {
-	singular = "CIS Grenade Charge Launcher"
-	singularPrefix = "an"
-	pickupTemplate_create = ""  
-    }
-
     specialData
     {
-	weaponID = "w_cis_sclaun_b"
-	hudTextureName = "" // new texture??
+        weaponID = "w_cis_sclaunup"
+    }
+}
+
+template singlepickup_gun_cisscharge : simplePickupPropBF
+{
+
+    obinstrenderer render
+    {
+	model = "weapon/cis/cis_chargelauncher_thirdperson"
+    }
+   
+    objectType		= "o_gun_cis_scl_h"
+    activate
+    {
+	myNameStringHandle  = "STR_PRIMARYWEAPON_CIS_SONIC_CHARGE_LAUNCHER"
+    }
+    
+    pickupComponentWeapon pickupComponent
+    {
+	pickupflags = "k_pickupNoNPC"
+
+	    inventoryComponentBF contents
+	    {
+		inventoryEntryBF entry0
+		{
+		    carryingobisfirstparam	= "true"
+			objectType		= "o_gun_cis_scl_h"
+		}
+
+		inventoryEntryBF entry1
+		{
+		    objectType  = "o_ammo_scl"
+			total	    = 500
+		}
+	    }
+    }
+
+     meta
+    {
+	canCreateInEditor    = 1
+	    editorInstanceName   = "SP_cisscharge"
+	    editorPath	     = "bf/pickups/guns/cis"
+	    renderDictPath	     = "render"
+    }
+
+}
+
+// Human Specfic
+template o_gun_cis_scl_h : o_gun_cis_scl
+{
+    specialData
+    {
+        weaponID = "w_cis_sclaun_h"
 	usesThisAmmo = "o_ammo_scl"
     }
 }

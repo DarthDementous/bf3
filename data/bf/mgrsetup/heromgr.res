@@ -3,7 +3,8 @@
 heroManager
 {
     class-id = "hero mgr"
-    timeBetweenHeroSpawns = 5.f
+    timeBetweenHeroSpawns = 180.f
+    heroSpawnDuration = 60.0f
     timeAwaitPlayerInput = 10.f
     maxHeroTime = 5.f
     republicHeroListName = "republic_heroes"

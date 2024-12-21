@@ -12,13 +12,24 @@ template o_gun_hoverTur : inventoryObjectTypeHoverTurret
 {
     details
     {
-	singular		= "hover turret"	    // Why isn't this in the string table?
+	singularStrHandle	= "STR_SECONDARYWEAPON_AUTOTURRET"        
 	plural			= "hover turrets"
-	maxnum			= 10
+	maxnum			= 3
     }
 
     specialData
     {
 	grenadeID	= "hoverAutoTurret"
+	hudTextureName = "misc_auto_turret"
+	hudTextureScale = 0.85f
+    }
+}
+
+// AUTO-TURRET upgrade - Increased fire rate
+template o_gun_hoverTurUp : o_gun_hoverTur
+{
+    specialData
+    {
+	grenadeID	= "hoverAutoTurUp"
     }
 }

@@ -1,5 +1,5 @@
 // vim: set syntax=c :
 
-actionpointmgrTemplate actionpointmgr
+/*actionpointmgrTemplate actionpointmgr
 {
-}
+}*/

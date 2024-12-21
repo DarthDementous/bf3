@@ -1,5 +1,5 @@
 // vim: set syntax=c :
 
-SpeechManagerTemplate SpeechManager
+/*SpeechManagerTemplate SpeechManager
 {
-}
+}*/

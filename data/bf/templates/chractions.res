@@ -970,45 +970,7 @@ template droidekaActionConfig : actionConfig
 }
 
 
-template youngobiwanActionConfig : jediActionConfig
-{
-    forceRepulse
-    {
-	enabled				= "true"
-	baseScore			= 90.0f
-    }
-    forceStun
-    {
-	enabled				= "true"
-	baseScore			= 150.0f
-    }
-    forceSaberThrow
-    {
-	enabled				= "true"
-        baseScore			= 120.0f
-    }
 
-}
-
-template oldobiwanActionConfig : jediActionConfig
-{
-    forcePull
-    {
-	enabled				= "true"
-	baseScore			= 100.0f
-    }
-    forceRepulse  // change to forceCloak when available //
-    {
-	enabled				= "true"
-	baseScore			= 100.0f
-    }
-    forceSaberThrow
-    {
-	enabled				= "true"
-        baseScore			= 120.0f
-    }
-
-}
 
 
 

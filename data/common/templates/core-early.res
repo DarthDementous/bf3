@@ -11,11 +11,16 @@ template obinstrenderer_base	// this is extended to obinstrenderer as a project 
     visibleParts    =	""
     castshadows = "true"
     receiveshadows = "true"
+    extendshadows = "false" // use only in very special cases
     castSimpleShadows = "false"	
     castComplexShadows = "true"
+    castReflections ="false"
     alwaysroom = "false"
     worldRoom = "false"
     affectedByStaticLights = "true"
+    staticCML = "false"	    // will retain original CML values
+    alwaysCML = "false"	    // will retain original CML values
+    noocclude =	"false"
     numLods = 0	
     float lodDist[] 
     { 5.0, 10.0, 20.0, 40.0 }
@@ -23,5 +28,14 @@ template obinstrenderer_base	// this is extended to obinstrenderer as a project 
     
     //this might never be reached because models will be preloaded before reaching serialise
     texstream = "true"
+
+    hologram = "false"
+
+    canBeCloaked    = "false" // material overrides for effect shaders
+    canBeHologram   = "false" // if added to, please replicate in scenevolume template (events.res)
+    onHoloTable	    = "false"
+    float cmlFaceScale [] {1.0, 1.0, 1.0, 1.0, 1.0, 1.0}
+    tickLods = "false" //tick ob models either side of current lod
+    uniformScale = 1.0f
 }
 

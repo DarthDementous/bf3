@@ -9,8 +9,8 @@ challengetrack all_challenges
     shortDescStringID = "STR_NULL"
 
     image = "misctex/frontend/levels/jedivsclone"
-    numChallenges = 18 //18
-  
+    numChallenges = 0 //18
+/*    
     // Challenge 1: "Artoo, hit the Buzz Droid's center eye!"
     challengelevel challenge_0
     {
@@ -48,6 +48,7 @@ challengetrack all_challenges
 
 	endingCriteria = "k_scripted"
 	medalCriteria = "k_speedMedalCriteria"
+
 	bronzeTime_s = 240
 	silverTime_s = 220
 	goldTime_s   = 200
@@ -93,7 +94,7 @@ challengetrack all_challenges
 	endingCriteria = "k_playerDied"
 	medalCriteria = "k_highScoreMedalCriteria"
 
-	chrTemplateNameKey = "STR_CHRNAME_REPCOMMANDER"
+	chrTemplateNameKey = "STR_CHRNAME_MACEWINDU"
 
 	bronzeScore   = 1500
 	silverScore   = 3000
@@ -117,7 +118,7 @@ challengetrack all_challenges
 	endingCriteria = "k_scripted"
 	medalCriteria = "k_highScoreMedalCriteria"
 
-	chrTemplateNameKey = "STR_CHRNAME_REPHEAVYTROOPER"
+	chrTemplateNameKey = "STR_CHRNAME_REBVANGUARD"
 
 	bronzeScore   = 1500
 	silverScore   = 3000
@@ -247,7 +248,7 @@ challengetrack all_challenges
     {
         name = "bounty"
         resfile = "dathomir/dathomir_chlg_bounty.res"
-		  
+        
 	titleStringID = "STR_CHALLENGE_BOUNTY"
 	descStringID = "STR_NULL"
 	shortDescStringID = "STR_NULL"
@@ -258,7 +259,7 @@ challengetrack all_challenges
 	endingCriteria = "k_scripted" // k_playerDied
 	medalCriteria = "k_speedMedalCriteria" // k_highScoreMedalCriteria
 		
-	chrTemplateNameKey = "STR_CHRNAME_LANCE_TRAIL"
+	chrTemplateNameKey = "STR_CHRNAME_JANGOFETT"
 		
 	bronzeTime_s 	= 420.0f // 7 Mins // bronzeScore   = 1500
 	silverTime_s 	= 300.0f // 5 Mins // silverScore   = 3000
@@ -294,7 +295,6 @@ challengetrack all_challenges
     challengelevel challenge_12
     {
         name = "sniper"
-
 	resfile = "endor/endor_chlg_marksman.res"
 
 	titleStringID = "STR_CHALLENGE_REBEL_MARKSMAN"
@@ -409,8 +409,8 @@ challengetrack testrooms
 	goldScore   = 30000
 	platinumScore = 40000
     }
-    
+    */
 }
 
-
+*/
 

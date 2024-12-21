@@ -1,3 +1,5 @@
+// vim: set syntax=c :
+
 template particleSystemLaserBolt : particleSystem
 {
     particleColourFormat			= "rgba"

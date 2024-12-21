@@ -1,3 +1,3 @@
-partyMgrTemplate partyMgr
+/*partyMgrTemplate partyMgr
 {
-}
+}*/

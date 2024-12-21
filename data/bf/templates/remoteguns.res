@@ -3,11 +3,11 @@
 // Acceleration values for remote guns.
 template cruiserRemote : movementRemote
 {
-    acclnLeftRight	= 3.2f
-    acclnUpDown		= 3.2f
-    acclnIdleLeftRight	= 1.4f
-    acclnIdleUpDown	= 1.4f
-    minXAxisAngle   = -180.0f
+    acclnLeftRight	= 9.0f  
+    acclnUpDown		= 9.0f
+    acclnIdleLeftRight	= 9.0f
+    acclnIdleUpDown	= 9.0f
+    minXAxisAngle   = -180.0f //
     maxXAxisAngle   =  0.0f
     minYAxisAngle   = -360.0f
     maxYAxisAngle   = 360.0f
@@ -15,18 +15,34 @@ template cruiserRemote : movementRemote
 
 template infantryRemote : movementRemote
 {
-    acclnLeftRight	= 3.4f
-    acclnUpDown		= 3.4f
-    acclnIdleLeftRight	= 1.4f
-    acclnIdleUpDown	= 1.4f
+    acclnLeftRight	= 9.0f  // 8.4
+    acclnUpDown		= 9.0f  // 4.4
+    acclnIdleLeftRight	= 9.0f  // 6.4 
+    acclnIdleUpDown	= 9.0f  // 6.4
+}
+
+template aaRemote : movementRemote
+{
+    acclnLeftRight	= 9.0f
+    acclnUpDown		= 9.0f
+    acclnIdleLeftRight	= 9.0f
+    acclnIdleUpDown	= 9.0f
+}
+
+template senRemote : movementRemote
+{
+    acclnLeftRight	= 10.f
+    acclnUpDown		= 10.f
+    acclnIdleLeftRight	= 10.f
+    acclnIdleUpDown	= 10.f
 }
 
 template AntiVRemote : movementRemote
 {
-    acclnLeftRight	= 2.4f
-    acclnUpDown		= 2.4f
-    acclnIdleLeftRight	= 0.4f
-    acclnIdleUpDown	= 0.4f
+    acclnLeftRight	= 9.0f
+    acclnUpDown		= 9.0f
+    acclnIdleLeftRight	= 9.0f
+    acclnIdleUpDown	= 9.0f
 }
 
 template RemoteCameraBF
@@ -35,11 +51,17 @@ template RemoteCameraBF
     
     cameraLenseDofName = ""
     fov = 50.0f
-    minFov = 35.f
+    minFov = 5.f
+    minFovManual = 12.25f
     maxFov = 50.f
     zoomSpeed= 0.5f
-    partialZoomFraction = 0.2f
+    partialZoomFraction = 0.7f
+    noLockZoomFraction = 0.8f
     fullZoomAtTargetDist = 200.0f
+    minFovManual = 12.25f
+    timeBetweenFiringAndCameraSwitchToIonBeam = 2.0f
+    timeBetweenExplosionAndCameraSwitchBackToCannon = 2.0f
+    zoomTurnScaler = 0.55f
 
     float thirdPersonOffset []
     {
@@ -50,6 +72,8 @@ template RemoteCameraBF
     {
 	0.000000, 0.000000, 0.000000
     }
+    
+    animset = "BFCamAnims"
 
     // This value isn't used by this component, but needs to be specified for
     // the base CCameraComponent. Perhaps the key should be renamed and the
@@ -57,38 +81,19 @@ template RemoteCameraBF
     chaseCamFOVScale = 1.f
 }
 
-template fixedguncovermaintainer : covermaintainercnt
-{
-    covers
-    {
-	run2  // ahem. "run to". stupid 4cc's.
-	{
-	    float offsetpos []
-	    {
-			0.000000, 0.000000, -1.500000
-	    }
-	    roty = 0.000000
-	    flags = "k_aicvr_fixedgun|k_aicvr_alwaysIgnoreMyProp|k_aicvr_dontdisable"  // gonna see how well 'k_aicvr_alwaysIgnoreMyProp' works. if it sucks then we'll need to add a single-direction ignore flag.
-	    vcovertemplate = "nullcovertemplate"
-	    lcovertemplate = "nullcovertemplate"
-	    rcovertemplate = "nullcovertemplate"
-	    outflankangle = 0.0f  // nb. the fixed-guns use the remote's min/max angle settings when calculating outflanking, not this
-	    partname = ""
-	    usedof = "false"
-	}
-    }
-}
-
 template RemoteControlBF
 {
     class-id = "remote control component bf"
 
-    playerCanLockOn = "false"
+    playerCanLockOn = "true"
     trackingSlownDownAngle = 35.0
     trackingSlowDownSpeedFraction = 0.60
     trackingSpeedUpSpeedFraction = 1.25
-    fullZoomDelay = 1.5f;
-
+    fullZoomDelay = 1.5f
+    autoZoomInSpeedReduction = 0.5f
+    hitIfAimedAtLead = "false"
+    maintainAimPos = "false"
+    autoAimAmount = 2.0f
 }
 
 template FixedGunControl : RemoteControlBF
@@ -109,8 +114,16 @@ template controlVehicleRemote : FixedGunControl
 
 template remotePropBF : remoteProp
 {
-    class-id = "remote prop bf"
-    animOffset[] = { 0.0f, 0.0f, 0.0f }
+    autoRepairDelay = -1.0f
+    soundmap-field soundmap
+    {
+	default = "sndmap_null"
+    }
+
+    soundeventsystem sndeventsystem
+    {
+	definition = "sndevt_turret"
+    }
 
     FixedGunControl control 
     {
@@ -118,15 +131,31 @@ template remotePropBF : remoteProp
 
     aiTargetType = "k_targetType_all"
 
+    //Viable targets
+    shouldTargetChrs = "false"
+    shouldTargetPlayers = "false"
+    shouldTargetRemotes = "false"
+    shouldTargetVehicles = "false"
+    shouldTargetGroundVehicles = "false"
+    shouldTargetWalkers = "false"
+    shouldTargetTanks = "false"
+    shouldTargetSpaceCraft = "false"
+//    shouldTargetTransports = "false"
+    shouldTargetCapitalShips = "false"
+    shouldTargetEscapePods = "false"
+
     visTableSeer = 42
 
     playerTargettingComponent playerTargetting
     {
 	requiredTargettingPrecision = 0.0f			//Alters the targetting 'sloppyness'
-	maxTargettingRange	    = 2000.0f			//The max range this can target at
+	maxTargettingRange	    = 1000.0f			//The max range this can target at
 	indicatePotentialTargets    = "true"			//Highlight all potential targets?
     }
-    hudImageName = "turret_icon"
+    hudImageName = "no_image"
+    simpleGroupieComponent groupie
+    {
+    }
 }
 
 template RemoteBrainBF : RemoteBrain
@@ -136,15 +165,25 @@ template RemoteBrainBF : RemoteBrain
     burstfire = "true"
 }
 
+template RemoteIonCannonBrain : RemoteBrain
+{
+    class-id = "remote ion cannon brain"
+
+    targetToFireAtName = ""
+
+    burstfire = "true"
+}
+
 template targetablePhysicsRemoteProp : remotePropBF
 {
-    autoAimTargetComponentBF autoaimtarget
+    autoaimtarget
     {
 	playerTurnToFaceAutomatically	= "true"
 	playerBulletsAttractedToTarget	= "true"
 	canOverrideSquadOrders		= "true"
+	isRemote			= "true"
 	sizeScale			=  1.5f
-	flags				= "k_autoAimBF_considerForDisplayOnShipHud|k_autoAimBF_canBeLockedOntoByStarFighter|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"
+	flags				= "k_autoAimBF_displayAsPointOfInterestOnHud|k_autoAimBF_considerForDisplayOnShipHud|k_autoAimBF_canBeLockedOntoByStarFighter|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"//|k_autoAimBF_displaySeparatePoiIcon"
     }
 
     bfvehicledescriptcomponent descript
@@ -159,11 +198,6 @@ template targetablePhysicsRemoteProp : remotePropBF
     }
 }
 
-template soundmap_sentry
-{
-//    fire = "w_mp5_f_test_this_is_a_stupidly_long_name"
-}
-
 template animmap_rem_bf
 {
     u_hold_up		    = "AN_u_cln_e11_suc"
@@ -171,23 +205,26 @@ template animmap_rem_bf
 
 template bfRemoteGun
 {
-    class-id			    = "remote gun component bf"
+    class-id			    = "remote gun component"
     swivelPartName		    = "B_SEAT"
     barrelPartName		    = "B_GUN"
     barrelPivotDofName		    = "X_AXIS"
-    barrelShootPosDofName	    = "SHOOTPOS_PRIMARY1"
+    swivelPivotDofName		    = "Y_AXIS"
+    //barrelShootPosDofName	    = "SHOOTPOS_PRIMARY1"
     barrelShootPosDofArrayName	    = "SHOOTPOS_PRIMARY"
+
+    //this is to allow us to have different laser colours dependant on faction in control of remote
+    gunInfoOverride		    = ""
+
+    recoilComponent recoil
+    {
+    }
 
     guncomponent_linetest gunComponent
     {
 	class-id = "gun laser bf"
     
-	muzzleFlashEffect	    = "muzRedRem1"
-        muzzleFlash_lightTimer	    =   0.f
-        muzzleFlash_lightDuration   =	0.2f
-        muzzleFlash_lightRadius	    =	6.0f
-        muzzleFlash_lightColour[]	{1.f, 0.f, 0.f}
-        muzzleFlash_lightOffset[]	{0.0f, 0.0f, 1.0f}
+        muzzleFlash_lightTimer	    =   0.f 
 
 	emptyAnimChar		    = "N"
 	loweredAmount		    = 0.f
@@ -213,12 +250,19 @@ template bfRemoteGun
 	gunZoomComponent_justChangeFov zoom
 	{
 	}
-    }
+    }    
 }
 
 template turretDefault : remotePropBF
 {   
+    //redefined here to remove k_flag_returnToRestDir
+    flags = "k_flag_canTrack|k_flag_idleSweepY|k_flag_canActivateDirectly|k_flag_wantsReticuleDrawn"
     movementDescription = "bf_mCruiser_gun"
+
+    aiTargetType = "k_targetType_ships|k_targetType_capitalShips|k_targetType_remotes"
+
+    //viable target types
+    shouldTargetPlayers = "true"
 
     RemoteCameraBF camera
     {
@@ -230,6 +274,8 @@ template turretDefault : remotePropBF
     bfRemoteGun remoteGun
     {
     }
+    
+    visTableSeer = 0
     
     RemoteStimSensorArc sensor
     {
@@ -245,25 +291,28 @@ template turretDefault : remotePropBF
 	fieldOfView = 30.0f	
     }
 
-    RemoteBrainBF brain
+    playerTargetting
     {
+	maxTargettingRange	    = 200.0f
     }
 
     control 
     {
 	playerCanLockOn = "true"
     }
+    
     remoteMovingMatrix360 moving
     {
         basePartNum = 1
         armPartNum = 2
         gunPartNum = 3
 
-        responsibleForSettingCharacterPos = "false"
+        responsibleForSettingCharacterPos = "true"
 
         physics
         {
             physicsDescription = "bf_pCruiser_gun"
+			useRBs = "true"
         }
     }
 
@@ -271,35 +320,43 @@ template turretDefault : remotePropBF
 
     dmghealthcomponentbf health
     {
-	fullhealth	= 1.0
+	fullhealth	= 25.f
 	invincibilityChannel = ""
 	healthComponentSettings |= "k_healthComponentSetting_isRepairable"
-    }    
-    
-    bfexplodingpropdescript descript
-    {
     }
+       
+    repairpropdesc descript
+    {}
     
     propflags |= "k_neverChangeBgRoomGroup"
-    baseobflags     = "k_baseobflag_dontRuntimeSerialiseSave"
     
     autoAimTargetComponentBF autoaimtarget
     {
-	nameKey	= "STR_FIXED_GUN"
+	isRemote	= "true"
+	nameKey		= "STR_FIXED_GUN"
+	flags		|= "k_autoAimBF_canBeLockedOntoByStarFighter"
+     	minimap_flags	= "k_guiMapRenderTurretsIcons"
+	minimap_icon	= 11
     }
-    
+
     groupingcomp grouping
     {
 	maxgroups = 2
     }  
 }
 
+
 template remoteSentryGunBF : turretDefault // or just inherit from remoteProp to disable auto-aim / squad order stuff above
 {
     movementDescription = "remote_sentry"
 
     flags |= "k_flag_controlPanelAnim|k_flag_alwaysConsiderUpright" // This gun is controlled via a control panel
+   
+    aiTargetType = "k_targetType_ships|k_targetType_capitalShips|k_targetType_remotes"
     
+    //viable targets
+    
+
     RemoteBrainSentryGun brain
     {
 	class-id = "bf remote brain"
@@ -318,16 +375,19 @@ template remoteSentryGunBF : turretDefault // or just inherit from remoteProp to
 	physics
 	{
 	    physicsDescription = "remote_gun"
-		fixedGun = "true"
+	    fixedGun = "true"
 	}
     }
 
     autoaimtarget
     {
 	nameKey = "STR_FIXED_GUN"
-	flags	= "k_autoAimBF_considerForDisplayOnShipHud|k_autoAimBF_canBeLockedOntoByStarFighter|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"
+	flags	= "k_autoAimBF_displayAsPointOfInterestOnHud|k_autoAimBF_considerForDisplayOnShipHud|k_autoAimBF_canBeLockedOntoByStarFighter|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"//|k_autoAimBF_displaySeparatePoiIcon"
+	float overridePosition[] = {0.0f, 0.5f, 0.0f}
     }
-  
+    
+    hudImageName = "turret_icon"
+    
     meta
     {
 	canCreateInEditor   = 1
@@ -338,27 +398,31 @@ template remoteSentryGunBF : turretDefault // or just inherit from remoteProp to
 
 
 template antiInfantryTurret : turretDefault
-{    
-    movementDescription = "bf_mRebTurret"
-    flags = "k_flag_canActivateDirectly|k_flag_canTrack|k_flag_seatedFixedGunAnim|k_flag_setUserInvisible"
-    animOffset[] = { 0.0f, 0.37f, 0.25f }
-    aiTargetType = "k_targetType_infantry|k_targetType_groundVehicles"
-    SimpleActivate activate
-    {
-	myNameStringHandle = "STR_FIXED_GUN"
-	pointA
-	{
-	    pos[] {0.f, 0.f, 0.0f}
-	    distance = 3.f
-	    hudPromptStringHandle = "STR_ACTIVATEPROMPT_USE"
-	}
+{   
+    remoteType = "k_type_antiInfantry"
 
-	doPropLineTest = "false"
-    }
+    movementDescription = "bf_mRebTurret"
+    flags = "k_flag_canTrack|k_flag_canActivateDirectly|k_flag_seatedFixedGunAnim|k_flag_wantsReticuleDrawn"
+    animOffset[] = { 0.03f, 1.27f, 0.355f }
+    aiTargetType = "k_targetType_infantry|k_targetType_groundVehicles"
+
+    //viable targets
+    shouldTargetChrs = "true"
     
-    control 
+	
+    SimpleActivateBF activate
     {
-	playerCanLockOn = "true"
+        heroesAllowedToActivate = "false"
+	class-id = "remote activate component bf"
+        myNameStringHandle = "STR_FIXED_GUN"
+        pointA
+        {
+            pos[] {0.f, 0.f, 0.0f}
+            distance = 5.f
+            hudPromptStringHandle = "STR_ACTIVATEPROMPT_USE"
+        }
+
+        doPropLineTest = "false"
     }
 
     sensor
@@ -369,12 +433,18 @@ template antiInfantryTurret : turretDefault
 	minViewDist = 5.0f
 	fieldOfView = 30.0f	
     }
+
+    playerTargetting
+    {
+	maxTargettingRange	    = 100.0f
+    }
+    
     camera
     {
 	cameraLenseDofName = "SHOOTPOS_PRIMARY1"
 	fullZoomAtTargetDist = 25.0f
 	
-	minFov = 15.f
+	minFov = 10.f
 	maxFov = 50.f
 
 	thirdPersonOffset []
@@ -388,63 +458,51 @@ template antiInfantryTurret : turretDefault
 	}
     }
 
+    soundmap    = "sndmap_avtrrt"
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }   
     bfRemoteGun remoteGun
     {
         gunComponent
         {   
             gunInfoFromMgr  = "infantryTur"
-	    muzzleFlashEffect	= "muzRedRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
-            ubiks	    = "ubiks_basePlus"
-
-            soundmap_player = "sndmap_avtrrt"	
-            soundmap_npc    = "sndmap_avtrrt"
-
+	    
+	    ubiksBasePlus = "true"
             useUbiks	    = "false"
             loweredAmount   = 0.000000
-	    ubiks	    = "ubiks_none"
 
             gunAnimationGroup anims
             {
-                set	    = "gunanims_aat"
+                set	    = "ga_aat"
                 animmap	    = "animmap_rem_bf"
                 reactmap    = "reactmap_generic"
             }
         }
     }
 
-    RemoteBrainBF brain
+    health
     {
-    }
-
-    dmghealthcomponentbf health
-    {
-	fullhealth	= 10.0
+	fullhealth	= 10.0f	//50.0f
 	invincibilityChannel = ""
-	healthComponentSettings |= "k_healthComponentSetting_isRepairable"
     }    
-    
-    bfexplodingpropdescript descript
-    {
-    }
-    
+       
     propflags |= "k_neverChangeBgRoomGroup"
-    baseobflags     = "k_baseobflag_dontRuntimeSerialiseSave"
     
     autoaimtarget
     {
 	nameKey	= "STR_FIXED_GUN"
+	flags |= "k_autoAimBF_displaySeparatePoiIcon"
     }
     
     groupingcomp grouping
     {
 	maxgroups = 2
     }
+    
+    hudImageName = "anti_infantry_icon"
+    
     meta
     {
 	canCreateInEditor   = 0
@@ -453,152 +511,256 @@ template antiInfantryTurret : turretDefault
 
 template antiAirCraftGuns : turretDefault
 {
-    flags = "k_flag_canActivateDirectly|k_flag_seatedFixedGunAnim"
-    animOffset[] = { 0.0f, 0.37f, 0.25f }
+    remoteType = "k_type_antiAir"
+    
+    flags = "k_flag_canTrack|k_flag_canActivateDirectly|k_flag_seatedFixedGunAnim|k_flag_wantsReticuleDrawn"
+    animOffset[] = { 0.0f, -0.38f, -0.65f }
     aiTargetType = "k_targetType_ships"
 
+
+    //viable targets
+    shouldTargetSpaceCraft = "true"
+//    shouldTargetTransports = "true"
+    shouldTargetEscapePods = "true"
+    
     movementDescription = "bf_AAGun"	    
     float startAngles [] = {-20.0f, -10.0f}
     control 
     {
 	playerCanLockOn = "true"
+	hitIfAimedAtLead = "true"
     }
 
-    SimpleActivate activate
+    SimpleActivateBF activate
     {
-	myNameStringHandle = "STR_FIXED_GUN"
-	pointA
-	{
-	    pos[] {0.f, 0.f, 0.0f}
-	    distance = 3.f
-	    hudPromptStringHandle = "STR_ACTIVATEPROMPT_USE"
-	}
+        heroesAllowedToActivate = "false"
+	class-id = "remote activate component bf"
+        myNameStringHandle = "STR_AA_GUN"
+        pointA
+        {
+            pos[] {0.f, 0.f, 0.0f}
+            distance = 5.f
+            hudPromptStringHandle = "STR_ACTIVATEPROMPT_USE"
+        }
 
-	doPropLineTest = "false"
+        doPropLineTest = "false"
+    }
+
+    sensor
+    {
+	sensorFlags   = "k_updateWithRemoteAngles"
+        partName	= "B_GUN"
+	maxViewDist = 400.0f
+	minViewDist = 15.0f
+	fieldOfView = 30.0f	
+    }
+    
+    playerTargetting
+    {
+        maxTargettingRange	    = 480.0f
     }
    
     camera
     {
-	fullZoomAtTargetDist = 50.0f
-    }	
+        minFov = 7.5f
+        maxFov = 50.f
+        fullZoomAtTargetDist = 50.0f
+    }
+
+    soundmap    = "sndmap_aatrrt"
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }   
     bfRemoteGun remoteGun
     {       	
-	gunComponent
-	{
-	    gunInfoFromMgr	    = "aaGun"
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzRedRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
+        gunComponent
+        {
+            gunInfoFromMgr	    = "aaGun"         
+        
+            useUbiks      = "false"
+            loweredAmount = 0.000000
 
-	
-	    useUbiks      = "false"
-	    loweredAmount = 0.000000
-	    ubiks	  = "ubiks_none" 
-
-	    soundmap_player = "sndmap_rebtrrt"	
-	    soundmap_npc    = "sndmap_rebtrrt"
-	
-	    gunAnimationGroup anims
-	    {
-		set		    = "gunanims_tf"
-		animmap		    = "animmap_rem_bf"
-		reactmap	    = "reactmap_generic"
-	    }
-	}
+            gunAnimationGroup anims
+            {
+            set		    = "ga_tf"
+            animmap		    = "animmap_rem_bf"
+            reactmap	    = "reactmap_generic"
+            }	    
+        }
     }
 
     remoteMovingMatrix360 moving
     {
-	physics
-	{
-	    physicsDescription = "bf_pCruiser_gun"
-	}
+        physics
+        {
+            physicsDescription = "bf_pCruiser_gun"
+			useRBs = "true"
+        }
     }
     
     ticktype		= "k_tickAlways"  
-    dmghealthcomponentbf health
+    health
     {
-	fullhealth	= 15.f
-	invincibilityChannel = ""
-	isrepairable	    = "true"
+        fullhealth	= 15.0f	    //150.f
+        invincibilityChannel = ""
     }    
-    descript
-    {
-    }
-    propflags |= "k_neverChangeBgRoomGroup"
+
+    propflags |= "k_neverChangeBgRoomGroup|k_aiDoAvoid"
 
     autoaimtarget
     {
-	nameKey = "STR_AA_GUN"
+        nameKey = "STR_AA_GUN"
+	flags |= "k_autoAimBF_displaySeparatePoiIcon"	    
     }
+    
+    hudImageName = "anti_air_turret_icon"
 
     meta
     {
-	canCreateInEditor   = 0
+        canCreateInEditor   = 0
     }
 }
+
 template antiVehicleGuns : antiAirCraftGuns
 {
-    aiTargetType = "k_targetType_groundVehicles|k_targetType_remotes"
+    remoteType = "k_type_antiVehicle"
 
-    flags = "k_flag_canActivateDirectly|k_flag_seatedFixedGunAnim"
+    aiTargetType = "k_targetType_groundVehicles"
+
+    animOffset[] = { 0.04f, -0.36f, -1.45f }
+
+    //viable target types
+    shouldTargetChrs = "false"
+    shouldTargetGroundVehicles = "true"
+    shouldTargetWalkers = "true"
+    shouldTargetTanks = "true"
+    shouldTargetSpaceCraft = "false"
+//    shouldTargetTransports = "false"
+    shouldTargetEscapePods = "false"
+    
+
+    flags = "k_flag_canTrack|k_flag_canActivateDirectly|k_flag_seatedFixedGunAnim|k_flag_wantsReticuleDrawn"
+    activate
+    {
+        myNameStringHandle = "STR_AVEH_GUN"
+    }
+    soundmap    = "sndmap_newav"
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }   
     remoteGun
-    {       	
-	gunComponent
-	{
-	    gunInfoFromMgr	    = "aVehGun"
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzRedRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
-	
-	    useUbiks      = "false"
-	    loweredAmount = 0.000000
-	    ubiks	  = "ubiks_none" 
-
-	    soundmap_player = "sndmap_rebtrrt"	
-	    soundmap_npc    = "sndmap_rebtrrt"
-	
-	    gunAnimationGroup anims
-	    {
-		set		    = "gunanims_aat"
-		animmap		    = "animmap_rem_bf"
-		reactmap	    = "reactmap_generic"
-	    }
-	}
+    {       
+//	barrelShootPosDofName	    = "SHOOTPOS_PRIMARY1"
+//	barrelShootPosDofArrayName	    = ""
+        gunComponent
+        {
+            gunInfoFromMgr	    = "aVehGun"
+                    
+            useUbiks      = "false"
+            loweredAmount = 0.000000
+        
+            gunAnimationGroup anims
+            {
+            set		    = "ga_aat"
+            animmap		    = "animmap_rem_bf"
+            reactmap	    = "reactmap_generic"
+            }
+        }
     }
 
-    dmghealthcomponentbf health
+    health
     {
-	fullhealth	= 20.f
-	invincibilityChannel = ""
-	isrepairable	    = "true"
+        fullhealth	= 15.0f	    //150.f
+        invincibilityChannel = ""
     }    
     
     autoaimtarget
     {
-	nameKey = "STR_AVEH_GUN"
+        nameKey = "STR_AVEH_GUN"
     }
+    
+    hudImageName = "anti_vehicle_turret_icon" 
 }
 
 template rebTurret : antiInfantryTurret
 {
-    flags = "k_flag_canActivateDirectly|k_flag_canTrack|k_flag_setUserInvisible"
+    flags = "k_flag_canTrack|k_flag_canActivateDirectly|k_flag_setUserInvisible|k_flag_wantsReticuleDrawn"
     sensor
     {
-	sensorFlags      = "k_updateWithRemoteAngles"
+        sensorFlags      = "k_updateWithRemoteAngles"
 	
-	minViewDist = 0.1f
-    	maxViewDist = 25.0f
+        minViewDist = 0.1f
+    	maxViewDist = 100.0f
     }
+
+    playerTargetting
+    {
+        maxTargettingRange	    = 100.0f
+    }
+    
+    moving
+    {
+        recoilParts
+        {
+            recoilPart recoil1 
+            {
+            partnum = 4
+            maxrange = 1.5f
+            minlerp = 0.7f
+            recoilspeed = 200.0f
+            restorespeed = 10.0f
+            }
+        }
+        
+        physics
+        {
+            physicsDescription = "bf_pCruiser_gun"
+        }
+    }
+}
+
+// Rebel Turrets
+template reb_turret_infant_ice : rebTurret //Hoth anti-infantry turret
+{
+    remoteType = "k_type_antiInfantry"
+
+    obinstrenderer render
+    {
+        model = "turrets/reb/reb_turret_infant_ice/reb_turret_infant_ice"
+	castshadows = "true"
+	receiveshadows = "true"
+        //numLods = 3
+        //lodDist[] 
+        //{ 30.0, 50.0, 100.0 }
+    }
+    camera
+    {
+        cameraLenseDofName = "SHOOTPOS_PRIMARY1"
+        fullZoomAtTargetDist = 25.0f
+        
+        minFov = 10.f
+        maxFov = 50.f
+
+        thirdPersonOffset []
+        {
+	    // right
+	    -1.3, 0.75, -4.0
+        }
+
+        firstPersonOffset []
+        {
+	    // right
+	    -1.3, 0.75, -4.0
+        }
+    }
+    soundmap    = "sndmap_rebtrrt"
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }   
+   
     moving
     {
 	recoilParts
@@ -606,226 +768,170 @@ template rebTurret : antiInfantryTurret
 	    recoilPart recoil1 
 	    {
 		partnum = 4
-		maxrange = 1.5f
-		minlerp = 0.7f
-		recoilspeed = 200.0f
-		restorespeed = 10.0f
+		maxrange = 0.4f
+		minlerp = 0.0f
+		recoilspeed = 20.0f 
+		restorespeed = 10.0f 
 	    }
 	}
-        physics
-        {
-            physicsDescription = "bf_pCruiser_gun"
+    }
+    
+    health
+    {
+	fullhealth	= 15.f
+	invincibilityChannel = ""
+    }
+
+    hudImageName = "reb_inf_turret_icon" 
+    
+    meta
+    {
+        canCreateInEditor  = 1
+        editorInstanceName = "reb_tur_ice"
+        editorPath         = "bf/remoteguns/rebel"
+    }
+}
+
+template inf_ice_sty : reb_turret_infant_ice //Hoth anti-infantry turret STORY ONLY
+{
+    remoteGun
+    {
+        gunComponent
+        {   
+            gunInfoFromMgr  = "inf_tur_sty"
         }
-    } 
-}
-
-// Rebel Turrets
-template reb_turret_infant_desert : rebTurret
-{
-    m_teamNum = 1
-    obinstrenderer render
-    {
-	model = "props/turrets/reb_turret_infant_desert_barrel"
-	numLods = 3
-	lodDist[] 
-	{ 30.0, 50.0, 100.0 }
-    }
-
-    remoteGun
-    {
-        gunComponent
-        {   
-            soundmap_player = "sndmap_rebtrrt"	
-            soundmap_npc    = "sndmap_rebtrrt"
-	}
-    }
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "reb_tur_des"
-	editorPath         = "bf/remoteguns/rebel"
-    }
-}
-
-template reb_turret_infant_forest : rebTurret
-{
-    obinstrenderer render
-    {
-	model = "props/turrets/reb_turret_infant_forest_barrel"
-  	numLods = 3
-	lodDist[] 
-	{ 30.0, 50.0, 100.0 }
-    }
-    
-    remoteGun
-    {
-        gunComponent
-        {   
-            soundmap_player = "sndmap_rebtrrt"	
-            soundmap_npc    = "sndmap_rebtrrt"
-	}
     }
     
     meta
     {
-	canCreateInEditor  = 1
-	editorInstanceName = "reb_tur_for"
-	editorPath         = "bf/remoteguns/rebel"
-    }
-}
-
-template reb_turret_infant_ice : rebTurret
-{
-    obinstrenderer render
-    {
-	model = "props/turrets/reb_turret_infant_ice_barrel"
-  	numLods = 3
-	lodDist[] 
-	{ 30.0, 50.0, 100.0 }
-    }
-
-    remoteGun
-    {
-        gunComponent
-        {   
-
-            soundmap_player = "sndmap_rebtrrt"	
-            soundmap_npc    = "sndmap_rebtrrt"
-	}
-    }
-    
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "reb_tur_ice"
-	editorPath         = "bf/remoteguns/rebel"
+        canCreateInEditor  = 1
+        editorInstanceName = "reb_tur_ice"
+        editorPath         = "bf/remoteguns/rebel"
     }
 }
 
 template cruiserSentryGunDefault : remoteSentryGunBF
 {
-    aiTargetType = "k_targetType_ships"
+    remoteType = "k_type_externalCruiserSentryGun"
+    
+    aiTargetType = "k_targetType_ships|k_targetType_capitalShips" 
+
+    //viable target types
+    shouldTargetSpaceCraft = "true"
+//    shouldTargetTransports = "true"
+    shouldTargetCapitalShips = "true"
+    	
     float startAngles [] = {-10.0f, -10.0f}    
     movementDescription = "bf_mAcc_gun"
-    
+
     render
     {
-	model = "props/turrets/cis_cruiser/cis_cruiser_turret_barrel"
+        model = "turrets/cis/cis_cruiser/cis_cruiser_turret/cis_cruiser_turret"
     }
 
     sensor
     {
-    	maxViewDist = 1500.0f
+	partName    = "B_GUN"
+    	maxViewDist = 900.0f
+    }
+
+    playerTargetting
+    {
+        maxTargettingRange = 850.0f
     }
 
     RemoteCameraBF camera
     {
-	minFov = 5.f
-	maxFov = 50.f
-	cameraLenseDofName   = "SENSORPOS_1"
+        minFov = 5.f
+        maxFov = 50.f
+        cameraLenseDofName   = "SENSORPOS_1"
 
-	thirdPersonOffset []
-	{
-	    0.000000, 0.000000, -4.000000
-	}
+        thirdPersonOffset []
+        {
+            0.000000, 0.000000, -4.000000
+        }
 
-	firstPersonOffset []
-	{
-	    0.000000, 0.000000, -4.000000
-	}
+        firstPersonOffset []
+        {
+            0.000000, 0.000000, -3.700000 // 0, 0, -4
+        }
     }
     
+    soundmap    = "sndmap_muntrrt"
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }   
+
     remoteGun
     {
         gunComponent
         {   
             gunInfoFromMgr	    = "cruRemoteTur"
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzRedRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
-            ubiks		    = "ubiks_basePlus"
-
-            soundmap_player = "sndmap_muntrrt"	
-            soundmap_npc    = "sndmap_muntrrt"
-
+   
+	    ubiksBasePlus = "true"
             useUbiks = "true"
             loweredAmount = 0.000000
 	    plugins
 	    {
 		gunPluginOverheat overheat	
 		{
-		    shotsRequiredToOverheat		= 50
-		    timeAfterFireBeforeCoolDown		= 0.6f	    
-		    timeAfterOverheatBeforeCoolDown	= 2.4f
-		    gunUnusableWhenOverheats		= "true"    
-		    coolDownTime			= 0.5f	    
-		    gunRecoilMultiplyWhenCold		= 1.0f
-		    gunRecoilMultiplyWhenHot		= 1.0f
-		    coolDownPercentageBeforeCanFireAgain    = 0.f
-		    current_heatFraction		= 0.0f
-		    current_timeBeforeCoolDown		= 0.0f
-		    overheatEffect			= ""
 		}
 	    }
             gunAnimationGroup anims
             {
-                set	    = "gunanims_tf"
+                set	    = "ga_tf"
                 animmap	    = "animmap_rem_bf"
                 reactmap    = "reactmap_generic"
             }
         }
-	hudDisplayType = "k_hudDisplayType_overheatBar"
     }
 
     RemoteBrainBF brain
     {
+	lineTestForTargets = "true"
     }
 
     moving
     {
-	recoilParts 
-	{
-	    recoilPart recoil1 
-	    {
-		partnum = 7
-		maxrange = 1.5f
-		minlerp = 0.7f
-		recoilspeed = 200.0f
-		restorespeed = 10.0f
-	    }
-	    
-	    recoilPart recoil2 
-	    {
-		partnum = 6
-		maxrange = 1.5f
-		minlerp = 0.7f
-		recoilspeed = 200.0f
-		restorespeed = 10.0f
-	    }
-	    
-	    recoilPart recoil3
-	    {
-		partnum = 5
-		maxrange = 1.5f
-		minlerp = 0.7f
-		recoilspeed = 200.0f
-		restorespeed = 10.0f
-	    }
-
-	    recoilPart recoil4
-	    {
-		partnum = 4
-		maxrange = 1.5f
-		minlerp = 0.7f
-		recoilspeed = 200.0f
-		restorespeed = 10.0f
-	    }
-	}
+        recoilParts 
+        {
+            recoilPart recoil1 
+            {
+            partnum = 7
+            maxrange = 1.5f
+            minlerp = 0.7f
+            recoilspeed = 200.0f
+            restorespeed = 10.0f
+            }
+            
+            recoilPart recoil2
+            {
+            partnum = 5
+            maxrange = 1.5f
+            minlerp = 0.7f
+            recoilspeed = 200.0f
+            restorespeed = 10.0f
+            }	 
+            
+            recoilPart recoil3
+            {
+            partnum = 6
+            maxrange = 1.5f
+            minlerp = 0.7f
+            recoilspeed = 200.0f
+            restorespeed = 10.0f
+            }
+            
+            recoilPart recoil4
+            {
+            partnum = 4
+            maxrange = 1.5f
+            minlerp = 0.7f
+            recoilspeed = 200.0f
+            restorespeed = 10.0f
+            }
+        }
 
         responsibleForSettingCharacterPos = "false"
 
@@ -844,33 +950,34 @@ template cruiserSentryGunDefault : remoteSentryGunBF
     //this is all you guys need to add to do a basic gibs test
     ticktype		= "k_tickAlways"
 
-    dmghealthcomponentbf health
+    health
     {
-	    fullhealth	= 1.0 //10.f
-	    invincibilityChannel = ""
-	    healthComponentSettings |= "k_healthComponentSetting_isRepairable"
-    }    
-    
-    bfexplodingpropdescript descript
-    {
+	fullhealth	= 5.f
+	invincibilityChannel = ""
     }
-   
+      
     autoaimtarget
     {
 	nameKey = "STR_CAPITAL_SHIP_TURRET"
+	isRemote = "true"
+	float overridePosition[] = {0.0f, 2.2f, 0.0f}
     }
 
     propflags |= "k_neverChangeBgRoomGroup"
-    baseobflags = "k_baseobflag_dontRuntimeSerialiseSave"
+
+    hudImageName = "cis_turret_icon"     
 }   
+
 
 template cis_cruiser_turret : cruiserSentryGunDefault // these turrets will need to be removed from final game. Level specific ones required, don't just plonk a cis_cruiser turret in your level!
 {
     aiTargetType = "k_targetType_ships"
-    
+
+    visTableSeer = 0
+        
     obinstrenderer render
     {
-	model = "props/turrets/cis_cruiser/cis_cruiser_turret_barrel"
+	model = "turrets/cis/cis_cruiser/cis_cruiser_turret/cis_cruiser_turret"
 	numLods = 3
 	lodDist[]
 	{ 30.0, 50.0, 100.0 }
@@ -890,38 +997,54 @@ template cruiserSentryGun : cruiserSentryGunDefault
 
 template cruiserSentryGun_Mun : cruiserSentryGunDefault
 {
+    soundmap    = "sndmap_muntrrt"
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }   
+
     remoteGun
     {
 	gunComponent
         {   
-            soundmap_player = "sndmap_muntrrt"	
-            soundmap_npc    = "sndmap_muntrrt"
-
             gunAnimationGroup anims
             {
-                set	    = "gunanims_tf"
+                set	    = "ga_tf"
                 animmap	    = "animmap_rem_bf"
                 reactmap    = "reactmap_generic"
             }
         }
     }
+    autoaimtarget
+    {
+	float overridePosition[] = {0.0f, 4.0f, 0.0f}
+    }
+    visTableSeer = 0
+}
 
+template cruiserSentryGun_Dest : cruiserSentryGun_Mun // Story level guns, now explode
+{
+    bfexplodingpropdescript descript
+    {
+    }   
+    health
+    {
+	healthComponentSettings = ""
+    }
+    visTableSeer = 0 
 }
 
 template cruiserSentryGun_Acc : cruiserSentryGunDefault
 {
-
     movementDescription = "bf_mAcc_gun" 
     
     render
     {
-	model = "props/turrets/rep/rep_cruiser/rep_cruiser_turret_barrel"
-    }
-    sensor
-    {
-    	maxViewDist = 1500.0f
+	model = "turrets/rep/rep_cruiser/rep_cruiser_turret"
     }
 
+    visTableSeer = 0
+	
     RemoteCameraBF camera
     {
 	minFov = 5.f
@@ -930,7 +1053,7 @@ template cruiserSentryGun_Acc : cruiserSentryGunDefault
 
 	thirdPersonOffset []
 	{
-	    0.000000, 0.000000, -10.00000
+	    0.000000, 0.500000, -10.00000
 	}
 
 	firstPersonOffset []
@@ -939,39 +1062,34 @@ template cruiserSentryGun_Acc : cruiserSentryGunDefault
 	}
     }
     
+    soundmap = "sndmap_accltrrt"
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }   
     remoteGun
     {
         barrelShootPosDofArrayName  = "SHOOTPOS_"
         gunComponent
         {
             gunInfoFromMgr	    = "cruRemREPTur"
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzBlueRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
 
-	    ubiks		    = "ubiks_basePlus"
-
-	    soundmap_npc = "sndmap_accltrrt"
-	    soundmap_player = "sndmap_accltrrt"
-
+	    ubiksBasePlus = "true"
             useUbiks = "true"
             loweredAmount = 0.000000
 
             gunAnimationGroup anims
             {
-                set	    = "gunanims_tf"
+                set	    = "ga_tf"
                 animmap	    = "animmap_rem_bf"
                 reactmap    = "reactmap_generic"
             }
         }
     }
-
-    RemoteBrainBF brain
+    
+    autoaimtarget
     {
+	float overridePosition[] = {0.0f, 6.0f, 0.0f}
     }
 
     remoteMovingMatrix360 moving
@@ -981,7 +1099,7 @@ template cruiserSentryGun_Acc : cruiserSentryGunDefault
 	    recoilPart recoil1 
 	    {
 		partnum = 4
-		maxrange = 1.5f
+		maxrange = 3.5f
 		minlerp = 0.7f
 		recoilspeed = 200.0f
 		restorespeed = 10.0f
@@ -990,7 +1108,7 @@ template cruiserSentryGun_Acc : cruiserSentryGunDefault
 	    recoilPart recoil2 
 	    {
 		partnum = 5
-		maxrange = 1.5f
+		maxrange = 3.5f
 		minlerp = 0.7f
 		recoilspeed = 200.0f
 		restorespeed = 10.0f
@@ -1002,32 +1120,101 @@ template cruiserSentryGun_Acc : cruiserSentryGunDefault
         physics
         {
             physicsDescription = "bf_pCruiser_gun"
+            useRBs = "true"
         }
     }
 }
 
-template cruiserSentryGun_Green : cruiserSentryGunDefault
+template cruiserSentryGun_Green : cruiserSentryGunDefault // star destroyer turrets
 {
+    soundmap = "sndmap_stdstrrt"
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }   
+
+    render
+    {
+        model = "turrets/imp/imp_cruiser/imp_cruiser_turret/imp_cruiser_turret"
+    }
+    visTableSeer = 0
+    repaircptur descript
+    {
+    }
+
+    autoaimtarget
+    {
+	float overridePosition[] = {0.0f, 13.0f, 0.0f}
+    }
+    
     remoteGun
     {
-        gunComponent
+        barrelShootPosDofArrayName        = "SHOOTPOS_"
+	    
+	gunComponent
         {
-            gunInfoFromMgr  = "fiSentry_Green"
-	    soundmap_npc = "sndmap_stdstrrt"
-	    soundmap_player = "sndmap_stdstrrt"
+            gunInfoFromMgr  = "cruRemIMPTur"   
         }    
     }
+    
+    remoteMovingMatrix360 moving
+    {
+	recoilParts
+	{
+	    recoilPart recoil1
+	    {
+		partnum = 4
+		maxrange = 1.5f
+		minlerp = 0.7f
+		recoilspeed = 200.0f
+		restorespeed = 10.0f
+	    }
+	}
+
+    }     
 }
 
-template cruiserSentryGun_Blue : cruiserSentryGunDefault
+// Nebulon Frigate Turrets
+template cruiserSentryGun_Blue : cruiserSentryGun_Acc
 {
+    soundmap = "sndmap_rebtrrt"
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }
+
+    render
+    {
+        model = "turrets/reb/reb_cruiser/reb_cruiser_turret/reb_cruiser_turret"
+    }
+    visTableSeer = 0	
+    RemoteCameraBF camera
+    {
+	minFov = 5.f
+	maxFov = 50.f
+	cameraLenseDofName   = "SENSORPOS_1"
+
+	thirdPersonOffset []
+	{
+	    0.000000, 0.000000, -4.50000
+	}
+
+	firstPersonOffset []
+	{
+	    0.000000, 0.000000, -4.500000
+	}
+    }
+    
+    autoaimtarget
+    {
+	float overridePosition[] = {0.0f, 8.5f, 0.0f}
+    }
+    
     remoteGun
     {
         gunComponent
         {
-            gunInfoFromMgr  = "fiSentry_Blue"
-	    soundmap_npc = "sndmap_rebtrrt"
-	    soundmap_player = "sndmap_rebtrrt"
+            gunInfoFromMgr  = "cruRemREBTur"
         }    
     }
 
@@ -1037,108 +1224,65 @@ template cruiserSentryGun_Blue : cruiserSentryGunDefault
     }
 }
 
-template bfcatoturretdescript : descriptcomponent
-{
-    script = "
-
-    BTOP
-    {
-	event init
-	{
-	    setdmgstate( normal )
-	    makevisible_wc( BTOP, true )
-	    makevisible_wc( B_GIB*, false )
-	    //debugprintf(init)
-	}
-    }
-
-    * 
-    {
-	event bullethit
-	{
-	    particleeffect( ship_sparks, true, 0.0, 0.0, 0.0, $1.v, 0, 0 )
-	
-    	    if healthlessthan( 0.05 ) 
-	    {
-		if comparedmgstate(normal)
-		{
-    		    setdmgstate( damaged )
-		    latent(unusable, 0.0001)
-		}
-	    }
-
-	    if comparedmgstate( needsrepair )
-	    {
-		if healthgreaterthan( 0.1 )
-		{
-    		    setinvincible(false)
-		}
-		
-		if healthgreaterthan( 0.25 )
-		{
-		    makevisible_wc( *, true)
-		    makevisible_wc( B_DAMAGED*, false)
-		    setdmgstate( normal )
-		}
-	    }
-	}
-	
-	event unusable
-	{
-	    if comparedmgstate( damaged )
-	    {
-		setdmgstate( needsrepair )
-		makevisible_wc( *, false )
-		makevisible_wc( B_DAMAGED*, true )
-		particleeffect( ship_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2 )
-		setinvincible(true)
-	    }
-	}
-	
-	event zerohealth
-	{	    	  
-	}	
-    }
-    "	  
-}
-
+// Non-Repairable Sentry Gun for Cato Story
 template catoSentryGun : turretDefault
 {
-    teamNum = 1
-
-    movementDescription = "bf_mBespin_gun"
-    aiTargetType = "k_targetType_ships"
+    remoteType = "k_type_antiVehicle"
     
+    teamNum = 1
+    movementDescription = "bf_mCato_gun"
+    aiTargetType = "k_targetType_ships"
+
+    flags |= "k_flag_alwaysConsiderUpright|k_flag_canTrack|k_flag_idleSweepY"
+    
+    shouldTargetSpaceCraft = "true"
+
     render
     {
-	model = "props/cato/sentry_turret"
+	model = "turrets/cis/cato_sentry/turret_high"
     }
-   
+    visTableSeer = 0
     sensor
     {
-	minViewDist = 0.1f
+	minViewDist = 1.0f
     	maxViewDist = 500.0f
         pivotDofName	= "X_AXIS"
-    }	
+    }
+    
+    playerTargetting
+    {
+	maxTargettingRange	    = 500.0f
+    }
+    
+    RemoteBrainBF brain
+    {
+    }
+    
+    soundmap    = "sndmap_cistrrt"
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }   
+
     remoteGun
     {
         gunComponent
         {   
             gunInfoFromMgr  = "besRemoteTur"
-            soundmap_player = "sndmap_cistrrt"	
-            soundmap_npc    = "sndmap_cistrrt"
 	}
     }
-   /* 
-    bfcatoturretdescript descript
+
+    health
     {
-	
+	fullhealth	= 5.f
+	invincibilityChannel = ""
+	healthComponentSettings = ""
     }
-    */
+ 
     RemoteCameraBF camera
     {
-	class-id = "Fixed Gun Camera"
 	chaseCamFOVScale = 1.f
+	cameraLenseDofName = "SENSORPOS"
     }
    
     moving
@@ -1166,9 +1310,17 @@ template catoSentryGun : turretDefault
     }
     autoaimtarget
     {
-	nameKey = "STR_FIXED_GUN"
+	nameKey = "STR_AA_GUN"
 	flags	= "k_autoAimBF_considerForDisplayOnShipHud|k_autoAimBF_canBeLockedOntoByStarFighter|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"
+	float overridePosition[] = {0.0f, 31.0f, 0.0f}	
     }
+    
+    bfnonrepturret descript
+    {
+    }
+    
+    hudImageName = "cato_turret_icon" 
+    
     meta
     {
 	canCreateInEditor   = 1
@@ -1177,47 +1329,75 @@ template catoSentryGun : turretDefault
     }
 }   
 
+// Non-Repairable Sentry Gun for Bespin Story
 template bespinSentryGun : catoSentryGun
 {
     render
     {
 	model = "props/bes/t_g_turret"
     }
+    visTableSeer = 0
     RemoteStimSensorArc sensor
     {
-        partName	= "B_gun"
-        swivelPartName  = "B_seat"
-        sensorDofName   = "SHOOTPOS_PRIMARY1"
+        partName	= "B_GUN"
+        swivelPartName  = "B_SEAT"
+        sensorDofName   = "SENSORPOS"
         pivotDofName    = "X_AXIS"
 	sensorFlags      = "k_updateWithRemoteAngles"
-	minViewDist = 0.1f
-    	maxViewDist = 500.0f
+	minViewDist = 1.1f
+    	maxViewDist = 400.0f
     }
+
+    playerTargetting
+    {
+	maxTargettingRange	    = 400.0f
+    }
+
+    startAngles [] = {-10.0f, 0.0f}
+    
+    soundmap    = "sndmap_cistrrt"
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }   
 
     bfRemoteGun remoteGun
     {
-        swivelPartName		    = "B_seat"
-        barrelPartName		    = "B_gun"
+        swivelPartName		    = "B_SEAT"
+        barrelPartName		    = "B_GUN"
         barrelPivotDofName	    = "X_AXIS"
-	barrelShootPosDofName	    = "SHOOTPOS_PRIMARY1"
+	//barrelShootPosDofName	    = "SHOOTPOS_PRIMARY1"
         barrelShootPosDofArrayName  = "SHOOTPOS_PRIMARY"
 	
         gunComponent
         {   
             gunInfoFromMgr  = "besRemoteTur"
-            soundmap_player = "sndmap_cistrrt"	
-            soundmap_npc    = "sndmap_cistrrt"
 	}
     }
     
-    remoteMovingMatrix360 moving
+    remoteMovingMatrix moving
     {
         basePartNum = 2
         armPartNum = 3
         gunPartNum = 4
+        physics
+        {
+            physicsDescription = "bf_pCruiser_gun"
+            useRBs = "true"
+        }
     }
     
     propflags |= "k_neverChangeBgRoomGroup"
+    
+    autoaimtarget
+    {
+	nameKey = "STR_AA_GUN"
+	overridePosition[] {0.0f, 27.0f, 0.0f}
+	isRemote = "true"
+	flags |= "k_autoAimBF_canBeLockedOntoByStarFighter|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"
+    }
+
+    hudImageName = "bespin_cannon_icon" 
     
     meta
     {
@@ -1226,154 +1406,306 @@ template bespinSentryGun : catoSentryGun
         editorPath = "bf/remoteguns/sentry"
     }
 }   
-  
-template ubiks_basePlus
+
+template des_asteroid_turret : catoSentryGun
 {
-    channels = "base+"
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }  
+    soundmap    = "sndmap_cistrrt" 
+
+    movementDescription = "bf_mDesRoid"
+
+    render
+    {
+	model = "props/turrets/des_roid_turr"
+    }
+    
+    RemoteBrainBF brain
+    {
+	ignoreBGForTargets = "true"
+    }
+
+    RemoteStimSensorArc sensor
+    {
+        partName	= "B_GUN"
+        swivelPartName  = "B_SEAT"
+        sensorDofName   = "SENSORPOS"
+        pivotDofName    = "X_AXIS"
+	sensorFlags      = "k_updateWithRemoteAngles"
+	minViewDist = 1.0f
+    	maxViewDist = 500.0f
+	aspectRatio = 2.0f
+    }
+
+    playerTargetting
+    {
+	maxTargettingRange	    = 500.0f
+    }
+
+    bfRemoteGun remoteGun
+    {
+        swivelPartName		    = "B_SEAT"
+        barrelPartName		    = "B_GUN"
+        barrelPivotDofName	    = "X_AXIS"
+	//barrelShootPosDofName	    = "SHOOTPOS_PRIMARY1"
+        barrelShootPosDofArrayName  = "SHOOTPOS_PRIMARY"
+	
+        gunComponent
+        {   
+            gunInfoFromMgr  = "besRemoteTur"
+    	}
+      }
+
+    propflags |= "k_neverChangeBgRoomGroup"
+    
+    autoAimTargetComponentBF     autoaimtarget
+    {
+	nameKey = "STR_AA_GUN"
+	flags |= "k_autoAimBF_canBeLockedOntoByStarFighter|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"
+    }
+
+    moving
+    {
+        basePartNum = 1
+        armPartNum = 2
+        gunPartNum = 3
+
+	recoilParts
+	{
+	   recoilPart recoil1 
+	   {
+		partnum = 4 //B_BARREL1
+		maxrange = 0.6f
+		minlerp = 0.01f
+		recoilspeed = 20.0f
+		restorespeed = 2.8f
+	   }
+	}
+    }
+
+    meta
+    {
+	canCreateInEditor   = 1
+	editorInstanceName = "des_roid_tur"
+        editorPath = "bf/props/desolation/"
+    }
 }
 
-// We might want the gun to think it's using ubiks for aiming for we don't actually want the anim to animate
-template ubiks_none
+// Repairable Instant Action Turret (Tied to Command Post)
+template CP_auto_turret : bespinSentryGun
 {
-    channels = "empty"
+    autoRepairDelay = 45.0f
+    render
+    {
+	model = "props/turrets/des_roid_turr"
+    }
+	
+    repairpropdesdesc descript
+    {
+    }    
+
+    health
+    {
+	healthComponentSettings |= "k_healthComponentSetting_isRepairable"
+    }
+
+    meta
+    {
+	canCreateInEditor   = 1
+	editorInstanceName = "des_roid_tur"
+        editorPath = "bf/props/desolation/"
+    }
+
+    moving
+    {
+        basePartNum = 1
+        armPartNum = 2
+        gunPartNum = 3
+
+	recoilParts
+	{
+	   recoilPart recoil1 
+	   {
+		partnum = 4 //B_BARREL1
+		maxrange = 0.6f
+		minlerp = 0.01f
+		recoilspeed = 20.0f
+		restorespeed = 2.8f
+	   }
+	}
+    }
+}   
+
+// Repairable Instant Action Turret (Tied to Command Post) : Clone Wars
+template clonewar_auto_turret : CP_auto_turret
+{
+   render
+    {
+	model = "props/turrets/con_aa_turr"
+    }
+
+   autoaimtarget
+    {
+		flags = "k_autoAimBF_displayAsPointOfInterestOnHud|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"
+    }
+    
+    remoteGun
+    {
+	gunInfoOverride = "CISAutoRemoteTur"
+        gunComponent
+        {   
+            gunInfoFromMgr  = "RepAutoRemoteTur"
+	}
+    }
 }
 
-template gunanims_aat
+// Repairable Instant Action Turret (Tied to Command Post) : Galactic Civil War
+template civilwar_auto_turret : CP_auto_turret
 {
-    slots = "idle;fire;noAim;lower;down;raise"
-    prefix = "N"
-    ubiks = ""
+    render
+    {
+	model = "props/turrets/con_aa_turr"
+    }
+    
+	autoaimtarget
+    {
+		flags = "k_autoAimBF_displayAsPointOfInterestOnHud|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"
+    }
 
-    gunStateIdle Nidle_0
+    remoteGun
     {
-	canZoom =   "yes-show-view"
-	time	=   10.f
-	script	=   ""
+	gunInfoOverride = "EmpAutoRemoteTur"
+        gunComponent
+        {   
+            gunInfoFromMgr  = "RebAutoRemoteTur"
+	}
     }
-    gunStateNormalFire Nfire_0
-    {
-	script	    = "sfx(fire);fire"
-	onEnd	    = "setFireState(fire)"
-	canZoom =   "yes-show-view"
-	time	=   0.3f
-    }
-    gunStateIdle NnoAim_0
-    {
-	time	= 1.f
-	canZoom = "no"
-    }
-    gunStateLower Nlower_0
-    {
-	canZoom = "no"
-	time	= 0.0f
-        float gunAlpha[] {1.0f}
-    }
-    gunStateDown Ndown_0
-    {
-	canZoom = "no"
-	time	= 0.0f
-        float gunAlpha[] {1.0f}
-    }
-    gunStateRaise Nraise_0
-    {
-	canZoom = "no"
-	time	= 0.0f
-        float gunAlpha[] {1.0f}
-    }
-}
+}   
 
-template gunanims_tf : gunanims_aat
-{
-    Nfire_0
-    {
-	script	    = "sfx(fire);fire;fire"
-    }
-}
-
-template gunanims_trif : gunanims_aat
-{
-    Nfire_0
-    {
-	script	    = "sfx(fire);fire;fire;fire"
-    }
-}
 template remoteAATGun : remotePropBF
 {
+    remoteType = "k_type_vehicleTurret"
+
     movementDescription = "bf_mAAT_gun"
 
     startState = "k_state_off" 
-    flags |= "k_flag_alwaysConsiderUpright"
-    
+    flags |= "k_flag_alwaysConsiderUpright|k_flag_driverControllable"
+    aiTargetType = "k_targetType_infantry|k_targetType_groundVehicles|k_targetType_ships|k_targetType_remotes" 
+
+    shouldTargetChrs = "true"
+    shouldTargetVehicles = "true"
+    shouldTargetSpaceCraft = "true"
+    shouldTargetRemotes	= "true"
+
     obinstrenderer render
     {
 	model =	"vehicles/cis/cis_aat_gun"
     }
     
-    RemoteBrain brain
+    RemoteCameraBF camera
+    {
+	cameraLenseDofName = "SHOOTPOS_PRIMARY1"
+	thirdPersonOffset []
+	{
+	    0.000000, 0.600000, -4.050000
+	}
+
+	firstPersonOffset []
+	{
+	    0.000000, 0.600000, -4.0500000
+	}
+	chaseCamFOVScale = 1.f
+    }
+
+    RemoteBrainBF brain
     {
     }
-  
+      
     bfvehicledescriptcomponent descript
     {
     }
    
     dmghealthcomponentbf health
     {
-	fullhealth	= 7.0f  // Set to same as AAT so when explosions go off it doesn't get destroyed first
-        isrepairable	= "false"
+	fullhealth	= 7.5f  // Set to same as AAT so when explosions go off it doesn't get destroyed first
     } 
     
     controlVehicleRemote control
     {
     }
 
+    soundmap    = "sndmap_aattrt"
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }   
+
     bfRemoteGun remoteGun
     {
-	barrelPartName         = "B_joint_canon" 
-	swivelPartName         = "B_joint_turret1" 
-	barrelPivotDofName     = "main_canon_pivot"
-	barrelShootPosDofName  = "SHOOTPOS_PRIMARY1"
+	//barrelPartName         = "B_joint_canon" 
+	//swivelPartName         = "B_joint_turret1" 
+	//barrelPivotDofName     = "main_canon_pivot"
+//	barrelShootPosDofName  = "SHOOTPOS_PRIMARY1"
 
 	gunComponent
 	{
-	    gunInfoFromMgr = "fiAATGun"
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzOraRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.7f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
+	    gunInfoFromMgr = "fiAATGun" 
 
-	
-	    ubiks = "ubiks_basePlus"
-
-	    soundmap_player = "sndmap_aattrt"	
-	    soundmap_npc    = "sndmap_aattrtpla"
-
+	    ubiksBasePlus = "true"
 	    useUbiks = "false"
 	    loweredAmount = 0.000000
 
 	    gunAnimationGroup anims
 	    {
-		set		    = "gunanims_aat"
+		set		    = "ga_aat"
 		animmap		    = "animmap_rem_bf"
 		reactmap	    = "reactmap_generic"
 	    }
 	}
     }
 
-    remoteMovingPhysics moving
+    remoteMovingMatrix moving
     {
 	responsibleForSettingCharacterPos = "false"
+
+        basePartNum = 0 // BTOP
+        armPartNum  = 1 // B_SEAT
+        gunPartNum  = 2 // B_GUN
 
 	physics
 	{
 	    physicsDescription = "bf_pAAT_gun"	
 	    numJoints = 2
+	    useRBs = "true"
+	}
+	recoilParts
+	{
+	   recoilPart recoil1 
+	   {
+		partnum = 3 //B_BARREL1
+		maxrange = 0.6f
+		minlerp = 0.01f
+		recoilspeed = 20.0f
+		restorespeed = 2.8f
+	   }
 	}
     }
-  
+ 
+    RemoteStimSensorArc sensor
+    {
+        partName	= "B_GUN"
+        swivelPartName	= "B_SEAT"
+        sensorDofName	= "SHOOTPOS_PRIMARY1"
+        pivotDofName	= "X_AXIS"
+
+	sensorFlags      = "k_updateWithRemoteAngles"
+
+	fieldOfView     = 120.0f	
+	maxViewDist	= 1500.0f
+    } 
+ 
     meta
     {
 	canCreateInEditor   = 1
@@ -1381,68 +1713,49 @@ template remoteAATGun : remotePropBF
 	editorPath	    = "bf/generic/remotes"
     }
 
-    driverAimOnWii	    = "true"
+    hudImageName = "turret_icon"     
 }
 
-template remoteAATGunNonPhysics : remoteAATGun
+template remoteAATGun_story : remoteAATGun
 {
-    remoteMovingMatrixBF moving
+    dmghealthcomponentbf health
     {
-        responsibleForSettingCharacterPos = "false"
-
-        basePartNum = 1
-        armPartNum  = 2
-        gunPartNum  = 3
-    }
-
-    meta
-    {
-        canCreateInEditor   = 1
-        editorInstanceName  = "AATGunNonPhysics"
-        editorPath  	    = "bf/generic/remotes"
-    }
-}
-
-template alternateAATGun : remoteAATGunNonPhysics
-{
+	fullhealth	= 2.1f  // Set to same as AAT so when explosions go off it doesn't get destroyed first
+    } 
+    applyDamageOnRemoteOwner = "true"	    // allow to damage the tank when gun get an impact
     bfRemoteGun remoteGun
-    {   
+    {
 	gunComponent
 	{
-	    gunInfoFromMgr = "altAATGun"
-	
-	    ubiks = "ubiks_basePlus"
-
-	    soundmap_player = "sndmap_aattrt"	
-	    soundmap_npc    = "sndmap_aattrtpla"
-
-	    useUbiks = "false"
-	    loweredAmount = 0.000000
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzRedRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
-	    
-	    gunAnimationGroup anims
-	    {
-		set		    = "gunanims_aat"
-		animmap		    = "animmap_rem_bf"
-		reactmap	    = "reactmap_generic"
-	    }
+	    gunInfoFromMgr = "fiAATGun_s"
 	}
     }
 }
 
 template remoteImpTurret : remotePropBF
 {
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }  
+
+    remoteType = "k_type_vehicleTurret"
+    
     movementDescription = "bf_mImpShut_gun"
 
     startState = "k_state_off" 
     flags |= "k_flag_alwaysConsiderUpright"
+    aiTargetType = "k_targetType_all" 
+
+    shouldTargetChrs = "true"
+    shouldTargetPlayers = "true"
+    shouldTargetRemotes = "true"
+    shouldTargetVehicles = "true"
+    shouldTargetWalkers = "true"
+    shouldTargetTanks = "true"
+    shouldTargetSpaceCraft = "true"
+//    shouldTargetTransports = "true"
+    shouldTargetHeroVehicles = "true"
     
     obinstrenderer render
     {
@@ -1451,7 +1764,7 @@ template remoteImpTurret : remotePropBF
 
     float startAngles [] = {0.0f, 180.0f}
     
-    RemoteBrain brain
+    RemoteBrainBF brain
     {
         float RestDir[] { 0.0f, 180.0f, 0.0f }	
     }
@@ -1463,13 +1776,18 @@ template remoteImpTurret : remotePropBF
     bfvehicledescriptcomponent descript
     {
     }
-   
+
+    RemoteCameraBF camera
+    {
+	cameraLenseDofName = "SHOOTPOS_PRIMARY1"
+    }
+ 
     dmghealthcomponentbf health
     {
-	fullhealth	= 7.0f  // Set to same as AAT so when explosions go off it doesn't get destroyed first
-        isrepairable	= "false"
+	fullhealth	= 36.0f 
     }  
     
+    soundmap    = "sndmap_impshtrt"
     bfRemoteGun remoteGun
     {
 	barrelPartName         = "B_gun" 
@@ -1481,25 +1799,15 @@ template remoteImpTurret : remotePropBF
 	{
 	    gunInfoFromMgr = "ImpShutTurret"
 	
-	    ubiks = "ubiks_basePlus"
+	    ubiksBasePlus = "true"
 
-	    soundmap_player = "sndmap_impshtrt"	
-	    soundmap_npc    = "sndmap_impshtrt"
 
 	    useUbiks = "false"
 	    loweredAmount = 0.000000
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzGreRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {0.f, 1.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
-	    
+   	    
 	    gunAnimationGroup anims
 	    {
-		set		    = "gunanims_aat"
+		set		    = "ga_aat"
 		animmap		    = "animmap_rem_bf"
 		reactmap	    = "reactmap_generic"
 	    }
@@ -1514,11 +1822,8 @@ template remoteImpTurret : remotePropBF
         armPartNum  = 2
         gunPartNum  = 1
 
-	physics
-	{
-	    physicsDescription = "bf_pAAT_gun"	
-	    numJoints = 2
-	}
+        // not having physics for imp shuttle turret - not very noticable but helps performance
+	physics = 42
 
     }
 
@@ -1535,28 +1840,48 @@ template remoteImpTurret : remotePropBF
 	maxViewDist	= 1500.0f
     } 
 
+    playerTargetting
+    {
+	maxTargettingRange	    = 1500.0f
+    }
+
     meta
     {
         canCreateInEditor   = 0
         editorInstanceName  = "ImpTurret"
         editorPath  	    = "bf/generic/remotes"
     }
+    
+    hudImageName = "reb_inf_turret_icon"     
 }
 
 
 template remoteYWingGun : remotePropBF
 {
+    remoteType = "k_type_vehicleTurret"
+	
     movementDescription = "bf_mYWing_gun"
 
     startState = "k_state_off" 
     flags |= "k_flag_alwaysConsiderUpright"
+    aiTargetType = "k_targetType_all"
+    
+    shouldTargetChrs = "true"
+    shouldTargetPlayers = "true"
+    shouldTargetRemotes = "true"
+    shouldTargetVehicles = "true"
+    shouldTargetWalkers = "true"
+    shouldTargetTanks = "true"
+    shouldTargetSpaceCraft = "true"
+//    shouldTargetTransports = "true"
+    shouldTargetHeroVehicles = "true"
     
     obinstrenderer render
     {
 	model =	"vehicles/reb/reb_ywing_turret"
     }
     
-    RemoteBrain brain
+    RemoteBrainBF brain
     {
     }
   
@@ -1566,14 +1891,14 @@ template remoteYWingGun : remotePropBF
    
     dmghealthcomponentbf health
     {
-	fullhealth	= 7.0f  // Set to same as AAT so when explosions go off it doesn't get destroyed first
-        isrepairable	= "false"
+	fullhealth	= 10.0f
     }
     
     controlVehicleRemote control
     {
     } 
    
+    soundmap    = "sndmap_ywingtrt"
     bfRemoteGun remoteGun
     {
 	barrelPartName         = "B_gun" 
@@ -1585,25 +1910,13 @@ template remoteYWingGun : remotePropBF
 	{
 	    gunInfoFromMgr = "mountedYWingGun"
 	
-	    ubiks = "ubiks_basePlus"
-
-	    soundmap_player = "sndmap_ywingtrt"	
-	    soundmap_npc    = "sndmap_ywingtrt"
-
+	    ubiksBasePlus = "true"
 	    useUbiks = "false"
 	    loweredAmount = 0.000000
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzRedRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
-	    
+  	    
 	    gunAnimationGroup anims
 	    {
-		set		    = "gunanims_aat"
+		set		    = "ga_aat"
 		animmap		    = "animmap_rem_bf"
 		reactmap	    = "reactmap_generic"
 	    }
@@ -1618,12 +1931,7 @@ template remoteYWingGun : remotePropBF
         armPartNum  = 2
         gunPartNum  = 1
 
-	physics
-	{
-	    physicsDescription = "bf_pAAT_gun"	
-	    numJoints = 2
-	}
-
+       	//physics = 42
     }
 
     RemoteStimSensorArc sensor
@@ -1635,22 +1943,42 @@ template remoteYWingGun : remotePropBF
 
 	sensorFlags      = "k_updateWithRemoteAngles"
 
-	fieldOfView     = 360.0f	
+	fieldOfView     = 180.0f	
 	maxViewDist	= 1500.0f
     } 
 
+    playerTargetting
+    {
+	maxTargettingRange	    = 1500.0f
+    }
+    
+    RemoteCameraBF camera
+    {
+	cameraLenseDofName = "SHOOTPOS_SECONDARY1"
+    }
+    
     meta
     {
         canCreateInEditor   = 0
         editorInstanceName  = "YWingTurret"
         editorPath  	    = "bf/generic/remotes"
     }
+    
+    hudImageName = "reb_inf_turret_icon"     
 }
 
 template remoteARC170Gun : remotePropBF
 {
+    remoteType = "k_type_vehicleTurret"
+	
     movementDescription = "bf_mARC170_gun"
+    aiTargetType = "k_targetType_groundVehicles|k_targetType_ships|k_targetType_remotes"
 
+    //viable targets
+    shouldTargetGroundVehicles	= "true"
+    shouldTargetSpaceCraft	= "true"
+    shouldTargetRemotes		= "true"
+    
     startState = "k_state_off" 
     flags |= "k_flag_alwaysConsiderUpright"
     float startAngles [] = {0.0f, 180.0f}
@@ -1660,7 +1988,7 @@ template remoteARC170Gun : remotePropBF
 	model =	"vehicles/rep/rep_arc170_turret"
     }
     
-    RemoteBrain brain
+    RemoteBrainBF brain
     {
         float RestDir[] { 0.0f, -180.0f, 0.0f }
     }
@@ -1671,12 +1999,12 @@ template remoteARC170Gun : remotePropBF
    
     dmghealthcomponentbf health
     {
-	fullhealth	= 7.0f  // Set to same as AAT so when explosions go off it doesn't get destroyed first
-        isrepairable	= "false"
+	fullhealth	= 10.0f
     }
     
     controlVehicleRemote control
     {
+	playerCanLockOn = "true"
     } 
    
 
@@ -1689,40 +2017,29 @@ template remoteARC170Gun : remotePropBF
 
 	sensorFlags      = "k_updateWithRemoteAngles"
 
-	fieldOfView     = 360.0f	
-	maxViewDist	= 1500.0f
+	fieldOfView     = 180.0f	
+	maxViewDist	= 500.0f
     } 
 
+    soundmap    = "sndmap_arctrt"
     bfRemoteGun remoteGun
     {
 	barrelPartName         = "B_gun" 
 	swivelPartName         = "B_base" 
 	barrelPivotDofName     = "bot"
-	barrelShootPosDofName  = "shootpos1"
+	barrelShootPosDofArrayName  = "shootpos1"
 
 	gunComponent
 	{
 	    gunInfoFromMgr = "mountedARC170Gun"
 	
-	    ubiks = "ubiks_basePlus"
-
-	    soundmap_player = "sndmap_arctrt"	
-	    soundmap_npc    = "sndmap_arctrt"
-
+	    ubiksBasePlus = "true"
 	    useUbiks = "false"
 	    loweredAmount = 0.000000
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzRedRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
-	    
+	        
 	    gunAnimationGroup anims
 	    {
-		set		    = "gunanims_aat"
+		set		    = "ga_aat"
 		animmap		    = "animmap_rem_bf"
 		reactmap	    = "reactmap_generic"
 	    }
@@ -1737,12 +2054,12 @@ template remoteARC170Gun : remotePropBF
         armPartNum  = 1
         gunPartNum  = 2
 
-	physics
-	{
-	    physicsDescription = "bf_pAAT_gun"	
-	    numJoints = 2
-	}
+	// physics = 42
+    }
 
+    RemoteCameraBF camera
+    {
+	cameraLenseDofName = "shootpos1"
     }
 
     meta
@@ -1751,21 +2068,149 @@ template remoteARC170Gun : remotePropBF
         editorInstanceName  = "ARC170 Turret"
         editorPath  	    = "bf/generic/remotes"
     }
+    
+    hudImageName = "turret_icon"     
+}
+
+
+template remoteMelFalcon : remotePropBF
+{
+    remoteType = "k_type_vehicleTurret"
+	
+    movementDescription = "bf_mFalcon_gun"
+    aiTargetType = "k_targetType_all"
+    
+    shouldTargetChrs = "true"
+    shouldTargetPlayers = "true"
+    shouldTargetRemotes = "true"
+    shouldTargetVehicles = "true"
+    shouldTargetWalkers = "true"
+    shouldTargetTanks = "true"
+    shouldTargetSpaceCraft = "true"
+//    shouldTargetTransports = "true"
+    shouldTargetHeroVehicles = "true"
+
+    startState = "k_state_off" 
+    flags |= "k_flag_alwaysConsiderUpright"
+    float startAngles [] = {0.0f, 0.0f}
+
+    obinstrenderer render
+    {
+	model =	"vehicles/reb/reb_falcon_turret"
+    }
+    
+    RemoteBrainBF brain
+    {
+        float RestDir[] { 0.0f, 0.0f, 0.0f }
+    }
+  
+    bfvehicledescriptcomponent descript
+    {
+    }
+   
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 40.0f
+    }
+    
+    controlVehicleRemote control
+    {
+	playerCanLockOn = "true"
+    } 
+   
+    RemoteStimSensorArc sensor
+    {
+        partName	= "B_GUN"
+        swivelPartName	= "B_BASE"
+        sensorDofName	= "SHOOTPOS_PRIMARY1"
+        pivotDofName	= "GUN"
+
+	sensorFlags      = "k_updateWithRemoteAngles"
+
+	minViewDist	= 0.5f
+	fieldOfView     = 180.0f
+	maxViewDist	= 750.0f
+    } 
+
+    soundmap    = "sndmap_arctrt"
+    bfRemoteGun remoteGun
+    {
+	barrelPartName         = "B_GUN" 
+	swivelPartName         = "B_BASE" 
+	barrelPivotDofName     = "GUN"
+	barrelShootPosDofName  = "SHOOTPOS_PRIMARY"
+
+	gunComponent
+	{
+	    gunInfoFromMgr = "mountedFalconGun"
+	
+	    ubiksBasePlus = "true"
+
+
+	    useUbiks = "false"
+	    loweredAmount = 0.000000
+	        
+	    gunAnimationGroup anims
+	    {
+		set		    = "ga_aat"
+		animmap		    = "animmap_rem_bf"
+		reactmap	    = "reactmap_generic"
+	    }
+	}
+    }
+
+    remoteMovingMatrixBF moving
+    {
+        responsibleForSettingCharacterPos = "false"
+
+        basePartNum = 0
+        armPartNum  = 1
+        gunPartNum  = 2
+
+	//physics = 42	// physics for remote components doesn't work properly, so disable it.
+    }
+
+    RemoteCameraBF camera
+    {
+	cameraLenseDofName = "SHOOTPOS_PRIMARY"
+    }
+
+    meta
+    {
+        canCreateInEditor   = 0
+        editorInstanceName  = "Falcon Turret Top"
+        editorPath  	    = "bf/generic/remotes"
+    }
+
+    hudImageName = "turret_icon"     
 }
 
 template remoteAAC : remotePropBF
 {
+    remoteType = "k_type_vehicleTurret"
+	
     movementDescription = "bf_mAAT_gun"
 
     startState = "k_state_off" 
-    flags |= "k_flag_alwaysConsiderUpright"
+    flags |= "k_flag_alwaysConsiderUpright|k_flag_driverControllable"
+    aiTargetType = "k_targetType_all"
+
+    shouldTargetChrs = "true"
+    shouldTargetPlayers = "true"
+    shouldTargetRemotes = "true"
+    shouldTargetVehicles = "true"
+    shouldTargetWalkers = "true"
+    shouldTargetTanks = "true"
+    shouldTargetSpaceCraft = "true"
+//    shouldTargetTransports = "true"
+    shouldTargetHeroVehicles = "true"
     
     obinstrenderer render
     {
 	model =	"vehicles/reb/reb_aac-3_turret"
     }
     
-    RemoteBrain brain
+    RemoteBrainBF brain
     {
     }
   
@@ -1780,40 +2225,43 @@ template remoteAAC : remotePropBF
 
     dmghealthcomponentbf health
     {
-	fullhealth	= 7.0f  // Set to same as AAT so when explosions go off it doesn't get destroyed first
-        isrepairable	= "false"
+	fullhealth	= 7.5f  // Set to same as AAT so when explosions go off it doesn't get destroyed first
     }  
+
+    RemoteCameraBF camera
+    {
+	cameraLenseDofName = "SHOOTPOS_SECONDARY1"
+       	thirdPersonOffset []
+	{
+	    -0.83f, 0.4f, -0.35f
+	}
+
+	firstPersonOffset []
+	{
+	    -0.83f, 0.4f, -0.35f
+	}
+	chaseCamFOVScale = 1.f
+    }
     
+    soundmap    = "sndmap_aacturw"
     bfRemoteGun remoteGun
     {
 	barrelPartName         = "B_missile_launcher" 
 	swivelPartName         = "B_turret_plattform" 
 	barrelPivotDofName     = "ROT2"
-	barrelShootPosDofArrayName = "SHOOTPOS_SECONDARY"
+	barrelShootPosDofArrayName = "SHOOTPOS_SECONDARY" // this is without the digit so it iterates through all shoot positions - MP
 	
 	gunComponent
 	{
-	    gunInfoFromMgr = "fiAATGun"
+	    gunInfoFromMgr = "AACTurret"
 	
-	    ubiks = "ubiks_basePlus"
-
-	    soundmap_player = "sndmap_aacturw"	
-	    soundmap_npc    = "sndmap_aacturw"
-
+	    ubiksBasePlus = "true"
 	    useUbiks = "false"
 	    loweredAmount = 0.000000
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzRedRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
-	    
+	     
 	    gunAnimationGroup anims
 	    {
-		set		    = "gunanims_aat"
+		set		    = "ga_aat"
 		animmap		    = "animmap_rem_bf"
 		reactmap	    = "reactmap_generic"
 	    }
@@ -1833,6 +2281,11 @@ template remoteAAC : remotePropBF
 	maxViewDist	= 500.0f
     }
 
+    playerTargetting
+    {
+	maxTargettingRange	    = 500.0f
+    }
+
     remoteMovingMatrixBF moving
     {
         responsibleForSettingCharacterPos = "false"
@@ -1841,12 +2294,7 @@ template remoteAAC : remotePropBF
         armPartNum  = 1
         gunPartNum  = 2
 
-	physics
-	{
-	    physicsDescription = "bf_pAAT_gun"	
-	    numJoints = 2
-	}
-
+	//physics = 42	// physics for remote components doesn't work properly, so disable it.
     }
 
     meta
@@ -1855,23 +2303,37 @@ template remoteAAC : remotePropBF
         editorInstanceName  = "AATGunNonPhysics"
         editorPath  	    = "bf/generic/remotes"
     }
+    
+    hudImageName = "turret_icon"         
 }
 
 
 
 template remoteIFTGun : remotePropBF
 {
+    remoteType = "k_type_vehicleTurret"
+	
     movementDescription = "bf_mAAT_gun"
 
     startState = "k_state_off" 
-    flags |= "k_flag_alwaysConsiderUpright"
+    flags |= "k_flag_alwaysConsiderUpright|k_flag_driverControllable"
+    aiTargetType = "k_targetType_all"
+    shouldTargetChrs = "true"
+    shouldTargetPlayers = "true"
+    shouldTargetRemotes = "true"
+    shouldTargetVehicles = "true"
+    shouldTargetWalkers = "true"
+    shouldTargetTanks = "true"
+    shouldTargetSpaceCraft = "true"
+//    shouldTargetTransports = "true"
+    shouldTargetHeroVehicles = "true"
     
     obinstrenderer render
     {
 	model =	"vehicles/rep/rep_ift_gun"
     }
     
-    RemoteBrain brain
+    RemoteBrainBF brain
     {
     }
   
@@ -1881,46 +2343,59 @@ template remoteIFTGun : remotePropBF
    
     dmghealthcomponentbf health
     {
-	fullhealth	= 7.0f  // Set to same as AAT so when explosions go off it doesn't get destroyed first
-        isrepairable	= "false"
+	fullhealth	= 7.5f
     }
     
     controlVehicleRemote control
     {
     } 
    
+    RemoteCameraBF camera
+    {
+	cameraLenseDofName = "SHOOTPOS_PRIMARY1"
+	thirdPersonOffset []
+	{
+	    0.000000, 0.5f, -1.4f
+	}
 
+	firstPersonOffset []
+	{
+	    0.000000, 0.5f, -1.4f
+	}
+	chaseCamFOVScale = 1.f
+    }
+
+    soundmap    = "sndmap_ifttturw"
     bfRemoteGun remoteGun
     {
-	barrelPartName         = "B_part_topgun" 
-	swivelPartName         = "BTOP" 
-	barrelPivotDofName     = "GUNCENTER"
-	barrelShootPosDofName  = "SHOOTPOS_SECONDARY1"
-
-	gunComponent
+	GunComponent_Beam gunComponent
 	{
-	    gunInfoFromMgr = "fiAATGun"
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzRedRem2"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
+	    chargeTime			= 0.0f
+	    fireTime			= 1.5f
+	    cooldownTime		= 3.0f
+	    laserSpeed			= 200.0f
+            laserSizeScaleCore		= 20.0f
+	    laserSizeScaleGlow		= 7.5f
+	    damageMultiplier		= 2.0f
+	    laserHitEffect		= "hit_generic"
+            texName			= "misctex/laser_fx/remote_laser_glow"
+            texCoreName			= "misctex/laser_fx/remote_laser_core"
+            glowcol[]			{ 0.1f, 1.0f, 0.1f, 1.0f }
+            corecol[]			{ 1.0f, 1.0f, 1.0f, 1.0f }
 
+	    gunInfoFromMgr		= "LAATSideGun"
+		
+	    ubiksBasePlus		= "true"
 	
-	    ubiks = "ubiks_basePlus"
+	    useUbiks			= "false"
+	    loweredAmount		= 0.000000
+    	
+	    state			= "idle"
 
-	    soundmap_player = "sndmap_ifttturw"	
-	    soundmap_npc    = "sndmap_ifttturw"
-
-	    useUbiks = "false"
-	    loweredAmount = 0.000000
-	    
 	    gunAnimationGroup anims
 	    {
-		set		    = "gunanims_aat"
-		animmap		    = "animmap_rem_bf"
+		set		    = "ga_noreload"
+		animmap		    = "animmap_vehicle"
 		reactmap	    = "reactmap_generic"
 	    }
 	}
@@ -1928,10 +2403,10 @@ template remoteIFTGun : remotePropBF
 
     RemoteStimSensorArc sensor
     {
-	partName	= "B_part_topgun"
-	swivelPartName	= "BTOP"
-	sensorDofName	= "SHOOTPOS_SECONDARY1"
-	pivotDofName	= "GUNCENTER"
+	partName	= "B_GUN"
+	swivelPartName	= "B_SEAT" // or B_SEAT
+	sensorDofName	= "SHOOTPOS_PRIMARY1"
+	pivotDofName	= "X_AXIS"
 
 	sensorFlags      = "k_updateWithRemoteAngles"
 
@@ -1939,19 +2414,31 @@ template remoteIFTGun : remotePropBF
 	maxViewDist	= 500.0f
     }
 
-    remoteMovingMatrixBF moving
+    remoteMovingMatrix moving
     {
         responsibleForSettingCharacterPos = "false"
         usingNonOriginRotation = "true"
 
-        basePartNum = 0
-        armPartNum  = 0
-        gunPartNum  = 1
+        basePartNum = 0 // BTOP
+        armPartNum  = 1 // B_SEAT
+        gunPartNum  = 2 // B_GUN
 
 	physics
 	{
 	    physicsDescription = "bf_pAAT_gun"	
 	    numJoints = 2
+	}
+	
+	recoilParts
+	{
+	   recoilPart recoil1 
+	   {
+		partnum = 3
+		maxrange = 0.08f
+		minlerp = 0.01f
+		recoilspeed = 20.0f
+		restorespeed = 4.8f
+	   }
 	}
     }
 
@@ -1961,23 +2448,31 @@ template remoteIFTGun : remotePropBF
         editorInstanceName  = "IFTTankTurret"
         editorPath  	    = "bf/generic/remotes"
     }
-    driverAimOnWii	    = "true"
+
+    hudImageName = "turret_icon"         	
 }
 
 
 template remoteCloneTankGun : remotePropBF
 {
+    remoteType = "k_type_vehicleTurret"
+	
     movementDescription = "bf_mCHT_gun"
 
     startState = "k_state_off" 
-    flags |= "k_flag_alwaysConsiderUpright"
+    flags |= "k_flag_alwaysConsiderUpright|k_flag_returnToRestDir|k_flag_driverControllable"
+
+    aiTargetType = "k_targetType_infantry|k_targetType_groundVehicles" 
+
+    shouldTargetChrs = "true"
+    shouldTargetGroundVehicles = "true"
     
     obinstrenderer render
     {
 	model =	"vehicles/rep/rep_clone_hover_tank_gun"
     }
     
-    RemoteBrain brain
+    RemoteBrainBF brain
     {
     }
   
@@ -1992,40 +2487,44 @@ template remoteCloneTankGun : remotePropBF
 
     dmghealthcomponentbf health
     {
-	fullhealth	= 7.0f  // Set to same as AAT so when explosions go off it doesn't get destroyed first
-        isrepairable	= "false"
+	fullhealth	= 7.5f  // Set to same as AAT so when explosions go off it doesn't get destroyed first
     }  
     
+    RemoteCameraBF camera
+    {
+	cameraLenseDofName = "SHOOTPOS_PRIMARY1"
+	thirdPersonOffset []
+	{
+	    0.000000, 0.600000, -3.80f //TODO: this clips slightly, apparently we are getting code to stop it clipping
+	}
+
+	firstPersonOffset []
+	{
+	    0.000000, 0.600000, -3.80f //TODO: this clips slightly, apparently we are getting code to stop it clipping
+	}
+	chaseCamFOVScale = 1.f
+    }
+    
+    soundmap    = "sndmap_aattrt"
     bfRemoteGun remoteGun
     {
-	barrelPartName         = "B_part_gun" 
-	swivelPartName         = "B_part_base" 
-	barrelPivotDofName     = "GUN"
-	barrelShootPosDofName  = "SHOOTPOS_SECONDARY1"
+// naming convention ftw
+	//barrelPartName         = "B_GUN" 
+	//swivelPartName         = "B_SEAT" 
+	//barrelPivotDofName     = "GUN"
+	barrelShootPosDofName  = "SHOOTPOS_PRIMARY1" //TODO: stefan should be changing this to primary, as naming convention
 
 	gunComponent
 	{
-	    gunInfoFromMgr = "fiAATGun"
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzRedRem2"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
+	    gunInfoFromMgr = "hovertankTurret"
 	
-	    ubiks = "ubiks_basePlus"
-
-	    soundmap_player = "sndmap_aattrt"	
-	    soundmap_npc    = "sndmap_aattrtpla"
-
+	    ubiksBasePlus = "true"
 	    useUbiks = "false"
 	    loweredAmount = 0.000000
 	    
 	    gunAnimationGroup anims
 	    {
-		set		    = "gunanims_aat"
+		set		    = "ga_aat"
 		animmap		    = "animmap_rem_bf"
 		reactmap	    = "reactmap_generic"
 	    }
@@ -2034,10 +2533,10 @@ template remoteCloneTankGun : remotePropBF
 
     RemoteStimSensorArc sensor
     {
-	partName	= "B_part_gun"
-	swivelPartName	= "B_part_base"
-	sensorDofName	= "SHOOTPOS_SECONDARY1"
-	pivotDofName	= "GUN"
+	partName	= "B_GUN"
+	swivelPartName	= "B_SEAT"
+	sensorDofName	= "SHOOTPOS_PRIMARY1" //TODO: stefan should be changing this to primary, as naming convention
+	pivotDofName	= "X_AXIS"
 
 	sensorFlags      = "k_updateWithRemoteAngles"
 
@@ -2045,92 +2544,113 @@ template remoteCloneTankGun : remotePropBF
 	maxViewDist	= 500.0f
     }
 
-    remoteMovingMatrixBF moving
+    remoteMovingMatrix moving
     {
         responsibleForSettingCharacterPos = "false"
 
-        basePartNum = 0
-        armPartNum  = 2
-        gunPartNum  = 1
+        basePartNum = 0 // BTOP
+        armPartNum  = 1 // B_SEAT
+        gunPartNum  = 2 // B_GUN
 
 	physics
 	{
 	    physicsDescription = "bf_pAAT_gun"	
 	    numJoints = 2
+	    useRBs = "true"
+	}
+    	recoilParts
+	{
+	    recoilPart recoil1 
+	    {
+		partnum = 3 
+		maxrange = 0.80f
+		minlerp = 0.01f
+		recoilspeed = 20.0f
+		restorespeed = 2.8f
+	    }
 	}
     }
-
     meta
     {
         canCreateInEditor   = 0
         editorInstanceName  = "CloneHoverTankTurret"
         editorPath  	    = "bf/generic/remotes"
     }
-    driverAimOnWii	    = "true"
-}
 
+    hudImageName = "turret_icon"         
+}
 
 template remoteATTEGun : remotePropBF
 {
+    remoteType = "k_type_vehicleTurret"
+    
     movementDescription = "bf_mATTE_gun"
 
     startState = "k_state_off" 
-    flags |= "k_flag_alwaysConsiderUpright"
-    
+    flags |= "k_flag_alwaysConsiderUpright|k_flag_driverControllable"
+   
+    aiTargetType = "k_targetType_infantry|k_targetType_groundVehicles" 
+    shouldTargetChrs = "true"
+    shouldTargetGroundVehicles = "true"
+
     obinstrenderer render
     {
 	model =	"vehicles/rep/rep_atte_gun"
     }
     
-    RemoteBrain brain
+    RemoteBrainBF brain
     {
     }
   
     bfvehicledescriptcomponent descript
     {
     }
-   
-    dmghealthcomponentbf health
-    {
-	fullhealth	= 7.0f
-        isrepairable	= "false"
-    }  
-        
+    
     controlVehicleRemote control
     {
     } 
-   
+    
+    
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 24.0f
+    }  
+        
+    RemoteCameraBF camera
+    {
+	cameraLenseDofName = "TURRET_CAM"	    //"SHOOTPOS_PRIMARY1"
+	thirdPersonOffset []
+	{
+	    0.000000, 0.000000, 0.000000
+	}
 
+	firstPersonOffset []
+	{
+	    0.000000, 0.000000, 0.000000
+	}
+	chaseCamFOVScale = 1.f
+    }
+    
+    soundmap    = "sndmap_attetrt"
     bfRemoteGun remoteGun
     {
-	barrelPartName         = "B_PART_GUN" 
-	swivelPartName         = "B_PART_SEAT" 
-	barrelPivotDofName     = "TILT"
-	barrelShootPosDofName  = "SHOOTPOS_PRIMARY1"
+// hopefully this is default now
+	//barrelPartName         = "B_PART_GUN" 
+	//swivelPartName         = "B_PART_SEAT" 
+//	barrelPivotDofName     = "TILT"
+	//barrelShootPosDofName  = "SHOOTPOS_PRIMARY1"
 
 	gunComponent
 	{
 	    gunInfoFromMgr = "ATTEmaingun"
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzGreRem2"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {0.f, 1.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
 	
-	    ubiks = "ubiks_basePlus"
-
-	    soundmap_player = "sndmap_attetrt"	
-	    soundmap_npc    = "sndmap_attetrt"
-
+	    ubiksBasePlus = "true"
 	    useUbiks = "false"
 	    loweredAmount = 0.000000
 	    
 	    gunAnimationGroup anims
 	    {
-		set		    = "gunanims_aat"
+		set		    = "ga_aat"
 		animmap		    = "animmap_rem_bf"
 		reactmap	    = "reactmap_generic"
 	    }
@@ -2139,10 +2659,10 @@ template remoteATTEGun : remotePropBF
 
     RemoteStimSensorArc sensor
     {
-	partName	= "B_PART_GUN"
-	swivelPartName	= "B_PART_SEAT"
+	partName	= "B_GUN"
+	swivelPartName	= "B_SEAT"
 	sensorDofName	= "SHOOTPOS_PRIMARY1"
-	pivotDofName	= "TILT"
+	pivotDofName	= "X_AXIS"
 
 	sensorFlags      = "k_updateWithRemoteAngles"
 
@@ -2150,13 +2670,13 @@ template remoteATTEGun : remotePropBF
 	maxViewDist	= 500.0f
     }
 
-    remoteMovingMatrixBF moving
+    remoteMovingMatrix moving
     {
         responsibleForSettingCharacterPos = "false"
 
-        basePartNum = 0
-        armPartNum  = 1
-        gunPartNum  = 2
+        basePartNum = 0 // BTOP
+        armPartNum  = 2 // B_SEAT
+        gunPartNum  = 3 // B_GUN
 
 	physics
 	{
@@ -2164,6 +2684,17 @@ template remoteATTEGun : remotePropBF
 	    numJoints = 2
 	}
 
+	recoilParts
+	{
+	    recoilPart recoil1 
+	    {
+		partnum = 4
+		maxrange = 0.7f
+		minlerp = 0.3f
+		recoilspeed = 200.0f
+		restorespeed = 10.0f
+	    }
+	}
     }
 
     meta
@@ -2172,16 +2703,24 @@ template remoteATTEGun : remotePropBF
         editorInstanceName  = "ATTEGun"
         editorPath  	    = "bf/generic/remotes"
     }
-    driverAimOnWii	    = "true"
+
+    hudImageName = "turret_icon"         
 }
 
 
 template remoteATTERearGun : remotePropBF
 {
+    remoteType = "k_type_vehicleTurret"
+	
     movementDescription = "bf_mATTE_rear"
 
     startState = "k_state_off" 
     flags |= "k_flag_alwaysConsiderUpright"
+
+    aiTargetType = "k_targetType_infantry|k_targetType_groundVehicles|k_targetType_ships" 
+    shouldTargetChrs = "true"
+    shouldTargetGroundVehicles = "true"
+    shouldTargetSpaceCraft = "true"
     
     obinstrenderer render
     {
@@ -2190,7 +2729,7 @@ template remoteATTERearGun : remotePropBF
     
     float startAngles [] = {0.0f, 180.0f}
     
-    RemoteBrain brain
+    RemoteBrainBF brain
     {
         float RestDir[] { 0.0f, 180.0f, 0.0f }
     }
@@ -2201,15 +2740,30 @@ template remoteATTERearGun : remotePropBF
    
     dmghealthcomponentbf health
     {
-	fullhealth	= 7.0f
-        isrepairable	= "false"
+	fullhealth	= 24.0f
     }  
         
     controlVehicleRemote control
     {
     } 
+
+    RemoteCameraBF camera
+    {
+	cameraLenseDofName = "SHOOTPOS_PRIMARY7"
+
+	thirdPersonOffset []
+	{
+	    0.190000, 0.800000, -1.500000
+	}
+
+	firstPersonOffset []
+	{
+	    0.190000, 0.800000, -1.500000
+	}
+    }
    
 
+    soundmap    = "sndmap_attetrt"
     bfRemoteGun remoteGun
     {
 	barrelPartName         = "B_gun" 
@@ -2219,27 +2773,15 @@ template remoteATTERearGun : remotePropBF
 
 	gunComponent
 	{
-	    gunInfoFromMgr = "ATTEmaingun"
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzGreRem2"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {0.f, 1.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
-	
-	    ubiks = "ubiks_basePlus"
-
-	    soundmap_player = "sndmap_attetrt"	
-	    soundmap_npc    = "sndmap_attetrt"
-
+	    gunInfoFromMgr = "ATTErearguns"
+    
+	    ubiksBasePlus = "true"
 	    useUbiks = "false"
 	    loweredAmount = 0.000000
 	    
 	    gunAnimationGroup anims
 	    {
-		set		    = "gunanims_aat"
+		set		    = "ga_aat"
 		animmap		    = "animmap_rem_bf"
 		reactmap	    = "reactmap_generic"
 	    }
@@ -2267,11 +2809,12 @@ template remoteATTERearGun : remotePropBF
         armPartNum  = 1
         gunPartNum  = 2
 
-	physics
-	{
-	    physicsDescription = "bf_pAAT_gun"	
-	    numJoints = 2
-	}
+	physics = 42	// physics for remote components doesn't work properly, so disable it.
+	//physics
+	//{
+	//    physicsDescription = "bf_pAAT_gun"	
+	//    numJoints = 2
+	//}
     }
 
     meta
@@ -2280,164 +2823,38 @@ template remoteATTERearGun : remotePropBF
         editorInstanceName  = "ATTERearGun"
         editorPath  	    = "bf/generic/remotes"
     }
-}
 
-template remoteHTTGun : remotePropBF
-{
-    movementDescription = "bf_mHTT_gun"
-
-    startState = "k_state_off" 
-    flags |= "k_flag_alwaysConsiderUpright"
-    
-    obinstrenderer render
-    {
-	model =	"vehicles/reb/reb_htt_gun"
-    }
-    
-    RemoteBrain brain
-    {
-    }
-  
-    bfvehicledescriptcomponent descript
-    {
-    }
-   
-    dmghealthcomponentbf health
-    {
-	fullhealth	= 7.0f  // Set to same as AAT so when explosions go off it doesn't get destroyed first
-        isrepairable	= "false"
-    }  
-        
-    controlVehicleRemote control
-    {
-    } 
-   
-
-    bfRemoteGun remoteGun
-    {
-	barrelPartName         = "B_part_barrel" 
-	swivelPartName         = "B_part_base" 
-	barrelPivotDofName     = "BARREL"
-	barrelShootPosDofName  = "SHOOTPOS_PRIMARY1"
-
-	gunComponent
-	{
-	    gunInfoFromMgr = "mountedHTTGun"
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzBluRem2"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {0.f, 0.1f, 1.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
-	
-	    ubiks = "ubiks_basePlus"
-
-	    soundmap_player = "sndmap_ifttturw"	
-	    soundmap_npc    = "sndmap_ifttturw"
-
-	    useUbiks = "false"
-	    loweredAmount = 0.000000
-	    
-	    gunAnimationGroup anims
-	    {
-		set		    = "gunanims_aat"
-		animmap		    = "animmap_rem_bf"
-		reactmap	    = "reactmap_generic"
-	    }
-	}
-    }
-
-    RemoteStimSensorArc sensor
-    {
-	partName	= "B_part_barrel"
-	swivelPartName	= "B_part_base"
-	sensorDofName	= "SHOOTPOS_PRIMARY1"
-	pivotDofName	= "BARREL"
-
-	sensorFlags      = "k_updateWithRemoteAngles"
-
-	fieldOfView     = 60.0f	
-	maxViewDist	= 500.0f
-    }
-
-    meta
-    {
-	canCreateInEditor   = 1
-	editorInstanceName  = "HTTGun"
-	editorPath	    = "bf/generic/remotes"
-    }
-    driverAimOnWii	    = "true"
-    remoteMovingMatrixBF moving
-    {
-        responsibleForSettingCharacterPos = "false"
-
-        basePartNum = 0
-        armPartNum  = 2
-        gunPartNum  = 1
-
-	physics
-	{
-	    physicsDescription = "bf_pAAT_gun"	
-	    numJoints = 2
-	}
-    }
-}
-
-
-template gunanims_laat	//LAAT
-{
-    slots = "idle;fire;noAim;lower;down;raise"
-        prefix = "N"
-        ubiks = ""
-
-        gunStateIdle Nidle_0
-        {
-            canZoom =   "yes-show-view"
-            time	=   10.f
-            script	=   ""
-        }
-    gunStateNormalFire Nfire_0
-    {
-        script	    = "sfx(fire);fire"
-        onEnd	    = "setFireState(fire)"
-        canZoom =   "yes-show-view"
-        time	=   0.3f
-    }
-    gunStateIdle NnoAim_0
-    {
-        time	= 1.f
-        canZoom = "no"
-    }
-
-    gunStateLower Nlower_0
-    {
-        canZoom = "no"
-        time	= 0.0f
-        float gunAlpha[] {1.0f}
-    }
-    gunStateDown Ndown_0
-    {
-        canZoom = "no"
-        time	= 0.0f
-        float gunAlpha[] {1.0f}
-    }
-    gunStateRaise Nraise_0
-    {
-        canZoom = "no"
-        time	= 0.0f
-        float gunAlpha[] {1.0f}
-    }
+    hudImageName = "turret_icon"         
 }
 
 
 //LAAT turret
 template remoteLAATGun : remotePropBF
 {
+    remoteType = "k_type_vehicleTurret"
+
+    RemoteCameraBF camera
+    {
+	cameraLenseDofName = "camerapos"    
+	chaseCamFOVScale = 1.f
+	thirdPersonOffset []
+	{
+	    0.000000, 0.100000, -0.700000
+	}
+
+	firstPersonOffset []
+	{
+	    0.000000, 0.100000, -0.700000
+	}
+    }
+
     startState = "k_state_off"
     flags |= "k_flag_alwaysConsiderUpright"
     aiTargetType = "k_targetType_infantry|k_targetType_groundVehicles|k_targetType_ships"
+
+    shouldTargetChrs = "true"
+    shouldTargetGroundVehicles = "true"
+    shouldTargetSpaceCraft = "true"
     
     obinstrenderer render
     {
@@ -2450,58 +2867,50 @@ template remoteLAATGun : remotePropBF
     dmghealthcomponent health
     {
     	fullhealth	= 4.0f
-        isrepairable	= "false"
     }
     
     controlVehicleRemote control
     {
     }
     
+    soundmap    = "sndmap_laattrt"
     bfRemoteGun remoteGun
     {
 	barrelPartName         = "B_globe" 
 	swivelPartName         = "B_joint" 
 	barrelPivotDofName     = "turret_rotate_z"
 	barrelShootPosDofName  = "turret_shootpos"
+	barrelShootPosDofArrayName = "turret_shootpos"
 	ubiksForPivot = "false"
 
 	GunComponent_Beam gunComponent
 	{
-	    chargeTime	     = 0.0f
-	    fireTime	     = 5.0f
-	    cooldownTime     = 0.0f
-	    laserSpeed	     = 200.0f
-            laserSizeScaleCore = 35.5f
-	    laserSizeScaleGlow = 7.5f
-	    damageMultiplier = 12.5f //1.25f
-	    laserHitEffect = "lImpHHHit"
-            texName = "misctex/laser_fx/remote_laser_glow"
-            texCoreName = "misctex/laser_fx/remote_laser_core"
-            glowcol[] { 0.1f, 1.f, 0.1f, 1.f }
-            corecol[] {1.f, 1.f, 1.f, 1.f }
+	    chargeTime			= 0.0f
+	    fireTime			= 2.0f
+	    cooldownTime		= 2.0f
+	    laserSpeed			= 200.0f
+            laserSizeScaleCore		= 20.0f
+	    laserSizeScaleGlow		= 7.5f
+	    damageMultiplier		= 1.5f
+	    laserHitEffect		= "hit_generic"
+            texName			= "misctex/laser_fx/remote_laser_glow"
+            texCoreName			= "misctex/laser_fx/remote_laser_core"
+            glowcol[]			{ 0.1f, 1.0f, 0.1f, 1.0f }
+            corecol[]			{ 1.0f, 1.0f, 1.0f, 1.0f }
 
-	    gunInfoFromMgr = "LAATSideGun"
+	    gunInfoFromMgr		= "LAATSideGun"
 		
-	    ubiks = "ubiks_basePlus"
+	    ubiksBasePlus		= "true"
 	
-	    soundmap_player = "sndmap_laattrt"	
-	    soundmap_npc    = "sndmap_laattrt"
 
-	    useUbiks = "false"
-	    loweredAmount = 0.000000
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzRedRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-	    state = "idle"
+	    useUbiks			= "false"
+	    loweredAmount		= 0.000000	
+	    state			= "idle"
 
 
 	    gunAnimationGroup anims
 	    {
-		set		    = "gunanims_noreload"
+		set		    = "ga_noreload"
 		animmap		    = "animmap_vehicle"
 		reactmap	    = "reactmap_generic"
 	    }
@@ -2520,8 +2929,8 @@ template remoteLAATGun : remotePropBF
 	fieldOfView     = 90.0f
 
 	minViewDist = 1.0f
-    	maxViewDist = 1500.0f
-	//maxViewDist	= 500.0f
+    	//maxViewDist = 1500.0f
+	maxViewDist	= 70.0f
     } 
 
     meta
@@ -2530,11 +2939,13 @@ template remoteLAATGun : remotePropBF
 	editorInstanceName  = "LAATGun"
 	editorPath	    = "bf/generic/remotes"
     }
+    
+    hudImageName = "turret_icon"         
 }
 
 template remoteLAATGunNonPhysicsLeft : remoteLAATGun
 {
-    applyDamageOnRemoteOwner = "true"	    // allow to damage the spider droid when gun get an impact
+    applyDamageOnRemoteOwner = "true"
     movementDescription = "bf_LAAT_left"
     float startAngles [] = {0.0f, 90.0f}
      
@@ -2560,6 +2971,7 @@ template remoteLAATGunNonPhysicsLeft : remoteLAATGun
 	armPartNum  = 2
         gunPartNum  = 1
 
+	//physics = 42
         //float startAngles [] = {0.0f, 90.0f}
     }
   
@@ -2569,11 +2981,13 @@ template remoteLAATGunNonPhysicsLeft : remoteLAATGun
 	editorInstanceName  = "LAATGunNonPhysicsLeft"
 	editorPath	    = "bf/generic/remotes"
     }
+    
+    hudImageName = "turret_icon"     
 }
 
 template remoteLAATGunNonPhysicsRight : remoteLAATGun
 {
-    applyDamageOnRemoteOwner = "true"	    // allow to damage the spider droid when gun get an impact
+    applyDamageOnRemoteOwner = "true"
     movementDescription = "bf_LAAT_right" 
     float startAngles [] = {0.0f, -90.0f}
      
@@ -2598,8 +3012,9 @@ template remoteLAATGunNonPhysicsRight : remoteLAATGun
 	basePartNum = 0
 	armPartNum  = 2
         gunPartNum  = 1
+
+	//physics = 42
         //float startAngles [] = {0.0f, -90.0f}
-        
     }
   
     meta
@@ -2608,12 +3023,19 @@ template remoteLAATGunNonPhysicsRight : remoteLAATGun
 	editorInstanceName  = "LAATGunNonPhysicsRight"
 	editorPath	    = "bf/generic/remotes"
     }
+    
+    hudImageName = "turret_icon"     
 }
 
 template remoteGunshipTurret : remotePropBF
 {
+    remoteType = "k_type_vehicleTurret"
+	
     startState = "k_state_off"
     flags |= "k_flag_alwaysConsiderUpright"
+    aiTargetType = "k_targetType_ships|k_targetType_capitalShips" 
+    shouldTargetCapitalShips = "true"
+    shouldTargetSpaceCraft = "true"
     
     obinstrenderer render
     {
@@ -2625,18 +3047,18 @@ template remoteGunshipTurret : remotePropBF
    
     dmghealthcomponent health
     {
-    	fullhealth	= 4.0f
-        isrepairable	= "false"
+    	fullhealth	= 36.0f
     }
         
     controlVehicleRemote control
     {
     } 
     
+    soundmap    = "sndmap_cisvtrt"
     bfRemoteGun remoteGun
     {
 	barrelPartName         = "B_turret" 
-	swivelPartName         = "B_turret" 
+	swivelPartName         = "B_turretseat" 
 	barrelPivotDofName     = "turret"
 	barrelShootPosDofArrayName = "SHOOTPOS_PRIMARY"
 
@@ -2645,26 +3067,14 @@ template remoteGunshipTurret : remotePropBF
 	gunComponent
 	{
 	    gunInfoFromMgr = "DrdGnshpSideGun"
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzRedRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
-		
-	    ubiks = "ubiks_basePlus"
-	
-	    soundmap_player = "sndmap_cisvtrt"	
-	    soundmap_npc    = "sndmap_cisvtrt"
-
+   
+	    ubiksBasePlus = "true"
 	    useUbiks = "false"
 	    loweredAmount = 0.000000
 
 	    gunAnimationGroup anims
 	    {
-		set		    = "gunanims_aat"
+		set		    = "ga_aat"
 		animmap		    = "animmap_vehicle"
 		reactmap	    = "reactmap_generic"
 	    }
@@ -2681,8 +3091,23 @@ template remoteGunshipTurret : remotePropBF
 	sensorFlags      = "k_updateWithRemoteAngles"
 
 	fieldOfView     = 60.0f	
-	maxViewDist	= 500.0f
+	maxViewDist	= 1500.0f
     } 
+
+    RemoteCameraBF camera
+    {
+	cameraLenseDofName = "SHOOTPOS_PRIMARY1"
+	    thirdPersonOffset []
+	    {
+		0.190000, 0.800000, -1.500000
+	    }
+
+	firstPersonOffset []
+	{
+	    0.190000, 0.800000, -1.500000
+	}
+
+    }
     
     meta
     {
@@ -2690,16 +3115,17 @@ template remoteGunshipTurret : remotePropBF
 	editorInstanceName  = "GunshipTurret"
 	editorPath	    = "bf/generic/remotes"
     }
-
+    
+    hudImageName = "turret_icon"         
 }
 
 template remoteGunshipTurretLeft : remoteGunshipTurret
 {
-    applyDamageOnRemoteOwner = "true"	    // allow to damage the spider droid when gun get an impact
+    applyDamageOnRemoteOwner = "true"
     movementDescription = "bf_droid_left"
     float startAngles [] = {0.0f, 65.0f}
      
-    RemoteBrain brain
+    RemoteBrainBF brain
     {
         float RestDir[] { 0.0f, 65.0f, 0.0f }
     }
@@ -2716,8 +3142,10 @@ template remoteGunshipTurretLeft : remoteGunshipTurret
         responsibleForSettingCharacterPos = "false"
         
 	basePartNum = 0
-	armPartNum  = 1
+	armPartNum  = 2
         gunPartNum  = 1
+        
+        //physics = 42
 
         //float startAngles [] = {0.0f, 65.0f}
     }
@@ -2728,15 +3156,17 @@ template remoteGunshipTurretLeft : remoteGunshipTurret
 	editorInstanceName  = "remoteGunshipTurretLeft"
 	editorPath	    = "bf/generic/remotes"
     }
+    
+    hudImageName = "turret_icon"         
 }
 
 template remoteGunshipTurretRight : remoteGunshipTurret
 {
-    applyDamageOnRemoteOwner = "true"	    // allow to damage the spider droid when gun get an impact
+    applyDamageOnRemoteOwner = "true"
     movementDescription = "bf_droid_right"
     float startAngles [] = {0.0f, -65.0f}
      
-    RemoteBrain brain
+    RemoteBrainBF brain
     {
         float RestDir[] { 0.0f, -65.0f, 0.0f }
     }
@@ -2753,8 +3183,10 @@ template remoteGunshipTurretRight : remoteGunshipTurret
         responsibleForSettingCharacterPos = "false"
         
 	basePartNum = 0
-	armPartNum  = 1
+	armPartNum  = 2
         gunPartNum  = 1
+        
+        physics = 42
 
         //float startAngles [] = {0.0f, -65.0f}
     }
@@ -2765,24 +3197,27 @@ template remoteGunshipTurretRight : remoteGunshipTurret
 	editorInstanceName  = "remoteGunshipTurretLeft"
 	editorPath	    = "bf/generic/remotes"
     }
+    
+    hudImageName = "turret_icon"         
 }
 
 template remoteGrapple : remotePropBF
 {
+    remoteType = "k_type_vehicleTurret"
+	
     movementDescription = "bf_ssGrapple"
 
     startState = "k_state_off" 
     flags |= "k_flag_alwaysConsiderUpright"
+
+    aiTargetType = "k_targetType_groundVehicles" 
+    shouldTargetWalkers = "true"
     
     obinstrenderer render
     {
-	    model =	"vehicles/reb/reb_snowspeeder_grapple"
+	model =	"vehicles/reb/reb_snowspeeder_grapple"
     }
-    
-    RemoteBrain brain
-    {
-    }
-  
+      
     bfvehicledescriptcomponent descript
     {
     }
@@ -2791,43 +3226,27 @@ template remoteGrapple : remotePropBF
     {
     } 
    
-    dmghealthcomponentbf health
-    {
-	fullhealth	= 2.0f
-        isrepairable	= "false"
-    }
-    
+    soundmap    = "sndmap_hvrtank"
     bfRemoteGun remoteGun
     {
-    	barrelPartName         = "BTOP" 
-    	swivelPartName         = "BTOP" 
+    	barrelPartName         = "B_part_gun" 
+    	swivelPartName         = "B_part_seat" 
     	barrelPivotDofName     = "ROTAXIS"
     	barrelShootPosDofName  = "SHOOTPOS_PASSENGER"
-
+	barrelShootPosDofArrayName = "SHOOTPOS_PASSENGER"
+	
 	gunComponent
 	{
 	    gunInfoFromMgr = "grappleGun"
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzRedRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
-
-	    ubiks = "ubiks_basePlus"
-
-	    soundmap_player = "sndmap_hvrtank"	
-	    soundmap_npc    = "sndmap_hvrtank"
-
+   
+	    ubiksBasePlus = "true"
 	    useUbiks = "false"
 	    loweredAmount = 0.000000
 
 	    gunAnimationGroup anims
 	    {
-		set		    = "gunanims_noreload"
-		animmap		    = "animmap_vehicle"
+		set		    = "ga_aat"
+		animmap		    = "animmap_rem_bf"
 		reactmap	    = "reactmap_generic"
 	    }
 	}
@@ -2848,6 +3267,10 @@ template remoteGrapple : remotePropBF
 
     remoteMovingPhysics moving
     {
+	basePartNum = 0
+        armPartNum  = 2
+        gunPartNum  = 1
+
 	responsibleForSettingCharacterPos = "false"
 
 	physics
@@ -2856,6 +3279,11 @@ template remoteGrapple : remotePropBF
 	}
     }
   
+    RemoteCameraBF camera
+    {
+	cameraLenseDofName = "SHOOTPOS_PASSENGER"
+    }
+
     meta
     {
 	canCreateInEditor   = 0
@@ -2866,33 +3294,27 @@ template remoteGrapple : remotePropBF
 
 template remoteGrappleGun : remoteGrapple
 {
-
     float startAngles [] = {0.0f, 0.0f}
-     
-    RemoteBrain brain
-    {
-        float RestDir[] { 0.0f, 0.0f, 0.0f }
-    }
     
     remoteMovingMatrixBF moving
     {
         responsibleForSettingCharacterPos = "false"
 
         basePartNum = 0
-        armPartNum  = 0
-        gunPartNum  = 0
+        armPartNum  = 2
+        gunPartNum  = 1
 
 	localXAxisDof = "ROTAXIS"
         localYAxisDof = "ROTAXIS"
+       	
+       	physics = 42	// since the grapple gun is so small compared to snowspeeder, it makes no difference if it has physics or not
     }
 
+    soundmap = "sndmap_swsprtrt"
     remoteGun
     {
-
 	gunComponent
 	{
-	    soundmap_npc = "sndmap_swsprtrt"
-	    soundmap_player = "sndmap_swsprtrt"
 	}
     }
 
@@ -2904,33 +3326,34 @@ template remoteGrappleGun : remoteGrapple
     }
 }
 
-/*template BeamRender : obinstrenderer 
-{
-    class-id = "Beam Render Component" 
-
-    glowcol[] { 0.f, 1.f, 0.f, 1.f }
-    corecol[] { 1.f, 1.f, 1.f, 1.f }
-    //texName = "misctex/lightsaber_fx/lightsaber_side_glow_new"	    //TODO - Update
-    //texCoreName = "misctex/lightsaber_fx/lightsaber_side_core_new"  //TODO - Update
-    texName = "misctex/laserbeam"
-    texCoreName = "misctex/laserbeam" 
-
-}*/
-
 template remoteSpiderGunBot : remotePropBF
 {
-    movementDescription = "bf_mSpider_gun"
+    movementDescription = "bf_mSpider_gunb"
 
-    applyDamageOnRemoteOwner = "true"	    // allow to damage the spider droid when gun get an impact
+    applyDamageOnRemoteOwner = "true"
 
     startState = "k_state_idle"
-    flags |= "k_flag_alwaysConsiderUpright"
-    
+    flags |= "k_flag_alwaysConsiderUpright|k_flag_canTrack|k_flag_idleSweepY"
+
+    shouldTargetChrs		= "true"
+    shouldTargetPlayers		= "true"
+    shouldTargetGroundVehicles	= "true"
+
+    startAngles [] = {-10.0f, -10.0f} 
+
     teamNum = 1
+    
+    
+    physics
+    {
+	useRBs = "true"
+    }    
     
     obinstrenderer render
     {
 	model =	"vehicles/cis/cis_spiderdroid_lower_gun"
+	castshadows = "true"
+        receiveshadows = "true"
     }
     
     RemoteBrainBF brain
@@ -2940,9 +3363,7 @@ template remoteSpiderGunBot : remotePropBF
     RemoteStimSensorArc sensor
     {
         partName	= "B_gun"
-        //partName	= "B_lower_gun"
         swivelPartName	= "B_base"
-        //swivelPartName	= "B_lower_gun_base"
         sensorDofName	= "PIVOT"
         pivotDofName	= "PIVOT"
 
@@ -2951,19 +3372,15 @@ template remoteSpiderGunBot : remotePropBF
 	fieldOfView     = 60.0f
 	maxViewDist	= 1500.0f
     }
-  
-    bfvehicledescriptcomponent descript
-    {
-    }
-    
+        
     
     dmghealthcomponentbf health
     {
 	//healthComponentSettings = "k_healthComponentSetting_isInvincible"   // Have to take out the spider to kill the guns
-	fullhealth	= 7.0f
-        isrepairable	= "false"
+	fullhealth	= 21.0f // make sure gun cannot die before spider droid.
     }
     
+    soundmap    = "sndmap_hvrtank"
     bfRemoteGun remoteGun
     {
 	barrelPartName         = "B_gun"	
@@ -2982,17 +3399,15 @@ template remoteSpiderGunBot : remotePropBF
 
 	    gunInfoFromMgr = "fiAATGun"		//TODO - Change to beam gun
 	
-	    ubiks = "ubiks_basePlus"
+	    ubiksBasePlus = "true"
 
-	    soundmap_player = "sndmap_hvrtank"	
-	    soundmap_npc    = "sndmap_hvrtank"
 
 	    useUbiks = "false"
 	    loweredAmount = 0.000000
 	   	    
 	    gunAnimationGroup anims
 	    {
-		set		    = "gunanims_aat"
+		set		    = "ga_aat"
 		animmap		    = "animmap_rem_bf"
 		reactmap	    = "reactmap_generic"
 	    }
@@ -3018,20 +3433,31 @@ template remoteSpiderGunBot : remotePropBF
 
 template remoteSpiderGunTop : remotePropBF
 {
-    aiTargetType = "k_targetType_ships"
+    float startAngles [] = {-45.0f, -10.0f} 
 
-    movementDescription = "bf_mSpider_gun"
+    shouldTargetSpaceCraft = "true"
+    shouldTargetPlayers		= "false"
+    shouldTargetGroundVehicles	= "false"
 
-    applyDamageOnRemoteOwner = "true"	    // allow to damage the spider droid when gun get an impact
+    movementDescription = "bf_mSpider_gunt"
+
+    applyDamageOnRemoteOwner = "true"
 
     startState = "k_state_idle"
-    flags |= "k_flag_alwaysConsiderUpright"
+    flags |= "k_flag_alwaysConsiderUpright|k_flag_canTrack|k_flag_idleSweepY"
     
     teamNum = 1
+    
+    physics
+    {
+	useRBs = "true"
+    }
     
     obinstrenderer render
     {
 	model =	"vehicles/cis/cis_spiderdroid_upper_gun"
+	castshadows = "true"
+        receiveshadows = "true"
     }
     
     RemoteBrainBF brain
@@ -3041,36 +3467,26 @@ template remoteSpiderGunTop : remotePropBF
     RemoteStimSensorArc sensor
     {
         partName	= "B_gun"
-        //partName	= "B_lower_gun"
         swivelPartName	= "B_base"	
-        //swivelPartName	= "B_lower_gun_base"
         sensorDofName	= "PIVOT"
         pivotDofName	= "PIVOT"
 
 	sensorFlags      = "k_updateWithRemoteAngles"
 
-	fieldOfView     = 60.0f	
-	maxViewDist	= 1500.0f
+	fieldOfView     = 80.0f	
+	maxViewDist	= 300.0f
     }
-  
-    bfvehicledescriptcomponent descript
-    {
-    }
-    
-    
+     
     dmghealthcomponentbf health
     {
-	//healthComponentSettings = "k_healthComponentSetting_isInvincible"   // Have to take out the spider to kill the guns
-	fullhealth	= 7.0f
-        isrepairable	= "false"
+	fullhealth	= 21.0f // changed so cannot die before dpider droid
     }
     
+    soundmap    = "sndmap_hvrtank"
     bfRemoteGun remoteGun
     {
 	barrelPartName         = "B_gun"	
-	//barrelPartName         = "B_lower_gun"	
 	swivelPartName         = "B_base"	
-	//swivelPartName         = "B_lower_gun_base"	
 	barrelPivotDofName     = "PIVOT"		
 	barrelShootPosDofName  = "SHOOTPOS_PRIMARY1"
 
@@ -3083,17 +3499,19 @@ template remoteSpiderGunTop : remotePropBF
 
 	    gunInfoFromMgr = "fiAATGun"		//TODO - Change to beam gun
 	
-	    ubiks = "ubiks_basePlus"
+	    ubiksBasePlus = "true"
 
-	    soundmap_player = "sndmap_hvrtank"	
-	    soundmap_npc    = "sndmap_hvrtank"
+	    cooldownTime     = 0.5f
+            chargeTime	     = 0.5f
+            fireTime	     = 2.0f
+	    damageMultiplier = 100.25f
 
 	    useUbiks = "false"
 	    loweredAmount = 0.000000
 	   	    
 	    gunAnimationGroup anims
 	    {
-		set		    = "gunanims_aat"
+		set		    = "ga_aat"
 		animmap		    = "animmap_rem_bf"
 		reactmap	    = "reactmap_generic"
 	    }
@@ -3105,8 +3523,8 @@ template remoteSpiderGunTop : remotePropBF
 	responsibleForSettingCharacterPos = "false"
 	
 	basePartNum = 0
-	armPartNum  = 1
-        gunPartNum  = 2
+	armPartNum  = 2
+        gunPartNum  = 1
     }
     
     meta
@@ -3117,196 +3535,92 @@ template remoteSpiderGunTop : remotePropBF
     }
 }
 
-template remoteSentryGunNoFire : remoteSentryGunBF
+template cor_sd_top : remoteSpiderGunTop // Less nuclear version of the spider droids top gun - standard gun one shot kills ships.
 {
-    RemoteBrainSentryGun brain
+    remoteGun
     {
-    }
-    
-    meta
-    {
-	canCreateInEditor   = 1
-	editorInstanceName  = "tSentryGunNoFire"
-	editorPath	    = "bf/generic/remotes"
-    }
-}
-
-/*
-template remoteFixedGun : targetablePhysicsRemoteProp
-{
-    flags = "k_flag_canActivateDirectly|k_flag_seatedFixedGunAnim"
-
-    aiTargetType = "k_targetType_capitalShips|k_targetType_ships|k_targetType_remotes"
-	
-    obinstrenderer render
-    {
-	model = "props/turrets/cis_cruiser/cis_cruiser_turret"
-    }
-    
-    movementDescription = "bf_mRebTurret"
-
-    SimpleActivate activate
-    {
-	myNameStringHandle = "STR_FIXED_GUN"
-
-	pointA
-	{
-	    pos[] {0.f, 0.f, 0.0f}
-	    distance = 3.f
-	    hudPromptStringHandle = "STR_ACTIVATEPROMPT_USE"
-	}
-
-	doPropLineTest = "false"
-    }
-
-
-    RemoteStimSensorArc sensor
-    {
-        partName	= "B_BASE"
-        swivelPartName	= "B_SEAT"
-        sensorDofName	= "SHOOTPOS_PRIMARY"
-        pivotDofName	= "X_AXIS"
-
-	sensorFlags   = "k_updateWithRemoteAngles"
-
-	maxViewDist = 200.0f
-	minViewDist = 5.0f
-	fieldOfView = 30.0f	
-    }
-
-    RemoteCameraBF camera
-    {
-	cameraLenseDofName   = "SENSORPOS_1"
-
-	thirdPersonOffset []
-	{
-	    0.000000, 5.000000, -27.500000
-	}
-
-	firstPersonOffset []
-	{
-	    0.000000, 0.000000, -4.000000
-	}
-    }
-    
-    bfRemoteGun remoteGun
-    {       	
-	swivelPartName		= "B_SEAT"
-	barrelPartName		= "B_GUN"
-	barrelPivotDofName	= "X_AXIS"
-	barrelShootPosDofName	= "SHOOTPOS_PRIMARY1"
-
 	gunComponent
 	{
-	    gunInfoFromMgr	    = "cruRemoteTur"
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzRedRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
-	
-	    useUbiks      = "false"
-	    loweredAmount = 0.000000
-	    ubiks	  = "ubiks_none" 
-
-	    soundmap_player = "sndmap_hvrtank"	
-	    soundmap_npc    = "sndmap_hvrtank"
-	
-	    gunAnimationGroup anims
-	    {
-		set		    = "gunanims_aat"
-		animmap		    = "animmap_rem_bf"
-		reactmap	    = "reactmap_generic"
-	    }
+	    damageMultiplier = 1.f
 	}
-    }
-
-    remoteMovingMatrix360 moving
-    {
-	basePartNum = 2
-	armPartNum = 3
-	gunPartNum = 4
-	
-	physics
-	{
-	    physicsDescription = "bf_pRebTurret"
-	}
-    }
-
-    //this is all you guys need to add to do a basic gibs test
-    ticktype		= "k_tickAlways"  
-    dmghealthcomponentbf health
-    {
-	fullhealth	= 1.0 //10.f
-	invincibilityChannel = ""
-	isrepairable	    = "true"
-    }    
-    bfexplodingpropdescript descript
-    {
-    }
-    propflags |= "k_neverChangeBgRoomGroup"
-
-    autoAimTargetComponentBF autoaimtarget
-    {
-	nameKey = "STR_FIXED_GUN"
-    }
-
-    meta
-    {
-	canCreateInEditor   = 0
     }
 }
-*/
-template reb_turret_vehicle : rebTurret 
+
+template reb_turret_vehicle : rebTurret // Hoth antivehicle laser
 {
-    flags = "k_flag_canActivateDirectly|k_flag_seatedFixedGunAnim"
+    remoteType = "k_type_antiVehicle"
+	
+    flags = "k_flag_canActivateDirectly|k_flag_seatedFixedGunAnim|k_flag_wantsReticuleDrawn"
     aiTargetType = "k_targetType_infantry|k_targetType_groundVehicles"
+
+    shouldTargetChrs = "false"
+    shouldTargetVehicles = "true"
+    shouldTargetGroundVehicles = "true"
+    shouldTargetWalkers = "true"
+    shouldTargetTanks = "true"
+   
     movementDescription = "bf_hothSat"
+
+    animOffset[] = { 0.f, -0.87f, -1.18f }
     
     obinstrenderer render
     {
-	model = "props/turrets/reb/reb_turret_vehicle_barrel"
+	model = "turrets/reb/reb_turret_vehicle/reb_turret_vehicle"
+	castshadows = "true"
+	receiveshadows = "true"
     }
+       
+    sensor
+    {
+        minViewDist = 1.0f
+    	maxViewDist = 200.0f
+    }
+
+    playerTargetting
+    {
+        maxTargettingRange	    = 200.0f
+    }
+
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 15.f
+	invincibilityChannel = ""
+    }
+    
     camera
     {
 	cameraLenseDofName   = "SHOOTPOS_PRIMARY1"
 	thirdPersonOffset []
 	{
-	    0.000000, 0.100000, -0.700000
+	    // right
+	    -0.28, 0.18, -0.95
 	}
 
 	firstPersonOffset []
 	{
-	    0.000000, 0.100000, -0.700000
+	    // right
+	    -0.28, 0.18, -0.95
 	}
     }
 
     
+    soundmap    = "sndmap_hothtrrt"
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }   
+
     remoteGun
     {       	
 	gunComponent
 	{
 	    useUbiks      = "false"
 	    loweredAmount = 0.000000
-	    ubiks	  = "ubiks_none"
 	    gunInfoFromMgr	    = "hothVLaser"    
-	    
-	    muzzleFlashEffect	= "muzRedRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	1.0f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
-	    soundmap_player = "sndmap_hothtrrt"	
-	    soundmap_npc    = "sndmap_hothtrrt"
 
 	    gunAnimationGroup anims
 	    {
-		set		    = "gunanims_aat"
+		set		    = "ga_aat"
 		animmap		    = "animmap_rem_bf"
 		reactmap	    = "reactmap_generic"
 	    }
@@ -3320,9 +3634,9 @@ template reb_turret_vehicle : rebTurret
 	    recoilPart recoil1 
 	    {
 		partnum = 4
-		maxrange = 0.7f
+		maxrange = 0.4f
 		minlerp = 0.3f
-		recoilspeed = 200.0f
+		recoilspeed = 20.0f
 		restorespeed = 10.0f
 	    }
 	}
@@ -3334,6 +3648,8 @@ template reb_turret_vehicle : rebTurret
         editorInstanceName = "H_Tur_Veh"
         editorPath         = "bf/remoteguns/rebel"
     }
+
+    hudImageName = "reb_veh_turret_icon"
 }   
 
 template turret_gen_antiveh : antiVehicleGuns 
@@ -3342,7 +3658,9 @@ template turret_gen_antiveh : antiVehicleGuns
 
     obinstrenderer render
     {
-	model = "props/turrets/turret_gen_antiveh"
+	model = "turrets/other/anti_vehicle/turret_gen_antiveh"
+	castshadows = "true"
+    receiveshadows = "true"
     }
     
     remoteGun
@@ -3350,22 +3668,30 @@ template turret_gen_antiveh : antiVehicleGuns
 	barrelShootPosDofName	= "SHOOTPOS_PRIMARY1"
 	gunAnimationGroup anims
 	{
-	    set	= "gunanims_trif"
+	    set	= "ga_trif"
+	    animmap	    = "animmap_rem_bf"
+	    reactmap	    = "reactmap_generic"
 	}
     }
 
     camera
     {
+	minFov = 5.f
+	maxFov = 50.f
+	fullZoomAtTargetDist = 50.0f
+	
 	cameraLenseDofName   = "SHOOTPOS_PRIMARY1"
     
     	thirdPersonOffset []
     	{
-    	    0.000000, 0.750000, -1.50000
+	    // right
+	    -0.92, 0.3, -1.6
     	}
 
     	firstPersonOffset []
     	{
-    	    0.000000, 0.750000, -1.500000
+	    // right
+	    -0.92, 0.3, -1.6
     	}
     }
     
@@ -3373,239 +3699,219 @@ template turret_gen_antiveh : antiVehicleGuns
     {
         canCreateInEditor  = 1
         editorInstanceName = "T_Gen_Antiv"
-        editorPath         = "bf/remoteguns/generic"
+        editorPath         = "bf/remoteguns/generic/standard"
     }
+    
+    hudImageName = "anti_vehicle_turret_icon"
+    propflags |= "k_aiDoAvoid"	
 }   
 
-template republic_fixed_gun : rebTurret
+template for_anti_veh : turret_gen_antiveh
 {
     obinstrenderer render
     {
-	model = "props/turrets/repfieldgun01_barrel"
-    }
-    
-    SimpleActivate activate
-    {
-	myNameStringHandle = "STR_COR_REPUBLIC_GUN_TURRET"
-    }
-    camera
-    {
-	cameraLenseDofName   = "SHOOTPOS1"
-	thirdPersonOffset []
-	{
-	    0.470000, 0.180000, -1.470000
-	}
-
-	firstPersonOffset []
-	{
-	    0.470000, 0.180000, -1.470000
-	}
-    }
-    remoteGun
-    {
-//	barrelShootPosDofName	    = "SHOOTPOS"
-        barrelShootPosDofArrayName  = "SHOOTPOS"
-    }
-    autoAimTargetComponentBF autoaimtarget
-    {
-	nameKey = "STR_COR_REPUBLIC_GUN_TURRET"
-    }
-    moving
-    {
-	recoilParts
-	{
-	    recoilPart recoil1 
-	    {
-		partnum = 4
-		maxrange = 1.5f
-		minlerp = 0.7f
-		recoilspeed = 200.0f
-		restorespeed = 10.0f
-	    }
-	    recoilPart recoil2 
-	    {
-		partnum = 5
-		maxrange = 1.5f
-		minlerp = 0.7f
-		recoilspeed = 200.0f
-		restorespeed = 10.0f
-	    }
-	}
+	model = "turrets/other/anti_vehicle/turret_gen_antiveh_forest"
     }
     meta
     {
         canCreateInEditor  = 1
-        editorInstanceName = "repTurret"
-        editorPath         = "bf/remoteguns/republic"
+        editorInstanceName = "forestAntiv"
+        editorPath         = "bf/remoteguns/generic/forest"
+    }
+}
+
+template sand_anti_veh : turret_gen_antiveh
+{
+    obinstrenderer render
+    {
+	model = "turrets/other/anti_vehicle/turret_gen_antiveh_sand"
+    }
+    meta
+    {
+        canCreateInEditor  = 1
+        editorInstanceName = "sandAntiv"
+        editorPath         = "bf/remoteguns/generic/sand"
     }
 }
 
 template anti_infantry_gun : antiInfantryTurret
 {
+    animOffset[] = { 0.00f, -0.60f, 0.01f }    
+    soundmap-field soundmap
+    {
+	default	= "sndmap_aitrrt"
+    }
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }   
+	
     obinstrenderer render
     {
-	model = "props/turrets/turret_gen_anti_infantry_barrel"
+        model = "turrets/other/turret_gen_anti_infantry/turret_gen_anti_infantry"
+	castshadows = "true"
+    receiveshadows = "true"
     }
     
-    SimpleActivate activate
+    activate
     {
-	myNameStringHandle = "STR_FIXED_GUN"
+        myNameStringHandle = "STR_INFANTRY_GUN"
     }
    
-    autoAimTargetComponentBF autoaimtarget
+    autoaimtarget
     {
-	nameKey = "STR_FIXED_GUN"
+        nameKey = "STR_INFANTRY_GUN"
     }
     camera
     {
-	cameraLenseDofName   = "SHOOTPOS_PRIMARY1"
-	thirdPersonOffset []
-	{
-	    0.000000, 0.22000, -0.6400000
-	}
+        cameraLenseDofName   = "SHOOTPOS_PRIMARY1"
 
-	firstPersonOffset []
-	{
-	    0.000000, 0.220000, -0.6400000
+	minFov = 10.f
+	maxFov = 40.f
+
+        thirdPersonOffset []
+        {
+	    // to right
+	     -0.75, 0.3, -2.2
 	}
+        	
+
+        firstPersonOffset []
+        {
+	    // to right
+	     -0.75, 0.3, -2.2	 
+        }
     }
-    
+
+	    
     remoteGun
-    {       
-	gunComponent	
-	{
-	    gunInfoFromMgr	    = "chainTur"
-	    muzzleFlashEffect	= "muzRedRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
+    {   
+        gunComponent	
+        {
+            gunInfoFromMgr	    = "chainTur"
+               
+            useUbiks      = "false"
+            loweredAmount = 0.000000
 
-	
-	    useUbiks      = "false"
-	    loweredAmount = 0.000000
-	    ubiks	  = "ubiks_none" 
-
-	    soundmap_player = "sndmap_rebtrrt"	
-	    soundmap_npc    = "sndmap_rebtrrt"
-	
-	    gunAnimationGroup anims
-	    {
-		set		    = "gunanims_aat"
-		animmap		    = "animmap_rem_bf"
-		reactmap	    = "reactmap_generic"
-	    }
-	}
+            gunAnimationGroup anims
+            {
+            set		    = "ga_aat"
+            animmap		    = "animmap_rem_bf"
+            reactmap	    = "reactmap_generic"
+            }
+        }
     }
 
     remoteMovingMatrix360 moving
     {
-	aimOffsetFromXAxis[] {0.0f, 1.5f, 0.0}
-	physics
-	{
-	    physicsDescription = "bf_pCruiser_gun"
-	}
+	responsibleForSettingCharacterElevation = "true"
+        aimOffsetFromXAxis[] {0.0f, 1.5f, 0.0}
+        physics
+        {
+            physicsDescription = "bf_pCruiser_gun"
+            useRBs = "true"
+        }
     }
 
     meta
     {
         canCreateInEditor  = 1
         editorInstanceName = "genTurret"
-        editorPath         = "bf/remoteguns/generic"
+        editorPath         = "bf/remoteguns/generic/standard"
     }
+
+    propflags |= "k_aiDoAvoid"
+
+    hudImageName = "anti_infantry_icon"         
 }
 
-template D_S_turret : anti_infantry_gun
+template anti_infantry_gun_st : anti_infantry_gun
 {
-    movementDescription = "bf_mDSTurret"
+    bfexplodingpropdescript descript
+    {}
+
     meta
     {
         canCreateInEditor  = 1
-        editorInstanceName = "DSTurret"
-        editorPath         = "bf/remoteguns/specific"
-    }
-
-}
-
-//Mustafar challenge fixed gun
-/*
-template mustafar_republic_fixed_gun : republic_fixed_gun
-{
-
-    RemoteGun remoteGun
-    {       	
-	gunComponent
-	{
-	    gunInfoFromMgr	    = "musRemoteTur"
-	}
+        editorInstanceName = "genTrt_story"
+        editorPath         = "bf/remoteguns/generic/standard"
     }
 }
-*/
 
-template yav_aagun : antiAirCraftGuns 
+
+template cato_story_gun : anti_infantry_gun
 {
-    activate
+    movementDescription = "bf_mCatoTurret"
+    
+    meta
     {
-	numActivatePoints = 2
-	
-	ActivatePoint pointA
-	{
-	    pos[] {-1.0f, -0.7f, -1.8f}
-	    id = "TURRETR"
-	    distance = 3.2f
-	    hudPromptStringHandle = "STR_ACTIVATEPROMPT_USE"
-	    rotPartIndex = 2
-	    flags = "kActivatePointFlag_enabled"
-	}
-	
-	ActivatePoint pointB
-	{
-	    pos[] {1.0f, -0.7f, -1.8f}
-	    distance = 3.2f
-	    id = "TURRETL"
-	    rotPartIndex = 2
-	    hudPromptStringHandle = "STR_ACTIVATEPROMPT_USE"
-	    flags = "kActivatePointFlag_enabled"
-	}
-
-	doPropLineTest = "false"
+        canCreateInEditor  = 1
+        editorInstanceName = "catoTurret"
+        editorPath         = "bf/remoteguns/generic/standard"
     }
+}
+
+template forest_inf : anti_infantry_gun
+{
     obinstrenderer render
     {
-	model = "props/turrets/yav_aagun_barrel"
+        model = "turrets/other/turret_gen_anti_infantry/turret_gen_anti_infantry_forest"
+    }
+    meta
+    {
+        canCreateInEditor  = 1
+        editorInstanceName = "forTurret"
+        editorPath         = "bf/remoteguns/generic/forest"
+    }
+}
+
+template sand_inf : anti_infantry_gun
+{
+    obinstrenderer render
+    {
+        model = "turrets/other/turret_gen_anti_infantry/turret_gen_anti_infantry_sand"
+    }
+    meta
+    {
+        canCreateInEditor  = 1
+        editorInstanceName = "sandTurret"
+        editorPath         = "bf/remoteguns/generic/sand"
+    }
+}
+
+template yav_aagun : antiAirCraftGuns 
+{   
+    obinstrenderer render
+    {
+        model = "turrets/other/turret_gen_anti_air/turret_gen_anti_air"
+		castshadows = "true"
+		receiveshadows = "true"
     }
     
     meta
     {
         canCreateInEditor  = 1
         editorInstanceName = "yav_aagun"
-        editorPath         = "bf/remoteguns/generic"
+        editorPath         = "bf/remoteguns/generic/standard"
     }
+
+    soundmap    = "sndmap_aatrrt"
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }   
 
     remoteGun
     {    
-	swivelPartName		= "B_SEAT"
-	barrelPartName		= "B_GUN"
-	
-	gunComponent
-	{
-	    gunInfoFromMgr	    = "aaGun"
-	    muzzleFlashEffect	= "muzBlueRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
-	    soundmap_player = "sndmap_avtrrt"	
-	    soundmap_npc    = "sndmap_avtrrt"
-	}
+        gunComponent
+        {
+            gunInfoFromMgr	    = "aaGun" 
+        }
     }
 
     camera
     {
-	cameraLenseDofName   = "SHOOTPOS_PRIMARY1"
+        cameraLenseDofName   = "SHOOTPOS_PRIMARY1"
     
     	thirdPersonOffset []
     	{
@@ -3625,33 +3931,75 @@ template yav_aagun : antiAirCraftGuns
 
     moving
     {
-	recoilParts 
-	{
-	    recoilPart recoil1 
-	    {
-		partnum = 4
-		maxrange = 1.5f
-		minlerp = 0.7f
-		recoilspeed = 200.0f
-		restorespeed = 10.0f
-	    }
-	    
-	    recoilPart recoil2 
-	    {
-		partnum = 5
-		maxrange = 1.5f
-		minlerp = 0.7f
-		recoilspeed = 200.0f
-		restorespeed = 10.0f
-	    }
-	}        
+        recoilParts 
+        {
+            recoilPart recoil1 
+            {
+            partnum = 4
+            maxrange = 1.5f
+            minlerp = 0.7f
+            recoilspeed = 200.0f
+            restorespeed = 10.0f
+            }
+            
+            recoilPart recoil2 
+            {
+            partnum = 5
+            maxrange = 1.5f
+            minlerp = 0.7f
+            recoilspeed = 200.0f
+            restorespeed = 10.0f
+            }
+        }        
         physics
         {
             physicsDescription = "bf_pRebTurret"
         }
     }
-} 
 
+} 
+template corAAGun : yav_aagun // Auto turret with decreased accuracy/damage for use in Cor story. Non mountable.
+{
+    remoteGun
+    {    
+        gunComponent
+        {
+            gunInfoFromMgr	    = "CoraaGun" 
+        }
+    }
+    visTableSeer = 0
+    RemoteBrainBF brain
+    {
+	canAlwaysSeeDesiredTarget = "true"
+    }
+}
+template forAntiAir : yav_aagun
+{   
+    obinstrenderer render
+    {
+	model = "turrets/other/turret_gen_anti_air/turret_gen_anti_forest_air"
+    }
+    meta
+    {
+        canCreateInEditor  = 1
+        editorInstanceName = "forAntiAir"
+        editorPath         = "bf/remoteguns/generic/forest"
+    }
+}
+
+template sandAntiAir : yav_aagun
+{   
+    obinstrenderer render
+    {
+	model = "turrets/other/turret_gen_anti_air/turret_gen_anti_sand_air"
+    }
+    meta
+    {
+        canCreateInEditor  = 1
+        editorInstanceName = "sandAntiAir"
+        editorPath         = "bf/remoteguns/generic/sand"
+    }
+}
 
 //-------------------
 // Hover auto turret
@@ -3660,6 +4008,7 @@ template hoverTurretTick : tickingProjectileComponent
 {
     class-id = "ticking hover turret"
     spin	= 0.f
+    activeWeaponType = "k_active_turret"
 }
 
 template hoverAutoTurret : targetablePhysicsRemoteProp	// Anti infanty turret deployed as secondary weapon
@@ -3670,7 +4019,16 @@ template hoverAutoTurret : targetablePhysicsRemoteProp	// Anti infanty turret de
 
     startState = "k_state_idle"
     flags |= "k_flag_alwaysConsiderUpright"
-        
+
+    aiTargetType = "k_targetType_infantry|k_targetType_groundVehicles" 
+    
+    shouldTargetChrs = "true"
+    shouldTargetGroundVehicles = "true"
+    soundmap = "sndmap_autoturret"
+    soundeventsystem sndeventsystem
+    {
+	definition = "sndevt_hoverturret"
+    }
     render
     {
 	model =	"weapon/misc/misc_auto_turret"
@@ -3678,62 +4036,59 @@ template hoverAutoTurret : targetablePhysicsRemoteProp	// Anti infanty turret de
     
     RemoteBrainBF brain
     {
+	onlyFireWhenAimedAtTarget = "true"
     }
 
     RemoteStimSensorArc sensor
     {
-        partName	= "B_BODY"
-        swivelPartName	= "B_BASE"
+        partName	= "B_GUN"
+        swivelPartName	= "B_SEAT"
         sensorDofName	= "SHOOTPOS_PRIMARY1"
         pivotDofName	= "Y_AXIS"
 	
 	sensorFlags      = "k_updateWithRemoteAngles"
 
 	fieldOfView     = 60.0f	
-	maxViewDist	= 1500.0f
+	maxViewDist	= 25.0f
     }
     
     dmghealthcomponent health
     {
-	fullhealth	= 1.0f
-        isrepairable	= "false"
+	fullhealth	= 1.5f
     }
     
     hoverTurretTick tick 
     {
 	hoverHeight = 2.5f
+	hoverYRange  = 0.1f
+	hoverYSpeed  = 2.f
+	hoverXZRange  = 0.1f
+	hoverXZSpeed  = 1.5f
+
+	glow_onTime	= 0.2f
+	glow_offTime	= 0.5f
+	glow_fadeTime	= 0.1f
     }
     
     bfRemoteGun remoteGun
     {
-	barrelPartName         = "B_BODY"	
-	swivelPartName         = "B_BASE"	
+	barrelPartName         = "B_GUN"	
+	swivelPartName         = "B_SEAT"	
 	barrelPivotDofName     = "Y_AXIS"
 	barrelShootPosDofArrayName = "SHOOTPOS_PRIMARY"
+
+	recoil = 0	//don't want a recoil component as it doesn't have a camera (and will crash)
 
 	gunComponent
 	{
 	    gunInfoFromMgr = "fiHoverTur"
-    // MUZZLEFLASH - new way to do things	
-	    muzzleFlashEffect	= "muzRedRem1"
-	    muzzleFlash_lightTimer	    =   0.f
-	    muzzleFlash_lightDuration	    =	0.2f
-	    muzzleFlash_lightRadius	    =	6.0f
-	    muzzleFlash_lightColour[]     {1.f, 0.f, 0.f}
-	    muzzleFlash_lightOffset[]     {0.0f, 0.0f, 1.0f}
-
-	
-	    ubiks = "ubiks_basePlus"
-
-	    soundmap_player = "sndmap_hvrtank"	
-	    soundmap_npc    = "sndmap_hvrtank"
-
+	    ubiksBasePlus = "true"
 	    useUbiks = "false"
 	    loweredAmount = 0.000000
 	   	    
 	    gunAnimationGroup anims
 	    {
-		set		    = "gunanims_aat"
+		set		    = "ga_aat"
 		animmap		    = "animmap_rem_bf"
 		reactmap	    = "reactmap_generic"
 	    }
@@ -3749,20 +4104,862 @@ template hoverAutoTurret : targetablePhysicsRemoteProp	// Anti infanty turret de
 	    useRBs = "true"
 	}
 	
-	basePartNum = 0
-	armPartNum  = 1
-        gunPartNum  = 1
+	basePartNum = 2
+	armPartNum  = 3
+        gunPartNum  = 4
+
+	recoilParts
+        {
+            recoilPart recoil1 
+            {
+            partnum = 4
+            maxrange = 0.1f
+            minlerp = 0.5f
+            recoilspeed = 10.0f
+            restorespeed = 1.0f
+            }
+        }
+    }
+
+    detonatorcomponent detonator
+    {
+	explosion
+	{
+	    particleEffect	= "gren_thermal" 
+	    maxRad		= 2.0f
+	    force		= 10.0f   
+	    edgeForce		= 1.0f 
+	    damageatcentre	= 1.0f		// Maximum Damage
+	    damageradius	= 2.0f
+	}
+    }
+
+    playerTargetting
+    {
+	maxTargettingRange	    = 25.0f			//The max range this can target at
+    }
+
+    autoAimTargetComponentBF autoaimtarget
+    {
+	isVehicle = "false"
+        playerTurnToFaceAutomatically	= "true"
+        playerBulletsAttractedToTarget	= "true"
+        canOverrideSquadOrders		= "true"
+	isEscapePod			= "false"
+	nameKey	=   "STR_SECONDARYWEAPON_AUTOTURRET"	
+    }
+}
+
+template hoverAutoTurUp : hoverAutoTurret
+{
+    remotegun
+    {
+	gunComponent
+	{
+	    gunInfoFromMgr = "fiHoverTurUp"
+	}
+    }
+}
+
+///////////////////////////////
+////// Cruiser Internal ///////
+////// Security Guns //////////
+///////////////////////////////
+
+template internalCruiserTurret : cruiserSentryGunDefault
+{
+    remoteType = "k_type_internalCruiserSentryGun"
+	
+    aiTargetType = "k_targetType_infantry"
+    shouldTargetChrs = "true"
+    shouldTargetSpaceCraft = "false"
+//    shouldTargetTransports = "false"
+    shouldTargetCapitalShips = "false"
+
+    float startAngles [] = {-10.0f, -10.0f}    
+    movementDescription = "bf_sentryGun"
+    
+    render
+    {
+	model = "props/turrets/des_hang_tur"
+    }
+    
+    sensor
+    {
+    	maxViewDist = 50.0f
+	fieldOfView = 90.0f
+    }
+
+    playerTargetting
+    {
+	maxTargettingRange = 50.0f
+    }
+
+    RemoteCameraBF camera
+    {
+
+	minFov = 15.f
+	maxFov = 50.f
+	cameraLenseDofName   = "SENSORPOS"
+
+
+	thirdPersonOffset []
+	{
+	    0.00000, -0.40000, -0.10000
+	}
+
+	firstPersonOffset []
+	{
+	    0.00000, -0.40000, -0.100000
+	}
+    }
+    
+    soundmap = "sndmap_muntrrt"
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }   
+
+    remoteGun
+    {
+        gunComponent
+        {   
+            gunInfoFromMgr	    = "SentryTurRep"	    // Blue lasers
+	    
+	    ubiksBasePlus = "true"
+            useUbiks = "true"
+            loweredAmount = 0.000000
+	    plugins
+	    {
+		gunPluginOverheat overheat	
+		{
+		}
+	    }
+            gunAnimationGroup anims
+            {
+                set	    = "ga_tf"
+                animmap	    = "animmap_rem_bf"
+                reactmap    = "reactmap_generic"
+            }
+        }
+    }
+    
+    health
+    {
+	fullhealth	= 1.5f
+	invincibilityChannel = ""
+    }    
+   
+    autoaimtarget
+    {
+	nameKey = "STR_SECURITY_GUN"
+	isRemote = "true"
+	playerTurnToFaceAutomatically = "true"
+	playerBulletsAttractedToTarget = "true"
+    }
+
+    propflags |= "k_neverChangeBgRoomGroup"
+
+    meta
+    {
+	editorInstanceName = "accSentry"
+        editorPath = "bf/remoteguns/sentry"
+	canCreateInEditor = 1
+    }
+}
+
+template internalCruiserTurret_story : internalCruiserTurret
+{
+    bfexplodingpropdescript descript
+    {}
+ 
+    meta
+    {
+	editorInstanceName = "accSentry_st"
+        editorPath = "bf/remoteguns/sentry"
+	canCreateInEditor = 1
+    }
+}
+
+template internalCruiserTurret_CIS : internalCruiserTurret
+{
+    remoteGun
+    {
+	gunComponent
+	{
+	    gunInfoFromMgr		= "SentryTurCIS"		// Orange lasers
+	}
+    }
+}
+
+template internalCruiserTurret_Reb : internalCruiserTurret
+{
+    remoteGun
+    {
+	gunComponent
+	{
+	    gunInfoFromMgr		= "SentryTurReb"		// Red lasers
+	}
+    }
+}
+
+template internalCruiserTurret_Imp : internalCruiserTurret
+{
+    remoteGun
+    {
+	gunComponent
+	{
+	    gunInfoFromMgr		= "SentryTurImp"		// Green lasers 
+	}
+    }
+}
+
+template internalTurretDes : internalCruiserTurret // destructible 
+{
+    aiTargetType = "k_targetType_infantry"
+    shouldTargetChrs = "true"
+    movementDescription = "bf_mDesol_gun"
+
+    render
+    {
+	model = "props/turrets/des_hang_tur"
+    }
+
+    remoteGun
+    {
+	
+        gunComponent
+        {   
+            gunInfoFromMgr	    = "SentryTurDes"
+        }
+    }
+    health
+    {
+	fullhealth	= 0.3f
+    }  
+    
+    meta
+    {
+	editorInstanceName = "accSentryDesOld"
+        editorPath = "bf/props/desolation"
+	canCreateInEditor = 1
+    }
+}
+
+template internalTurretDes2 : internalCruiserTurret //invincible until shield goes down
+{
+    aiTargetType = "k_targetType_infantry"
+    movementDescription = "bf_mDesol_gun"
+    render
+    {
+	model = "props/turrets/des_hang_tur"
+    }
+
+    remoteGun
+    {
+        gunComponent
+        {   
+            gunInfoFromMgr	    = "SentryTurDes"	
+        }
+    }
+    
+    repairpropdesdesc descript
+    {
+    }
+    
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "destur"
+    	editorPath         = "bf/props/desolation"
+    }
+    
+    autoaimtarget
+    {
+	nameKey = "STR_SECURITY_GUN_PROTECTED"
+    }
+    
+}
+
+
+template internalTurretDesShield : staticprop
+{
+    obinstrenderer render
+    {
+	model = "props/turrets/des_hang_tur_shield"
+    }
+    
+    physics
+    {
+        useRBs        =    "true"
+    }
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "desturshield"
+    	editorPath         = "bf/props/desolation"
+    }
+}
+
+///////////////////////////////
+////// Planetary Cannons //////
+///////////////////////////////
+
+template ionCannonControl : RemoteControlBF
+{
+    class-id = "ion cannon control component bf"
+}
+
+template ionCannonBase : cruiserSentryGunDefault
+{
+    remoteType = "k_type_planetaryCannon"
+
+    //redefined here to remove k_flag_returnToRestDir and k_flag_wantsReticuleDrawn
+    baseobflags = ""
+    flags = "k_flag_canTrack|k_flag_idleSweepY|k_flag_canActivateDirectly|k_flag_alwaysConsiderUpright|k_flag_controlPanelAnim"
+    class-id = "ion cannon remote bf"
+    
+    aiTargetType = "k_targetType_infantry"
+    shouldTargetPlayers = "false"
+    shouldTargetSpaceCraft = "false"
+//    shouldTargetTransports = "false"
+    shouldTargetCapitalShips = "true"
+
+
+    float startAngles [] = {-10.0f, -10.0f}    
+    movementDescription = "bf_IonCannon"
+    aftertouchEnabled = "true"
+
+    consoleProp = "" // Set to the ion cannon control prop
+
+    soundeventsystem sndeventsystem
+    {
+	definition = "sndevt_ioncannon"
+    }
+
+    soundmap-field aftertouchsndmap
+    {
+	default = "sndmap_ioncannon"
+    }
+
+    soundmap = "sndmap_sphattrt"
+
+    RemoteIonCannonBrain brain
+    {
+	
+    }
+    
+    render
+    {
+	model = "props/misc/ion_cannon_remote"
+    }
+
+    sensor
+    {
+    	maxViewDist = 50.0f
+    }
+
+    playerTargetting
+    {
+	maxTargettingRange = 50.0f
+    }
+
+    ionCannonControl control
+    {
+	playerCanLockOn = "false"
+    }
+
+    RemoteCameraBF camera
+    {
+	minFov		= 5.f
+	maxFov		= 80.f
+	minFovManual	= 4.0f
+	zoomSpeed	= 0.1f
+	
+	cameraLenseDofName   = "SHOOTPOS_PRIMARY1"
+
+
+	thirdPersonOffset []
+	{
+	    0.00000, -0.40000, -0.10000
+	}
+
+	firstPersonOffset []
+	{
+	    0.750000, 0.410000, -1.340000
+	}
+    }
+    
+
+    remoteGun
+    {
+        gunComponent
+        {   
+            gunInfoFromMgr	    = "ionCannonRemote"
+	    
+	    ubiksBasePlus = "true"
+            useUbiks = "true"
+            loweredAmount = 0.000000
+
+	    // Don't want the overheat plugin from the sentry template
+	    plugins = 42 // Magic disapear
+
+            gunAnimationGroup anims
+            {
+                set	    = "ga_tf"
+                animmap	    = "animmap_rem_bf"
+                reactmap    = "reactmap_generic"
+            }
+        }
+    }
+    
+    health
+    {
+	fullhealth	= 100.f
+	invincibilityChannel = ""
+    }    
+    
+    bfexplodingpropdescript descript
+    {
+    }
+   
+    autoaimtarget
+    {
+	nameKey = "STR_IONCANNON"
+    }
+
+    propflags |= "k_neverChangeBgRoomGroup"
+    meta
+    {
+	editorInstanceName = "ionCannon"
+        editorPath = "bf/remoteguns/ion_cannon"
+	canCreateInEditor = 1
+    }
+} 
+
+template planetCannon : ionCannonBase
+{
+    remoteType = "k_type_planetaryCannon"
+    autoaimtarget
+    {
+	nameKey = "STR_PLANETARYCANNON"
+    }
+}
+
+template ionCannonTurret : ionCannonBase
+{
+    movementDescription = "bf_IonCnnHot"
+
+    startAngles [] = {-45.0f, -10.0f}
+    
+    remoteGun
+    {
+        gunComponent
+        {   
+            gunInfoFromMgr	    = "ionCannonRemote"
+	}
+    }
+}
+
+template corIonCannon : planetCannon
+{
+    
+    render
+    {
+	model = "props/planet_cannons/coruscant_bespin/coruscantcannon_barrel"
+    }
+    camera
+    {
+        thirdPersonOffset []
+        {
+            0.000000, 0.000000, 1.000000
+        }
+
+        firstPersonOffset []
+        {
+            0.000000, 0.000000, 1.000000
+        }
+    }
+    
+    meta
+    {
+	editorInstanceName = "corIonCannon"
+        editorPath = "bf/remoteguns/ion_cannon"
+	canCreateInEditor = 1
+    }
+
+    hudImageName = "hoth_ion_cannon_icon"         
+}
+
+template besIonCannon : planetCannon
+{
+    render
+    {
+	model = "props/planet_cannons/coruscant_bespin/bespincannon_barrel"
+    }
+    camera
+    {
+        thirdPersonOffset []
+        {
+            0.000000, 0.000000, 1.000000
+        }
+
+        firstPersonOffset []
+        {
+            0.000000, 0.000000, 1.000000
+        }
+    }
+
+    ioncannonrepair descript
+    {
+    }
+       
+    meta
+    {
+	editorInstanceName = "besIonCannon"
+        editorPath = "bf/remoteguns/ion_cannon"
+	canCreateInEditor = 1
+    }
+    
+    hudImageName = "bespin_cannon_icon"     
+}
+
+template tatIonCannon : planetCannon
+{
+    render
+    {
+	model = "props/planet_cannons/tatooine/tatcannon"
+    }
+
+    camera
+    {
+        thirdPersonOffset []
+        {
+            0.000000, 0.000000, 5.000000
+        }
+
+        firstPersonOffset []
+        {
+            0.000000, 0.000000, 5.000000
+        }
+    }
+    
+    meta
+    {
+	editorInstanceName = "tatIonCannon"
+        editorPath = "bf/remoteguns/ion_cannon"
+	canCreateInEditor = 1
+    }
+    
+    hudImageName = "tatooine_cannon_icon"         
+}
+
+template musIonCannon : planetCannon
+{
+    render
+    {
+	model = "props/planet_cannons/cis_mustafar/cis_must_cannon_barrel"
+    }
+    camera
+    {
+        thirdPersonOffset []
+        {
+            0.000000, 0.000000, 1.000000
+        }
+
+        firstPersonOffset []
+        {
+            0.000000, 0.000000, 1.000000
+        }
+    }
+    
+    meta
+    {
+	editorInstanceName = "musIonCannon"
+        editorPath = "bf/remoteguns/ion_cannon"
+	canCreateInEditor = 1
+    }
+    
+    hudImageName = "mustafar_cannon_icon"         
+}
+
+template catoIonCannon : planetCannon
+{
+    render
+    {
+	model = "props/planet_cannons/cato/cato_cannon_barrel"
+    }
+    camera
+    {
+        thirdPersonOffset []
+        {
+            0.000000, 0.000000, 2.000000
+        }
+
+        firstPersonOffset []
+        {
+            0.000000, 0.000000, 2.000000
+        }
+    }
+    movementDescription = "bf_IonCnnCat" 
+    meta
+    {
+	editorInstanceName = "catoIonCannon"
+        editorPath = "bf/remoteguns/ion_cannon"
+	canCreateInEditor = 1
+    }
+    
+    hudImageName = "cato_cannon_icon"         
+}
+
+template kasIonCannon : planetCannon
+{
+    render
+    {
+	model = "props/planet_cannons/kassahyyyk/kassahyyyk_cannon_barrel"
+    }
+    camera
+    {
+        thirdPersonOffset []
+        {
+            0.000000, 0.000000, 1.000000
+        }
+
+        firstPersonOffset []
+        {
+            0.000000, 0.000000, 1.000000
+        }
+    }
+        
+    meta
+    {
+	editorInstanceName = "kasIonCannon"
+        editorPath = "bf/remoteguns/ion_cannon"
+	canCreateInEditor = 1
+    }
+    
+    hudImageName = "cato_cannon_icon"             
+}
+
+// This version contains a uber strong Ion cannon to take down landing ships.
+template uberIonCannon : ionCannonTurret
+{
+    teamNum = 1
+    
+    movementDescription = "bf_IonCnnTat"
+    render
+    {
+	model = "props/planet_cannons/tatooine/tatcannon"//model = "props/misc/ion_cannon_remote"
+    }
+    
+    camera
+    {
+        thirdPersonOffset []
+        {
+            0.000000, 0.000000, 5.000000
+        }
+
+        firstPersonOffset []
+        {
+            0.000000, 0.000000, 5.000000
+        }
+    }
+
+    remoteGun
+    {
+        gunComponent
+        {   
+            gunInfoFromMgr	    = "tatCannonRemote"
+	}
+    }
+
+    autoaimtarget
+    {
+	nameKey = "STR_PLANETARYCANNON"
     }
 
     meta
     {
-	canCreateInEditor   = 0
-	editorInstanceName  = "hoverAutoTurret"
-	editorPath	    = "bf/generic/remotes"
+	editorInstanceName = "uberCannon"
+        editorPath = "bf/remoteguns/ion_cannon"
+	canCreateInEditor = 1
     }
 }
 
+// This version contains a uber strong Ion cannon for Hoth Story
+template uberHotCannon : ionCannonTurret
+{
+    teamNum = 0
+    
+    movementDescription = "bf_IonCnnHot"
+    render
+    {
+        model = "props/misc/hoth_ion_cannon"
+    }
+    
+    camera
+    {
+        thirdPersonOffset []
+        {
+            0.000000, 0.000000, 5.000000
+        }
+
+        firstPersonOffset []
+        {
+            0.000000, 0.000000, 5.000000
+        }
+    }
+
+    remoteGun
+    {
+        gunComponent
+        {   
+            gunInfoFromMgr	    = "hotCannonRemote"	
+	}
+    }
+
+    meta
+    {
+	editorInstanceName = "uberHotCann"
+        editorPath = "bf/remoteguns/ion_cannon"
+	canCreateInEditor = 1
+    }
+}
+
+template capIonCannon : ionCannonBase
+{
+    remoteType = "k_type_frigateCannon"
+
+    movementDescription = "bf_capShpCnn"
+    render
+    {
+	model = "props/planet_cannons/capship/capship_cannon_barrel"
+    }
+   
+    remoteType = "k_type_planetaryCannon"
+       	
+    autoaimtarget
+    {
+	nameKey = "STR_FRIGATECANNON"
+    }
+    
+    repairpropdesc descript
+    {}
+    remoteGun
+    {
+        gunComponent
+        {   
+            gunInfoFromMgr	    = "frigCannonRemote" 
+
+	    ubiksBasePlus = "true"
+            useUbiks = "true"
+            loweredAmount = 0.000000
+
+	    // Don't want the overheat plugin from the sentry template
+	    plugins = 42 // Magic disapear
+
+            gunAnimationGroup anims
+            {
+                set	    = "ga_tf"
+                animmap	    = "animmap_rem_bf"
+                reactmap    = "reactmap_generic"
+            }
+        }
+    }
+    camera
+    {
+	cameraLenseDofName   = "SHOOTPOS_PRIMARY1"
+
+	thirdPersonOffset []
+	{
+	    0.00000, 0.0000, 1.50000
+	}
+
+	firstPersonOffset []
+	{
+	    0.0000, 0.0000, 1.500000
+	}
+    }
 
 
+    meta
+    {
+	editorInstanceName = "capIonCannon"
+        editorPath = "bf/remoteguns/ion_cannon"
+	canCreateInEditor = 1
+    }
+}
 
+template ImpIonCannon : planetCannon
+{
+    render
+    {
+	model = "props/planet_cannons/imperial/imp_planet_cannon"
+    }
+    camera
+    {
+        thirdPersonOffset []
+        {
+            0.000000, 0.000000, 1.000000
+        }
+
+        firstPersonOffset []
+        {
+            0.000000, 0.000000, 1.000000
+        }
+    }
+    
+    meta
+    {
+	editorInstanceName = "ImpIonCannon"
+        editorPath = "bf/remoteguns/ion_cannon"
+	canCreateInEditor = 1
+    }
+}
+
+//Assault Objective Summoned ship Gun templates
+
+template aoISD_Turret : cruiserSentryGun_Green 
+{
+    aiTargetType = "k_targetType_infantry|k_targetType_groundVehicles|k_targetType_remotes|k_targetType_ships" 
+    
+    sensor
+    {
+	minViewDist = 1.0f
+	maxViewDist = 1000.0f
+    } 
+}
+
+template aoMonC_Turret : cruiserSentryGun_Mun 
+{
+    aiTargetType = "k_targetType_infantry|k_targetType_groundVehicles|k_targetType_remotes|k_targetType_ships" 
+    
+    sensor
+    {
+	minViewDist = 1.0f
+	maxViewDist = 1000.0f
+    } 
+}
+
+template aoInvH_Turret : cruiserSentryGun_Mun 
+{
+    aiTargetType = "k_targetType_infantry|k_targetType_groundVehicles|k_targetType_remotes|k_targetType_ships" 
+    
+    sensor
+    {
+	minViewDist = 1.0f
+	maxViewDist = 1000.0f
+    } 
+}
+
+template aoVen_Turret : cruiserSentryGun_Acc 
+{
+    aiTargetType = "k_targetType_infantry|k_targetType_groundVehicles|k_targetType_remotes|k_targetType_ships" 
+    
+    sensor
+    {
+	minViewDist = 1.0f
+	maxViewDist = 1000.0f
+    } 
+}
 

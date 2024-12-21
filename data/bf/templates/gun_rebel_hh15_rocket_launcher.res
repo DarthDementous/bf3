@@ -23,19 +23,13 @@ template fp_reb_rocket_launcher_boned : animfirstpersongun
 
 template w_reb_rlaun : gun
 {
-    dynamiclight light
-    {
-	exponent    = 1.f
-	rotspeed    = 0.f
-	offset[]    { 0.4f, 0.f, 0.f }
-	light-type  = "k_lightSpot"
-	colour[]    {3.75f, 3.75f, 3.75f}
-	angle	    = 70.f
-	enabled	    = "false"
-    }
-
     guncomponent_hominglauncher_bf gun
     {
+	autoRecurseTemplateName-field rocket
+	{
+	    default = "proj_infrocket"
+	}
+	
 	gunAnimationGroup anims
 	{
 	    set		    = "ga_rep_rocket"
@@ -45,48 +39,19 @@ template w_reb_rlaun : gun
 
 	gunInfoFromMgr = "bfrebh15rl"	
 
-	hasFirePos = "true"
-	firstPersonFireDof  = "SHOOTPOS_1"
-	firstPersonFireBone = "b_body"
-//	firstPersonFireBone = ""	
-	firstPersonFireDir []	{0.f, 0.f, 1.f}
-	firstPersonFirePos []	{0.f, 0.05f, -0.30f}
-//	firstPersonFirePos []	{-0.0023765948f, 0.040309835f, 0.31420904f}
-	thirdPersonFireDir[]   {0.f, 0.f, 1.f}
-	thirdPersonFirePos[]   {0.0, 0.12, 0.50}
-
-	hasLightPos = "true"
-//	hasLightPos = "false"
-	firstPersonLightBone = "b_body"
-	firstPersonLightDir []	{0.f, 0.f, 1.f}
-	firstPersonLightPos []	{0.f, 0.10f, -0.1f}
-	thirdPersonLightDir[]   {0.f, 0.f, 1.f}
-	thirdPersonLightPos[]   {0.0, 0.17, -0.40f}
-
-	hasParticleUpPos	    = "true"
-	firstPersonParticleUpBone   = "b_body"
-	firstPersonParticleUpPos[]  {0.f, 0.05f, 0.40f}
-	firstPersonParticleUpDir[]  {0.f, 1.f, 0.f}
-	thirdPersonParticleUpPos[]  {0.0, 0.12, 0.16}
-	thirdPersonParticleUpDir[]  {0.f, 1.f, 0.f}
-
-	hasCartridgePos	    = "true"
-	firstPersonCartridgeBone   = "b_body"
-	firstPersonCartridgePos[]  {0.f, 0.05f, 0.40f}
-	firstPersonCartridgeDir[]  {1.f, 0.f, 0.f}
-	thirdPersonCartridgePos[]  {0.0, 0.12, 0.f}
-	thirdPersonCartridgeDir[]  {1.f, 0.f, 0.f}
-
-	soundmap_npc	    =	"sndmap_reprl"
-	soundmap_player	    =	"sndmap_reprlpla"
+	soundmap	    =	"sndmap_reprl"
 	firstperson	    =	"fp_reb_rocket_launcher_boned"	
-	muzzleFlashEffect     = "muzRedLsr1"
 	ammoID		    = "o_ammo_reb_rl"
 	weaponID	    = "o_gun_reb_rl"	
    	weaponType	    = "k_rocket"
 	
 	recoilComponent recoil
 	{
+	}
+
+	zoom
+	{
+     	    allowIronSightLockOn = "false"	    
 	}
     }
 
@@ -96,19 +61,145 @@ template w_reb_rlaun : gun
     }
 }
 
+// Upgraded Rocket Launcher With Increased Clip Size
+template w_reb_rlaun_v2 : w_reb_rlaun
+{
+    gun
+    {
+	weaponID	    = "o_gun_reb_rl_v2"
+	ammoID		    = "o_ammo_reb_rl_up"
+    }
+}
+
+// Upgraded Rocket Launcher With Increased Reload Speed
+template w_reb_rlaun_up : w_reb_rlaun_v2
+{
+    gun
+    {
+	weaponID	    = "o_gun_reb_rl_up"
+	gunInfoFromMgr	    = "bfrebh15rl_up"	
+	    
+	anims
+	{
+	    set		    = "ga_rep_rocket_up"
+	}
+    }
+}
+
+// Story version
+template w_reb_rlaun_s : w_reb_rlaun
+{
+    gun
+    {
+	weaponID	    = "o_gun_reb_rl_s"
+	
+	autoRecurseTemplateName-field rocket
+	{
+	    default = "proj_rocket_st"
+	}
+    }
+}
+
 template o_gun_reb_rl : inventoryObjectTypeWeapon 
 {
     details
     {
-        singular = "HH-15 Projectile Launcher"
-	singularPrefix = "a"
-	pickupTemplate_create = ""		
+	singularStrHandle   = "STR_PRIMARYWEAPON_REB_ROCKET_LAUNCHER"
+	pickupTemplate_create = "singlepickup_gun_hh15_rl"		
     }
 
     specialData
     {
 	weaponID = "w_reb_rlaun"
 	hudTextureName = "rep_rocket_launcher"
+	hudTextureScale = 0.7f
 	usesThisAmmo = "o_ammo_reb_rl"
     }
 }
+
+// Upgraded Rocket Launcher Object - Increased clip size
+template o_gun_reb_rl_v2 : o_gun_reb_rl
+{
+    specialData
+    {
+        weaponID	= "w_reb_rlaun_v2"
+	usesThisAmmo	= "o_ammo_reb_rl_up"
+    }
+}
+
+// Upgraded Rocket Launcher Object - Increased reload speed
+template o_gun_reb_rl_up : o_gun_reb_rl_v2
+{
+    specialData
+    {
+        weaponID = "w_reb_rlaun_up"
+    }
+}
+
+// Story version
+template o_gun_reb_rl_s : o_gun_reb_rl
+{
+    specialData
+    {
+        weaponID = "w_reb_rlaun_s"
+    }
+}
+
+/*
+// Upgraded Rocket Launcher Object With Double Rockets
+template o_gun_reb_rl_dd : o_gun_reb_rl_up
+{
+    specialData
+    {
+        weaponID = "w_reb_rlaun_dd"
+    }
+}
+*/
+
+template singlepickup_gun_hh15_rl : simplePickupPropBF
+{
+
+    obinstrenderer render
+    {
+	model	    =	"weapon/reb/reb_hh15rocketlauncher_thirdperson"
+    }
+   
+    objectType		= "o_gun_reb_rl"
+    activate
+    {
+	myNameStringHandle  = "STR_PRIMARYWEAPON_REB_ROCKET_LAUNCHER"
+    }
+ 
+    pickupComponentWeapon pickupComponent
+    {
+	pickupflags = "k_pickupNoNPC"
+
+	    inventoryComponentBF contents
+	    {
+		inventoryEntryBF entry0
+		{
+		    carryingobisfirstparam	= "true"
+			objectType		= "o_gun_reb_rl"
+		}
+
+		inventoryEntryBF entry1
+		{
+		    objectType		= "o_ammo_reb_rl"
+			total			= 5
+			flags			= "k_inventoryFlags_canUseInfinite"		
+		}
+
+	    }
+    }
+
+     meta
+    {
+	canCreateInEditor    = 1
+	    editorInstanceName   = "SP_rebhh15rl"
+	    editorPath	     = "bf/pickups/guns/reb"
+	    renderDictPath	     = "render"
+    }
+
+}
+
+

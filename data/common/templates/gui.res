@@ -16,11 +16,6 @@
 template guiMgrTemplate
 {
     class-id = "GUI Manager"
-//  Depricated. Uses soundmap now!
-//    singleSound-field beep
-//    {
-//	default = "hud_psemenu_dpad"
-//    } 
     soundmap-field soundmap
     {
 	default = "sndmap_gui"
@@ -75,8 +70,23 @@ template menuitem
         0.000000, 0.000000, 0.000000,
         0.500000
     }
+    rotation3d []
+    {
+        0.000000, 0.000000, 0.000000
+    }
+
+    translation3d []
+    {
+        0.000000, 0.000000, 0.000000
+    }
+    editorDataComponent editordata
+    {
+
+    }
 
     platforms		= "k_pc|k_ps3|k_360|k_wii"
+
+    shouldRenderOutlineBox = "false"
 }
 
 template text_component_core
@@ -91,6 +101,7 @@ template text_component_core
     fontsize		= 1.f
     text-style		= ""
     flags		= "k_fixedFontScale"
+    check-selected	= "true"
 }
 
 template container_core : menuitem
@@ -132,6 +143,10 @@ template icon_core : menuitem
         0.000000, 0.000000, 0.000000,
         1.000000
     }
+    tex-coords []
+    {
+	0.000000, 1.000000, 1.000000, 0.000000
+    }
     editorID	    = "icon"
 }
 
@@ -161,7 +176,7 @@ template page_core : menuitem
 {
     class-id	    = "GUI Menu Page"    
     type	    = "MENU_TYPE_PAGE"
-    float fillcolour [] = { 0.0f, 0.0f, 0.0f, 1.0f }
+    float fillcolour [] = { 0.0f, 0.0f, 0.0f, 0.0f }
     float pos []
     {
         0.000000, 0.000000, 100.000000,
@@ -176,6 +191,8 @@ template page_core : menuitem
     {
 	default = ""
     }
+
+    doTransition = "true"
 }
 
 template buttonprompt_core : menuitem
@@ -300,6 +317,7 @@ template menutable_core : menuitem
     min-rows	    = 1
     max-rows	    = 50
     float row-colour [] = { 0.0f, 0.0f, 0.0f, 0.3f }
+    float header-colour [] = {1.0f, 1.0f, 1.0f, 1.0f}
 //    fixedX = "true"
 //    fixedY = "true"
 //    fixedWidth = "true"
@@ -315,11 +333,6 @@ template menutable_core : menuitem
     editorID	    = "tble"
 }
 
-template kickPlayerTable_core : menuitem
-{
-    class-id	    = "GUI Menu Kick Player Table"
-    editorID	    = "kick"
-}
 
 template tablecell
 {
@@ -345,67 +358,6 @@ template menukeyboard_core : menuitem
     {
     }    
     editorID	    = "keyb"
-}
-
-template menubar_core : menuitem
-{
-    class-id = "GUI Menu Bar"
-      
-    bartype = "vertical"
-    texture-field imagebg          
-    {
-	default = "misctex/icons/noimage"
-    }
-    texture-field imagehigh           
-    {
-	default = "misctex/icons/noimage"
-    }
-    
-    colourHigh []
-    {
-	0.7f, 0.7f, 0.4f, 1.0f	
-    }
-    
-    colourIcon [] 
-    {
-	1.0f, 0.95f, 0.75f, 1.0f
-    }
-
-    colourIconHigh []
-    {
-	0.6f, 0.5f, 0.30f, 1.0f
-    }
-
-    colourTextHigh []
-    {
-	1.0f, 0.4f, 0.4f, 1.0f
-    }
-    
-    skinbar
-    {
-	iconSize = 0.06f
-	iconSizeHigh = 0.085f
-	iconSpacing = 0.175f
-	textOffset = 0.07225f
-	menuOffsetx = 0.05f
-	menuOffsety = 0.0f
-    }
-
-    skinmenu
-    {
-	iconSize = 0.05f
-	iconSizeHigh = 0.075f
-	iconSpacing = 0.175f
-	textOffset = 0.07225f
-	menuOffsetx = 0.26075f
-	menuOffsety = 0.175f
-    }
-
-    menus
-    {
-
-    }
-    editorID	    = "mbar"
 }
 
 template menuprop_core : menuitem
@@ -476,15 +428,14 @@ template menuevent
     eventTargetList sceneEvents
     {
     }
-    
+    editorDataComponent editordata
+    {
+
+    }
+   
     platforms		= "k_pc|k_ps3|k_360|k_wii"
 }
 
-template guifxcomponent
-{
-    class-id	    = "gui fx component"
-    test	    = "test"
-}
 
 template guicontrol
 {
@@ -523,20 +474,15 @@ template levelselect
     gamemodes = "k_noGameMode"
     mapid = 0 // don't set this in levelselect.res it's automatically set in the code when it's read in.
     era = "k_CloneWarsEra|k_GalacticCivilWarEra"
+    mapsizes = ""
 }
 
-template tutorialBox_core : menuitem
-{
-    class-id	    = "GUI Tutorial Box"
-    editorID	    = "ttbx"
-
-    displayTime	    = 5.f
-}
 
 template dialogBox_core : container_core
 {
     class-id	    = "GUI Menu Dialog Box"
     options	    = 1
+    shouldLock = "false"
 }
 
 template tabWindow_core : menuitem
@@ -545,6 +491,7 @@ template tabWindow_core : menuitem
     float pos []    = { 0.0f, 0.0f, 100.0f, 100.0f }
     editorID	    = "tabw"
     tabsHeight	    = 0.1f
+    style_page = ""
 }
 	
 template tabPage_core : menuitem
@@ -562,4 +509,9 @@ template video : menuitem
     class-id	    = "GUI Menu Video"
     float pos []    = { 0.0f, 0.0f, 100.0f, 100.0f }
     editorID	    = "vido"
+}    
+
+template mapRendering
+{
+    class-id	    = "GUI Map Rendering"
 }    

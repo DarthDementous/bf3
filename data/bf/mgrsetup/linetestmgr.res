@@ -10,6 +10,6 @@
 
 latent_linetest_mgr_template linetestmgr
 {
-    maxTasks			= 10
+    maxTasks			= 64
     maxLinetestsPerTask		= 100   // Use something sensible, maybe 20?
 }

@@ -1,5 +1,5 @@
 // vim: set syntax=c :
 
-chrmoveanimmanagerTemplate chrmoveanimmanager
+/*chrmoveanimmanagerTemplate chrmoveanimmanager
 {
-}
+}*/

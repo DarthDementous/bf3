@@ -34,6 +34,9 @@ debugManager debug
     {
 	string profiles []
 	{
+	    "CNavMgr::RouteExists",
+	    "CNavMgr::RouteExists navmeshFindClosestNode #1",
+	    "CNavMgr::RouteExists navmeshFindClosestNode #2"
 	}
     }
 
@@ -43,7 +46,14 @@ debugManager debug
     // "MT" = (ie any 'trace' style user) draw only for this user
     channels
     {
-	dbggfx		    = "TRUE" //"RS&SF&DC&PH&MF&MC&JT&CC&RB&AH&AHM&PR&JQ" // enable via USERNAME ONLY
+	max-channels-in-menu    = 50 
+	
+	dbggfx
+	{
+	    enabled = "TRUE" //"RS&SF&DC&PH&MF&MC&JT&CC&RB&AH&AHM&PR&JQ"
+	    menuLocation = "Debug graphics"
+	    comment = "Master switch to enable/disable all (or, probably, most) debug graphics"
+	}
 
 	// ---- PLAYER AND CAMERA CONTROLS -----
 	//
@@ -74,7 +84,10 @@ debugManager debug
 	//
 	draw-physics-contacts = "FALSE"    // NB: if there are too many contact points it will flood debugdraw
 	profile-physics-tick = "FALSE"  // NB: This causes the physics tick to be blocking. i.e. the main thread waits for the physics to compelete	
-	
+	draw-embedded-bodies-warning = "TRUE"
+	displayPhysicsWarnings = "!CP"
+	buoyancy-draw="FALSE"
+	buoyancy-test="FALSE"
 	//
 	//--------------------------------------
 
@@ -85,8 +98,11 @@ debugManager debug
 	//
 	//--------------------------------------
 
-	watchCheckPointSaveSize = "FALSE"
-	checkpointDumpTextFile = "CP"
+	watchCheckPoints	    = "CP"
+	watchCheckPointSaveSize	    = "CP"
+	checkpointDumpTextFile	    = "CP"
+	traceCheckpoints	    = "CP"
+	watchCheckPointsAvailable   = "FALSE"
 	
 	// ---- COLOUR THE COLLISION MESH ------
 	//
@@ -98,7 +114,8 @@ debugManager debug
 	//--------------------------------------
 	
 	bg-portals	    = "FALSE"	    // draw portals
-	
+	bg-loadParticles    = "TRUE"	    //load particles for bg
+
 	ode-geoms	    = "DC"	    // all ode geoms
 	ode-geoms-filled    = "DC"	    // all ode geoms
 	ode-geoms-chr	    = "DC"	    // ode geoms for chrs only
@@ -111,24 +128,29 @@ debugManager debug
 
 	//---------- GUI ------------------------
 	guimgr-dumping-enabled = "DC"	    // press x to dump tMLg mgr to a file
-	guiBoundingBoxes    = "FALSE"
+	guiBoundingBoxes    = "DC"
 	guiPCUsesPS3Pad	    = "TRUE"	    // PC version uses same input as PS3 version
 	traceGuiStuff	    = "DC"	    // print stuff to the console whenever anything happens in CGuiMenu / CGuiMgr
 	watchTickingGuiObjects = "FALSE"
+	
+	displayEnumInsteadofText = "FALSE"
 
 	// Netgame
-	print-netstats		= "PMH&MC"
+	print-netstats		= "PMH&MC&LB"
 	print-netpackets	= "PMH&MC"
 	print-nettime		= "FALSE"
 	net-writelog		= "PMH&MF"
 	net-showpropowner	= "PMH"
+	net-watchNumProps	= "LB&MF&AS"
 	net-print-all-sends	= "FALSE"
 	net-gamespy-natneg	= "TRUE"
 	net-gamespy-traffic	= "TRUE"
+	traceRPCProcess		= "FALSE"
 	
 	net-dontallowrestart	= "FALSE"	
 	net-watchchannel	= "FALSE"    // allow watching of channel
 	net-senddebug	    = "TRUE"
+	net-type = "FALSE"
 	netDoNotSendGameModeUpdate = "FALSE"
 
 	// Misc
@@ -154,7 +176,7 @@ debugManager debug
 	// CNetGamePropmgr
 	net-insertintoworld	    = "FALSE"   // prop insertintoworld msg on propmgrcreate
 	net-playerinsertintoworld   = "FALSE"	// player insertintoworld info
-	net-propmgrcreate	    = "FALSE"	// show propmgr create msg info
+	net-propcreate		    = "LB"	// show propmgr create msg info
 
 	// NetDataStream
 	net-dictionarystream	= "FALSE"   // shows the dictionary in stream format
@@ -164,6 +186,9 @@ debugManager debug
 	net-serverlosthudmessage = "FALSE"
 
 	gmc-bestspawner = "FALSE"
+	active-spawners = "MK"
+	active-spawnees = "MK"
+	active-vehicles = "MK"
 	
 	// These pile up nicely when more than one turned on...
 	prop-inventory	    = "FALSE"	    // prop inventory contents
@@ -173,6 +198,8 @@ debugManager debug
 	prop-id		    = "FALSE"	    // display the props' id (name, kinda)
 	prop-teamname	    = "FALSE"	    // display which team the prop is in
 	prop-parts	    = "FALSE"
+
+	watchNumberOfProps  = "FALSE"	    // displays the current number of props in the world 
 
 	bug-legs	    = "FALSE"	    // bug legs dbg lines
 	bug-legs-bind	    = "FALSE"	    // draw bind positions of bug legs
@@ -188,23 +215,42 @@ debugManager debug
 	vehicle-override-fp-cam	= "FALSE"	    // override first person vehicle cam with values from f_constants.res
 	vehicleCamDoPitch	= "TRUE"	    // Better with or without pitch applied to vehicle chase cam?
 	vehicleWatchInput	= "PH"
+	watchVehicleAutoAim	= "FALSE"	    // Draw a green line from the vehicle to the props being auto-aimed at 
+	watchVehicleAimDistance	= "FALSE"	    // Watch the distance from the vehicles guns to the point being aimed at
+	watchVehicleGunRot	= "FALSE"	    // Watch vehicle weapon aim angle, to help setting up weaponRotX
+	watchVehicleArmourCalcs	= "FALSE"
 
 	// Challenges
 	watchRace		= "FALSE"
 	watchBuzzDroidChal	= "FALSE"
-	watchEscortChal		= "TRUE"
+	watchEscortChal		= "FALSE"
 
 	// CSG/BSP/NAV stuff
-	navmesh		    = "FALSE"	    // enables the following options:
-	navmesh-mesh	    = "FALSE"	    // render the navmesh
-	navmesh-labels	    = "MT"	    // renders labels for the navmesh
+	navmesh
+	{
+	    enabled	    = "FALSE"
+	    menuLocation    = "Navmesh"
+	    comment	    = "enables the navmesh options"
+	}
+	navmesh-mesh
+	{
+	    enabled	    = "TRUE"
+	    menuLocation    = "Navmesh"
+	    comment	    = "render the navmesh"
+	}
+	navmesh-labels
+	{
+	    enabled	    = "MT"
+	    menuLocation    = "Navmesh"
+	    comment	    = "renders labels for the navmesh"
+	}
 	navmesh-normals	    = "JH"	    // renders normals for the navmesh
 	navmesh-optimise    = "FALSE"	    // run optimisation code when loading navmesh
-	navmesh-zones	    = "MT"	    // display zonenumber over navmesh nodes (requires labels=on)
+	navmesh-zones	    = "BN"	    // display zonenumber over navmesh nodes (requires labels=on)
 	navmesh-octree	    = "FALSE"	    // draw navmesh/obstacles loose octree
 	navmesh-volumes	    = "JH"	    // draw navmesh volumes
 	navmesh-highlightMoveZone = "MT"    // highlight the movement zone of the currently selected dbg prop
-	navmesh-mouse	    = "FALSE"	    // Test paths with mouse
+	navmesh-mouse	    = "WB"	    // Test paths with mouse
 	navmesh-show-stats  = "FALSE"	    // Show stats on navmesh load
 	csg		    = "MC&DC"	    // draw csg volumes
 	csg-depthtest	    = "FALSE"	    // draw CSG volumes with depth test enabled or not
@@ -215,6 +261,7 @@ debugManager debug
 
 	// Funnel graphics
 	draw-funnel	    = "FALSE"
+	disableFunnelLimits = "FALSE"
 
 	// Dynamic obstacle pathfinding stuff
 	ai-disable-dynamic-pathfind = "FALSE"	    // enable (by default) dynamic obstacle pathfinding
@@ -249,6 +296,7 @@ debugManager debug
 	ai-watch-guard-points		    = "FALSE"
 
 	// AI debug GFX
+	ai-dynamic-avoidance= "FALSE"
 	ai-steer-all	    = "FALSE"	    // displays steering vectors for all npcs
 	ai-sight	    = "FALSE"	    // display ai sight tests (vistable results)
 	ai-skel		    = "FALSE"	    // display ai skeleton (TEH F1X0R3D)
@@ -271,7 +319,7 @@ debugManager debug
 	ai-curcover	    = "MT"	    // draw a line to the current and nearest cover
 	ai-autocover-dbggfx = "FALSE"	    // draw debug graphics for the CAutoBoundaryCoverMaintainerComponents
 	ai-cmds		    = "FALSE"	    // ai cmds are output to the console as they change state
-	ai-path		    = "ML"	    // display the path npcs are going to take
+	ai-path		    = "FALSE"	    // display the path npcs are going to take
 	ai-squadtraces	    = "FALSE"	    // some traces from squads
 	ai-accuracywatches  = "FALSE"	    // outputs some accuracy debugging stuff
 	ai-bulletlines	    = "FALSE"	    // draws lines where the bullets go - good for accuracy debugging
@@ -279,13 +327,15 @@ debugManager debug
 	ai-notfiringreasons = "FALSE"	    // output stuff describing why an npc isn't firing
 	ai-nav-movetest-all = "FALSE"	    // draws info about navmesh movetests for all npcs
 	ai-target	    = "MT&AHM"	    // draws line debug prop's to current npc target - colourised depending on vis table result
+	ai-ground-targets   = "AHM"
 	ai-target-all	    = "FALSE"	    // draws all npcs targets
-	ai-autothrowgrenades    = "TRUE"    // set to true to automatically throw grenades
+	ai-autothrowgrenades    = "TRUE"    // set to TRUE to automatically throw grenades
 	ai-autothrowcvrgrenades = "TRUE"
 	ai-meleelungeattack	= "TRUE"
 	ai-meleetargetgfx	= "ML"      // draws prop direction for the duration of doing melee & aabb's of target and assaulter
 	ai-meleeboundsgfx       = "ML"	    // draws the arc in which the melee can start 
 	ai-grenadeavoiddbggfx = "FALSE"	    // draw the avoidance gfx for grenade dives/rolls
+	ai-grenadeHelperUsers	= "FALSE"
 	ai-drawchsngrenpath = "MT&ML"       // draw the about to be thrown grenade path 
 	ai-grenpickupgfx    = "ML"
 	ai-motor-trace	    = "FALSE"	    // some traces from within the ai chr motor component for nav dbg
@@ -298,11 +348,13 @@ debugManager debug
 	ai-disablenpcshadows	= "FALSE"   // disable all npc shadows, mainly due to them showing through geom on the e3demo, consider turning back on later
 	ai-chrhistorytrails = "TRUE"	    // draw line trail of character movements
 	ai-vehicles	    = "FALSE"	    // vehicle information (steering etc)
+	ai-vehicles-nav	    = "FALSE"	    // draw lines that vehicles use for navigating navmeshes
 	ai-reportallhistory = "FALSE"	    // report each and every history entry
 	ai-reportdbgprophistory = "FALSE"   // report history entries belonging to the current dbg prop whenever they happen, does nothing if no dbg prop selected
 	ai-phrase-dbg-gfx   = "FALSE"	    // draw debug gfx for the ai's speech phrases (indicating the event, the speaker, etc.)
 	ai-danger-area-gfx  = "FALSE"
-	ai-flyvehiclesplinegfx = "DC"    // draw debug gfx for the splines flying vehicles are following
+	ai-friendlyfiregfx  = "FALSE"	    // draw debug gfx which may prevent firing due to friendly fire checks
+	ai-flyvehiclesplinegfx = "FALSE"    // draw debug gfx for the splines flying vehicles are following
 	ai-flyvehiclechasegfx = "FALSE"	    // draw lines from vehicles to their targets
 	ai-flyvehicleavoidgfx = "DC"	    // draw lines showing the flying vehicle avoidance tests
 	ai-flyingdisplaystate = "FALSE"     // display text above flying vehicles showing which ai state they are in
@@ -326,16 +378,24 @@ debugManager debug
 	ai-names	    = "MT"	    // display npcs name
 	ai-state	    = "FALSE"	    // display details of npcs current state
 	ai-statestack	    = "FALSE"	    // display npcs state stack
-	ai-thoughts	    = "AHM&JT"	    // display npcs thoughts
+	ai-thoughts	    = "AHM"	    // display npcs thoughts
 	ai-whiskerwatch	    = "FALSE"	    // display overhead information about whiskers
-	ai-squaddiestate    = "TRUE"	    // display state relating to current squad actions for the debug prop's squad
+	ai-squaddiestate    = "FALSE"	    // display state relating to current squad actions for the debug prop's squad
 	ai-squaddiestateall = "FALSE"	    // display state relating to current squad actions for all squaddies
 	ai-role		    = "FALSE"	    // display npcs role
 	ai-chrclass	    = "FALSE"	    // display npcs character class
 	ai-rank		    = "FALSE"	    // display npcs rank
-	ai-group	    = "AHM&BN"	    // display group npc belongs to
+	ai-group	    = "BN"	    // display group npc belongs to
 	ai-group-status	    = "BN"	    // display status of npc's group
 	ai-spawn-group	    = "FALSE"	    // display spawn group npc belongs to (story mode only)
+	ai-actions	    = "FALSE"	    // display npc actions
+	ai-melee-substate   = "FALSE"	    // display melee combat substate (for melee characters)
+	ai-objectiveEx	    = "BN"	    // display active AI objective
+	debug-shoot-vis	    = "FALSE"
+	ai-gunstate	    = "FALSE"	    // display gun state
+	ai-renderObjective  = "FALSE"
+	ai-grndveh-shoot-action = "FALSE"   // draws varius debuging lines for ground vehicles shoot action
+					    // for debuging hover vehicle movement action set the ai-dest
 
 	aiplan-watchobs	    = "FALSE"	    // watch all the planning objects in a scene
 	aiplan-watchstate   = "FALSE"	    // watch the planning current state
@@ -353,7 +413,15 @@ debugManager debug
 
 	ai-disableUseBestWeaponToPredictHealthLoss = "FALSE"	// Use best weapon by default.
 	ai-flamerChooseToFireGFX = "FALSE"
-	ai-always-use-jetpack = "FALSE"
+
+	ai-always-use-jetpack	    = "FALSE"
+	ai-trace-jetpack	    = "FALSE"
+	ai-draw-jetpack-path	    = "FALSE"
+
+	//droideka
+	ddeka-mtr-force-roll	    = "FALSE"
+	ddeka-mtr-force-walk	    = "FALSE"
+	ddeka-mtr-draw-axes	    = "FALSE"
 
 	//hit reacts
 	hitreact-interrupt-usefraclimit    = "FALSE" //Use (k_hitreact_interruptfraclimit) the global frac interrupt anim played, disabling uses animTags on a per anim basis
@@ -389,18 +457,47 @@ debugManager debug
 	disableGibs			= "FALSE"
 
 	// Cheats
-	disableCheats			= "FALSE"
-	watchCheats			= "FALSE"
-	traceCheatsOnOff		= "TRUE"	// Useful as HUD messages are hidden while the pause menu is displayed at the moment
+	disableCheats
+	{
+	    enabled	    = "AS"
+	    menuLocation    = "Cheats"
+	}
+	
+	watchCheats
+	{
+	    enabled	    = "FALSE"
+	    menuLocation    = "Cheats"
+	}
+	
+	traceCheatsOnOff
+	{
+	    enabled	    = "TRUE"
+	    menuLocation    = "Cheats"
+	    comment	    = "Useful as HUD messages are hidden while the pause menu is displayed at the moment"
+	}
 
 	player-hit-particles		= "!JH&ML&TLH"   // Don't emit chunks of bloody flesh when the player is shot
 
 	// HUD
-	hudHideAll			= "FALSE"   // Don't do any in-game HUD element list drawing code, no way, no how
-						    // NB: This won't hide debug gfx or any on-screen stuff that's not been implemented using CHudElement
+	hudHideAll
+	{
+	    enabled	    = "FALSE"
+	    menuLocation    = "HUD/Graphics"
+	    comment	    = "Don't do any in-game HUD element list drawing code, no way, no how"
+	}// NB: This won't hide debug gfx or any on-screen stuff that's not been implemented using CHudElement
 
-	hudDrawScreenRegions		= "FALSE"   // Fill in rectangles behind areas defined in mgrsetup/hudmgr.res
-	hudDrawRedBorder		= "FALSE"   // Draw red no-HUD zone
+	hudDrawScreenRegions	
+	{
+	    enabled	    = "FALSE"
+	    menuLocation    = "HUD/Graphics"
+	    comment	    = "Fill in rectangles behind areas defined in mgrsetup/hudmgr.res"
+	}
+	hudDrawRedBorder
+	{
+	    enabled	    = "FALSE"
+	    menuLocation    = "HUD/Graphics"
+	    comment	    = "Draw red no-HUD zone"
+	}
 	hudDrawGrenadeIcons		= "G6"	    // Set to TRUE to draw grenades as icons, FALSE to just print total held
 	hudHideSquadControlStuff	= "FALSE"   // Show it for everyone who's got it enabled (check "disableSquadControl" channel at top)
 	hudHideStickyWallHelp		= "TRUE"
@@ -409,35 +506,46 @@ debugManager debug
 	draw-no-hud-gfx			= "FALSE"   // Don't draw any HUD images (pain, reticule...)
 	draw-no-hud-messages		= "FALSE"   // Hide HUD messages
 	gunGrenadeHud			= "TRUE"    // Show player's remaining grenades on screen
+	hudHideGrenadeWarning
+	{
+	    enabled	    = "FALSE"
+	    menuLocation    = "HUD/Graphics"
+	    comment	    = "Show the 'omfg there's a grenade next to me' warnings"
+	}
 	hudDisableActivatePrompts	= "FALSE"	
 	
 	hudNectarLowWarning_disable = "FALSE"      // Set to TRUE to display "nectar low" warning hud element
 	hudNectarLowWarning_icon        = "FALSE"    // TRUE to use icon, FALSE to use text
 	hudNectarLowWarning_doGlitches  = "FALSE"
 
+	hudDisplayHumanReadableStateWhileLoading    =	"FALSE"
+
 	disablePlayerHitFilters		= "MT&TLH"	    // Don't do full-screen filter stuff (currently a blur) when player is injured
-	hideBuildDate			= "TF&TLH"  // Hide the build date (don't just set this to true, it's needed for milestone builds!)
+	hideBuildDate			= "TF&TLH"  // Hide the build date (don't just set this to TRUE, it's needed for milestone builds!)
 	numberKeysDoFilterTests		= "AB"
 
 	assertOnKeysNotReadDuringSerialise  = "FALSE"		// see "source/framework/dictionary/CSerialiseStore.cpp"
 	assertifobnotpreloaded		    = "G5"		// asserts if an ob isn't preloaded when the render component serialises in - I THINK GAME 5 NOW ACTS PROPERLY, SO EVERYONE RUNNING G5 CAN HAVE THESE ASSERTS!
-	runExportStringsWhenStringNotFound  = "TRUE"
+	runExportStringsWhenStringNotFound  = "!AS"
 
-	// vm
+	// VM related channels
 	vmshowstats			= "MT&CP&TF"// show the running vms on the console screen (make the window less than half screen to see them)
 	vmconsolehashud			= "FALSE"   // show the player hud when the vm console is on screen
-	vmwatchticking			= "CP&TF"	    // Print out the vms when they tick
+	vmwatchticking			= "CP&TF"   // Print out the vms when they tick
 	vmTraceSerialise		= "JB&CP"   // Print information about script serialisation
 	vmPrintFunctionNames		= "CP"	    // Print the called function names from the call function opcode
-	vmCompUsers			= "CP&TF"   // Information about script compilation
 	vmwatchnumscripts		= "CP"	    // Display information about the number of active scripts
 	vmOpcodeTrace			= "CP"	    // Print information about the various opcodes when the script is executed
-	vmCompilerLineInfo		= "CP"	    // Include line number info in the compiled script object file
 	vmTraceLoadedScripts		= "MT&CP"   // Used by vmDumpLoadedScripts
 	vmTraceLoadProcess		= "CP"	    // Details about the load process of VM scripts
-	vmDebugDumpCompiles		= "CP"
+	vmDebugPrintToCmdLine		= "FALSE"   // vmPrintf also prints to cmdline window (default is only the output window)
+	vmCmdLineMisc			= "FALSE"   // Misc vm command line printfs
+	vmShowVMComponentNum		= "CP"	    // Show the number of active vm components as a watch
+	vmScriptExecution		= "CP"	    // Information regarding execution of scripts
 
 	// Gun stuff
+	watchHands	    = "FALSE"
+	
 	gunAnimAsserts	    = "FALSE"	    // Assert when minor things go wrong with the gun anims
 	disableGunAutoReload= "FALSE"	    // Automatically reload guns when empty (now PLAYER ONLY)
 	gunStartEmpty	    = "FALSE"	    // When switch to a gun, put no bullets into it (ie. use empty raise anims)
@@ -451,7 +559,12 @@ debugManager debug
 	disableGunAllowForceState  = "FALSE"
 	gunSwipeTestArcs    = "ML"
 	gunEditAttach	    = "FALSE"	    // edit 3rd person gun attachment pos/rot using f_constants.res
-	gunGetUbiksAngles   = "FALSE"	    // set this to work out and display ubiks angles stuff... kind of breaks playability!
+	gunGetUbiksAngles
+	{
+	    enabled	    = "FALSE"
+	    menuLocation    = "Ubiks"
+	    comment	    = "set this to work out and display ubiks angles stuff... kind of breaks playability!"
+	}
 	gunThrowGrenadesMax = "FALSE"	    // Throw grenades with full strength, no matter how far away aim pos is
 	gunInfiniteGrenades = "FALSE"	    // General Override: Everyone has infinite
 					    // - InventoryEntry specific overrides exist
@@ -460,10 +573,12 @@ debugManager debug
 	gunDrawGrenadeDir   = "DL"	    // Draw big chunky arrows showing where grenades were thrown
 	debugMeleeLineTest  = "FALSE"
 	traceMeleeDamage    = "FALSE"
+	damageDisplay	    = "FALSE"	    //Draw world space text relating to the amount and type of damage attained by a prop
 	meleeScreenFlash    = "FALSE"
 
 	disableGunNoParticlesWhenIronSight = "FALSE"
-	gunWatchStates		    = "FALSE"
+	gunWatchStates		    = "CA"
+	watchFusionCutter	    = "CA"
 	gunTraceStates		    = "FALSE"	// tracegunstates
 	gunTraceStates_all	    = "FALSE"	// by default, only trace the players' gun states - set this to trace the state of ALL guns
 	gunDebugZoomMode	    = "FALSE"	    // Currently just draws points at target pos and cam pos 
@@ -471,7 +586,7 @@ debugManager debug
 	bulletDrawChrOBBHits	    = "FALSE"
 	gunFlamethrowerDbgGfx	    = "FALSE"
 	gunListAll		    = "FALSE"
-	gunStoreTwoWeapons	    = "TRUE"	// True = Two weapons are created and stored, False = One gun stored with creation and deletion when guns switched
+	gunStoreTwoWeapons	    = "TRUE"	// TRUE = Two weapons are created and stored, FALSE = One gun stored with creation and deletion when guns switched
 
 	// Projectiles (grenades, rockets, molotovs...)
 	projectileNoExplode	    = "FALSE"	    // Projectiles don't explode
@@ -480,6 +595,8 @@ debugManager debug
 	projectileLineTestDebug	    = "FALSE"
 	
 	mortarDbgGfx		    = "FALSE"	    // Show lines to the ground, hit pos, hit normal...
+
+	door-automatic-info	    = "BJ"
 	
 	// First person settings
 	firstPersonAlways	= "FALSE"       // always render first person arms/gun, even if not in first person camera
@@ -494,8 +611,8 @@ debugManager debug
 	disableFirstPersonHideShadow	= "FALSE"     // Hide 3rd person version's shadow
 
 	// Carrying stuff
-	carryMultipleGrenadeTypes   = "FALSE"	    // Works for G5 player only (currently always true for G6)
-	carryMoreThanTwoGunTypes    = "FALSE"	    // Workd for G5 player only (currently always true for G6)
+	carryMultipleGrenadeTypes   = "FALSE"	    // Works for G5 player only (currently always TRUE for G6)
+	carryMoreThanTwoGunTypes    = "FALSE"	    // Workd for G5 player only (currently always TRUE for G6)
 	
 	// Chr movement and animation
 	animDisableUbiks	    = "FALSE"	    // stops ubiks being overlaid
@@ -523,12 +640,23 @@ debugManager debug
 	trace-setanims		    = "FALSE"
 	trace-setanims-dbgprop	    = "MT"
 
-        vehicleDismountRender       = "FALSE"        //Renders dismount spheres and if they are colliding
+        vehicleDismountRender		= "FALSE"   // Renders the player dismount positions and if they are colliding
+        vehicleBailDismountRender	= "FALSE"   // Renders the player bailout positions and if they are colliding
+        vehiclePassengerDismountRender	= "FALSE"   // Renders the passenger dismount positions for all active passengers and if they are colliding
 
 	// Explosions
 	explosionHitAssertReport	    = "FALSE"
 	explosionAssertIfCausedByNullProp   = "FALSE"
 	explosionTraceCreation		    = "FALSE"
+	explosionTraceDamageDealt	    = "FALSE"
+
+	explosionDrawDamageRadius	    = "FALSE"	    // Show the size of the damage radius of an explosion (only works if ENABLE_STICKY_DRAW and dbgstickydraw-enabled is true)
+	explosionDrawRadius		    = "FALSE"	    // Show the size of the max force radius of an explosion (only works if ENABLE_STICKY_DRAW and dbgstickydraw-enabled is true)
+	explosionDbgGfxCollisionTests	    = "FALSE"	    // Draw lines showing the status of the collision tests that occurred.
+
+	drawExplosionNearestPointOnProp	    = "FALSE"	    // Point explosion hit a prop
+	explosions_expandReallySlowly	    = "FALSE"
+	explosions_addNoForceToHitProps	    = "FALSE"	    // Don't do the physics force push on explosion.
 
 	// Audio magic!
 	drawCollisionSounds	    = "FALSE"
@@ -544,17 +672,72 @@ debugManager debug
 	playerDisableCollectPickups = "FALSE"
 	playerSpecialAnimSlow	    = "FALSE"
 
-	statsShowScoreTable	    = "MF"	    // WE DON'T ALL WANT THIS ON OUR SCREENS, THANKS MARK!
+	statsShowScoreTable	    = "FALSE"
 	
+	// Awareness Arrows
+	aa-reach-radius
+	{
+	    enabled	    = "WB"
+	    menuLocation    = "Awareness Arrows"
+	    comment	    = "Draw a cylinder around object of interest with radius of the reach distance (below which player/arrow) is considered have reached object"
+	}
+	aa-path
+	{
+	    enabled	    = "FALSE"
+	    menuLocation    = "Awareness Arrows"
+	    comment	    = "Draw the path using debug lines"
+	}
+	aa-arrows
+	{
+	    enabled	    = "FALSE"
+	    menuLocation    = "Awareness Arrows"
+	    comment	    = "Draw cylinders where arrows are placed along the path"
+	}
+	aa-use-test-scenario
+	{
+	    enabled	    = "FALSE"
+	    menuLocation    = "Awareness Arrows"
+	    comment	    = "Always return the test scenario which cycles on all arrows (rather than the one that applies to the player)"
+	}
+
 	// Settings which affect ALL watches
-	watches		    = "TRUE" 		// any watches on screen?
-	watchSmall	    = "PH&MA&TF&MT&MD&TLH&DC&AHM&FB&CC&MC"	// smaller watches
-	watchReallySmall    = "FALSE"		// really small watches
+	watches
+	{
+	    enabled	    = "RS&DR&TF&AM&CA&HA&PK&RK&RN&LB&JT&AK&MF&AHM&JR&CP&MK&WB"
+	    menuLocation    = "Watches"
+	    comment	    = "any watches on screen?"
+	}
+	watchSmall
+	{
+	    enabled	    = "RS&PH&MA&TF&MT&MD&TLH&DC&AHM&FB&CC&MC&MF&DR&RN&CP&MK"
+	    menuLocation    = "Watches"
+	    comment	    = "smaller watches"
+	}
+	watchReallySmall
+	{
+	    enabled	    = "FALSE"
+	    menuLocation    = "Watches"
+	    comment	    = "really small watches"
+	}
 
 	// Optional watches
-	watchesWhileLoading = "TRUE"
-	watchChrPhysMove    = "FALSE"	    // watch chr physics movement stuff
-	watchChrPhysContact = "FALSE"	    // watch chr physics movement contacts
+	watchesWhileLoading
+	{
+	    enabled	    = "!RN"
+	    menuLocation    = "Watches"
+	}
+	watchChrPhysMove
+	{
+	    enabled	    = "FALSE"
+	    menuLocation    = "Watches"
+	    comment	    = "watch chr physics movement stuff"
+	}
+	watchChrPhysContact
+	{
+	    enabled	    = "FALSE"
+	    menuLocation    = "Watches"
+	    comment	    = "watch chr physics movement contacts"
+	}
 	watchChrRecoil	    = "FALSE"	    // Watch player's current recoil values (angle, limit, recovery rate)
 	watchChrFloorMaterial="FALSE"
 	watchhealthstats    = "FALSE"	    // display health stats stuff (including damage array) using watches
@@ -565,7 +748,12 @@ debugManager debug
 	watchPhysIgnoreList = "FALSE"	    // watch physics contact ignore lists (eg. player and own grenades/bullets/rockets/cartridges, driver and car, chr and fixed gun being used...)
 	watchOverlayBlends  = "FALSE"	    // set this to print out loads of stuff about overlay blending
 	watchAnimPosDelta   = "FALSE"	    // set this to watch how far each animation is meant to be moving its chrs
-	watchAnimUbiksBlend = "FALSE"	    // set this to watch ubiks blending numbers and fun and games and data and stuff
+	watchAnimUbiksBlend
+	{
+	    enabled	    = "FALSE"
+	    menuLocation    = "Ubiks"
+	    comment	    = "set this to watch ubiks blending numbers and fun and games and data and stuff"
+	}
 	watchAnimPropPropPos = "FALSE"
 	watchAnimPropAnimPos = "FALSE"
 	watchAnimSnapPos    = "FALSE"	    //Set this to view the anims position when copying the pos
@@ -574,11 +762,28 @@ debugManager debug
 	watchInputTweakers  = "FALSE"	    // Watch players' input tweaking components
 	watchChrTraversalAnimState  = "FALSE"
 	watchAIScriptedSplineProgress = "FALSE" // Watch the current segment of vehicles flying along scripted splines
+	watchObjectiveIndicators = "FALSE"
 
 	watchInputMapper	  = "FALSE" // New player input mapping traces/watches
-	watchInputMapper_inputs   = "FALSE" // Display physical pad inputs
-	watchInputMapper_states   = "FALSE" // Display game states known about by input mapper
-	watchInputMapper_rules    = "FALSE" // Display rule outputs
+	watchInputMapper_inputs
+	{
+	    enabled	= "FALSE" 
+	    menuLocation = "Inputs"
+	    comment	= "Display physical pad inputs"
+	}
+	watchInputMapper_states
+	{
+	    enabled	= "FALSE"
+	    menuLocation = "Inputs"
+	    comment	= "Display game states known about by input mapper"
+	}
+	watchInputMapper_rules
+	{
+	    enabled	= "FALSE"
+	    menuLocation = "Inputs"
+	    comment	= "Display rule outputs"
+	}
+	watchCheats		  = "FALSE"
     	watchScriptedResponseMgr  = "FALSE"
 	traceInputMapperSetup	  = "FALSE"
 
@@ -587,15 +792,22 @@ debugManager debug
 	watchSkelBonesDrawn = "FALSE"	    // Watch the names of the bones drawn by the skeleton debug gfx (obviously only does something if skel debugging is on for some prop(s))
 	watchFootsteps	    = "FALSE"
 	watchNav	    = "FALSE"
-	watchNumCorpses	    =   "FALSE"
+	watchNumCorpses	    = "FALSE"
+	watchCorpseMgrList  = "FALSE"
 	hoverWatches	    = "FALSE"	    // Hover vehicle watches
 	spaceshipWatches    = "FALSE"	    // Space ship watches
 	walkingVehicleDebugGFX	= "FALSE"   // Walking vehicle debug graphics. Lots of them.
 	watchTeamInfo	    = "BJ"
 
+	watchReasonsForBeingPaused  = "FALSE"
 	watchLoadedProfiles	    = "FALSE"
 	watchProfileLoadSaveLog	    = "FALSE"
-	
+	tracePlayerProfileLoadSave  = "FALSE"
+	traceProfileCheckpoints	    = "CP"
+
+	editortick-all		    = "FALSE" //Allows ALL props in scene to do EditorTick() every Editor Tick in CEditorScene.cpp
+	editor-splinefly	    = "FALSE" //Splines do a flying example
+
 	// Optional traces
 	playerSquadOrderTraces	    = "MT"	    // traces relating to squad order system (player side)
 	traceSpeech		    = "FALSE"	    // A few speech related watches
@@ -606,12 +818,15 @@ debugManager debug
 	traceGunInfoMgr		    = "FALSE"
 	traceGunCreateDestroy	    = "FALSE"
 	traceGunStateLoad	    = "FALSE"
-	traceGunUbiksLoad	    = "FALSE"
+	traceGunUbiksLoad
+	{
+	    enabled		    = "FALSE"
+	    menuLocation	    = "Ubiks"
+	}
 	traceGunAnimScript	    = "FALSE"
 	traceChrDescriptionMgr	    = "FALSE"
 	traceHudElementDeleteCallbacks = "FALSE"
 	traceHudMgr		    = "FALSE"
-	traceGunInfoMgr		    = "FALSE"
 	traceSquaddieHudElements    = "MT"
 	traceCameraAnims	    = "FALSE"	    // Traces relating to animations being applied to player's eye position/rotation
 	printSoundWarnings	    = "FALSE"
@@ -629,11 +844,24 @@ debugManager debug
 	traceChrWeaponSwitch	    = "MT"
 	traceCreatePropWithNoBgSet  = "MC"
 	printShaderGfxWarnings	    = "RB&AW"
+	traceCheatsOnOff	    = "FALSE"	// Useful as HUD messages are hidden while the pause menu is displayed at the moment
 	traceNoSpawnNPCs	    = "MT"	// Mark T. added the printf so I assume he wants to see it...
 	traceSetBgRoomGroup	    = "MC"
-	traceSetupFiles		    = "MC&TF&CP"    // trace info relating to setup file instancing etc
-	printIgnoredAsserts	    = "!TF"
+	traceSetupFiles		    = "MC&TF&CP&LB"	// trace info relating to setup file instancing etc
+	traceSetupFileProps	    = "LB&CP"		// show detailed info about prop creation - spammy
+	watchSetupFiles		    = "LB&AM&CP"
+	watchPropSending	    = "LB"
+	printIgnoredAsserts	    = "!TF&CP&AS"
 	tracePlayerSpawnerOnOff	    = "DS&BJ&DWC"
+	
+	// Output window redirection
+	outputWindowToFile	    = "CP"
+	outputWindowFilename	    = "outputWindow.txt"
+	maxOutputBufferSize	    = 1048576
+
+	// Objectives
+	traceObjectiveInfo	    = "CP"
+	watchObjectives		    = "FALSE"
 	
 	// Just drawing things... doesn't affect actual operation
 	autoaimPrint	    = "FALSE"	    // print auto-aim stuff to screen
@@ -642,16 +870,31 @@ debugManager debug
 	anim-pivot	    = "FALSE"	    // draw animation pivot bone orientations
 	materialHit	    = "FALSE"	    // display the material of object being shot
 	showChrAnims	    = "FALSE"	    // display anims that chrs are playing
-	showChrAnims_ubiks  = "FALSE"	    // display ubiks anims that chrs are playing also
+	showChrAnims_ubiks
+	{
+	    enabled	    = "FALSE"
+	    menuLocation    = "Ubiks"
+	    comment	    = "display ubiks anims that chrs are playing also"
+	}
 	drawFloorLineTests  = "FB"	    // Draw chr movement line tests to find floor height
-	drawFindClosestProp = "FALSE"	    // Finding something to activate (Vehicle Entrance/Exit Points)
+	drawFindClosestProp
+	{
+	    enabled = "FALSE"	    
+	    menuLocation = "Debug graphics"
+	    comment = "Draw spheres representing all activation points (buttons, vehicles etc.)"
+	}
 	drawPassengerSpaces = "FALSE" //TF&DL"	    // Draw lines representing passenger attach positions and look limits
 	drawPlayerEyePos    = "FALSE"	    // Draw sphere at player's eye-pos
 	drawLadders	    = "FALSE"	    
 	enemyFlashOnVisible = "FALSE"
 	drawFloorNormals    = "FALSE"
 
-	DEBUGDRAW_ENABLED   = "!ART"	    // In case people commit debugdraw stuff enabled... NB: this won't hide people's debug gfx drawn with dl or idraw!
+	DEBUGDRAW_ENABLED
+	{
+	    enabled = "!ART"		    // In case people commit debugdraw stuff enabled... NB: this won't hide people's debug gfx drawn with dl or idraw!
+	    menuLocation = "Debug graphics"
+	    comment = "Art PC master control on debug graphics"
+	}
 	
 	// Injury, pain and death
 	nodamage_default	    = "ML"		    // don't damage props
@@ -678,10 +921,18 @@ debugManager debug
 	ragdollDeathTransition		= "FALSE" 
 	ragdollDeathDebugTransition     = "FALSE"
 	//ragdollDrawAxes   = "SF"	    // Draws the axes for the bones (red: x, green: y, blue: z)
+	
+	// New ragdoll debugging
+	ragdollLeaveInSetupPose	= "FALSE"
+	ragdollFreezeBonesInSetupPose = "FALSE"
+	ragdollFreezeRootBoneInSetupPose = "FALSE"
+	
+	walker-numberedRBs		= "FALSE"
+	walker-namedRBs			= "FALSE"
 	//
 	test-normaimpoint   = "FALSE"
 
-	dontShowFRDSplashScreen		= "JT&DC&AHM"
+	dontShowFRDSplashScreen		= "JT&DC&AHM&WB"
 
 	animMgrListAnimIndexAndHndlsOnAdding = "FALSE"
 
@@ -702,7 +953,13 @@ debugManager debug
 	draw-phys-linetest = "FALSE"
 
 	turretPlayerUsesLead = "TRUE"
-}
+
+	printtexstats = "PK"
+	status-show-stats = "AHM&MK"
+	status-disable-fps-warnings = "WB"
+
+	disable-prematch = "FALSE"
+    }
 
     inputs
     {
@@ -720,8 +977,8 @@ debugManager debug
 	dump_mem_profile    = "F11"	    // dumps a mem profile to the file memdebuglog.txt, use memSort for analysis
 //	dump_all_chrhistory = "h"	   //dumps the chr history to console for all the chrs
 	npc-break = "0"
-	toggle-offscreen-movement-and-physics = "m"
-	toggle-force-chr-lod = "F5"
+	toggle-force-chr-lod = "F7"
+	throw-grenade = "g"
     }
 
     settings
@@ -807,11 +1064,51 @@ debugManager debug
 	
 	playerStatsToWatch = 0
 
-	displayStatusBar = "true"
-	justDisplayFrameRate = "true"
-	MilesTestOptimisations = "false"
+	displayStatusBar = "TRUE"
+	justDisplayFrameRate = "TRUE"
+	MilesTestOptimisations = "FALSE"
 
 	navmeshSmallNodeArea = 0.5f
 	navmeshThinNodeDot = 0.997f
+    }
+    
+    menu-constants
+    {
+	//Constants must be declared thus: <constantname> = "min/max/step/menu/submenu/..."
+	//Always include the third '/'. Min/max/step still required for bools but the values are ignored
+	max-menu-items	    = 80
+	
+	k_glowstick_draw_swing	= "0/0/0/Glowstick"
+	k_glowstick_draw_blade	= "0/0/0/Glowstick"
+	k_glowstick_draw_debug	= "0/0/0/Glowstick"
+
+	k_chrScaleTurnAccelerationFromMenuLR = "1/20/1/Movement"
+	k_chrScaleTurnAccelerationFromMenuUD = "1/20/1/Movement"
+	k_chrScaleTurnSpeedFromMenuLR	     = "1/5/0.1/Movement"
+	k_chrScaleTurnSpeedFromMenuUD	     = "1/5/0.1/Movement"
+        k_inputSensitivityScaleX	     = "0/5/0.2/Movement"
+        k_inputSensitivityScaleY	     = "0/5/0.2/Movement"
+
+	/*k_flyVehScaleTurnFromMenuLR = "1/10/0.5/Movement"
+	k_flyVehScaleTurnFromMenuUD = "1/10/0.5/Movement"
+	k_hovVehScaleTurnFromMenuLR = "1/10/0.5/Movement"
+	k_hovVehScaleTurnFromMenuUD = "1/10/0.5/Movement"
+	k_walVehScaleTurnFromMenuLR = "1/10/0.5/Movement"
+	k_walVehScaleTurnFromMenuUD = "1/10/0.5/Movement"
+	k_traVehScaleTurnFromMenuLR = "1/10/0.5/Movement"
+	k_traVehScaleTurnFromMenuUD = "1/10/0.5/Movement"
+	k_remVehScaleTurnAccelFromMenuLR = "1/10/0.5/Movement"
+	k_remVehScaleTurnAccelFromMenuUD = "1/10/0.5/Movement"
+	k_remVehScaleTurnSpeedFromMenuLR = "1/10/0.5/Movement"
+	k_remVehScaleTurnSpeedFromMenuUD = "1/10/0.5/Movement"*/
+
+	k_grenadeWarnProximity	     = "0/30/1/GrenadeWarn"
+	k_grenadeOpaqueProximity     = "0/10/1/GrenadeWarn"
+	k_grenadeCircleCentreX	     = "0/1/0.01/GrenadeWarn"
+	k_grenadeCircleCentreY	     = "0/1/0.01/GrenadeWarn"
+	k_grenadeIconSizeBy2	     = "0/0.2/0.01/GrenadeWarn"
+	k_grenadeArrowDistFromCentre = "0/0.5/0.005/GrenadeWarn"
+	k_grenadeArrowSize	     = "0/0.02/0.03/GrenadeWarn"
+	k_grenadeShowIfThisOld	     = "0/2.5/0.1/GrenadeWarn"
     }
 }

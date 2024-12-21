@@ -8,6 +8,7 @@ template harpoonRope : prop
     class-id = "rope prop"
     ticktype = "k_tickAlways"
     debug = "true"
+    checkPointLoadFromOriginalSetup = "true"
     render
     {
         class-id = "rope render"
@@ -15,7 +16,6 @@ template harpoonRope : prop
         texCoreName = "misctex/snowspeeder_tow_rope"
     }
 }
-
 
 template tickingHarpoonComponent : tickingRocketComponent
 {
@@ -63,6 +63,13 @@ template weaponHarpoonProp : tickingphysicsprop
     detonatorcomponent
     {
     }
+
+    soundmap = "sndmap_grenade"
+	
+    soundeventsystem sndeventsystem
+    {
+        definition = "sndevt_grenade"
+    }
 }
 
 template proj_harpoon : weaponHarpoonProp
@@ -74,6 +81,7 @@ template proj_harpoon : weaponHarpoonProp
 
     physics
     {
+    mayaphysics			= "false"
 	type	    = "k_physicsSphere"
 	material    = "stel"
 	enabled	    = "true"
@@ -83,6 +91,8 @@ template proj_harpoon : weaponHarpoonProp
 	radius	    = 0.1f
 
     }
+
+    checkPointLoadFromOriginalSetup = "true"
 
     soundcomponent soundPlayer
     {
@@ -98,4 +108,3 @@ template proj_harpoon : weaponHarpoonProp
     	stickyDamage = 0.01f
     }
 }
-

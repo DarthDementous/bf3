@@ -2,7 +2,6 @@
 
 template inventoryComponentBF : inventoryComponent
 {
-    entrytemplates="inventoryEntriesBF"
     ownerType = "bfChr"
 }
 
@@ -10,8 +9,39 @@ template inventoryEntryBF : inventoryEntry
 {
     class-id		= "inventory entry bf"
     chrRankUnlockLevel	= "k_chrRank_rookie"
+    chrRankLockLevel	= "k_chrRank_numRanks"
+    aiAlwaysUnlock	= "false"
     allowWhenEmpty      = "false"
-    aiPreference	= 1.0f
+    weaponSubType	= "k_weaponSubType_maxSubTypes"
+}
+
+template inventoryEntryDefault : inventoryEntryBF // default is used if there's no entry for a particular inventory item
+{
+    total=0
+}
+
+template simplePickupPropBF : simplePickupProp
+{
+   class-id		= "simple pickup prop bf"
+ 
+    SimpleActivateBF activate
+    {
+	activatable = "true"
+	    displayStandardPrompt = "false"
+	    myNameStringHandle	    = "STR_ACTIVATENAME_INVENTORY"
+	    pointA
+	    {
+		hudPromptStringHandle   = "STR_ACTIVATEPROMPT_SWAP"
+		    activatedByPlayerInputMapperValue = "activate"
+		    distance    = 2.f
+		    howMuchNeedToLookAtTargetPos = 0.0f
+	    }
+
+    }
+    createEmpty = "false"
+
+    //don't want this, in fact not sure why you would ever want this for a pickup!!
+    editor-only-render = 42
 }
 
 template kitPickupProp : simplePickupProp
@@ -35,7 +65,7 @@ template kitPickupProp : simplePickupProp
 
     pickupComponentWeapon pickupComponent
     {
-	pickupflags = "k_pickupNoNPC|k_pickupNoAuto|k_pickupReplaceInventory"
+	pickupflags = "k_pickupNoNPC|k_pickupNoAuto"
 	    
 	inventoryComponentBF contents
 	{
@@ -55,119 +85,90 @@ template kitPickupProp : simplePickupProp
 	    }
 
     }
+
+    //don't want this, in fact not sure why you would ever want this for a pickup!!
+    editor-only-render = 42
 }
 
-template inventoryEntriesBF
-{
-    inventoryEntryBF default		// default is used if there's no entry for a particular inventory item
-    {
-	total=0
-    }
-}
-
-template pickupComponentWeaponBF : pickupComponentWeapon
-{
-	vanishWhenNobodyLooking vanish
-	{
-		enabled = "true"
-		vanishAfterTime = 10.0f
-	}
-}
-
-template pickupComponentGrenadeBF : pickupComponentGrenade
-{
-	vanishWhenNobodyLooking vanish
-	{
-		enabled = "true"
-		vanishAfterTime = 10.0f
-	}
-}
-
-template inventoryObjectTypeDetPackData
-{
-    class-id = "inventory object type det pack data"
-    
-    susceptibilityScore = "k_grenadeInventorySusceptibilityScore_default"
-
-    autoRecurseTemplateName-field grenadeID
-    {
-    }
-    
-    // Maybe stuff... maybe no stuff... who's to say?
-}
-
-template inventoryObjectTypeDetPack : inventoryObjectTypeBasic
+template inventoryObjectTypeDetPack : inventoryObjectTypeThrowableObject
 {
     wiiMotionTrigger   = "dropSecondary"
-    inventoryObjectTypeDetPackData specialData
+    inventoryObjectTypeGrenadeData specialData
     {
-	hudTextureName	= "rep_detpack"
-	ammoHudTextureName = "grenade_icon"
+	hudTextureName	    = "rep_detpack"
+	hudTextureScale	    = 0.85f
+	ammoHudTextureName  = "grenade_icon"
+	secondaryWeaponType = "detpack"
     }
 }
 
-template inventoryObjectTypeRemoteDetonatorData
-{
-    class-id = "inventory object type remote detonator data"
-    
-    susceptibilityScore = "k_grenadeInventorySusceptibilityScore_default"
-
-    autoRecurseTemplateName-field grenadeID
-    {
-    }
-    
-}
-
+// Used by o_gun_detonator
 template inventoryObjectTypeRemoteDetonator : inventoryObjectTypeBasic
 {
     wiiMotionTrigger   = "clickSecondary"
-    inventoryObjectTypeRemoteDetonatorData specialData
+    inventoryObjectTypeGrenadeData specialData
     {
-	hudTextureName	= "rep_detpack"
-	ammoHudTextureName = "grenade_icon"
+	hudTextureName	    = "rep_detpack"
+	hudTextureScale	    = 0.85f
+	ammoHudTextureName  = "grenade_icon"
+	secondaryWeaponType = "remoteDet"
     }
 }
 
-template inventoryObjectTypeHoverTurretData : inventoryObjectTypeGrenadeData 
-{
-}
-
-template inventoryObjectTypeHoverTurret : inventoryObjectTypeBasic
+template inventoryObjectTypeHoverTurret : inventoryObjectTypeThrowableObject
 {
     wiiMotionTrigger   = "dropSecondary"
-    inventoryObjectTypeHoverTurretData specialData
+    inventoryObjectTypeGrenadeData specialData
     {
-	hudTextureName	= "rep_detpack"		//TODO - Update
-	ammoHudTextureName = "grenade_icon"	//TODO - Update
+	hudTextureName	    = "rep_detpack"	//TODO - Update
+	hudTextureScale	    = 0.85f
+	ammoHudTextureName  = "grenade_icon"	//TODO - Update
+	secondaryWeaponType = "hoverTurret"
     }
 }
 
-template inventoryObjectTypeSpiderMineData : inventoryObjectTypeGrenadeData 
-{
-}
-
-template inventoryObjectTypeSpiderMine : inventoryObjectTypeBasic
+template inventoryObjectTypeSpiderMine : inventoryObjectTypeThrowableObject
 {
     wiiMotionTrigger   = "throwSecondary"
-    inventoryObjectTypeSpiderMineData specialData
+    inventoryObjectTypeGrenadeData specialData
     {
-	hudTextureName	= "rep_detpack"		//TODO - Update
-	ammoHudTextureName = "grenade_icon"	//TODO - Update
+	hudTextureName	    = "rep_detpack"	//TODO - Update
+	hudTextureScale	    = 0.85f
+	ammoHudTextureName  = "grenade_icon"	//TODO - Update
+	secondaryWeaponType = "spiderMine"
     }
-}
-
-
-template inventoryObjectTypeCloakData : inventoryObjectTypeGrenadeData 
-{
-    class-id = "inventory object type cloak data"
 }
 
 template inventoryObjectTypeCloak : inventoryObjectTypeBasic 
 {
-    inventoryObjectTypeCloakData specialData
+    inventoryObjectTypeGrenadeData specialData
     {
-	//hudTextureName	= "rep_detpack"		//TODO - Update
-	//ammoHudTextureName = "grenade_icon"	//TODO - Update
+	//hudTextureName	= "rep_detpack"	    //TODO - Update
+	//ammoHudTextureName	= "grenade_icon"    //TODO - Update
+	secondaryWeaponType	= "cloak"
     }
 }
 
+template inventoryObjectTypeDeployableShield : inventoryObjectTypeThrowableObject
+{
+    wiiMotionTrigger	= "throwSecondary"
+    wiiThrowLock	= "true"
+    
+    inventoryObjectTypeGrenadeData specialData
+    {
+	ammoHudTextureName  = "grenade_icon"
+	secondaryWeaponType = "depShield"
+    } 
+}
+
+template inventoryObjectTypeProxMine : inventoryObjectTypeThrowableObject
+{
+    wiiMotionTrigger	= "throwSecondary"
+    wiiThrowLock	= "true"
+    
+    inventoryObjectTypeGrenadeData specialData
+    {
+	ammoHudTextureName  = "grenade_icon"
+	secondaryWeaponType = "proximityMine"
+    }
+}

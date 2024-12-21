@@ -1,20 +1,13 @@
 // vim: set syntax=c:
 
-template battleDroidAnim : baseanim
-{
-    binduser		=   "dtasker"
-    bindfile		=   "My_bf/export_temp/battledroid/battledroid_model"
-    //bindfile		=   "placeholder/characters/troopers/trooperheads/marinesargehead/sargehead_bindpose"
-    bindextension	=   ".xml"
-}
+#include "data/common/templates/assetlimits.res"
+#include "data/bf/sound/database/resconverttemplates.res"
+
 
 template propanim : baseanim
 {
 }
 
-template propanimstream_res : baseanimstream
-{
-}
 
 template chranim_res : baseanim
 {
@@ -55,18 +48,7 @@ template clone_chranim_res_nostrip : clone_chranim_res
     reduxCompressLevel	=   3	    // set to 0 to turn off redux compression (similar to dontCompress, except still strips same frames (lossless compression), so is in fact better)
 }
 
-template cs_chranim_res_nostrip : clone_chranim_res
-{
-    extraoptions	=   "-pstripfacial false"
-    reduxdefaulterrorthreshold=0.001f	    // comment out to leave at tool default
-    reduxcompresslevel	=   1	    // set to 0 to turn off redux compression (similar to dontcompress, except still strips same frames (lossless compression), so is in fact better)
-}
 
-template cs_chranim : clone_chranim_res
-{
-    reduxdefaulterrorthreshold=0.001f	    // comment out to leave at tool default
-    reduxcompresslevel	=   1	    // set to 0 to turn off redux compression (similar to dontcompress, except still strips same frames (lossless compression), so is in fact better)
-}
 
 template gafanim : baseGafAnim
 {

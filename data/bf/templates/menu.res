@@ -1,9 +1,11 @@
 template ingamemenu
 {
     class-id = "bf ingame menu"    
+}
 
-    singleSound-field pausebeep_soundid
-    {
-	default = "hud_press_start"
-    }
+template cutsceneselect 
+{
+    stringID = "STR_FRONTEND_CUTSCENE"
+    image = "misctex/frontend/levels/tatooine"
+    resfile = ""
 }

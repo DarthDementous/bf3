@@ -3,11 +3,11 @@
 // Inventory object
 // ================
 
+// Used in code by CChrWeaponComponentBF
 template o_gun_detonator : inventoryObjectTypeRemoteDetonator
 {
     details
     {
-	singular		= "remote detonator"
 	plural			= "remote detonators"
 	maxnum			= 1
     }
@@ -15,6 +15,6 @@ template o_gun_detonator : inventoryObjectTypeRemoteDetonator
     specialData
     {
 	grenadeID	= ""
-//	hudTextureName = "rep_minigun_icon"
+	hudTextureName = "rep_detpack_det"
     }
 }

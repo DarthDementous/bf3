@@ -5,86 +5,13 @@
 // ===============================
 
 // 
-template hoth_base : staticprop
-{
-    obinstrenderer render
-    {
-        model = "props/hoth/hothbase"
-    }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "Hoth_base"
-        editorPath         = "bf/props/hoth"
-    }
-}
 
 //New Test Echo Base
-template echo_test : staticprop
-{
-    obinstrenderer render
-    {
-        model = "props/hoth/echobase_test"
-    }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        isMoveable = "true"
-        editorInstanceName = "Echo_Test"
-        editorPath         = "bf/props/hoth"
-    }
-}
 
 //New Test Rock Bluffs
-template rock_bluffs : staticprop
-{
-    obinstrenderer render
-    {
-        model = "props/hoth/rock_bluffs"
-    }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        isMoveable = "true"
-        editorInstanceName = "Rock_Bluffs"
-        editorPath         = "bf/props/hoth"
-    }
-}
 
 //New Test Ice Bunker
-template ice_bunker : staticprop
-{
-    obinstrenderer render
-    {
-        model = "props/hoth/ice_bunker"
-    }
 
-    meta
-    {
-        canCreateInEditor  = 1
-        isMoveable = "true"
-        editorInstanceName = "Ice_Bunker"
-        editorPath         = "bf/props/hoth"
-    }
-}
-
-template hoth_cave : staticprop
-{
-    obinstrenderer render
-    {
-        model = "props/hoth/hothcave"
-    }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "Hoth_cave"
-        editorPath         = "bf/props/hoth"
-    }
-}
 
 template hoth_generator : temp_controls_with_health //bfexplodingstaticprop
 {
@@ -101,25 +28,27 @@ template hoth_generator : temp_controls_with_health //bfexplodingstaticprop
     {
     }
     
-    autoaimtarget
-    {
-        nameKey    = "STR_SPAWNSELECT_HOTH_GENERATOR"
-    } 
-    
     autoAimTargetComponentBF autoaim
     {
         nameKey    = "STR_SPAWNSELECT_HOTH_GENERATOR"
+        flags = "k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"
     }
     
     healthcomponentbf health
     {
 	    fullhealth	= 40.0f
+	    healingratio = 0.0f
     }
 
     vistableseercomp vtseer
     {
     }
     
+    guardable
+    {
+	ai_weighting = 100.0f
+    }
+
     shipReactorShieldPropID = "HothShield1"
 
     destroyShieldWhenDestroyed = "true"
@@ -132,20 +61,6 @@ template hoth_generator : temp_controls_with_health //bfexplodingstaticprop
     }
 }
 
-template hoth_cannon : staticprop
-{
-    obinstrenderer render
-    {
-        model = "props/hoth/props/cannon"
-    }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "H_Cannon"
-        editorPath         = "bf/props/hoth"
-    }
-}
 
 
 template hoth_ebase_dc : staticprop
@@ -159,6 +74,21 @@ template hoth_ebase_dc : staticprop
     {
         canCreateInEditor  = 1
         editorInstanceName = "EbaseDrCl"
+        editorPath         = "bf/props/hoth"
+    }
+}
+
+template tunnel_fall : staticprop
+{
+    obinstrenderer render
+    {
+        model = "props/hoth/collapsed_tunnel"
+    }
+
+    meta
+    {
+        canCreateInEditor  = 1
+        editorInstanceName = "Tun_Fall"
         editorPath         = "bf/props/hoth"
     }
 }
@@ -180,11 +110,18 @@ template hoth_ebase_do : staticprop
 
 template hoth_shield : staticprop
 {
+
+    class-id = "force barricade prop"
+ 
+    shieldflags = "k_blockFriendlyAir|k_blockEnemyAir"
+
     obinstrenderer render
     {
         model = "props/hoth/props/shield"
         worldRoom = "true"
     }
+
+    ticktype	    = "k_tickAlways"
     
     meta
     {
@@ -194,64 +131,8 @@ template hoth_shield : staticprop
     }
 }
 
-template hoth_gun : staticprop
-{
-    obinstrenderer render
-    {
-        model = "props/hoth/trenchgun"
-    }
 
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "H_Tre_Gun"
-        editorPath         = "bf/props/hoth"
-    }
-}
-template hoth_trench_small : staticprop
-{
-    obinstrenderer render
-    {
-        model = "props/hoth/buildings/trench_small"
-    }
 
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "H_Trench_Sm"
-        editorPath         = "bf/props/hoth"
-    }
-}
-
-template hoth_trench_medium : staticprop
-{
-    obinstrenderer render
-    {
-        model = "props/hoth/buildings/trench_medium"
-    }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "H_Trench_Med"
-        editorPath         = "bf/props/hoth"
-    }
-}
-
-template hoth_trench_large : staticprop
-{
-    obinstrenderer render
-    {
-        model = "props/hoth/buildings/trench_large"
-    }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "H_Trench_Lg"
-        editorPath         = "bf/props/hoth"
-    }
-}
 
 // Computers
 template hoth_comp_a : staticprop
@@ -260,14 +141,66 @@ template hoth_comp_a : staticprop
     {
         model = "props/hoth/computer_a"
     }
-
+    
+    autoAimTargetComponentBF autoaim
+    {
+        nameKey    = "STR_HOTH_REBEL_DATABANK"
+    }
+   
+    teamNum = -1
+    
+    healthcomponentbf health
+    {
+	fullhealth	= 1.0f
+    } 
+    
+    groupingcomp grouping
+    {
+	maxgroups = 2
+    }
+    
+    repairpropdesc descript
+    {
+    }
+    
     meta
     {
         canCreateInEditor  = 1
         editorInstanceName = "H_Comp_A"
         editorPath         = "bf/props/hoth"
     }
+
+    soundeventsystem sndeventsystem
+    {
+	definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_console_rebel"
+    } 
+    
 }
+
+
+template databank_a : staticprop
+{
+    obinstrenderer render
+    {
+        model = "props/hoth/computer_a"
+    }
+     
+    teamNum = -1
+    
+    meta
+    {
+        canCreateInEditor  = 1
+        editorInstanceName = "databank_a"
+        editorPath         = "bf/props/hoth"
+    }
+}
+
+
 
 template hoth_comp_b : staticprop
 {
@@ -275,14 +208,65 @@ template hoth_comp_b : staticprop
     {
         model = "props/hoth/computer_b"
     }
-
+    
+    autoAimTargetComponentBF autoaim
+    {
+        nameKey    = "STR_HOTH_REBEL_DATABANK"
+    }
+    
+    teamNum = -1
+    
+    healthcomponentbf health
+    {
+	fullhealth	= 1.0f
+    }
+    
+    repairpropdesc descript
+    {
+    }
+    
+    groupingcomp grouping
+    {
+	maxgroups = 2
+    }
+    
     meta
     {
         canCreateInEditor  = 1
         editorInstanceName = "H_Comp_B"
         editorPath         = "bf/props/hoth"
     }
+    
+    soundeventsystem sndeventsystem
+    {
+	definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_console_rebel"
+    } 
+    
+    
 }
+
+template databank_b : staticprop
+{
+    obinstrenderer render
+    {
+        model = "props/hoth/computer_b"
+    }
+
+    teamNum = -1
+    
+    meta
+    {
+        canCreateInEditor  = 1
+        editorInstanceName = "databank_b"
+        editorPath         = "bf/props/hoth"
+    }
+}
+
 
 // Crates
 template hoth_crate_a : staticprop
@@ -292,6 +276,11 @@ template hoth_crate_a : staticprop
         model = "props/hoth/crate_a"
     }
 
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    
     meta
     {
         canCreateInEditor  = 1
@@ -307,6 +296,11 @@ template hoth_crate_b : staticprop
         model = "props/hoth/crate_b"
     }
 
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    
     meta
     {
         canCreateInEditor  = 1
@@ -322,6 +316,11 @@ template hoth_crate_c : staticprop
         model = "props/hoth/crate_c"
     }
 
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    
     meta
     {
         canCreateInEditor  = 1
@@ -330,41 +329,86 @@ template hoth_crate_c : staticprop
     }
 }
 
-template hoth_crate_d : staticprop
+template big_ice : staticprop
 {
     obinstrenderer render
     {
-        model = "props/hoth/crate_d"
+        model = "props/hoth/props/big_ice_cover"
     }
-
+    
     meta
     {
         canCreateInEditor  = 1
-        editorInstanceName = "H_Crate_D"
+        editorInstanceName = "Big_Ice"
         editorPath         = "bf/props/hoth"
     }
 }
 
+template med_ice : staticprop
+{
+    obinstrenderer render
+    {
+        model = "props/hoth/props/med_ice_cover"
+    }
+    
+    meta
+    {
+        canCreateInEditor  = 1
+        editorInstanceName = "Med_Ice"
+        editorPath         = "bf/props/hoth"
+    }
+}
+
+template hoth_spool_physics : simplephysicsprop
+{
+    obinstrenderer render
+    {
+        model = "props/hoth/props/physics/cable_spool"
+    }
+    
+    odesimplephysics physics
+    {
+    	mayaphysics = "true"
+		//minMassPerPart  = 500.f
+		//maxMassPerPart  = 500.f
+	bodyMass		= 4.0f
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "spool_phys"
+    	editorPath         = "bf/props/hoth/physics"
+    }
+}
+
+template hoth_tool_physics : simplephysicsprop
+{
+    obinstrenderer render
+    {
+        model = "props/hoth/props/physics/toolbox"
+    }
+    
+    odesimplephysics physics
+    {
+    	mayaphysics = "true"
+		//minMassPerPart  = 500.f
+		//maxMassPerPart  = 500.f
+	bodyMass		= 6.0f
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "tool_phys"
+    	editorPath         = "bf/props/hoth/physics"
+    }
+}
 
 ////////////////////////////////
 //    STAR DESTROYER PROPS    //
 ////////////////////////////////
 
-template debris : staticprop
-{
-    obinstrenderer render
-    {
-        model = "capital_ships/imp/imp_stardestroyer_interior/debris"
-    }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        isMoveable = "true"
-        editorInstanceName = "destdebris"
-        editorPath         = "bf/props/hoth"
-    }
-}
 
 template deb_mirr : staticprop
 {
@@ -387,6 +431,7 @@ template doorwaya : staticprop
     obinstrenderer render
     {
         model = "capital_ships/imp/imp_stardestroyer_interior/doorway_a"
+		castReflections = "true"
     }
 
     meta
@@ -398,21 +443,6 @@ template doorwaya : staticprop
     }
 }
 
-template doorwayb : staticprop
-{
-    obinstrenderer render
-    {
-        model = "capital_ships/imp/imp_stardestroyer_interior/doorway_b"
-    }
-
-    meta
-    {
-        canCreateInEditor  = 1
-        isMoveable = "true"
-        editorInstanceName = "destdoorwayb"
-        editorPath         = "bf/props/hoth"
-    }
-}
 
 template blast_frm : staticprop
 {
@@ -453,6 +483,24 @@ template reactor : staticprop
         model = "capital_ships/imp/imp_stardestroyer_interior/reactor"
     }
 
+    teamNum = 1
+    
+    dmghealthcomponentbf health
+    {
+        fullhealth = 7.500000
+        ignoreDamageTypes = "k_DamageType_Bullet"
+    }
+    
+    soundeventsystem sndeventsystem
+    {
+	definition = "props"
+    }
+    
+    autoAimTargetComponentBF autoaim
+    {
+        nameKey = "STR_STORY_STARDESTROYER_INTAKE"
+        flags = "k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"
+    }
     meta
     {
         canCreateInEditor  = 1
@@ -478,75 +526,90 @@ template contshield : staticprop
     }
 }
 
-template cellshield : staticprop
+
+
+template cell_red : staticprop
 {
     obinstrenderer render
     {
-        model = "capital_ships/imp/imp_stardestroyer_interior/call_laser"
+        model = "capital_ships/imp/imp_stardestroyer_int/props/cell_door_red"
     }
 
     meta
     {
         canCreateInEditor  = 1
         isMoveable = "true"
-        editorInstanceName = "cellshld"
+        editorInstanceName = "cell_rd"
         editorPath         = "bf/props/hoth"
     }
 }
 
-template bridgegrate : staticprop
+// Cover
+
+template hoth_crate_cover : staticprop
 {
     obinstrenderer render
     {
-        model = "capital_ships/imp/imp_stardestroyer_interior/bridgegrate"
+	    model = "backgrounds/hoth/props/hoth_crate_cover"
+    }
+    
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
     }
 
     meta
     {
-        canCreateInEditor  = 1
-        isMoveable = "true"
-        editorInstanceName = "destgrate"
-        editorPath         = "bf/props/hoth"
+    	canCreateInEditor  = 1
+	    editorInstanceName = "crate_cover"
+    	editorPath         = "bf/props/hoth/cover"
     }
 }
 
-/////////////////////////////
-//    THETA BARGE PROPS    //
-/////////////////////////////
-
-template theta_barge_default : theta_barge
+template hoth_crate_crouch : staticprop
 {
-    groupProp = "ATATGroup"
+    obinstrenderer render
+    {
+	    model = "backgrounds/hoth/props/hoth_crate_crouch"
+    }
+    
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    meta
+    {
+    	canCreateInEditor  = 1
+	    editorInstanceName = "crate_crouch"
+    	editorPath         = "bf/props/hoth/cover"
+    }
 }
 
-template theta_barge1 : theta_barge_default
-{    
-    // These will be level specific
-    landingPad = "Barge1Land"
-    entrySpline = "Barge1Entry"   
-    exitSpline = "Barge1Exit"
-}
-
-template theta_barge2 : theta_barge_default
+template hoth_crate_stand : staticprop
 {
-    // These will be level specific
-    landingPad = "Barge2Land"
-    entrySpline = "Barge2Entry"   
-    exitSpline = "Barge2Exit"
+    obinstrenderer render
+    {
+	    model = "backgrounds/hoth/props/hoth_crate_stand"
+    }
+
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }
+    
+    meta
+    {
+    	canCreateInEditor  = 1
+	    editorInstanceName = "crate_stand"
+    	editorPath         = "bf/props/hoth/cover"
+    }
 }
 
-template theta_barge3 : theta_barge_default
+template hoth_cloud_layer : staticprop
 {
-    // These will be level specific
-    landingPad = "Barge3Land"
-    entrySpline = "Barge3Entry"   
-    exitSpline = "Barge3Exit"
+    render
+    {
+	model	    =	"backgrounds/hoth/props/hoth_cloud_layer"
+    }
 }
 
-template theta_barge4 : theta_barge_default
-{ 
-    // These will be level specific
-    landingPad = "Barge4Land"
-    entrySpline = "Barge4Entry"   
-    exitSpline = "Barge4Exit"
-}

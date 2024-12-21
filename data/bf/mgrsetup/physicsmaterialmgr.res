@@ -18,27 +18,7 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // Default average settings
 	    density = 1.0f
 	    soundOcclusion = 0.f
-	  /*  bulletsound = "small_laser_impact_stone"
-	    playerbulletsound = "small_laser_impact_stone"
-	    footstepsound = "mvt_soldier_metal_walk"
-	    fallontosound = "mvt_soldier_metal_land"
-	    fallontohighsound = "mvt_soldier_metal_land"
-	    footsteprunsound = "mvt_soldier_metal_run"
-	    footstepcrawlsound = "mvt_soldier_metal_crawl"
-	    footstepstopsound = "mvt_soldier_metal_stop"
-	    getupsound = "mvt_soldier_metal_getup"
-	    jumpsound = "mvt_soldier_metal_jump"
-	    pronesound = "mvt_soldier_metal_lie"
-	    rollsound = "mvt_soldier_metal_roll"
-	    stumblesound = "mvt_soldier_metal_stumble"*/
 
-	    //not loaded as a soundmap (because of the order things are loaded) but created as one
-	    //so the sounds can be edited in the soundmap editor - it actually just reads the fields
-	    //in and loads sounds as before
-	    k_MatStep_Standard	= "sndmap_pmdfltS"
-	    k_MatStep_Metal	= "sndmap_pmdfltM"
-	    k_MatStep_Light	= "sndmap_pmdfltL" 
-	    
 	    particleEffectVehicleFoot = "con_snw_wlker"
 
 	    //bulletdecal
@@ -48,15 +28,13 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 		materials = "2ddecals/wood_01"	
 	    }
 
+	    wakeAmount = 1.0f	//Size of wake on this material (ShipProps)
 	}
 
 	bfpmatinfo flyspac
 	{
 	    density = 1.0f
 	    soundOcclusion = 0.f
-//	    bulletsound = "bh_flsh"
-//	    playerbulletsound = "bh_flsh_pla"
-//	    footstepsound = "fs_all"
 
 	    // decal wood temp
 	    k_decal_bullet //bulletdecal
@@ -73,12 +51,7 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 
 	    density = 1.0f	// apparently humans have a density of about 1 cos they're 90% water
 	    soundOcclusion = 0.f
-//	    bulletsound = "bh_flsh"
-//	    playerbulletsound = "bh_flsh_pla"
-//	    footstepsound = "fs_all"
-	    particleEffectBulletReflect	= "bulletChar"
-	    particleEffectGrenade	= "grenadeChar"
-	    particleEffectRocket	= "rocketChar"
+	    particleEffectBulletReflect	= "bulletChar" 
 	    maxSpeedMultiplier	=   0.8f
 
 	}
@@ -88,13 +61,9 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // general flesh
 	    pmatgroup_type = "k_pmatgroup_type_flesh"
 	    density = 0.9f
+	    
 	    soundOcclusion = 0.f
-//	    bulletsound = "bh_flsh"
-//	    playerbulletsound = "bh_flsh_pla"
-//	    footstepsound = "fs_all"
 	    particleEffectBulletReflect	= "bulletFlsh"
-	    particleEffectGrenade	= "grenadeFlsh"
-	    particleEffectRocket	= "rocketFlsh"
 	    maxSpeedMultiplier	=   0.8f
 
 	    k_decal_bullet //bulletdecal 
@@ -106,23 +75,30 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // Concrete
 	    density = 2.403f
 	    soundOcclusion = 1.f
-	    bulletsound = "small_laser_impact_stone"
-	    playerbulletsound = "small_laser_impact_stone"
-	    footstepsound = "footstep_stone_concrete_hard"
-	    fallontosound = "footstep_jumpland_stone_concrete_hard"
-	    ricochetsound = "small_laser_impact_stone"
-	    playerricochetsound = "small_laser_impact_stone"
-//	    brassshellsound = "bulletdrop_normal_concrete"
-//	    cartridgesound = "w_fra_be"
+
+
+	    k_MatSnd_BulletHit = "bi_stone"
+	    k_MatSnd_BulletHitPlayer = "plyr_bi_stone"
+	    k_MatSnd_FootStep = "fs_stone"
+	    k_MatSnd_FallOnto = "fallonto_stone"
+	    k_MatSnd_FallOntoHigh = "fallontohigh_stone"
+	    k_MatSnd_FootStepRun = "fs_run_stone"
+	    k_MatSnd_Crawl = "fs_crawl_stone"
+	    k_MatSnd_FootStepStop = "fs_stop_stone"
+	    k_MatSnd_Getup = "getup_stone"
+	    k_MatSnd_Jump = "jump_stone"
+	    k_MatSnd_Prone = "lie_stone"
+	    k_MatSnd_Roll = "roll_stone"
+	    k_MatSnd_Stumble = "stumble_stone"
+	    k_MatSnd_Scrape = "scrape_stone"
+	    k_MatSnd_Collision = "collision_stone"
+
+
 	    particleEffectBulletReflect	= "bulletConc"
-	    particleEffectGrenade	= "grenadeConc"
-	    particleEffectRocket	= "rocketConc"
 	    particleEffectVehicle   = "vehicleConc"
 
-	    k_MatStep_Standard	= "sndmap_pmstoneS"
-	    k_MatStep_Metal	= "sndmap_pmstoneM"
-	    k_MatStep_Light	= "sndmap_pmstoneL"
-
+	    particleEffectBulletDebris	= "dbr_conc"
+	    
 	    k_decal_bullet 
 	    {
 		materials = "parallaxdecals/decalConc"
@@ -142,23 +118,28 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // Grass
 	    density = 1.906f
 	    soundOcclusion = 0.f
-//	    bulletsound = "bh_conc"
-//	    playerbulletsound = "bh_conc_pla"
-//	    footstepsound = "fs_gras"
-//	    throughsound = "foilage_brush"
-//	    brassshellsound = "bulletdrop_normal_grass"
-//	    grenadesound = "grenade_hit_grass"
+
+
+	    k_MatSnd_BulletHit = "bi_grass"
+	    k_MatSnd_BulletHitPlayer = "plyr_bi_grass"
+	    k_MatSnd_FootStep = "fs_deft"
+	    k_MatSnd_FallOnto = "fallonto_grass"
+	    k_MatSnd_FallOntoHigh = "fallontohigh_grass"
+	    k_MatSnd_FootStepRun = "fs_run_grass"
+	    k_MatSnd_Crawl = "fs_crawl_grass"
+	    k_MatSnd_FootStepStop = "fs_stop_grass"
+	    k_MatSnd_Getup = "getup_grass"
+	    k_MatSnd_Jump = "jump_grass"
+	    k_MatSnd_Prone = "lie_grass"
+	    k_MatSnd_Roll = "roll_grass"
+	    k_MatSnd_Stumble = "stumble_grass"
+	    k_MatSnd_Scrape = "scrape_grass"
+	    k_MatSnd_Collision = "collision_grass"
+
+	    particleEffectBulletDebris	= "dbr_grass"
+
 	    particleEffectBulletReflect	= "bulletGras"
-	    particleEffectGrenade	= "grenadeGras"
-	    particleEffectRocket	= "rocketGras"
 	    particleEffectVehicle   = "vehicleGras"
-	    particleEffectTire	= "tireGras"
-	    particleEffectWheelSpin = "wheelSpinGras"
-
-	    k_MatStep_Standard	= "sndmap_pmgrassS"
-	    k_MatStep_Metal	= "sndmap_pmgrassM"
-	    k_MatStep_Light	= "sndmap_pmgrassL"
-
 	}
 
 	bfpmatinfo dirt
@@ -166,25 +147,30 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // Dirt
 	    density = 1.906f
 	    soundOcclusion = 0.25f
-	    bulletsound = "small_laser_impact_earth_sand_snow"
-	    playerbulletsound = "small_laser_impact_earth_sand_snow"
-//	    footstepsound = "fs_dirt"
-	    ricochetsound = "small_laser_impact_earth_sand_snow"
-	    playerricochetsound = "small_laser_impact_earth_sand_snow"
-//	    brassshellsound = "bulletdrop_normal_dirt"
-//	    grenadesound = "grenade_hit_sand"
-	    particleEffectBulletReflect	= "bulletDirt"
-	    particleEffectGrenade	= "grenadeDirt"
-	    particleEffectRocket	= "rocketDirt"
-	    particleEffectVehicle   = "vehicleDirt"
-	    particleEffectTire	= "tireDirt"
-	    particleEffectWheelSpin = "wheelSpinDirt"	
-	    particleEffectMortar = "expMortar"
-	    maxSpeedMultiplier	=   0.9f	
 
-	    k_MatStep_Standard	= "sndmap_pmdirtS"
-	    k_MatStep_Metal	= "sndmap_pmdirtM"
-	    k_MatStep_Light	= "sndmap_pmdirtL"	    
+
+	    k_MatSnd_BulletHit = "bi_dirt"
+	    k_MatSnd_BulletHitPlayer = "plyr_bi_dirt"
+	    k_MatSnd_FootStep = "fs_dirt"
+	    k_MatSnd_FallOnto = "fallonto_dirt"
+	    k_MatSnd_FallOntoHigh = "fallontohigh_dirt"
+	    k_MatSnd_FootStepRun = "fs_run_dirt"
+	    k_MatSnd_Crawl = "fs_crawl_dirt"
+	    k_MatSnd_FootStepStop = "fs_stop_dirt"
+	    k_MatSnd_Getup = "getup_dirt"
+	    k_MatSnd_Jump = "jump_dirt"
+	    k_MatSnd_Prone = "lie_dirt"
+	    k_MatSnd_Roll = "roll_dirt"
+	    k_MatSnd_Stumble = "stumble_dirt"
+	    k_MatSnd_Scrape = "scrape_dirt"
+	    k_MatSnd_Collision = "collision_dirt"
+
+
+
+	    particleEffectBulletReflect	= "bulletDirt"
+	    particleEffectVehicle   = "vehicleDirt"
+	    
+	    maxSpeedMultiplier	=   0.9f	
 
 	    k_decal_rocket //rocketdecal
 	    {   
@@ -199,25 +185,25 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // Sand
 	    density = 1.602f
 	    soundOcclusion = 0.25f
-	    bulletsound = "small_laser_impact_earth_sand_snow"
-    	    playerbulletsound = "small_laser_impact_earth_sand_snow"	    
-//	    grenadesound = "grenade_hit_sand"
-	    footstepsound = "footstep_snow"
-	    fallontosound = "footstep_jumpland_snow"
-	    ricochetsound = "small_laser_impact_earth_sand_snow"
-	    playerricochetsound = "small_laser_impact_earth_sand_snow"
-//	    brassshellsound = "bulletdrop_normal_sand"
-	    particleEffectBulletReflect	= "bulletSand"
-	    particleEffectGrenade	= "grenadeSand"
-	    particleEffectRocket	= "rocketSand"
-	    particleEffectVehicle   = "vehicleSand"
-	    particleEffectTire	= "tireSand"
-	    particleEffectWheelSpin = "wheelSpinSand"
-	    particleEffectMortar = "expMortar"
 
-	    k_MatStep_Standard	= "sndmap_pmsnowS"
-	    k_MatStep_Metal	= "sndmap_pmsnowM"
-	    k_MatStep_Light	= "sndmap_pmsnowL"
+	    k_MatSnd_BulletHit = "bi_dirt"
+	    k_MatSnd_BulletHitPlayer = "plyr_bi_dirt"
+	    k_MatSnd_FootStep = "fs_dirt"
+	    k_MatSnd_FallOnto = "fallonto_dirt"
+	    k_MatSnd_FallOntoHigh = "fallontohigh_dirt"
+	    k_MatSnd_FootStepRun = "fs_run_dirt"
+	    k_MatSnd_Crawl = "fs_crawl_dirt"
+	    k_MatSnd_FootStepStop = "fs_stop_dirt"
+	    k_MatSnd_Getup = "getup_dirt"
+	    k_MatSnd_Jump = "jump_dirt"
+	    k_MatSnd_Prone = "lie_dirt"
+	    k_MatSnd_Roll = "roll_dirt"
+	    k_MatSnd_Stumble = "stumble_dirt"
+	    k_MatSnd_Scrape = "scrape_dirt"
+	    k_MatSnd_Collision = "collision_dirt"
+
+	    particleEffectBulletReflect	= "bulletSand"
+	    particleEffectVehicle   = "vehicleSand"
 
 	    maxSpeedMultiplier	=   0.80f
 	}
@@ -227,23 +213,27 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // Rock
 	    density = 2.515f
 	    soundOcclusion = 1.f
-	    bulletsound = "small_laser_impact_stone"
-	    playerbulletsound = "small_laser_impact_stone"
-	    footstepsound = "footstep_stone_concrete_hard"
-	    fallontosound = "footstep_jumpland_stone_concrete_hard"
-	    ricochetsound = "small_laser_impact_stone"
-	    playerricochetsound = "small_laser_impact_stone"
-	    particleEffectBulletReflect	= "bulletRock"
-	    particleEffectGrenade	= "grenadeRock"
-	    particleEffectRocket	= "rocketRock"
-	    particleEffectVehicle   = "vehicleRock"
-	    particleEffectTire	= "tireRock"
-	    particleEffectWheelSpin = "wheelSpinRock"
-	    particleEffectMortar = "expMortar"
 
-	    k_MatStep_Standard	= "sndmap_pmstoneS"
-	    k_MatStep_Metal	= "sndmap_pmstoneM"
-	    k_MatStep_Light	= "sndmap_pmstoneL"
+	    k_MatSnd_BulletHit = "bi_stone"
+	    k_MatSnd_BulletHitPlayer = "plyr_bi_stone"
+	    k_MatSnd_FootStep = "fs_stone"
+	    k_MatSnd_FallOnto = "fallonto_stone"
+	    k_MatSnd_FallOntoHigh = "fallontohigh_stone"
+	    k_MatSnd_FootStepRun = "fs_run_stone"
+	    k_MatSnd_Crawl = "fs_crawl_stone"
+	    k_MatSnd_FootStepStop = "fs_stop_stone"
+	    k_MatSnd_Getup = "getup_stone"
+	    k_MatSnd_Jump = "jump_stone"
+	    k_MatSnd_Prone = "lie_stone"
+	    k_MatSnd_Roll = "roll_stone"
+	    k_MatSnd_Stumble = "stumble_stone"
+	    k_MatSnd_Scrape = "scrape_stone"
+	    k_MatSnd_Collision = "collision_stone"
+
+
+	    particleEffectBulletReflect	= "bulletRock"
+	    particleEffectVehicle   = "vehicleRock"
+	    particleEffectBulletDebris	= "dbr_conc"
 
 	    k_decal_bullet //bulletdecal
 	    {
@@ -253,135 +243,38 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    }
 	}
 
-	bfpmatinfo grvl
-	{
-	    // Gravel
-	    density = 1.682f
-	    soundOcclusion = 0.75f
-//	    bulletsound = "bh_conc"
-//	    playerbulletsound = "bh_conc_pla"
-	    footstepsound = "footstep_gravel"
-	    fallontosound = "footstep_jumpland_gravel"
-//	    ricochetsound = "ricochet_snd"
-//	    playerricochetsound = "ricochet_snd_pla"
-//	    brassshellsound = "bulletdrop_normal_gravel"
-//	    grenadesound = "grenade_hit_gravel"
-	    particleEffectBulletReflect	= "bulletGrvl"
-	    particleEffectGrenade	= "grenadeGrvl"
-	    particleEffectRocket	= "rocketGrvl"
-	    particleEffectVehicle   = "vehicleGrvl"
-	    particleEffectTire	= "tireGrvl"
-	    particleEffectWheelSpin = "wheelSpinGrvl"
-	    particleEffectMortar = "expMortar"
-	    maxSpeedMultiplier	=   0.9f			
-	}
-
+	    
 	bfpmatinfo wood
 	{
 	    // Wood
 	    density = 0.65f
 	    soundOcclusion = 0.5f
-	    bulletsound = "small_laser_impact_wood"
-	    playerbulletsound = "small_laser_impact_wood"
-	    footstepsound = "footstep_wood"
-	    fallontosound = "footstep_jumpland_wood"
-	    ricochetsound = "small_laser_impact_wood"
-	    playerricochetsound = "small_laser_impact_wood"
-//	    brassshellsound = "bulletdrop_normal_wood"
-//	    grenadesound = "c_wSldBH"
+
+	    k_MatSnd_BulletHit = "bi_wood"
+	    k_MatSnd_BulletHitPlayer = "plyr_bi_wood"
+	    k_MatSnd_FootStep = "fs_wood"
+	    k_MatSnd_FallOnto = "fallonto_wood"
+	    k_MatSnd_FallOntoHigh = "fallontohigh_wood"
+	    k_MatSnd_FootStepRun = "fs_run_wood"
+	    k_MatSnd_Crawl = "fs_crawl_wood"
+	    k_MatSnd_FootStepStop = "fs_stop_wood"
+	    k_MatSnd_Getup = "getup_wood"
+	    k_MatSnd_Jump = "jump_wood"
+	    k_MatSnd_Prone = "lie_wood"
+	    k_MatSnd_Roll = "roll_wood"
+	    k_MatSnd_Stumble = "stumble_wood"
+	    k_MatSnd_Scrape = "scrape_wood"
+	    k_MatSnd_Collision = "collision_wood"
+
 	    particleEffectBulletReflect	= "bulletWood"
-	    particleEffectGrenade	= "grenadeWood"
-	    particleEffectRocket	= "rocketWood"
 	    particleEffectVehicle   = "vehicleWood"
 
-	    k_MatStep_Standard	= "sndmap_pmwoodS"
-	    k_MatStep_Metal	= "sndmap_pmwoodM"
-	    k_MatStep_Light	= "sndmap_pmwoodL"
-	    
-	    k_decal_bullet // bulletdecal
-	    {
-		materials = "parallaxdecals/decalwood"
-		float decalsize[] { 0.25f, 0.6f }
-	    }
-	}
-
-	bfpmatinfo hvwd
-	{
-	    // Heavy Wood
-	    density = 2.5f
-	    soundOcclusion = 0.5f
-	    bulletsound = "small_laser_impact_wood"
-	    playerbulletsound = "small_laser_impact_wood"
-	    footstepsound = "footstep_wood"
-	    fallontosound = "footstep_jumpland_wood"
-	    ricochetsound = "small_laser_impact_wood"
-	    playerricochetsound = "small_laser_impact_wood"
-//	    brassshellsound = "bulletdrop_normal_wood"
-//	    grenadesound = "c_wSldBH"
-	    particleEffectBulletReflect	= "bulletWood"
-	    particleEffectGrenade	= "grenadeWood"
-	    particleEffectRocket	= "rocketWood"
-	    particleEffectVehicle   = "vehicleWood"
-
-	    k_MatStep_Standard	= "sndmap_pmwoodS"
-	    k_MatStep_Metal	= "sndmap_pmwoodM"
-	    k_MatStep_Light	= "sndmap_pmwoodL"
+	    particleEffectBulletDebris	= "dbr_wood"
 
 	    k_decal_bullet // bulletdecal
 	    {
 		materials = "parallaxdecals/decalwood"
 		float decalsize[] { 0.25f, 0.6f }
-	    }
-	}
-
-
-
-	bfpmatinfo brck
-	{
-	    // Brick
-	    density = 1.922f
-	    soundOcclusion = 0.75f
-//	    bulletsound = "bh_conc"
-//	    playerbulletsound = "bh_conc_pla"
-//	    footstepsound = "fs_conc"
-//	    ricochetsound = "ricochet_snd"
-//	    playerricochetsound = "ricochet_snd_pla"
-//	    brassshellsound = "bulletdrop_normal_brick"
-	    particleEffectBulletReflect	= "bulletBrck"
-	    particleEffectGrenade	= "grenadeBrck"
-	    particleEffectRocket	= "rocketBrck"
-	    particleEffectVehicle   = "vehicleBrck"
-
-	    k_decal_bullet // bulletdecal
-	    {
-		materials = "parallaxdecals/decalConc"
-		float decalsize []    {  0.1f, 1.0f }
-		decalflags = "k_none"
-	    }
-	}
-
-	bfpmatinfo tile
-	{
-	    // tiles like you would find in a bathroom
-	    density = 1.922f
-	    soundOcclusion = 0.5f
-//	    bulletsound = "bi_wall_tile"
-//	    playerbulletsound = "bi_wall_tile_pla"
-//	    footstepsound = "fs_conc"
-//	    ricochetsound = "ricochet_snd"
-//	    playerricochetsound = "ricochet_snd_pla"
-//	    brassshellsound = "bulletdrop_normal_brick"
-	    particleEffectBulletReflect	= "bulletBrck"
-	    particleEffectGrenade	= "grenadeBrck"
-	    particleEffectRocket	= "rocketBrck"
-	    particleEffectVehicle   = "vehicleBrck"
-
-	    k_decal_bullet //bulletdecal
-	    {
-		materials = "parallaxdecals/decalConc"
-		float decalsize []    {  0.1f, 1.0f }
-		//decalflags = "k_alphafade|k_cornerblend|k_overlap|k_hardedges"
-		decalflags = "k_none"
 	    }
 	}
 
@@ -390,14 +283,8 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // Glass
 	    density = 0.5f //2.6f
 	    soundOcclusion = 0.1f
-//	    bulletsound = "bi_glass"
-//	    playerbulletsound = "bi_glass_pla"
-//	    footstepsound = "bi_glass"
 	    particleEffectBulletReflect	= "bulletGlss"
-	    particleEffectGrenade	= "grenadeGlss"
-	    particleEffectRocket	= "rocketGlss"
 	    particleEffectVehicle   = "vehicleGlas"
-
 	}
 
 	bfpmatinfo rbbr
@@ -405,16 +292,8 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // Rubber
 	    density = 1.506f
 	    soundOcclusion = 0.25f
-//	    bulletsound = "bh_rbbr"
-//	    playerbulletsound = "bh_rbbr_pla"
-//	    footstepsound = "fs_conc"
-//	    ricochetsound = "ricochet_snd"
-//	    playerricochetsound = "ricochet_snd_pla"
 	    particleEffectBulletReflect	= "bulletRbbr"
-	    particleEffectGrenade	= "grenadeRbbr"
-	    particleEffectRocket	= "rocketRbbr"
 	    particleEffectVehicle   = "vehicleRbbr"
-
 	}
 
 	bfpmatinfo ice
@@ -422,21 +301,9 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // Ice
 	    density = 0.897f
 	    soundOcclusion = 0.25f
-//	    bulletsound = "bh_conc"
-//	    playerbulletsound = "bh_conc_pla"
-	    footstepsound = "footstep_ice"
-	    fallontosound = "footstep_jumpland_ice"
 	    particleEffectBulletReflect	= "bulletIce"
-	    particleEffectGrenade	= "grenadeIce"
-	    particleEffectRocket	= "rocketIce"
 	    particleEffectVehicle   = "vehicleIce"
-	    particleEffectTire	= "tireIce"
-	    particleEffectWheelSpin = "wheelSpinIce"
 	    particleEffectVehicleFoot = "con_snw_wlker"
-
-	    k_MatStep_Standard	= "sndmap_pmsnowS"
-	    k_MatStep_Metal	= "sndmap_pmsnowM"
-	    k_MatStep_Light	= "sndmap_pmsnowL"
 
 	    gripFilter		= 0.20f	// Lower number means more friction
 
@@ -450,78 +317,34 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // Water
 	    density = 1.0f
 	    soundOcclusion = 0.f
-	    bulletsound = "small_laser_impact_water"
-	    playerbulletsound = "small_laser_impact_water"
-//	    brassshellsound = "bulletdrop_normal_water"
-//	    grenadesound = "grenade_hit_water"
-	    footstepsound = "footstep_wet"
-	    ricochetsound = "small_laser_impact_water"
-	    playerricochetsound = "small_laser_impact_water"
-//	    throughsound = "fs_water_wade"
-//	    fallontosound = "fs_jump_splash"
-	    particleEffectBulletReflect	= "bulletWter"
-	    particleEffectGrenade	= "grenadeWter"
-	    particleEffectRocket	= "rocketWter"
 
-	    k_MatStep_Standard	= "sndmap_pmwaterS"
-	    k_MatStep_Metal	= "sndmap_pmwaterM"
-	    k_MatStep_Light	= "sndmap_pmwaterL"
+	    k_MatSnd_BulletHit = "bi_water"
+	    k_MatSnd_BulletHitPlayer = "plyr_bi_water"
+	    k_MatSnd_FootStep = "fs_water"
+	    k_MatSnd_FallOnto = "fallonto_water"
+	    k_MatSnd_FallOntoHigh = "fallontohigh_water"
+	    k_MatSnd_FootStepRun = "fs_run_water"
+	    k_MatSnd_Crawl = "fs_crawl_water"
+	    k_MatSnd_FootStepStop = "fs_stop_water"
+	    k_MatSnd_Getup = "getup_water"
+	    k_MatSnd_Jump = "jump_water"
+	    k_MatSnd_Prone = "lie_water"
+	    k_MatSnd_Roll = "roll_water"
+	    k_MatSnd_Stumble = "stumble_water"
+	    k_MatSnd_Scrape = "scrape_water"
+	    k_MatSnd_Collision = "collision_water"
+
+	    particleEffectBulletReflect	= "bulletWter"
+
+	    particleEffectBulletHit	= "hit_water"
 
 	    maxSpeedMultiplier	=   0.65f
-	}
-
-	bfpmatinfo molt
-	{
-	    // Molten metal - does flamey damage to chrs and props!
-	    density = 1.5f
-	    soundOcclusion = 0.f
-//	    bulletsound = "bh_conc"
-//	    playerbulletsound = "bh_conc_pla"
-//	    brassshellsound = "bulletdrop_normal_water" // TODO: Sticky splodgy sound?
-//	    grenadesound = "grenade_hit_water"	    // TODO: Sticky splodgy sound?
-//	    footstepsound = "fs_wet"		    // TODO: Sticky splodgy sound?
-//	    throughsound = "fs_water_wade"		    // TODO: Sticky splodgy sound?
-	    particleEffectBulletReflect	= "bulletWter"
-	    particleEffectGrenade	= "grenadeWter"
-	    particleEffectRocket	= "rocketWter"
-
-	    maxSpeedMultiplier	=   0.45f
-	}
-
-	bfpmatinfo elec
-	{
-	    // Electrified metal
-	    density = 7.85f
-	    soundOcclusion = 0.5f
-//	    bulletsound = "bh_stel"
-//	    playerbulletsound = "bh_stel_pla"
-//	    footstepsound = "fs_meta"
-//	    ricochetsound = "ricochet_snd"
-//	    playerricochetsound = "ricochet_snd_pla"
-//	    brassshellsound = "bulletdrop_normal_metal_solid"
-//	    grenadesound = "grenade_hit_metal"
-	    particleEffectBulletReflect	= "bulletStel"
-	    particleEffectGrenade	= "grenadeStel"
-	    particleEffectRocket	= "rocketStel"
-	    particleEffectVehicle   = "vehicleStel"
-
-	    k_decal_bullet //bulletdecal 
-	    { 
-		materials = "2ddecals/bullet_hole_metal_1"
-	    }
 	}
 
 	bfpmatinfo magma
 	{
 	    density = 1.5f
 	    soundOcclusion = 0.f
-//	    bulletsound = "bi_magma"
-//	    playerbulletsound = "bi_magma_pla"
-//	    brassshellsound = "bulletdrop_normal_water"
-//	    grenadesound = "grenade_hit_water"
-//	    footstepsound = "fs_wet"
-//	    throughsound = "fs_water_wade"
-//	    fallontosound = "fs_jump_splash"
 	    particleEffectBulletReflect	= "bulletWter"
 	    particleEffectGrenade	= "grenadeWter"
 	    particleEffectRocket	= "rocketWter"
@@ -534,13 +357,7 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // Grenades - kind of like steel, but a lot more 'frictiony'
 	    density = 7.85f
 	    soundOcclusion = 0.f
-//	    bulletsound = "bh_stel"
-//	    playerbulletsound = "bh_stel_pla"
-//	    footstepsound = "fs_meta"
-//	    grenadesound = "grenade_hit_metal"
 	    particleEffectBulletReflect	= "bulletStel"
-	    particleEffectGrenade	= "grenadeStel"
-	    particleEffectRocket	= "rocketStel"
 	}
 
 	bfpmatinfo stel
@@ -548,22 +365,29 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // Steel
 	    density = 7.85f
 	    soundOcclusion = 0.5f
-//	    bulletsound = "bh_stel"
-//	    playerbulletsound = "bh_stel_pla"
-	    footstepsound = "footstep_metal"
-	    fallontosound = "footstep_jumpland_metal"
-//	    ricochetsound = "ricochet_snd"
-//	    playerricochetsound = "ricochet_snd_pla"
-//	    brassshellsound = "bulletdrop_normal_metal_solid"
-//	    grenadesound = "grenade_hit_metal"
-	    particleEffectBulletReflect	= "bulletStel"
-	    particleEffectGrenade	= "grenadeStel"
-	    particleEffectRocket	= "rocketStel"
-	    particleEffectVehicle   = "vehicleStel"
 
-	    k_MatStep_Standard	= "sndmap_pmmetalS"
-	    k_MatStep_Metal	= "sndmap_pmmetalM"
-	    k_MatStep_Light	= "sndmap_pmmetalL"
+	    k_MatSnd_BulletHit = "bi_metal"
+	    k_MatSnd_BulletHitPlayer = "plyr_bi_metal"
+	    k_MatSnd_FootStep = "fs_metal"
+	    k_MatSnd_FallOnto = "fallonto_metal"
+	    k_MatSnd_FallOntoHigh = "fallontohigh_metal"
+	    k_MatSnd_FootStepRun = "fs_run_metal"
+	    k_MatSnd_Crawl = "fs_crawl_metal"
+	    k_MatSnd_FootStepStop = "fs_stop_metal"
+	    k_MatSnd_Getup = "getup_metal"
+	    k_MatSnd_Jump = "jump_metal"
+	    k_MatSnd_Prone = "lie_metal"
+	    k_MatSnd_Roll = "roll_metal"
+	    k_MatSnd_Stumble = "stumble_metal"
+	    k_MatSnd_Scrape = "scrape_metal"
+	    k_MatSnd_Collision = "collision_metal"
+
+	    k_MatSnd_Scrape = "scrape_metal"
+	    k_MatSnd_Collision = "collision_metal"
+
+	    particleEffectBulletDebris = "dbr_steel"
+	    particleEffectBulletReflect	= "bulletStel"
+	    particleEffectVehicle   = "vehicleStel"
 
 	    k_decal_bullet //bulletdecal 
 	    { 
@@ -571,130 +395,6 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 		    //materials = "parallaxdecals/decalmetal"
 		    //decalsize = 0.15f
 	    }
-	}
-
-	bfpmatinfo metal_corrugated
-	{
-	    // Steel
-	    density = 7.85f
-	    soundOcclusion = 0.25f
-//	    bulletsound = "bi_mtl_corrugated"
-//	    playerbulletsound = "bi_mtl_corrugated_pla"
-//	    footstepsound = "fs_meta"
-//	    ricochetsound = "ricochet_snd"
-//	    playerricochetsound = "ricochet_snd_pla"
-//	    brassshellsound = "bulletdrop_normal_metal_solid"
-//	    grenadesound = "grenade_hit_metal"
-	    particleEffectBulletReflect	= "bulletStel"
-	    particleEffectGrenade	= "grenadeStel"
-	    particleEffectRocket	= "rocketStel"
-	    particleEffectVehicle   = "vehicleStel"
-
-	    k_MatStep_Standard	= "sndmap_pmmetalS"
-	    k_MatStep_Metal	= "sndmap_pmmetalM"
-	    k_MatStep_Light	= "sndmap_pmmetalL"
-	    
-	    k_decal_bullet //bulletdecal 
-	    { 
-		materials = "2ddecals/bullet_hole_metal_1"
-		    //materials = "parallaxdecals/decalmetal"
-		    //decalsize = 0.15f
-	    }
-
-	}
-
-	bfpmatinfo metal_hollow
-	{
-	    // Steel
-	    density = 4.85f
-	    soundOcclusion = 0.25f
-//	    bulletsound = "bi_hollow_pipe"
-//	    playerbulletsound = "bi_hollow_pipe_pla"
-//	    footstepsound = "fs_meta"
-//	    ricochetsound = "ricochet_snd"
-//	    playerricochetsound = "ricochet_snd_pla"
-//	    brassshellsound = "bulletdrop_normal_metal_solid"
-//	    grenadesound = "grenade_hit_metal"
-	    particleEffectBulletReflect	= "bulletStel"
-	    particleEffectGrenade	= "grenadeStel"
-	    particleEffectRocket	= "rocketStel"
-	    particleEffectVehicle   = "vehicleStel"
-
-	    k_MatStep_Standard	= "sndmap_pmmetalS"
-	    k_MatStep_Metal	= "sndmap_pmmetalM"
-	    k_MatStep_Light	= "sndmap_pmmetalL"
-
-	    k_decal_bullet //bulletdecal 
-	    { 
-		materials = "2ddecals/bullet_hole_metal_1"
-		    //materials = "parallaxdecals/decalmetal"
-		    //decalsize = 0.15f
-	    }
-	}
-
-	bfpmatinfo tstl
-	{
-	    // Steel
-	    density = 7.85f
-	    soundOcclusion = 0.5f
-//	    bulletsound = "bh_stel"
-//	    playerbulletsound = "bh_stel_pla"
-//	    footstepsound = "fs_meta"
-//	    ricochetsound = "ricochet_snd"
-//	    playerricochetsound = "ricochet_snd_pla"
-//	    brassshellsound = "bulletdrop_normal_metal_solid"
-//	    grenadesound = "grenade_hit_metal"
-	    particleEffectBulletReflect	= "bulletStel"
-	    particleEffectGrenade	= "grenadeStel"
-	    particleEffectRocket	= "rocketStel"
-	    particleEffectVehicle   = "vehicleStel"
-
-	    k_MatStep_Standard	= "sndmap_pmmetalS"
-	    k_MatStep_Metal	= "sndmap_pmmetalM"
-	    k_MatStep_Light	= "sndmap_pmmetalL"
-
-	    k_decal_bullet //bulletdecal 
-	    { materials = "2ddecals/metal_01" }
-	}
-
-	bfpmatinfo flyer
-	{
-	    // Steel
-	    density = 7.85f
-	    soundOcclusion = 0.5f
-//	    bulletsound = "bh_stel"
-//	    playerbulletsound = "bh_stel_pla"
-//	    footstepsound = "fs_meta"
-//	    brassshellsound = "bulletdrop_normal_metal_solid"
-//	    grenadesound = "grenade_hit_metal"
-	    particleEffectBulletReflect	= "bulletStel"
-	    particleEffectGrenade	= "grenadeStel"
-	    particleEffectRocket	= "rocketStel"
-	}
-
-	bfpmatinfo alum
-	{
-	    // Aluminum
-	    density = 2.643f
-	    soundOcclusion = 0.5f
-//	    bulletsound = "bh_stel"
-//	    playerbulletsound = "bh_stel_pla"
-//	    footstepsound = "fs_meta"
-//	    ricochetsound = "ricochet_snd"
-//	    playerricochetsound = "ricochet_snd_pla"
-//	    brassshellsound = "bulletdrop_normal_metal_solid"
-//	    grenadesound = "grenade_hit_metal"
-	    particleEffectBulletReflect	= "bulletAlum"
-	    particleEffectGrenade	= "grenadeAlum"
-	    particleEffectRocket	= "rocketAlum"
-	    particleEffectVehicle   = "vehicleAlum"
-
-	    k_MatStep_Standard	= "sndmap_pmmetalS"
-	    k_MatStep_Metal	= "sndmap_pmmetalM"
-	    k_MatStep_Light	= "sndmap_pmmetalL"
-
-	    k_decal_bullet //bulletdecal
-	    { materials = "2ddecals/metal_01" }
 	}
 
 	bfpmatinfo whel
@@ -702,14 +402,7 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // Wheel
 	    density = 2.643f
 	    soundOcclusion = 0.f
-//	    bulletsound = "bh_rbbr"
-//	    playerbulletsound = "bh_rbbr_pla"
-//	    footstepsound = "fs_meta"
-//	    brassshellsound = "bulletdrop_normal_metal_hollow"
-//	    grenadesound = "grenade_hit_metal"
 	    particleEffectBulletReflect	= "bulletDeft"
-	    particleEffectGrenade	= "grenadeDeft"
-	    particleEffectRocket	= "rocketDeft"
 	    particleEffectVehicle	= "vehicleDeft"
 
 	}
@@ -720,13 +413,26 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    //			density = 6.643f
 	    density = 1.922f
 	    soundOcclusion = 0.5f
-//	    bulletsound = "bh_rbbr"
-//	    playerbulletsound = "bh_rbbr_pla"
-//	    footstepsound = "fs_meta"
-//	    ricochetsound = "ricochet_snd"
-//	    playerricochetsound = "ricochet_snd_pla"
-//	    brassshellsound = "bulletdrop_normal_metal_hollow"
-//	    grenadesound = "grenade_hit_metal"
+
+	    k_MatSnd_BulletHit = "bi_metal"
+	    k_MatSnd_BulletHitPlayer = "plyr_bi_metal"
+	    k_MatSnd_FootStep = "fs_metal"
+	    k_MatSnd_FallOnto = "fallonto_metal"
+	    k_MatSnd_FallOntoHigh = "fallontohigh_metal"
+	    k_MatSnd_FootStepRun = "fs_run_metal"
+	    k_MatSnd_Crawl = "fs_crawl_metal"
+	    k_MatSnd_FootStepStop = "fs_stop_metal"
+	    k_MatSnd_Getup = "getup_metal"
+	    k_MatSnd_Jump = "jump_metal"
+	    k_MatSnd_Prone = "lie_metal"
+	    k_MatSnd_Roll = "roll_metal"
+	    k_MatSnd_Stumble = "stumble_metal"
+	    k_MatSnd_Scrape = "scrape_metal"
+	    k_MatSnd_Collision = "collision_metal"
+
+	    k_MatSnd_Scrape = "scrape_metal"
+	    k_MatSnd_Collision = "collision_metal"
+
 	}
 
 	bfpmatinfo clth
@@ -734,23 +440,8 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // Cloth
 	    density = 0.3f
 	    soundOcclusion = 0.f
-//	    bulletsound = "bh_rbbr"
-//	    playerbulletsound = "bh_rbbr_pla"
-//	    footstepsound = "fs_meta"
-
-
 	    k_decal_bullet //bulletdecal 
 	    { materials = "2ddecals/cloth_01" }
-	}
-
-	bfpmatinfo cbrd
-	{
-	    // Cardboard
-	    density = 0.689f
-	    soundOcclusion = 0.1f
-//	    bulletsound = "bh_rbbr"
-//	    playerbulletsound = "bh_rbbr_pla"
-//	    footstepsound = "fs_meta"
 	}
 
 	bfpmatinfo pstc
@@ -758,70 +449,8 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // Plastic
 	    density = 0.95f
 	    soundOcclusion = 0.1f
-//	    bulletsound = "bh_rbbr"
-//	    playerbulletsound = "bh_rbbr_pla"
-//	    footstepsound = "fs_meta"
-
 	    k_decal_bullet //bulletdecal
 	    { materials = "2ddecals/plastic_01" }
-	}
-
-	bfpmatinfo clot
-	{
-	    // Cloth
-	    density = 0.01f
-	    soundOcclusion = 0.f
-	    bulletenergytransfer    = 0.05f
-	}
-
-	bfpmatinfo frit
-	{
-	    // Fruit mostly uses flesh defaults for now
-	    density = 0.95f
-	    soundOcclusion = 0.f
-//	    bulletsound = "bh_flsh"
-//	    playerbulletsound = "bh_flsh_pla"
-//	    footstepsound = "fs_all"
-	    particleEffectBulletReflect	= "bulletFlsh"
-	    particleEffectGrenade	= "grenadeFlsh"
-	    particleEffectRocket	= "rocketFlsh"
-	    particleEffectMortar = "expMortar"
-	    maxSpeedMultiplier	=   0.8f
-	}
-
-	bfpmatinfo chin
-	{
-	    // China	
-	    density = 1.10f
-	    soundOcclusion = 0.f
-//	    bulletsound = "bh_conc"
-//	    playerbulletsound = "bh_conc_pla"
-//	    footstepsound = "fs_conc"
-//	    brassshellsound = "bulletdrop_normal_concrete"
-//	    playerricochetsound = "ricochet_snd_pla"
-	    particleEffectBulletReflect	= "bulletBrck"
-	    particleEffectGrenade	= "grenadeBrck"
-	    particleEffectRocket	= "rocketBrck"
-	}
-
-	bfpmatinfo papr
-	{
-	    // Paper
-	    density = 0.6f
-	    soundOcclusion = 0.f
-//	    bulletsound = "bh_rbbr"
-//	    playerbulletsound = "bh_rbbr_pla"
-//	    footstepsound = "fs_meta"
-	}
-
-	bfpmatinfo lthr
-	{
-	    // Leather
-	    density = 1.0f
-	    soundOcclusion = 0.f
-//	    bulletsound = "bi_cloth"
-//	    playerbulletsound = "bi_cloth_pla"
-//	    footstepsound = "fs_carp"
 	}
 
 	bfpmatinfo leaf
@@ -829,19 +458,26 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    // Leaf
 	    density = 1.906f
 	    soundOcclusion = 0.f
-//	    bulletsound = "bh_conc"
-//	    playerbulletsound = "bh_conc_pla"
-	    footstepsound = "footstep_leaves"
-	    fallontosound = "footstep_jumpland_leaves"
-//	    throughsound = "foilage_brush"
-//	    brassshellsound = "bulletdrop_normal_grass"
-//	    grenadesound = "grenade_hit_grass"
+
+	    k_MatSnd_BulletHit = "bi_grass"
+	    k_MatSnd_BulletHitPlayer = "plyr_bi_grass"
+	    k_MatSnd_FootStep = "fs_grass"
+	    k_MatSnd_FallOnto = "fallonto_grass"
+	    k_MatSnd_FallOntoHigh = "fallontohigh_grass"
+	    k_MatSnd_FootStepRun = "fs_run_grass"
+	    k_MatSnd_Crawl = "fs_crawl_grass"
+	    k_MatSnd_FootStepStop = "fs_stop_grass"
+	    k_MatSnd_Getup = "getup_grass"
+	    k_MatSnd_Jump = "jump_grass"
+	    k_MatSnd_Prone = "lie_grass"
+	    k_MatSnd_Roll = "roll_grass"
+	    k_MatSnd_Stumble = "stumble_grass"
+	    k_MatSnd_Scrape = "scrape_grass"
+	    k_MatSnd_Collision = "collision_grass"
+
+
 	    particleEffectBulletReflect	= "bulletLeaf"
-	    particleEffectGrenade	= "grenadeGras"
-	    particleEffectRocket	= "rocketGras"
 	    particleEffectVehicle   = "vehicleGras"
-	    particleEffectTire	= "tireGras"
-	    particleEffectWheelSpin = "wheelSpinGras"
 
 	    k_decal_bullet // no bulletdecal
 	    { materials = "" }
@@ -878,7 +514,6 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	{
 	    friction = 0.7f
 	    restitution = 0.45f
-	    colsound = "c_c"
 	}
 
 	pmatcolinfo gras
@@ -903,7 +538,6 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	{
 	    friction = 0.7f
 	    restitution = 0.4f
-	    colsound = "c_c"
 	}
 
 	pmatcolinfo grvl
@@ -916,14 +550,12 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	{
 	    friction = 0.37f
 	    restitution = 0.48f
-	    colsound = "c_w"
 	}
 
 	pmatcolinfo hvwd
 	{
 	    friction = 0.7f
 	    restitution = 0.48f
-	    colsound = "c_w"
 	}
 
 
@@ -944,7 +576,6 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    friction = 0.95f
 	    //restitution = 0.96f
 	    restitution = 0.66f
-	    colsound = "bi_glass"			
 	}
 
 	pmatcolinfo rbbr
@@ -975,7 +606,6 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	{
 	    friction = 0.78f
 	    restitution = 0.1f
-	    colsound = "c_m"
 	} 
 
 	pmatcolinfo magma
@@ -987,9 +617,8 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	pmatcolinfo gren
 	{
 	    // Grenades - kind of like steel, but a LOT more frictiony
-	    friction = 0.8f
-	    //restitution = 0.9f
-	    restitution = 0.4f
+	    friction = 0.05f
+	    restitution = 0.25f
 	}
 
 	pmatcolinfo stel
@@ -997,21 +626,18 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    friction = 0.78f
 	    //restitution = 0.9f
 	    restitution = 0.1f //3f
-	    colsound = "c_m"
 	} 
 
 	pmatcolinfo metal_corrugated
 	{
 	    friction = 0.78f
 	    restitution = 0.1f
-	    colsound = "c_m"
 	} 
 
 	pmatcolinfo metal_hollow
 	{
 	    friction = 0.78f
 	    restitution = 0.1f
-	    colsound = "c_m"
 	} 
 
 	pmatcolinfo tstl
@@ -1019,7 +645,6 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    friction = 0.78f
 	    //restitution = 0.9f
 	    restitution = 0.1f //3f
-	    colsound = "c_m"
 	} 
 
 	pmatcolinfo flyer
@@ -1032,7 +657,6 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	{
 	    friction = 1.2f
 	    restitution = 0.3f //6f
-	    colsound = "c_m"
 	}
 
 	pmatcolinfo whel
@@ -1139,7 +763,6 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 
 	    friction = 0.62f
 	    restitution = 0.47f
-	    colsound = "c_w"
 	}
 
 	pmatcolinfo anon_5
@@ -1155,7 +778,6 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    mat1 = "wood"
 	    mat2 = "brck"
 	    friction = 0.6f
-	    colsound = "c_w"
 	}
 
 	pmatcolinfo anon_7
@@ -1164,7 +786,6 @@ physicsMaterialMgrTemplate physicsmaterialmgr
 	    mat2 = "conc"
 
 	    friction = 0.62f
-	    colsound = "c_w"
 	}
     }//end of pmatcolinfos
 }

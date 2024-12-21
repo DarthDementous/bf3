@@ -153,5 +153,12 @@ template sc_world
     textureAdd		= "misctex/terraineditor/terrain_plugin_add"
     textureErase	= "misctex/terraineditor/terrain_plugin_erase"
     textureCheck	= "misctex/terraineditor/terrain_plugin_check"
+
+    p4rootfolder	= ""
+    p4repository	= ""
+    p4Enable		= "false"
+    p4Server		= ""
+    p4Port		= ""
+    p4Password		= ""
 }
 

@@ -1,3 +1,5 @@
+// vim: set syntax=c :
+
 //detail geom template for editor only
 
 template detailgeominstance
@@ -14,8 +16,3 @@ template detailgeominstance
     sunlightscale   = 1.0f
 }
 
-template detailgeommap
-{
-    typename = ""
-    path = ""
-}

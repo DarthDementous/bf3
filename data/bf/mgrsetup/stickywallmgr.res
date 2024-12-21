@@ -1,5 +1,5 @@
-// vim: set syntax=c :
+/*// vim: set syntax=c :
 
 StickyWallManagerTemplate StickyWallManager
 {
-}
+}*/

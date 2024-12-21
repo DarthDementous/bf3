@@ -78,12 +78,6 @@ template DoorComponent : BaseActivateComponent
 	tip	= "Here's a tool tip for this value, isn't this exciting"
     }
 
-    propid-field testPropId
-    {
-	default = ""
-	propType = "spwn"
-    }
-    
     defaultSendTime = 1.f
     maxSendTime = 20.f // 20 seconds
     interpolationTime = 0.10f
@@ -94,7 +88,56 @@ template DoorComponent : BaseActivateComponent
 
     soundmap-field soundmap
     {
+	default = "sndmap_sndmapDoorSmall"
+    }
+
+    float-field autoOpenRadius
+    {
+	default = 7.f
+	views = "basic setup"
+	tips = 	"The distance away a character is for the door to open automatically (requires k_automaticParent flag)"
+    }
+
+    float-field autoCloseRadius
+    {
+	default = 9.f
+	views = "basic setup"
+	tips = 	"The distance away that if no characters are within, the door will close automatically (requires k_automaticParent flag)"
+    }
+
+    propid-field autoChild1
+    {
 	default = ""
+	views = "basic setup"
+	tips = "If the door is automatic (flag k_automaticParent) it can auto open/close upto 2 children door props. The child props shouldn't be automatic parents themselves as only one parent will be needed tp control the automatic detection."
+    }
+    
+    propid-field autoChild2
+    {
+	default = ""
+	views = "basic setup"
+	tips = "If the door is automatic (flag k_automaticParent) it can auto open/close upto 2 children door props. The child props shouldn't be automatic parents themselves as only one parent will be needed tp control the automatic detection."
+    }
+
+    float-field autoOpenYDiffAmount
+    {
+	default = 5.f
+	views = "basic setup"
+	tips = 	"The vertical distance away (above or below and within autoOpenRadius) a character is for the door to open automatically (requires k_automaticParent flag)"
+    }
+
+    float-field autoCloseYDiffAmount
+    {
+	default = 5.f
+	views = "basic setup"
+	tips = 	"The vertical distance away (above or below and within autoCloseRadius) that if no characters are within, the door will close automatically (requires k_automaticParent flag)"
+    }
+
+    array-field autoOpenCloseOffset
+    {
+	float default []    { 0.0f, 0.0f, 0.0f }
+	views	= "basic setup"
+	tips = 	"This offset from the prop centre that the automatic open/close uses (requires k_automaticParent flag)"
     }
 
     float-field openingIncrement	
@@ -117,8 +160,20 @@ template DoorComponent : BaseActivateComponent
 	views = "basic setup"
 	tips = 	"The point at which a partially open door will consider itself open and simply open fully"
     }
+        
+    // Moved from Sliding door
+    string-field autoClose
+    {
+	default	    = "false"
+	views = "basic setup"
+    }
 
-	
+    float-field autoCloseDelay
+    {
+	default	    = 5.0f
+	views = "basic setup"
+	tip = "Time to wait before closing the door once open. If k_timedInstantClose is set then the delay is from when it starts opening so it could close even if not fully open yet"
+    }
 }
 
 template SingleSlideDoorComponent : DoorComponent
@@ -137,122 +192,6 @@ template SingleSlideDoorComponent : DoorComponent
 	default	    = 2.0f
 	views = "basic setup"
     }
-    
-    string-field autoClose
-    {
-	default	    = "false"
-	views = "basic setup"
-    }
-
-    float-field autoCloseDelay
-    {
-	default	    = 5.0f
-	views = "basic setup"
-	tip = "Time to wait before closing after deciding to autoclose, overidden by instantclose/speed"
-    }
-
-    string-field instantClose
-    {
-	default	    = "false"
-	views	    = "basic setup"
-    }
-
-    float-field instantCloseSpeed
-    {
-	default	    = 0.5f
-	views	    = "basic setup"
-    }
-}
-
-template HingeDoorComponent : DoorComponent
-{
-    class-id	= "hinge door component"
-
-    float-field limit
-    {
-	default = 0.5f
-	views = "basic setup"
-	tip = "this limit controls the fraction of 180 degrees that the door will open"
-    }
-
-    float-field openingSpeed
-    {
-	default = 2.0f
-	views = "basic setup"
-    }
-
-    float-field closingSpeed
-    {
-	default = 2.0f
-	views = "basic setup"
-    }
-    
-    pointA
-    {
-	distance = 1.5f
-	pos[] {-0.75f, 0.f, 0.f}
-	flags = "kActivatePointFlag_enabled|kActivatePointFlag_getYFromPropBounds|kActivatePointFlag_lookAtPosIsOffsetFromCentre"
-    }
-}
-
-template DoubleHingeDoorComponent : HingeDoorComponent
-{
-    class-id	= "double hinge door component"
-}
-
-template AnimatedDoorComponent : DoorComponent
-{
-    class-id	= "animated door component"
-
-    animmap-field animmap 
-    { 
-	default = "" 
-    }
-
-    soundPlayAnimTagCallback animTagCallback
-    {
-	// urgh why isn't this in a suitable soundplayanimtag template somewhere?
-	// IT IS NOW.. HURRAH
-    }
-
-    float-field limit
-    {
-	default	    = 1.0f
-//	views = "basic setup"	// don't want it to be edited as it has to be hardcoded to 1.0f
-    }
-
-    tickinganimplay tickAnimPlay
-    {
-	
-    }
-
-    float-field openingSpeed
-    {
-	default	    = 1.0f
-	views	    = "basic setup"
-	tip	    = "as this is an animated door this becomes a speed scale on the animation playback speed"
-    }
-     
-    float-field closingSpeed
-    {
-	default	    = 1.0f
-	views	    = "basic setup"
-	tip	    = "as this is an animated door this becomes a speed scale on the animation playback speed"
-    }
-}
-
-
-template openWithParamsData
-{
-//    doorSpeed = 0.1f
-    bool-field lockDoor
-    {
-	default = "true"
-	views = "basic setup"
-    }
-
-	
-    dataPath = "event:openWithParams:data"
 }
 
 template openWithParamsData2
@@ -319,24 +258,6 @@ template doorEvent : propEventInterface
 
 }
 
-template hingeDoorEvent : doorEvent
-{
-    class-id = "hinge door event interface component"
-
-    eventTargetList openIn
-    {
-    }
-
-    eventTargetList openOut
-    {
-    }
-}
-
-template doubleHingeDoorEvent : hingeDoorEvent
-{
-    class-id = "double hinge door event interface component"
-}
-
 template doorprop : prop
 {
     class-id = "door prop"
@@ -347,19 +268,6 @@ template doorprop : prop
 	
     }
 
-    lockComponent lock
-    {
-	
-    }
-
-/*
-    inventorySwitchComponent inventorySwitch
-    {
-	switchToItem       = "o_gun_multipick"
-	promptBeforeSwitch = "true"
-	promptMessage      = "STR_INVENTORYSWITCH_PROMPT_MESSAGE"
-    }
-*/
     doorEvent event
     {
 	
@@ -370,29 +278,13 @@ template doorprop : prop
 	isMoveable="true"
     }
 
-    network
+    staticNetworkComponent network
     {
-	activeSendLimit = 0.1f
-	maxInactiveSendLimit = 2.f
-	inactiveMultiplier = 2.f
-	active = "false"
-	distanceToPlayer = 100.f
     }
 
     propflags |= "k_neverChangeBgRoomGroup"
 }
 
-
-template HingeDoorProp : doorprop
-{
-    HingeDoorComponent door
-    {
-    }
-
-    hingeDoorEvent event
-    {
-    }
-}
 
 template SingleSlideDoorActivateMsgProp : doorprop
 {
@@ -402,15 +294,6 @@ template SingleSlideDoorActivateMsgProp : doorprop
     }
 
 }
-
-template AnimatedDoorProp : doorprop
-{
-    AnimatedDoorComponent door
-    {
-	
-    }
-}
-
 
 template SimpleSlideDoor1 : SingleSlideDoorActivateMsgProp
 {
@@ -434,21 +317,6 @@ template SimpleSlideDoor1 : SingleSlideDoorActivateMsgProp
     	canCreateInEditor   =	1
     	editorInstanceName  =	"slideDoor1_"
     	editorPath	    =	"common/test/doors"
-    }
-}
-
-template SimpleHingeDoor1 : HingeDoorProp
-{
-    render
-    {
-	model	    = "misc/blastdoor"
-    }
-    
-    meta
-    {
-	canCreateInEditor   =	1
-	editorInstanceName  =	"hingeDoor1_"
-	editorPath	    =	"common/test/doors"
     }
 }
 

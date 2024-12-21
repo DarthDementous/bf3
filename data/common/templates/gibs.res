@@ -1,7 +1,10 @@
-/******************************************************************************
-** gibs.res
-** 24 April '05
-******************************************************************************/
+// vim: set syntax=c :
+
+
+//******************************************************************************
+//** gibs.res
+//** 24 April '05
+//******************************************************************************/
 
 template gibprop : prop
 {
@@ -16,31 +19,6 @@ template gibprop : prop
     }
 
     baseobflags = "k_baseobflag_dontNetworkSerialiseSave|k_baseobflag_dontRuntimeSerialiseSave"
-
-    //'fx' and 'health'(dmg) are also added in the code iff defined by the prop descript - force some default settings here if you want
-    
-    //is possible to add a decsript here if absolutely necessary
-  /*
-    //maybe i can copy this from the B_Gib part of the original prop descript????
-    descriptcomponent descript
-    {
-	script = "
-	B_GIB*
-	{
-	    event init
-	    {
-		electrify()
-		debugprintf(gibresinit)
-	    }
-	    event bullethit
-	    {
-		debugprintf(gibresbullet)
-	    }
-	}
-    }
-	"
-    }    
-    */
-    
+    isAllowedNetworkComponent = "false"
 }
 

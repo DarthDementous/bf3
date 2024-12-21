@@ -25,7 +25,7 @@ template particleSystem
     particleExpDecaySize			= 0
     particleExpDecayColour			= 0
     particleColourFormat			= "rgba"
-    particleType				= "sprite"
+    particleType				= "sprite" // strip, quad, geom, spark
     particleLife				= 1.0f
     particleLifeRandom				= 0.0f
     particleSizeX				= 1.0f //these are being deprecated, use the particleSize ramp
@@ -50,18 +50,19 @@ template particleSystem
     particleLuminosityShadows			= 0
     particleRefraction				= 0.0f
     particleBloom				= 0.0f
-    particleBlur				= 0.04f
+    particleBlur				= 0.0f
     particleSort				= 0
     particleReverseSorting			= 0
     particleZFeather				= 0
     particleLowRes				= 0
+    particleRenderLast				= 0    
     particleCML					= 1
     particleStopRotatingWhenStatic		= 0
     particleRandomMoveOnFrameZero		= 0
     particleDecalSize				= 0.1f
     particleDecalSizeRandom			= 1.0f
     particleDecalLimit				= 0
-    particleTextureColour			= "misctex/particle/test/particle_missing"
+    particleTextureColour			= "test/particle_missing"
     particleChildBirthFrequency			= 0				// be very carefull with this as it can quickly flood a scene with particles
     particleChildBirthTime			= 99999999.0f			// if not set then it should be longer than particle life
     particleChildBirthTimeRandom		= 0.0f
@@ -108,10 +109,6 @@ template particleSystem
 //  particleDecalMaterials
 }
 
-template particleSystemGeometry : particleSystem
-{
-    particleType				= "geometry"
-}
 
 template particleSystemSprite : particleSystem
 {

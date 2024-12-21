@@ -1,3 +1,4 @@
+// vim: set syntax=c :
 
 template decal
 {
@@ -15,12 +16,6 @@ template decal
     maxage = 0.0f //0 = permanent
 }
 
-template decal3d
-{
-    class-id    = "decal3d component"
-    model       = "3ddecals/rocket"
-    decal3dsize = 1.0f;
-}
 
 template pmatinfo
 {
@@ -97,41 +92,6 @@ template pmatinfo
 
 
     //no 3d decal by default
-
-      
-    decal k_decal_scorch //using sm_blah which is currently the same as rockets, but should be for smaller marks
-    { 
-	float decalsize []{   0.3f, 1.0f    }
-
-	//materials = "2ddecals/sm_default"
-
-	decalflags = "k_alphafade|k_overlap"
-	maxage = 10.0f
-    }
-    //could use this for particle sparks, fire effects, flame thrower gun decals etc.
-
-//particle decals - 
-    //not really material specific - will tend to be the same whatever material they land on,
-    
-    decal k_decal_spray 
-    { 
-	float decalsize []{   1.0f, 2.0f    }
-	//use debug materials only in common
-	//materials = "2ddecals/bloodspray1_col" 
-
-	decalflags = "k_alphafade|k_overlap"
-	maxage = 10.0f
-    }
-
-    decal k_decal_splat 
-    { 
-	float decalsize []{   1.0f, 2.0f    }
-	//use debug materials only in common
-	//materials = "2ddecals/blood_splat_2" //more splodgey
-
-	decalflags = "k_alphafade|k_overlap"
-	maxage = 10.0f
-    }
 
 }
 

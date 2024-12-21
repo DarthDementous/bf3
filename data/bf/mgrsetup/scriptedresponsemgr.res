@@ -1,4 +1,4 @@
-// vim: set syntax=c :
+/*// vim: set syntax=c :
 
 scriptedResponseManagerTemplate scriptedResponseManager
 {
@@ -6,4 +6,4 @@ scriptedResponseManagerTemplate scriptedResponseManager
     {
     }
 }
-
+*/

@@ -13,9 +13,18 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	    useAnimMaps			= "true" // False = Anims specified will be actual anims, True = Anims will be looked up via ChrAnimMaps 
 	}
 	
+	VehicleSetupDescBF walker_setup	//animated 
+	{
+	    name			= "walker_setup"
+	    enginedesc			= ""
+	    //animidle			= "taunidle"	
+	    aiVisionRange		= "k_ai_vehicle_vision_range_long"
+	}
+
 	VehicleSetupDescBF tauntaun_setup 
 	{
 	    name			= "tauntaun_setup"
+	    driverDofName		= "" // origin based
 	    enginedesc			= ""
 	    animidle			= "taunidle"
 	    animgetinl			= "taungetinl"
@@ -24,12 +33,18 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	    animdeath			= "taundeath"		
 	    animhitreact		= "taunhit"
 	}
-	
-	VehicleSetupDescBF walker_setup	//animated 
+
+	VehicleSetupDescBF atrt_setup
 	{
-	    name			= "walker_setup"
+	    name			= "atrt_setup"
+	    driverDofName		= ""
 	    enginedesc			= ""
-//	    animidle			= "taunidle"	
+	    animidle			= "atrtidle"
+	    animgetinl			= "atrtgetin"
+	    animgetinr			= "atrtgetin"
+	    animgetout			= "atrtgetout"
+	    animdeath			= "atrtgetout"
+	    animhitreact		= "atrtidle"
 	}
 
 	VehicleSetupDescBF speeder_setup 
@@ -42,7 +57,7 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	    animgetinl			= "spdrgtinl"		
 	    animgetinr			= "spdrgtinr"		
 	    animgetout			= "spdrgtout"		
-	    animdeath			= "spdrgtout"		
+	    animdeath			= "spdrdeath"		
 	    animfallout			= "spdrgtout"		
 	    animhitreact		= "spdrhit"
 	}
@@ -52,12 +67,12 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	    class-id			= "vehicle setup description"
 	    name			= "barc_setup"
 	    enginedesc			= ""
-	    animsteer			= "barcsteer"		
-	    animidle			= "barcidle"		
-	    animgetinl			= "barcgtinl"		
+	    animsteer			= "barcsteer"
+	    animidle			= "barcidle"
+	    animgetinl			= "barcgtinl"
 	    animgetinr			= "barcgtinr"		
 	    animgetout			= "barcgtout"		
-	    //animdeath			= "barcdeath"		
+	    animdeath			= "barcdeath"		
 	    //animfallout		= "barcgtout"		
 	    //animhitreact		= "barchit"
 	}
@@ -72,91 +87,158 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	    animgetin			= "stapgtin"		
 	    //animgetinr		= "stapgtinr"		
 	    animgetout			= "stapgtout"		
-	    //animdeath			= "stapdth"		
+	    animdeath			= "stapdeath"		
 	    //animfallout		= "stapgtout"		
 	    //animhitreact		= "staphit"
 	}
 
-
-	VehicleSetupDescBF sith_setup
+	VehicleSetupDescBF rspeeder_setup 
 	{
 	    class-id			= "vehicle setup description"
-	    name			= "sith_setup"
+	    name			= "rspeeder_setup"
 	    enginedesc			= ""
-	    animsteer			= "sithsteer"		
-	    animidle			= "sithidle"		
-	    animgetinl			= "sithgtinl"		
-	    animgetinr			= "sithgtinr"		
-	    animgetout			= "sithgtout"		
-	    animdeath			= "sithgtout"		
-	    animfallout			= "sithgtout"		
-	    animhitreact		= "sithhit"
+	    animsteer			= "" //barcsteer"		
+	    animidle			= "" //barcidle"		
+	    animgetinl			= "" //barcgtinl"		
+	    animgetinr			= "" //barcgtinr"		
+	    animgetout			= "" //barcgtout"		
+	    animdeath			= "" //barcdeath"		
+	    //animfallout		= "barcgtout"		
+	    //animhitreact		= "barchit"
 	}
 
 	VehicleSetupDescBF atte_setup
 	{
 	    class-id			= "vehicle setup description"
 	    name			= "atte_setup"
-	    weaponRotXMin		= -50.0f   //currently only implemented for walkers!!
-	    weaponRotXMax		= 10.0f	//note - both must be defined!
+	    weaponRotXMin		= -20.0f   //currently only implemented for walkers!!
+	    weaponRotXMax		= 40.0f	//note - both must be defined!
 	}
     }
 
     engine
     {
 	// This is not actually needed
-	GearedEngineDesc flying_engine
+	flying_engine
 	{
 	    class-id			= "geared engine description"
 	    name			= "flying_engine"
+	    differential		= 12.f
+	    maxrevs			= 10000.f
+	    shiftUpRPM			= 7500.f
+	    shiftDownRPM		= 3500.f
+	    neutralDelay		= 0.1f
+	    shiftUpDelay		= 1.2f
+	    shiftDownDelay		= 0.5f
+	    throttleTimeUp		= 0.3f
+	    throttleTimeDown		= 0.7f
+	    scaleTorqueValues		= 1.0f	   
+	    boostForceXZ		= 50000.f
+	    boostForceY			= 25000.f
+
+	    float torquecurve [] =  
+	    {
+		0.0f, 360.0f,
+		1000.0f, 370.0f,
+		2000.0f, 400.0f,
+		3000.0f, 470.0f,
+		4000.0f, 570.0f,
+		5000.0f, 670.0f,
+		6000.0f, 725.0f,
+		7000.0f, 732.0f,
+		8000.0f, 700.0f,
+		9000.0f, 640.0f,
+		10000.0f, 540.0f
+	    }				
+
+	    float gearratios []	=	{0.00f, 5.00f, 3.40f, 2.45f, 1.85f, 1.64f, 5.00f}
 	}
     }
+
+    creature
+    {
+	AnimatedWalkingCreatureDesc tauntaun_anim
+	{
+	    name		= "tauntaun_anim"
+
+	    yawMultiplier	= 3.0f
+	    pitchMultiplier	= 1.0f
+
+	    lookLerp		= 2.0f
+	    moveLerp		= 4.0f
+
+	    turnFactor		= 3.0f
+	    turn		= 1.0f
+	    speed		= 11.0f
+
+	    ubiksInner		= 10.0f
+	    ubiksOuter		= 20.0f
+
+	    mountBoneName	= "spine_1"
+	    mountBoneOffset[]	= {0.0f, -1.1f, 0.0f}
+	}
+    }
+
     physics_tracked
     {
+	// whilst there is a part index discrepency between IV and III need this hacked vehicle
+	TrackedVehiclePhyDescTemplate hailfire_phys_4
+	{
+	    name			= "hailfire_phys_4"
+		
+	    fakewheeltype		= "fake_wheel"
+	    numFakeWheels		= 4
+	    numRotators			= 2
+	    
+	    maxSpeed			    = 20.f
+	    maxTrackSteerSpeedWhenStopped   = 8.0f
+	    maxTrackSteerSpeedWhenFast	    = 8.0f
+	    trackAccelRate		    = 20.0f
+
+	    //USE DEBUG GRAPHICS TO CHECK WHEEL POSITIONS ARE CORRECT
+	    float fakewheeloffsets  []	= { -3.2f, 1.1f,  2.0f,
+					    -3.2f, 1.1f, -3.0f,
+					     3.2f, 1.1f,  2.0f,
+					     3.2f, 1.1f, -3.0f
+					    }
+	    rotatorPartNumbers	    []	= {5, 10}
+	}
+
 	TrackedVehiclePhyDescTemplate hailfire_phys
 	{
 	    name			= "hailfire_phys"
 		
 	    fakewheeltype		= "fake_wheel"
-	    rotatorsAreGeometry		= "true"		//Otherwise, rotators are texture-based
-	    selfRighting		= "true"
-	    numFakeWheels		= 4
+	    numFakeWheels		= 8
 	    numRotators			= 2
-	    maxTrackSteerSpeed		= 7.0f
-	    maxSpeed			= 15.f
+	    
+	    maxSpeed			    = 13.f//17.f
+	    maxTrackSteerSpeedWhenStopped   = 6.5f
+	    maxTrackSteerSpeedWhenFast	    = 7.0f
+	    trackAccelRate		    = 17.0f
+
+	    fakeWheelSuspensionSpring = 0.1f
+	    fakeWheelSuspensionDampening = 0.5f
+	    fakeWheelSuspensionDampening2 = 0.5f
+	    fakeWheelSuspensionDampeningImpact = 0.5f
+	    fakeWheelSuspensionTravel = 0.3f
+	    fakeWheelSuspensionOffset = 0.01f
 
 	    //USE DEBUG GRAPHICS TO CHECK WHEEL POSITIONS ARE CORRECT
-	    float fakewheeloffsets  []	= { -3.2f, 0.90f,  2.0f,
-					    -3.2f, 0.90f, -3.0f,
-					     3.2f, 0.90f,  2.0f,
-					     3.2f, 0.90f, -3.0f
-					    }
-	    rotatorPartNumbers	    []	= {5, 10}
+    	    fakeWheelRadius		= 0.85f
+	    float fakewheeloffsets  []	= {
+					    -2.2f, 1.0f,  2.7f,
+					    -2.2f, 1.0f,  0.8f,
+					    -2.2f, 1.0f, -1.1f,
+					    -2.2f, 1.0f, -2.9f,
+					     2.2f, 1.0f,  2.7f,
+					     2.2f, 1.0f,  0.8f,
+					     2.2f, 1.0f, -1.1f,
+					     2.2f, 1.0f, -2.9f
+					  }
+	    rotatorPartNumbers	    []	= {4, 9}
 	}
-	TrackedVehiclePhyDescTemplate snailtank_phys
-	{
-	    name			= "snail_phys"
-		
-	    fakewheeltype		= "fake_wheel"
-	    rotatorsAreGeometry		= "false"		//Rotators are texture-based, not geometry
-	    selfRighting		= "true"
-	    numFakeWheels		= 6
-	    numRotators			= 8 //2
-	    maxTrackSteerSpeed		= 7.0f
-	    maxSpeed			= 15.f
-		fakeWheelRadius		= 0.75f
 
-	    numCentreFakeWheels		= 2
-
-	    //USE DEBUG GRAPHICS TO CHECK WHEEL POSITIONS ARE CORRECT
-	    float fakewheeloffsets  []	= { -3.2f, 0.55f,  1.7f,
-					    -3.2f, 0.50f,  4.5f,
-					     3.2f, 0.50f,  1.7f,
-					     3.2f, 0.50f,  4.5f,
-					     0.0f, 0.50f,  2.0f,
-					     0.0f, 0.50f, -5.0f   }
-	    rotatorPartNumbers	    []	= {4, 5, 6, 7, 8, 9, 10, 11}
-	}
 	TrackedVehiclePhyDescTemplate msedroid_vphys
 	{
 	    name			= "msedroid_vphys"
@@ -168,12 +250,13 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	    selfRighting		= "true"
 	    numFakeWheels		= 4
 	    numRotators			= 2
-	    maxTrackSteerSpeed		= 20.0f
-	    maxSpeed			= 40.f
 	
+	    maxSpeed			    = 40.f
+	    maxTrackSteerSpeedWhenStopped   = 20.0f
+	    maxTrackSteerSpeedWhenFast	    = 20.0f
+
 	    bodyMass			= 1000.0f
 	    wheelMass			= 20.f
-	//    centreOfMassOffset[]	= { 0.0f, -0.3f, 0.0f }
 
 	    //USE DEBUG GRAPHICS TO CHECK WHEEL POSITIONS ARE CORRECT
 	    fakeWheelRadius = 0.3f
@@ -189,227 +272,154 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	}
     }
 
-    physics_walking
+    physics_animated
     {
-	WalkingVehiclePhyDescTemplate atst_physics
+	AnimatedWalkingPhyDescTemplate atst_anim
 	{
-	    name			= "atst_phys"
-	    totalPhysicsParts		= 12 
-	    numLegs			= 2
-	    footFollowJointSpring		= 8500.f
-	    footFollowJointDamping		= 300.f
-	    bodyFollowJointSpring	= 13000.f
-	    bodyFollowJointDamping	= 1300.f
-	    //these behave differently: there's no damping; the higher the value the faster and more damped follow joint is.
-	    footFollowJointDirectK		= 10.0f;
-	    footFollowJointDirectAngK	= 200.0f;
-	    bodyFollowJointDirectK		= 5.0f;
-	    bodyFollowJointDirectAngK	= 20.0f;
-	    
-	    legStrings		[]	= { "RHIPTOP,Y;B_RHIP;RHIPBOT,X;B_RTHIGH;RKNEE,X;B_RSHIN;RANKLETOP,X;B_RANKLE;RANKLEBOT,X;B_RFOOT",
-					    "LHIPTOP,Y;B_LHIP;LHIPBOT,X;B_LTHIGH;LKNEE,X;B_LSHIN;LANKLETOP,X;B_LANKLE;LANKLEBOT,X;B_LFOOT"}
-	    bodyPartIndex		= 0
-	    headPartIndex		= 1
-	    maxStrideDist		= 7.0f
-	    maxStrideHeight		= 1.4f
-	    maxBodyLeadDist		= 1.0f
-	    footstepIncrement		= 1.8f
-	    numPistons			= 0
-	    independentHead		= "true"
-	    bodyMass			= 100.f
-	    headMass			= 10.0f
-	    socketSpringStrengthSwing	= 20.f
-	    socketSpringStrengthTwist	= 1.f
-	    strideTime			= 0.625f
-	    projectJoints		= "true"	//Ask RSemmens what this is
+	    name		= "atst_anim"
 
-	    footMass			= 50.f
-	    limbPartMass		= 15.f
-
-	    hingeSpringForce		= 1000.0f
+	    yawMultiplier	= 1.5f
+	    pitchMultiplier	= 1.5f
 	    
-	    scaleOffsetTowardsCentreRatio = 0.33f
-	    numJointsPerLeg		= 5
-	    legCycle[]			= { 0, 1 }
-	    //sorry, but the legJointLimits will get messy. See template for explanation
-	    legJointLimits	[]	= { -20.f, 0.f,   -20.f, 20.f,   -90.f, 90.f,   -10.f, 5.f,   -50.1f, 20.f,
-					    0.f, 20.f,    -20.f, 20.f,   -90.f, 90.f,   -10.f, 5.f,   -50.1f, 20.f}
+	    lookLerp		= 4.0f
+	    moveLerp		= 4.0f
+	    turnLerp		= 2.0f //lerps your inputs when strafing
+
+	    lookLerpToZero	= 8.0f
+	    moveLerpToZero	= 6.0f
+
+	    turnFactor		= 0.5f
+	    turn		= 1.0f
+	    speed		= 7.0f
+
+	    ubiksInner		= 50.0f
+	    ubiksOuter		= 60.0f
+
+	    ubiksInnerUpper	= 50.0f	//Slows down your movement as hit the inner
+	    ubiksOuterUpper	= 55.0f	//reducing it to zero when you hit the upper
+
+	    ubiksInnerLower	= 10.0f	//The same but for downwards
+	    ubiksOuterLower	= 20.0f
+	    
+	    ubiksAnimX		= 94.0f	//The angle that the animation is when max
+	    ubiksAnimY		= 40.0f	//these values can be used to align the ubiks with the camera
+
+	    movingUbiksBlend	= 1.0f
 	}
 
-	WalkingVehiclePhyDescTemplate atrt_physics
+	AnimatedWalkingPhyDescTemplate atrt_anim
 	{
-	    name			= "atrt_phys"
-	    totalPhysicsParts		= 9
-	    numLegs			= 2
-	    footFollowJointSpring	= 7000.f
-	    footFollowJointDamping	= 100.f
-	    bodyFollowJointSpring	= 10000.f
-	    bodyFollowJointDamping	= 1005.f
-	    //these behave differently: there's no damping; the higher the value the faster and more damped follow joint is.
-	    footFollowJointDirectK		= 10.0f;
-	    footFollowJointDirectAngK	= 10.0f;
-	    bodyFollowJointDirectK		= 5.0f;
-	    bodyFollowJointDirectAngK	= 20.0f;
+	    name		= "atrt_anim"
+
+	    yawMultiplier	= 1.4f
+	    pitchMultiplier	= 1.2f
+
+	    lookLerp		= 5.0f
+	    moveLerp		= 6.0f
 	    
-	    legStrings		[]	= { "RTHIGH,W;B_RTHIGH;RKNEE,X;B_RKNEE;RSHIN,X;B_RSHIN;RANKLE,X;B_RANKLE",
-					    "LTHIGH,W;B_LTHIGH;LKNEE,X;B_LKNEE;LSHIN,X;B_LSHIN;LANKLE,X;B_LANKLE"}
-	    bodyPartIndex		= 0
-	    headPartIndex		= 1
-	    maxStrideDist		= 3.2f
-	    maxStrideHeight		= 0.7f
-	    maxBodyLeadDist		= 0.25f
-	    projectJoints		= "true"    //Ask RSemmens what this is
+	    turnFactor		= 1.0f
+	    turn		= 0.5f
+	    speed		= 3.5f
 	    
-	    footstepIncrement		= 0.8f
-	    numPistons			= 0
-	    independentHead		= "false"
-	    bodyMass			= 50.f
-	    footMass			= 35.f
-	    limbPartMass		= 12.f
-	    strideTime			= 0.525f
+	    ubiksInnerUpper	= 25.0f	//Slows down your movement as hit the inner
+	    ubiksOuterUpper	= 30.0f	//reducing it to zero when you hit the upper
 
-	    scaleOffsetTowardsCentreRatio = 0.1f
-	    numJointsPerLeg		= 4
-	    legCycle[]			= { 0, 1 }
-
-	    socketSpringStrengthSwing	= 100.f
-	    socketSpringStrengthTwist	= 200.f
-
-   	    hingeSpringForce		= 300.0f
- 
-
-	    //sorry, but the legJointLimits will get messy. See template for explanation
-	    legJointLimits	[]	= { 25.f, 25.f,   -45.f, 45.f,   -45.f, 45.f,   -45.f, 45.f,
-					    25.f, 25.f,   -45.f, 45.f,   -45.f, 45.f,   -45.f, 45.f}
-	}
-	
-	WalkingVehiclePhyDescTemplate atat_physics
-	{
-	    name			= "atat_phys"
-	    totalPhysicsParts		= 22
-	    numLegs			= 4
-	    footFollowJointSpring		= 30000.f
-	    footFollowJointDamping		= 3000.f
-	    bodyFollowJointSpring		= 99500.f //was 3500
-	    bodyFollowJointDamping		= 9900.f
-	    //these behave differently: there's no damping; the higher the value the faster and more damped follow joint is.
-	    footFollowJointDirectK		= 10.0f;
-	    footFollowJointDirectAngK	= 10.0f;
-	    bodyFollowJointDirectK		= 5.0f;
-	    bodyFollowJointDirectAngK	= 20.0f;
+	    ubiksInnerLower	= 30.0f	//The same but for downwards
+	    ubiksOuterLower	= 35.0f
 	    
-	    legStrings		[]	= { "FR_hip,W;B_FR_hip;FR_thigh,X;B_FR_thigh;FR_knee,X;B_FR_knee;FR_ankle,X;B_FR_ankle;FR_foot,Z;B_FR_foot",
-					    "FL_hip,W;B_FL_hip;FL_thigh,X;B_FL_thigh;FL_knee,X;B_FL_knee;FL_ankle,X;B_FL_ankle;FL_foot,Z;B_FL_foot",
-					    "BR_hip,W;B_BR_hip;BR_thigh,X;B_BR_thigh;BR_knee,X;B_BR_knee;BR_ankle,X;B_BR_ankle;BR_foot,Z;B_BR_foot",
-					    "BL_hip,W;B_BL_hip;BL_thigh,X;B_BL_thigh;BL_knee,X;B_BL_knee;BL_ankle,X;B_BL_ankle;BL_foot,Z;B_BL_foot"}
+	    ubiksInner		= 40.0f
+	    ubiksOuter		= 50.0f
 
-	    projectJoints		= "false"	//Ask RSemmens what this is
-	    footMaxDegFromCentreline	= 15.0f
-
-	    bodyPartIndex		= 0
-	    headPartIndex		= 1
-	    maxStrideDist		= 8.0f
-	    maxStrideHeight		= 2.5f
-	    maxBodyLeadDist		= 0.15f
-	    strideTime			= 1.8f
-	    footMaxStrideAngle		= 15.0f
-	    footMovementAlgorithm	= 2
-	    strafeDampening		= 0.5f
-	    
-	    footstepIncrement		= 4.8f
-	    numPistons			= 0
-	    independentHead		= "true"
-	    lowerBodyOnFootRise		= "false"
-	    headMass			= 1.0f
-	    bodyMass			= 500.f
-	    footMass			= 200.f
-	    limbPartMass		= 100.f //was 50
-
-	    scaleOffsetTowardsCentreRatio   = 0.0f
-	    numJointsPerLeg		    = 5
-	    maxHeadRotDeg		    = 35.f
-
-	    socketSpringStrengthSwing	= 1000.f    //Controls how easily it swings
-	    socketSpringStrengthTwist	= 1000.f    //Controls how easily it twists
-	    hingeSpringForce		= 2000.0f
-	    hingeFrictionMotorForce	= 0.0f
-	    
-	    legCycle[]			= { 0, 3, 1, 2 }
-	    //sorry, but the legJointLimits will get messy. See template for explanation
-	    //twist, then swing limit on first pair
-	    legJointLimits	[]	= { 20.f, 10.f,   -60.f, 60.f,   -45.f, 5.f,   -55.f, 55.f,  -45.f, 45.f,
-					    20.f, 10.f,   -60.f, 60.f,   -45.f, 5.f,   -55.f, 55.f,  -45.f, 45.f,
-					    20.f, 10.f,   -60.f, 60.f,   -45.f, 5.f,   -55.f, 55.f,  -45.f, 45.f,
-					    20.f, 10.f,   -60.f, 60.f,   -45.f, 5.f,   -55.f, 55.f,  -45.f, 45.f}
+	    movingUbiksBlend	= 0.0f
 	}
 
-	WalkingVehiclePhyDescTemplate atte_physics
+	AnimatedWalkingPhyDescTemplate atat_anim
 	{
-	    name			= "atte_phys"
-	    totalPhysicsParts		= 25
-	    numLegs			= 6
-	    footFollowJointSpring	= 60000.f
-	    footFollowJointDamping	= 6000.f
-	    footFollowJointAngularMul	= 0.9f;
-	    bodyFollowJointSpring	= 100000.f //was 3500
-	    bodyFollowJointDamping	= 10000.f
-	    bodyFollowJointAngularMul	= 1.2f;
-	    
-	    footFollowJointDirectK	= 10.0f;
-	    footFollowJointDirectAngK	= 10.0f;
-	    bodyFollowJointDirectK	= 3.0f;
-	    bodyFollowJointDirectAngK	= 20.0f;
+	    name		= "atat_anim"
 
-	    legStrings		[]	= { "RFTHIGH,W;B_R_FTHIGH;RFSHINTOP,X;B_R_FSHIN;RFSHINBOT,Z;B_R_FANKLE;RFANKLE,X;B_R_FFOOT",
-					    "LFTHIGH,W;B_L_FTHIGH;LFSHINTOP,X;B_L_FSHIN;LFSHINBOT,Z;B_L_FANKLE;LFANKLE,X;B_L_FFOOT",
-					    "RMHIP,W;B_R_MHIP;RMTHIGHTOP,X;B_R_MTHIGHSHIN;RMTHIGHBOT,Z;B_R_MANKLE;RMANKLE,X;B_R_MFOOT",
-					    "LMHIP,W;B_L_MHIP;LMTHIGHTOP,X;B_L_MTHIGHSHIN;LMTHIGHBOT,Z;B_L_MANKLE;LMANKLE,X;B_L_MFOOT",
-					    "RBTHIGH,W;B_R_BTHIGH;RBSHINTOP,X;B_R_BSHIN;RBSHINBOT,Z;B_R_BANKLE;RBANKLE,X;B_R_BFOOT",
-					    "LBTHIGH,W;B_L_BTHIGH;LBSHINTOP,X;B_L_BSHIN;LBSHINBOT,Z;B_L_BANKLE;LBANKLE,X;B_L_BFOOT"}
+	    yawMultiplier	= 1.2f
+	    pitchMultiplier	= 1.2f
 
-	    projectJoints		= "false"	//Ask RSemmens what this is
-	    footMaxDegFromCentreline	= 15.0f
+	    lookLerp		= 1.0f
+	    moveLerp		= 2.0f
 
-	    bodyPartIndex		= 0
-	    headPartIndex		= 1
-	    maxStrideDist		= 2.0f
-	    maxStrideHeight		= 1.2f
-	    maxBodyLeadDist		= 0.15f
-	    strideTime			= 1.5f
-	    footMaxStrideAngle		= 0.0f
-	    footMovementAlgorithm	= 2
-	    strafeDampening		= 0.3f
-	    
-	    footstepIncrement		= 2.0f
-	    numPistons			= 0
-	    independentHead		= "true"
-	    lowerBodyOnFootRise		= "false"
-	    headMass			= 1.0f
-	    bodyMass			= 500.f
-	    footMass			= 100.f
-	    limbPartMass		= 50.f //was 50
+	    lookLerpToZero	= 8.0f
+	    moveLerpToZero	= 1.0f
+    
+	    turnFactor		= 0.1f
+	    turn		= 1.0f
+	    speed		= 2.5f
 
-	    scaleOffsetTowardsCentreRatio   = 0.0f
-	    numJointsPerLeg		    = 4
-	    maxHeadRotDeg		    = 20.0f
-	    
-	    socketSpringStrengthSwing	= 1000.f    //Controls how easily it swings
-	    socketSpringStrengthTwist	= 1000.f    //Controls how easily it twists
-	    hingeSpringForce		= 3500.0f
-	    hingeFrictionMotorForce	= 0.0f
+	    ubiksInner		= 45
+	    ubiksOuter		= 50
+
+	    ubiksInnerUpper	= 20.0f//30.0f	//Slows down your movement as hit the inner
+	    ubiksOuterUpper	= 25.0f//35.0f	//reducing it to zero when you hit the upper
+
+	    ubiksInnerLower	= 30.0f//40.0f	//The same but for downwards
+	    ubiksOuterLower	= 35.0f//45.0f
 	   
-	    numLegsAtOnce		= 3
-	    legCycle[]			= { 0, 3, 5, 1, 2, 4 }
-	    //sorry, but the legJointLimits will get messy. See template for explanation
-	    //twist, then swing limit on first pair
-	    legJointLimits	[]	= { 30.f, 20.f,   -60.f, 60.f,   -10.f, 10.f,   -10.f, 10.f,
-					    30.f, 20.f,   -60.f, 60.f,   -10.f, 10.f,   -10.f, 10.f,
-					    30.f, 20.f,   -60.f, 60.f,   -10.f, 10.f,   -10.f, 10.f,
-					    30.f, 20.f,   -60.f, 60.f,   -10.f, 10.f,   -10.f, 10.f,
-					    30.f, 20.f,   -60.f, 60.f,   -10.f, 10.f,   -10.f, 10.f,
-					    30.f, 20.f,   -60.f, 60.f,   -10.f, 10.f,   -10.f, 10.f }
+	    ubiksAnimX		= 54.0f	//The angle that the animation is when max
+	    ubiksAnimY		= 40.0f	//these values can be used to align the ubiks with the camera
+
+	    movingUbiksBlend	= 1.0f
+	}
+
+	AnimatedWalkingPhyDescTemplate atte_anim
+	{
+	    name		= "atte_anim"
+
+	    yawMultiplier	= 2f
+	    pitchMultiplier	= 5f
+
+	    lookLerp		= 1.0f
+	    moveLerp		= 8.0f
+	    
+	    turnFactor		= 0.5f	//turn speed when walking
+	    turn		= 1.0f	//input scaling
+	    speed		= 3.0f
+
+	    ubiksInner		= 30.0f //30
+	    ubiksOuter		= 35.0f //35
+
+	    ubiksInnerUpper	= 25.0f	//Slows down your movement as hit the inner
+	    ubiksOuterUpper	= 30.0f	//reducing it to zero when you hit the upper
+
+	    ubiksInnerLower	= 30.0f	//The same but for downwards //30
+	    ubiksOuterLower	= 35.0f	//35
+	    
+	    ubiksAnimX		= 40.0f	//The angle that the animation is when max
+	    ubiksAnimY		= 40.0f	//these values can be used to align the ubiks with the camera
+	}
+
+	AnimatedWalkingPhyDescTemplate atxr_anim
+	{
+	    name		= "atxr_anim"
+
+	    yawMultiplier	= 1.5f
+	    pitchMultiplier	= 1.5f
+
+	    lookLerp		= 4.0f
+	    moveLerp		= 4.0f	
+	    
+	    turnFactor		= 0.4f
+	    turn		= 1.0f
+	    speed		= 4.7f
+
+	    ubiksInnerUpper	= 35.0f	//Slows down your movement as hit the inner
+	    ubiksOuterUpper	= 40.0f	//reducing it to zero when you hit the upper
+
+	    ubiksInnerLower	= 15.0f	//The same but for downwards
+	    ubiksOuterLower	= 20.0f
+
+	    ubiksAnimX		= 110.0f	//The angle that the animation is when max
+	    ubiksAnimY		= 90.0f	//these values can be used to align the ubiks with the camera
+
+	    ubiksInner		= 45.0f
+	    ubiksOuter		= 55.0f
 	}
     }
+
     wheel
     {
 	/*
@@ -527,9 +537,7 @@ VehicleDescriptionsTemplate VehicleDescriptions
 
 	    rollMultiplier		= 4.0f
 	    rollDeadZone		= 0.0f
-	    pitchMultiplier		= 1.0f
-	    yawMultiplier		= 1.0f
-	    aiSpeedMultiplier		= 0.9f
+	    aiSpeedMultiplier		= 1.0f
 
 	    lowLevelSpeed		= 150
 	    accelLerpUp			= 1
@@ -557,52 +565,101 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	{
 	    name = "rep_starftr"
 	    lowLevelSpeed = 275
-	    yawMultiplier = 1.4f
-	    pitchMultiplier = 1.5f
 	    offsetForHeightCheck = -3.25f
 	    
 	    groundClearanceNeededForTakeOffAnim = 4.0f
 
-	    chassisMass			= 5000.0f
+	    chassisMass			= 4500.0f
 
 	    evadeSpeed			= 4.3f
 	    evadeTurn			= 3.25f
 	    evadeForce			= 22f
 
-            brakeTurnMultiplier		= 1.6f
-	    turnMultiplier		= 1.3f
-	    boostTurnMultiplier		= 0.9f
+	    brakeSpeedMultiplier	= 0.3f	// speed = 82.5  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.5f	// speed = 137.5  lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.5f	// speed =  lowLevelSpeed * boostSpeedMulti is your target speed when boosting
+
+	    brakeTurnMultiplier		= 1.9f
+	    turnMultiplier		= 1.45f
+	    boostTurnMultiplier		= 0.6f
     
 	    FakeRollAngle		= 70.0f
 
-	    chassisMass			= 8000.0f  
+	    fakeTurbulence		= 1.0f
+	    accelLerpUp			= 150
+	    accelLerpDown		= 120
 	}
 
 	FlyingVehiclePhyDescTemplate rep_gunship_phys
 	{
 	    name = "rep_gship"
 	    lowLevelSpeed = 160
-	    yawMultiplier = 0.6f
-	    pitchMultiplier = 0.6f
 	    allowInvertedFlight = "false"
 	    offsetForHeightCheck = -3.0f
 
-	    brakeTurnMultiplier		= 1.6f
-	    turnMultiplier		= 1.25f
-	    boostTurnMultiplier		= 1.1f
+	    takeOffSpeed	    = 100	//50 // The speed of take off
+	    takeOffTime		    = 15	//20 // The amount of time for which to engage the vertical thrusters
+	    landingSpeed	    = 50	//15 // The speed at which landing occurs
+	    maxLandingHeight	    = 30	// The maximum height at which the land button will work
+	    maxWakeHeight	    = 15	// The maximum height at which the ship causes a dust wake on the ground
+
+	    brakeSpeedMultiplier	= 0.4f	// speed = 16  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.7f	// speed = 80  lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.2f	// speed = 160 lowLevelSpeed * boostSpeedMulti is your target speed when boosting
+
+	    brakeTurnMultiplier		= 1.2f  // 5.66 seconds to complete 360 degree turn
+	    turnMultiplier		= 0.9f  // 7.11 seconds to complete 360 degree turn
+	    boostTurnMultiplier		= 0.58f // 10.84 seconds to complete 360 degree turn
+
+	    //brakeTurnMultiplier		= 1.1f  // 5.81 seconds to complete 360 degree turn
+	    //turnMultiplier		= 0.8f  // 8.09 seconds to complete 360 degree turn
+	    //boostTurnMultiplier		= 0.48f // 14.37 seconds to complete 360 degree turn
     
 	    FakeRollAngle		= 40.0f
+	    fakeTurbulence		= 0.25f
 	    landingCushionAngle		= 0.0f
 
 	    chassisMass			= 20000.0f  
+	}
+
+	// Really heavy version of the gunship above
+	FlyingVehiclePhyDescTemplate rep_gnshphv_phys
+	{
+	    name = "rep_gshiphv"
+	    lowLevelSpeed = 160
+	    allowInvertedFlight = "false"
+	    offsetForHeightCheck = -3.0f
+
+	    takeOffSpeed	    = 100	//50 // The speed of take off
+	    takeOffTime		    = 15	//20 // The amount of time for which to engage the vertical thrusters
+	    landingSpeed	    = 50	//15 // The speed at which landing occurs
+	    maxLandingHeight	    = 30	// The maximum height at which the land button will work
+	    maxWakeHeight	    = 15	// The maximum height at which the ship causes a dust wake on the ground
+
+	    brakeSpeedMultiplier	= 0.4f	// speed = 16  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.7f	// speed = 80  lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.2f	// speed = 160 lowLevelSpeed * boostSpeedMulti is your target speed when boosting
+
+	    brakeTurnMultiplier		= 1.2f  // 5.66 seconds to complete 360 degree turn
+	    turnMultiplier		= 0.9f  // 7.11 seconds to complete 360 degree turn
+	    boostTurnMultiplier		= 0.58f // 10.84 seconds to complete 360 degree turn
+
+	    //brakeTurnMultiplier		= 1.1f  // 5.81 seconds to complete 360 degree turn
+	    //turnMultiplier		= 0.8f  // 8.09 seconds to complete 360 degree turn
+	    //boostTurnMultiplier		= 0.48f // 14.37 seconds to complete 360 degree turn
+    
+	    FakeRollAngle		= 40.0f
+	    fakeTurbulence		= 0.25f
+	    landingCushionAngle		= 0.0f
+
+	    // Really high mass so it can't be knocked around to fix bugs on story
+	    chassisMass			= 990000.0f  
 	}
 
 	FlyingVehiclePhyDescTemplate rep_n1starfighter_phys
 	{
 	    name = "rep_n1sftr"
 	    lowLevelSpeed = 240
-	    yawMultiplier = 1.1f
-	    pitchMultiplier = 1.0f
 	    offsetForHeightCheck = -1.3f
 	   
 	    evadeSpeed			= 4.3f
@@ -621,9 +678,7 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	FlyingVehiclePhyDescTemplate rep_vwing_phys
 	{
 	    name = "rep_vwing"
-	    lowLevelSpeed = 225
-	    yawMultiplier = 1.0f
-	    pitchMultiplier = 0.9f
+	    lowLevelSpeed = 235
 	    offsetForHeightCheck = -4.5f
 
 	    groundClearanceNeededForTakeOffAnim = 4.0f
@@ -631,80 +686,123 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	    evadeSpeed			= 4.3f
 	    evadeTurn			= 3.25f
 	    evadeForce			= 22f
-
-	    
-            brakeTurnMultiplier		= 1.6f
-	    turnMultiplier		= 1.25f
-	    boostTurnMultiplier		= 1.1f
+	   
+	    brakeSpeedMultiplier	= 0.3f	// speed = 70.5  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.5f	// speed = 117.5  lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.4f	// speed = 235 lowLevelSpeed * boostSpeedMulti is your target speed when boosting
+	
+	    brakeTurnMultiplier		= 1.7f
+	    turnMultiplier		= 1.15f
+	    boostTurnMultiplier		= 0.7f
     
 	    FakeRollAngle		= 70.0f
+	    fakeTurbulence		= 0.8f
+	    accelLerpUp			= 130
+	    accelLerpDown		= 100
 
             chassisMass			= 8000.0f  
 	}
 
+	FlyingVehiclePhyDescTemplate rep_jedifighter_phys
+	{
+	    name = "jedi_fight"
+	    lowLevelSpeed = 300
+	    offsetForHeightCheck = -2.8f
 
+	    evadeSpeed			= 5.0f
+	    evadeTurn			= 4.25f
+	    evadeForce			= 22f
+
+	    brakeSpeedMultiplier	= 0.3f
+	    cruiseSpeedMultiplier	= 0.5f
+	    boostSpeedMultiplier	= 1.5f
+
+	    brakeTurnMultiplier		= 2.0f
+	    turnMultiplier		= 1.6f
+	    boostTurnMultiplier		= 0.9f
+	    	       
+	    FakeRollAngle		= 70.0f
+	    fakeTurbulence		= 1.0f
+	    accelLerpUp			= 150
+	    accelLerpDown		= 120
+	    
+   	    chassisMass			= 10000.0f 
+	}
 	//////////////////////////////////////////////
 	// CIS (Confederation of Indepedent Systems) SHIPS
 	//////////////////////////////////////////////
 	
 	// Scout Class
-	FlyingVehiclePhyDescTemplate cis_trifighter_phys
+	FlyingVehiclePhyDescTemplate cis_droidfighter_phys
 	{
-	    name = "cis_triftr"
+	    name = "cis_drdfghtr"
 	    lowLevelSpeed = 275
-	    yawMultiplier = 1.4f
-	    pitchMultiplier = 1.5f
-	    offsetForHeightCheck = -2.2f
-	    float inFlightControlFilterSpeed [] { 3.0f, 3.0f, 15.0f }
+	    offsetForHeightCheck = -7.0f
+//	    float inFlightControlFilterSpeed [] { 3.0f, 3.0f, 15.0f }
 
 	    evadeSpeed			= 4.3f
 	    evadeTurn			= 3.25f
 	    evadeForce			= 22f
     	    
-	    chassisMass			= 15000.0f  
+	    chassisMass			= 6000.0f
 
-	    brakeTurnMultiplier		= 1.6f
-	    turnMultiplier		= 1.25f
-	    boostTurnMultiplier		= 1.1f
+	    brakeSpeedMultiplier	= 0.3f	// speed = 82.5  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.5f	// speed = 137.5  lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.5f	// speed = 275 lowLevelSpeed * boostSpeedMulti is your target speed when boosting
+
+	    brakeTurnMultiplier		= 1.9f
+	    turnMultiplier		= 1.45f
+	    boostTurnMultiplier		= 0.6f
     
 	    FakeRollAngle		= 70.0f 
+	    fakeTurbulence		= 0.8f
+	    accelLerpUp			= 150
+	    accelLerpDown		= 120
 	}
 
-	FlyingVehiclePhyDescTemplate cis_droidfighter_phys
+	FlyingVehiclePhyDescTemplate cis_trifighter_phys
 	{
-	    name = "cis_drdfghtr"
-	    lowLevelSpeed = 275
-	    yawMultiplier = 1.4f
-	    pitchMultiplier = 1.5f
-	    offsetForHeightCheck = -7.0f
+	    name = "cis_triftr"
+	    lowLevelSpeed = 235
+	    offsetForHeightCheck = -2.2f
 
 	    evadeSpeed			= 4.3f
 	    evadeTurn			= 3.25f
 	    evadeForce			= 22f
 
-            brakeTurnMultiplier		= 1.6f
-	    turnMultiplier		= 1.25f
-	    boostTurnMultiplier		= 1.1f
-    
-	    FakeRollAngle		= 70.0f
+	    brakeSpeedMultiplier	= 0.3f	// speed = 70.5  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.5f	// speed = 117.5  lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.4f	// speed = 235 lowLevelSpeed * boostSpeedMulti is your target speed when boosting
 
-	    chassisMass			= 6000.0f  
+	    brakeTurnMultiplier		= 1.7f
+	    turnMultiplier		= 1.15f
+	    boostTurnMultiplier		= 0.7f
+   
+	    FakeRollAngle		= 70.0f
+	    fakeTurbulence		= 1.0f
+	    accelLerpUp			= 130
+	    accelLerpDown		= 100
+
+	    chassisMass			= 15000.0f
 	}
 
 	FlyingVehiclePhyDescTemplate cis_droidgunship_phys
 	{
 	    name = "cis_droidgun"
 	    lowLevelSpeed = 160
-	    yawMultiplier = 0.6f
-	    pitchMultiplier = 0.6f
 	    offsetForHeightCheck = -1.1f
 	    allowInvertedFlight = "false"
 
-	    brakeTurnMultiplier		= 1.6f
-	    turnMultiplier		= 1.25f
-	    boostTurnMultiplier		= 1.1f
+    	    brakeTurnMultiplier		= 1.2f  // 5.66 seconds to complete 360 degree turn
+	    turnMultiplier		= 0.9f  // 7.11 seconds to complete 360 degree turn
+	    boostTurnMultiplier		= 0.58f // 10.84 seconds to complete 360 degree turn
+  
+	    brakeSpeedMultiplier	= 0.2f	// speed = 32  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.5f	// speed = 57.6  lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.2f	// speed = 160 lowLevelSpeed * boostSpeedMulti is your target speed when boosting
     
 	    FakeRollAngle		= 50.0f     
+	    fakeTurbulence		= 0.25f
 	    landingCushionAngle		= 0.0f
 
 	    chassisMass			= 20000.0f  
@@ -716,11 +814,20 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	    lowLevelSpeed = 400
 	    midLevelMultiplier = 20.f
 	    highLevelMultiplier = 3.0f
-	    yawMultiplier = 1.2f
-	    pitchMultiplier = 0.9f
+	    boostTurnMultiplier = 0.50f
+	    turnMultiplier = 1.0f
+	    rollMultiplier = 0.0f
 	    offsetForHeightCheck = -4.0f
 	    zeroHealthOnCollision = "true"
+	    allowInvertedFlight = "false"
+	    minimumSpeedLanding = 40.0f
 	    
+	    accelMultiplier = 1000.0f
+	    accelLerpUp			= 2500
+	    accelLerpDown		= 2500
+	    
+	    FakeRollAngle		= 10.0f
+	    fakeTurbulence		= 2.0f
 	    chassisMass			= 3000.0f  
 	}
 	
@@ -728,8 +835,6 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	{
 	    name = "cis_lander"
 	    lowLevelSpeed = 160
-	    yawMultiplier = 0.6f
-	    pitchMultiplier = 0.6f
 	    offsetForHeightCheck = -14.0f
 	    allowInvertedFlight = "false"
 	    unstoppable = "true"
@@ -739,21 +844,26 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	FlyingVehiclePhyDescTemplate sith_infiltrator_phys
 	{
 	    name = "sith_infil"
-	    lowLevelSpeed = 235
-	    yawMultiplier = 0.8f
-	    pitchMultiplier = 0.8f
+	    lowLevelSpeed = 300
 	    offsetForHeightCheck = -2.8f
 
-	    evadeSpeed			= 4.3f
-	    evadeTurn			= 3.25f
+	    evadeSpeed			= 5.0f
+	    evadeTurn			= 4.25f
 	    evadeForce			= 22f
 
-            brakeTurnMultiplier		= 1.6f
-	    turnMultiplier		= 1.25f
-	    boostTurnMultiplier		= 1.1f
-    
+	    brakeSpeedMultiplier	= 0.3f
+	    cruiseSpeedMultiplier	= 0.5f
+	    boostSpeedMultiplier	= 1.5f
+
+	    brakeTurnMultiplier		= 2.0f
+	    turnMultiplier		= 1.6f
+	    boostTurnMultiplier		= 0.9f
+	    	       
 	    FakeRollAngle		= 70.0f
-	    
+	    fakeTurbulence		= 1.0f
+	    accelLerpUp			= 150
+	    accelLerpDown		= 120
+
    	    chassisMass			= 10000.0f 
 	}
 	
@@ -767,19 +877,25 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	{
 	    name = "imp_tie_int"
 	    lowLevelSpeed = 275
-	    yawMultiplier = 1.4f
-	    pitchMultiplier = 1.5f
 	    offsetForHeightCheck = -3.9f
 
 	    evadeSpeed			= 4.3f
 	    evadeTurn			= 3.25f
 	    evadeForce			= 22f
 
-	    brakeTurnMultiplier		= 1.6f
-	    turnMultiplier		= 1.25f
-	    boostTurnMultiplier		= 1.1f
+	    brakeSpeedMultiplier	= 0.3f	// speed = 82.5  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.5f	// speed = 137.5  lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.5f	// speed = 275 lowLevelSpeed * boostSpeedMulti is your target speed when boosting
+
+	    brakeTurnMultiplier		= 1.9f
+	    turnMultiplier		= 1.45f
+	    boostTurnMultiplier		= 0.6f
     
+
 	    FakeRollAngle		= 70.0f
+	    fakeTurbulence		= 1.0f
+	    accelLerpUp			= 150
+	    accelLerpDown		= 120
 	    
 	    chassisMass			= 5000.0f 
 	}
@@ -787,20 +903,25 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	FlyingVehiclePhyDescTemplate imp_tie_fighter_phys
 	{
 	    name = "imp_tie_ftr"
-	    lowLevelSpeed = 225
-	    yawMultiplier = 1.0f
-	    pitchMultiplier = 0.9f
-	    offsetForHeightCheck = -5.2f
+	    lowLevelSpeed = 235
+	    offsetForHeightCheck =	-6.2f	  
 
 	    evadeSpeed			= 4.3f
 	    evadeTurn			= 3.25f
 	    evadeForce			= 22f
-	    
-	    brakeTurnMultiplier		= 1.6f
-	    turnMultiplier		= 1.25f
-	    boostTurnMultiplier		= 1.1f
-    
+	 
+	    brakeSpeedMultiplier	= 0.3f	// speed = 70.5  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.5f	// speed = 117.5  lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.4f	// speed = 235 lowLevelSpeed * boostSpeedMulti is your target speed when boosting
+ 	
+	    brakeTurnMultiplier		= 1.7f
+	    turnMultiplier		= 1.15f
+	    boostTurnMultiplier		= 0.7f
+     
 	    FakeRollAngle		= 70.0f
+	    fakeTurbulence		= 0.8f
+	    accelLerpUp			= 130
+	    accelLerpDown		= 100
 
    	    chassisMass			= 3000.0f
 	}
@@ -809,33 +930,66 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	{
 	    name = "imp_shuttle"
 	    lowLevelSpeed = 160
-	    yawMultiplier = 0.6f
-	    pitchMultiplier = 0.6f
-	    offsetForHeightCheck = -3.0f
 	    maxLandingHeight = 150
 	    allowInvertedFlight = "false"
 	    takeOffTime = 6
 	    
 	    closeWingsIndoors = "true"
-	    groundClearanceNeededForTakeOffAnim = 20.0f
+	    groundClearanceNeededForTakeOffAnim = 12.0f
+	    offsetForHeightCheck = -2.0f
 
-	    brakeTurnMultiplier		= 1.6f
-	    turnMultiplier		= 1.25f
-	    boostTurnMultiplier		= 1.1f
-    
+	    //brakeTurnMultiplier		= 1.1f  // 5.81 seconds to complete 360 degree turn
+	    //turnMultiplier		= 0.8f  // 8.09 seconds to complete 360 degree turn
+	    //boostTurnMultiplier		= 0.48f // 14.37 seconds to complete 360 degree turn
+
+	    brakeTurnMultiplier		= 1.2f  // 5.66 seconds to complete 360 degree turn
+	    turnMultiplier		= 0.9f  // 7.11 seconds to complete 360 degree turn
+	    boostTurnMultiplier		= 0.58f // 10.84 seconds to complete 360 degree turn
+  
+	    brakeSpeedMultiplier	= 0.2f	// speed = 32  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.5f	// speed = 57.6  lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.2f	// speed = 160 lowLevelSpeed * boostSpeedMulti is your target speed when boosting
+
 	    FakeRollAngle		= 50.0f 
+	    fakeTurbulence		= 0.25f
+
 	    takeOffCushionAngle		= 0.0f
 	    landingCushionAngle		= 0.0f
 
 	    chassisMass			= 16000.0f
 	}
 
+	FlyingVehiclePhyDescTemplate imp_shu_noboost
+	{
+	    name = "imp_shu_noboost"
+	    lowLevelSpeed = 160
+	    maxLandingHeight = 150
+	    allowInvertedFlight = "false"
+	    takeOffTime = 6
+	    
+	    closeWingsIndoors = "true"
+	    groundClearanceNeededForTakeOffAnim = 12.0f
+	    offsetForHeightCheck = -2.0f
+
+	    brakeTurnMultiplier		= 1.6f
+	    turnMultiplier		= 1.25f
+	    boostTurnMultiplier		= 1.1f
+    
+	    FakeRollAngle		= 50.0f 
+	    fakeTurbulence		= 0.25f
+
+	    takeOffCushionAngle		= 0.0f
+	    landingCushionAngle		= 0.0f
+
+	    chassisMass			= 16000.0f
+
+    	    boostSpeedMultiplier	= 0.9f	//lowLevelSpeed * boostSpeedMulti is your target speed when boostin
+	}
+
 	FlyingVehiclePhyDescTemplate imp_shuttle_wingsup_phys
 	{
 	    name = "imp_shu_wup"
 	    lowLevelSpeed = 150
-	    yawMultiplier = 0.5f
-	    pitchMultiplier = 0.5f
 	    offsetForHeightCheck = -15.0f
 	    allowInvertedFlight = "false"
 
@@ -847,7 +1001,6 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	    name = "imp_barge"
 	    lowLevelSpeed = 150
 	    rollMultiplier = 0.5f
-	    pitchMultiplier = 0.5f
 	    offsetForHeightCheck = 20.0f
 	    allowInvertedFlight = "false" 
 	    maxWakeHeight = 50
@@ -857,18 +1010,29 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	    takeOffTime = 5.5f
 	    takeOffSpeed = 9.0f
 	    doVerticalTakeOffs = "true"
+
+	    chassisMass			= 100000.0f
 	}
 
 	FlyingVehiclePhyDescTemplate reb_trans_phys
 	{
 	    name = "reb_transport"
 	    takeOffTime = 3.0f
+	    lowLevelSpeed = 160
 	    allowInvertedFlight = "false"
 	    
-	    brakeTurnMultiplier		= 1.6f
-	    turnMultiplier		= 1.25f
-	    boostTurnMultiplier		= 1.1f
-    
+	    //brakeTurnMultiplier		= 1.1f  // 5.81 seconds to complete 360 degree turn
+	    //turnMultiplier		= 0.8f  // 8.09 seconds to complete 360 degree turn
+	    //boostTurnMultiplier		= 0.48f // 14.37 seconds to complete 360 degree turn
+
+	    brakeTurnMultiplier		= 1.2f  // 5.66 seconds to complete 360 degree turn
+	    turnMultiplier		= 0.9f  // 7.11 seconds to complete 360 degree turn
+	    boostTurnMultiplier		= 0.58f // 10.84 seconds to complete 360 degree turn
+  
+	    brakeSpeedMultiplier	= 0.4f	// speed = 16  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.7f	// speed = 80  lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.0f	// speed = 160 lowLevelSpeed * boostSpeedMulti is your target speed when boosting
+	    
 	    FakeRollAngle		= 40.0f	    
 	    landingCushionAngle		= 0.0f
 
@@ -878,13 +1042,39 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	FlyingVehiclePhyDescTemplate reb_gr75_phys
 	{
 	    name = "reb_gr75"
-	    takeOffTime = 3.0f
+	    takeOffTime = 150.0f
 	    allowInvertedFlight = "false"
 	    unstoppable = "true"
 	    
 	    chassisMass			= 100000.0f
 	}
 
+	FlyingVehiclePhyDescTemplate imp_slave_phys
+	{
+	    name    = "imp_slave"
+	    lowLevelSpeed = 300
+	    offsetForHeightCheck = -4.0f
+
+	    chassisMass			= 20000.0f
+
+	    evadeSpeed			= 5.0f
+	    evadeTurn			= 4.25f
+	    evadeForce			= 22f
+	
+	    brakeSpeedMultiplier	= 0.3f
+	    cruiseSpeedMultiplier	= 0.5f
+	    boostSpeedMultiplier	= 1.5f
+
+	    brakeTurnMultiplier		= 2.0f
+	    turnMultiplier		= 1.6f
+	    boostTurnMultiplier		= 0.9f
+    
+	    FakeRollAngle		= 70.0f
+	    fakeTurbulence		= 1.0f
+	    accelLerpUp			= 150
+	    accelLerpDown		= 120
+
+	}
 	//////////////////////////////////////////////
 	// REBELLION SHIPS
 	//////////////////////////////////////////////
@@ -894,9 +1084,7 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	{
 	    name    = "reb_awing"
 	    lowLevelSpeed = 275
-	    yawMultiplier = 1.4f
-	    pitchMultiplier = 1.5f
-	    offsetForHeightCheck = -2.6f
+	    offsetForHeightCheck = -3.0f
 	    
 	    chassisMass			= 4000.0f
 
@@ -904,20 +1092,25 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	    evadeTurn			= 3.25f
 	    evadeForce			= 22f
 
-	    brakeTurnMultiplier		= 1.6f
-	    turnMultiplier		= 1.25f
-	    boostTurnMultiplier		= 1.1f
+	    brakeSpeedMultiplier	= 0.3f	// speed = 82.5  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.5f	// speed = 137.5  lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.5f	// speed = 275 lowLevelSpeed * boostSpeedMulti is your target speed when boosting
+
+	    brakeTurnMultiplier		= 1.9f
+	    turnMultiplier		= 1.45f
+	    boostTurnMultiplier		= 0.6f
     
 	    FakeRollAngle		= 70.0f	
+	    fakeTurbulence		= 1.0f
+	    accelLerpUp			= 150
+	    accelLerpDown		= 120
 
 	}
 
 	FlyingVehiclePhyDescTemplate reb_xwing_phys
 	{
 	    name    = "reb_xwing"
-	    lowLevelSpeed = 225
-	    yawMultiplier = 1.0f
-	    pitchMultiplier = 0.9f
+	    lowLevelSpeed = 235
 	    offsetForHeightCheck = -2.5f
 
 	    groundClearanceNeededForTakeOffAnim = 4.0f
@@ -928,12 +1121,19 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	    evadeTurn			= 3.25f
 	    evadeForce			= 22f
 
-
-	    brakeTurnMultiplier		= 1.6f
-	    turnMultiplier		= 1.25f
-	    boostTurnMultiplier		= 1.1f
+	    brakeSpeedMultiplier	= 0.3f	// speed = 70.5  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.5f	// speed = 117.5  lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.4f	// speed = 235 lowLevelSpeed * boostSpeedMulti is your target speed when boosting
+	
+	    brakeTurnMultiplier		= 1.7f
+	    turnMultiplier		= 1.15f
+	    boostTurnMultiplier		= 0.7f
     
+
 	    FakeRollAngle		= 70.0f	
+	    fakeTurbulence		= 0.8f
+	    accelLerpUp			= 130
+	    accelLerpDown		= 100
 
 	}
 
@@ -941,9 +1141,7 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	{
 	    name    = "reb_bwing"
 	    lowLevelSpeed = 240
-	    yawMultiplier = 1.1f
-	    pitchMultiplier = 1.0f
-	    offsetForHeightCheck = -8.5f
+	    offsetForHeightCheck = -10.5f
 
 	    chassisMass			= 24000.0f
 
@@ -958,63 +1156,131 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	    FakeRollAngle		= 70.0f
 
 	}
-
-
-    
-	FlyingVehiclePhyDescTemplate reb_ywing_phys
+	
+   	FlyingVehiclePhyDescTemplate cis_strikebomber_phys
 	{
-	    name    = "reb_ywing"
-	    lowLevelSpeed = 200
-	    yawMultiplier = 0.7f
-	    pitchMultiplier = 0.7f
+	    name    = "cis_sbomber"
+	    lowLevelSpeed = 210
+	    offsetForHeightCheck = -15.25f
+
+	    chassisMass			= 18000.0f
+
+	    evadeSpeed			= 2.3f
+	    evadeTurn			= 3.25f
+	    evadeForce			= 22f
+
+	    brakeSpeedMultiplier	= 0.19f  // speed = 39.9  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.39f	 // speed = 81.9 lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.15f	 // speed = 210	 lowLevelSpeed * boostSpeedMulti is your target speed when boosting
+	
+	    brakeTurnMultiplier		= 1.2f	// 4.91 seconds to complete 360 degree turn 
+	    turnMultiplier		= 0.95f	// 6.89 seconds to complete 360 degree turn	} all averages.
+	    boostTurnMultiplier		= 0.6f	// 10.46 seconds to complete 360 degree turn
+    
+	    FakeRollAngle		= 50.0f
+	    fakeTurbulence		= 0.5f
+	}
+
+	
+    	FlyingVehiclePhyDescTemplate rep_arc170_phys
+	{
+	    name    = "rep_arc170"
+	    lowLevelSpeed = 210
 	    offsetForHeightCheck = -3.25f
 
 	    chassisMass			= 18000.0f
 
-	    evadeSpeed			= 4.3f
+	    evadeSpeed			= 3.3f
 	    evadeTurn			= 3.25f
 	    evadeForce			= 22f
-	
-	    brakeTurnMultiplier		= 1.6f
-	    turnMultiplier		= 1.25f
-	    boostTurnMultiplier		= 1.1f
-    
-	    FakeRollAngle		= 70.0f
+  	  
+	    brakeTurnMultiplier		= 1.2f	// 4.91 seconds to complete 360 degree turn 
+	    turnMultiplier		= 0.95f	// 6.89 seconds to complete 360 degree turn	} all averages.
+	    boostTurnMultiplier		= 0.6f	// 10.46 seconds to complete 360 degree turn
 
+	    brakeSpeedMultiplier	= 0.19f  // speed = 39.9  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.39f	 // speed = 81.9 lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.15f	 // speed = 210	 lowLevelSpeed * boostSpeedMulti is your target speed when boosting
+	    
+	    FakeRollAngle		= 50.0f
+	    fakeTurbulence		= 0.5f
 	}
 
-	FlyingVehiclePhyDescTemplate ywing_end_phys
+	
+    	FlyingVehiclePhyDescTemplate imp_tiebomber_phys
 	{
-	    name = "end_ywing"
-	    lowLevelSpeed = 225
-	    yawMultiplier = 1.0f
-	    pitchMultiplier = 0.9f
+	    name    = "imp_tiebomber"
+	    lowLevelSpeed = 210
+	    offsetForHeightCheck = -5.25f
 
-	    chassisMass			= 12000.0f
+	    chassisMass			= 18000.0f
 
-	    offsetForHeightCheck = -3.0f
+	    evadeSpeed			= 3.3f
+	    evadeTurn			= 3.25f
+	    evadeForce			= 22f
+
+	    brakeSpeedMultiplier	= 0.19f  // speed = 39.9  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.39f	 // speed = 81.9 lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.15f	 // speed = 210	 lowLevelSpeed * boostSpeedMulti is your target speed when boosting
+	
+	    brakeTurnMultiplier		= 1.2f	// 4.91 seconds to complete 360 degree turn 
+	    turnMultiplier		= 0.95f	// 6.89 seconds to complete 360 degree turn	} all averages.
+	    boostTurnMultiplier		= 0.6f	// 10.46 seconds to complete 360 degree turn
+   
+	    FakeRollAngle		= 50.0f
+	    fakeTurbulence		= 0.5f
+	}
+	
+    
+	FlyingVehiclePhyDescTemplate reb_ywing_phys
+	{
+	    name    = "reb_ywing"
+	    lowLevelSpeed = 210
+	    offsetForHeightCheck = -3.25f
+
+	    chassisMass			= 18000.0f
+
+	    evadeSpeed			= 3.3f
+	    evadeTurn			= 3.25f
+	    evadeForce			= 22f
+  	  
+	    brakeSpeedMultiplier	= 0.19f  // speed = 34.2  lowLevelSpeed * brakeSpeedMulti is your target speed when braking
+	    cruiseSpeedMultiplier	= 0.39f	 // speed = 70.2 lowLevelSpeed * cruiseSpeedMulti is your target speed when flying
+	    boostSpeedMultiplier	= 1.15f	 // speed = 180	 lowLevelSpeed * boostSpeedMulti is your target speed when boosting
+	
+	    brakeTurnMultiplier		= 1.2f	// 4.91 seconds to complete 360 degree turn 
+	    turnMultiplier		= 0.95f	// 6.89 seconds to complete 360 degree turn	} all averages.
+	    boostTurnMultiplier		= 0.6f	// 10.46 seconds to complete 360 degree turn
+	        
+	    FakeRollAngle		= 50.0f
+	    fakeTurbulence		= 0.5f
 
 	}
 
 	FlyingVehiclePhyDescTemplate reb_falcon_phys
 	{
 	    name    = "reb_falcon"
-	    lowLevelSpeed = 230
-	    yawMultiplier = 1.0f
-	    pitchMultiplier = 1.0f
+	    lowLevelSpeed = 300
 	    offsetForHeightCheck = -4.0f
 
 	    chassisMass			= 40000.0f
 
-	    evadeSpeed			= 4.3f
-	    evadeTurn			= 3.25f
+	    evadeSpeed			= 5.0f
+	    evadeTurn			= 4.25f
 	    evadeForce			= 22f
 	
-	    brakeTurnMultiplier		= 1.6f
-	    turnMultiplier		= 1.25f
-	    boostTurnMultiplier		= 1.1f
+	    brakeSpeedMultiplier	= 0.3f
+	    cruiseSpeedMultiplier	= 0.5f
+	    boostSpeedMultiplier	= 1.5f
+
+	    brakeTurnMultiplier		= 2.0f
+	    turnMultiplier		= 1.6f
+	    boostTurnMultiplier		= 0.9f
     
 	    FakeRollAngle		= 70.0f
+	    fakeTurbulence		= 1.0f
+	    accelLerpUp			= 150
+	    accelLerpDown		= 120
 
 	}
 
@@ -1022,8 +1288,6 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	{
 	    name    = "reb_snowspeeder"
 	    lowLevelSpeed = 120
-	    yawMultiplier = 1.0f
-	    pitchMultiplier = 0.9f
 	    offsetForHeightCheck = -1.5f
 	    
 	    chassisMass		= 500.0f
@@ -1032,11 +1296,18 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	    evadeTurn		= 3.25f
 	    evadeForce		= 22f
 	   
+	    brakeSpeedMultiplier	= 0.3f
+	    cruiseSpeedMultiplier	= 0.5f
+	    boostSpeedMultiplier	= 1.5f
+
 	    brakeTurnMultiplier		= 1.6f
 	    turnMultiplier		= 1.25f
-	    boostTurnMultiplier		= 1.1f
+	    boostTurnMultiplier		= 0.7f
     
-	    FakeRollAngle		= 70.0f	    
+	    FakeRollAngle		= 70.0f	 
+	    fakeTurbulence		= 1.0f
+	    accelLerpUp			= 130
+	    accelLerpDown		= 100
 	}
 
     }
@@ -1052,36 +1323,269 @@ VehicleDescriptionsTemplate VehicleDescriptions
 	HoverTankPhyDescTemplate cis_aat_physics
 	{
 	    name	    = "cis_aat"
+
+	    topSpeed			= 14
+	    topReverseSpeed		= 6
+	    topStrafeSpeedWhenMoving	= 8
+	    topStrafeSpeedWhenStill	= 7
+
+	    turnAccel = 10.0f
+	    turnDeccel = 20.0f
+	    fastMaxTurnSpeed = 0.8f
+	    slowMaxTurnSpeed = 1.2f
+    
+	    fastMaxTurnSpeed		= 0.5f
+	    slowMaxTurnSpeed		= 1.0f
+	    	    
+	    weight			= 26000
+	    dragFrac			= 0.166
+	    
+	    throttleMultiplier		= 1.0f	    //scales maximum change in velocity
+	    throttleStrafeMultiplier	= 1.0f
+	}
+
+	HoverTankPhyDescTemplate reb_aac_physics
+	{ 
+	    name	    = "reb_aac"
+
+	    topSpeed			= 12
+	    topReverseSpeed		= 6
+	    topStrafeSpeedWhenMoving	= 8
+	    topStrafeSpeedWhenStill	= 7
+
+	    turnAccel = 10.0f
+	    turnDeccel = 20.0f
+	    fastMaxTurnSpeed = 0.8f
+	    slowMaxTurnSpeed = 1.2f
+
+	    fastMaxTurnSpeed		= 0.5f
+	    slowMaxTurnSpeed		= 1.0f
+	    	    
+	    weight			= 24000
+	    dragFrac			= 0.166
+	    
+	    throttleMultiplier		= 1.0f	    //scales maximum change in velocity
+	    throttleStrafeMultiplier	= 1.0f
+	    
 	}
 
 	SpeederBikePhyDescTemplate cis_stap_physics
 	{
 	    name = "cis_stap"
+	    keepAlwaysUpright = "true"
+	     	
+	    topSpeed			= 23//28
+	    topReverseSpeed		= 11
+	    topStrafeSpeedWhenMoving	= 12
+	    topStrafeSpeedWhenStill	= 10
+
+	    turnAccel			= 10.0f
+	    turnDeccel			= 10.0f
+	    fastMaxTurnSpeed		= 1.6f
+	    slowMaxTurnSpeed		= 2.1f//1.2f
+	    	    
+	    weight			= 600
+	    dragFrac			= 0.166
+	    
+	    throttleMultiplier		= 1.0f	    //scales maximum change in velocity
+	    throttleStrafeMultiplier	= 1.0f//3.1f
+	    
+	    autoBrakingForce	= 1.0f	    //scales how much you slow down (NB multiplied by weight)
+					    //If the auto braking force == 0 then it will be 'instant'
+
+	    tiltLimit		= 0.05f	    //When the dot product between up and the vehicle up is smaller 
+					    //than this value the hovertank will be unsalvagable
+	    minHeight		= 1.4f
+	    maxHeight		= 1.6f
+
 	}
 
 	SpeederBikePhyDescTemplate rep_barc_physics
 	{
 	    name = "rep_barc"
+
+ 	    topSpeed			= 30//35
+	    topReverseSpeed		= 12
+	    topStrafeSpeedWhenMoving	= 13
+	    topStrafeSpeedWhenStill	= 8
+
+	    turnAccel			= 10.0f
+	    turnDeccel			= 10.0f
+	    fastMaxTurnSpeed		= 1.8 //1.3f//0.6f
+	    slowMaxTurnSpeed		= 2.1f//1.2f
+	    	    
+	    weight			= 600
+	    dragFrac			= 0.1//0.166
+	    
+	    minHeight		= 1.4f
+	    maxHeight		= 1.6f
+
+	    /*
+	    name = "rep_barc"
+
+	    topSpeed			= 27//32
+	    topReverseSpeed		= 12
+	    topStrafeSpeedWhenMoving	= 16
+	    topStrafeSpeedWhenStill	= 14
+
+	    turnAccel			= 10.0f
+	    turnDeccel			= 10.0f
+	    fastMaxTurnSpeed		= 1.5f
+	    slowMaxTurnSpeed		= 2.1f//1.2f
+	    	    
+	    weight			= 400
+	    dragFrac			= 0.166
+	    
+	    throttleMultiplier		= 1.0f	    //scales maximum change in velocity
+	    throttleStrafeMultiplier	= 1.0f//0.8f
+	    
+	    autoBrakingForce	= 1.0f	    //scales how much you slow down (NB multiplied by weight)
+					    //If the auto braking force == 0 then it will be 'instant'
+
+	    tiltLimit		= 0.5f	    //When the dot product between up and the vehicle up is smaller 
+					    //than this value the hovertank will be unsalvagable
+	    minHeight		= 1.4f
+	    maxHeight		= 1.6f
+	    */
 	}
 
 	SpeederBikePhyDescTemplate sith_spdr_physics
 	{
 	    name = "sith_spdr"
+
+	    topSpeed			= 29//30
+	    topReverseSpeed		= 15
+	    topStrafeSpeedWhenMoving	= 12
+	    topStrafeSpeedWhenStill	= 8
+
+	    turnAccel			= 10.0f
+	    turnDeccel			= 10.0f
+	    fastMaxTurnSpeed		= 1.6f//0.8f
+	    slowMaxTurnSpeed		= 2.0f//1.5f
+	    	    
+	    weight			= 600
+	    dragFrac			= 0.166
+	    
+	    throttleMultiplier		= 1.0f	    //scales maximum change in velocity
+	    throttleStrafeMultiplier	= 1.0f
+	    
+	    autoBrakingForce	= 1.0f	    //scales how much you slow down (NB multiplied by weight)
+					    //If the auto braking force == 0 then it will be 'instant'
+
+	    tiltLimit		= 0.5f	    //When the dot product between up and the vehicle up is smaller 
+					    //than this value the hovertank will be unsalvagable
+	    minHeight		= 1.4f
+	    maxHeight		= 1.6f
 	}
 
 	SpeederBikePhyDescTemplate imp_spdr_physics
 	{
 	    name = "imp_spdr"
+
+ 	    topSpeed			= 30//35
+	    topReverseSpeed		= 12
+	    topStrafeSpeedWhenMoving	= 13
+	    topStrafeSpeedWhenStill	= 8
+
+	    turnAccel			= 10.0f
+	    turnDeccel			= 10.0f
+	    fastMaxTurnSpeed		= 1.8 //1.3f//0.6f
+	    slowMaxTurnSpeed		= 2.1f//1.2f
+	    	    
+	    weight			= 600
+	    dragFrac			= 0.1//0.166
+	    
+	    throttleMultiplier		= 0.6f	    //scales maximum change in velocity
+	    throttleStrafeMultiplier	= 1.0f
+	    
+	    autoBrakingForce	= 1.0f	    //scales how much you slow down (NB multiplied by weight)
+					    //If the auto braking force == 0 then it will be 'instant'
+
+	    tiltLimit		= 0.5f	    //When the dot product between up and the vehicle up is smaller 
+					    //than this value the hovertank will be unsalvagable
+	    minHeight		= 1.4f
+	    maxHeight		= 1.6f
+	}
+
+	// AKA LANDSPEEDER
+	SpeederBikePhyDescTemplate rspeeder_phys
+	{
+	    name = "rspeeder_phys"
+
+ 	    topSpeed			= 25//27
+	    topReverseSpeed		= 10
+	    topStrafeSpeedWhenMoving	= 12
+	    topStrafeSpeedWhenStill	= 10
+
+	    turnAccel			= 10.0f
+	    turnDeccel			= 10.0f
+	    fastMaxTurnSpeed		= 1.2f//0.6f
+	    slowMaxTurnSpeed		= 1.5f//1.2f
+	    	    
+	    weight			= 1200
+	    dragFrac			= 0.15//66
+	    
+	    throttleMultiplier		= 0.7f	    //scales maximum change in velocity
+	    throttleStrafeMultiplier	= 1.0f//0.8f
+	    
+	    autoBrakingForce	= 1.0f	    //scales how much you slow down (NB multiplied by weight)
+					    //If the auto braking force == 0 then it will be 'instant'
+
+	    tiltLimit		= 0.5f	    //When the dot product between up and the vehicle up is smaller 
+					    //than this value the hovertank will be unsalvagable
+	    minHeight		= 1.4f
+	    maxHeight		= 1.6f
+	    
+	    minDamageImp	= 2.4
+		damageMult		= 0.09
 	}
 
 	HoverTankPhyDescTemplate rep_ift_physics
 	{
 	    name = "rep_ift"
+
+	    topSpeed			= 10
+	    topReverseSpeed		= 6
+	    topStrafeSpeedWhenMoving	= 8
+	    topStrafeSpeedWhenStill	= 7
+
+	    turnAccel = 10.0f
+	    turnDeccel = 20.0f
+	    fastMaxTurnSpeed = 0.8f
+	    slowMaxTurnSpeed = 1.2f
+
+	    fastMaxTurnSpeed		= 0.5f
+	    slowMaxTurnSpeed		= 1.0f
+	    	    
+	    weight			= 22500
+	    dragFrac		        = 0.166
+	    
+	    throttleMultiplier		= 1.0f	    //scales maximum change in velocity
+	    throttleStrafeMultiplier	= 1.0f
 	}
 
 	HoverTankPhyDescTemplate rep_chtank
-	{
+	{    
 	    name = "rep_chtank"
+
+	    topSpeed			= 14
+	    topReverseSpeed		= 6
+	    topStrafeSpeedWhenMoving	= 8
+	    topStrafeSpeedWhenStill	= 7
+
+	    turnAccel = 10.0f
+	    turnDeccel = 20.0f
+	    fastMaxTurnSpeed = 0.8f
+	    slowMaxTurnSpeed = 1.2f
+
+	    fastMaxTurnSpeed		= 0.5f
+	    slowMaxTurnSpeed		= 1.0f
+	    	    
+	    weight			= 20000
+	    dragFrac			= 0.166
+	    
+	    throttleMultiplier		= 1.0f	    //scales maximum change in velocity
+	    throttleStrafeMultiplier	= 1.0f
 	}
     }
 }

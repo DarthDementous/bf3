@@ -7,6 +7,7 @@ template battlebonus
     image = "misctex/gui/icons/bonus/bonuscard_00"
     name  = "STR_NULL"
     info  = "STR_NULL"
+    iconImage = "bonus_supercharge"
 }
 
 template presence : battlebonus
@@ -16,6 +17,7 @@ template presence : battlebonus
     info = "STR_BONUS_PRESENCE_INFO"
     image = "misctex/gui/icons/bonus/bonuscard_01"
     timescale = 1.5	//decrease capturing time by 50%
+    iconImage = "bonus_presence"
 }
 
 template forceleader : battlebonus
@@ -24,6 +26,7 @@ template forceleader : battlebonus
     tier = 0	//primary hero, i.e. those use force
     name = "STR_BONUS_FORCELEADER_NAME"
     info = "STR_BONUS_FORCELEADER_INFO"
+    iconImage = "bonus_force_leader"
 }
 
 template elitesoldier : battlebonus
@@ -32,6 +35,7 @@ template elitesoldier : battlebonus
     tier = 1	//secondary hero
     name = "STR_BONUS_ELITESOLDIER_NAME"
     info = "STR_BONUS_ELITESOLDIER_INFO"
+    iconImage = "bonus_elite_soldier"
 }
 
 template garrison : battlebonus
@@ -41,6 +45,7 @@ template garrison : battlebonus
     name = "STR_BONUS_GARRISON_NAME"
     info = "STR_BONUS_GARRISON_INFO"
     image = "misctex/gui/icons/bonus/bonuscard_02"
+    iconImage = "bonus_garrison"
 }
 
 template secondwave : battlebonus
@@ -49,6 +54,7 @@ template secondwave : battlebonus
     offset = 30 
     name = "STR_BONUS_SECONDWAVE_NAME"
     info = "STR_BONUS_SECONDWAVE_INFO"
+    iconImage = "bonus_secondwave"
 }
 
 template resurgence : battlebonus
@@ -57,6 +63,7 @@ template resurgence : battlebonus
     offset = 40 
     name = "STR_BONUS_RESURGENCE_NAME"
     info = "STR_BONUS_RESURGENCE_INFO"
+    iconImage = "bonus_resurgance"
 }
 
 template cutsupply : battlebonus
@@ -65,6 +72,7 @@ template cutsupply : battlebonus
     offset = -25
     name = "STR_BONUS_CUTSUPPLY_NAME"
     info = "STR_BONUS_CUTSUPPLY_INFO"
+    iconImage = "bonus_cut_supplyline"
 }
 
 template hugeloss : battlebonus
@@ -73,15 +81,7 @@ template hugeloss : battlebonus
     offset = -40
     name = "STR_BONUS_HUGELOSS_NAME"
     info = "STR_BONUS_HUGELOSS_INFO"
-}
-
-template afterburner : battlebonus
-{
-    class-id = "battle bonus sta"
-    duration = 120.0	//duration 2 mins
-    scale = 0.0		//never drains the stamina when in flight
-    name = "STR_BONUS_AFTERBURNER_NAME"
-    info = "STR_BONUS_AFTERBURNER_INFO"
+    iconImage = "bonus_huge_losses"
 }
 
 template herovehicle : battlebonus
@@ -89,6 +89,7 @@ template herovehicle : battlebonus
     class-id = "battle bonus hv"
     name = "STR_BONUS_HEROVEHICLE_NAME"
     info = "STR_BONUS_HEROVEHICLE_INFO"
+    iconImage = "bonus_hero_vehicle"
 }
 
 template supercharge : battlebonus
@@ -97,6 +98,7 @@ template supercharge : battlebonus
     name = "STR_BONUS_SUPERCHARGE_NAME"
     info = "STR_BONUS_SUPERCHARGE_INFO"
     duration = 0.0
+    iconImage = "bonus_supercharge"
 }
 
 template poison : battlebonus
@@ -105,11 +107,5 @@ template poison : battlebonus
     name = "STR_BONUS_POISON_NAME"
     info = "STR_BONUS_POISON_INFO"
     duration = 120.0
-}
-
-template resupply : battlebonus
-{
-    class-id = "battle bonus vehicle spawn"
-    name = "STR_BONUS_RESUPPLY_NAME"
-    info = "STR_BONUS_RESUPPLY_INFO"
+    iconImage = "bonus_poison"
 }

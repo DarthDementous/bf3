@@ -1,12 +1,9 @@
 // vim: set syntax=c :
 
-template AnimTree
-{
-}
 
 template AnimTreeNode
 {
-	class-id = "Anim Tree Node"
+    class-id = "Anim Tree Node"
 	
     float pos []
     {
@@ -19,4 +16,3 @@ template AnimTreeNode
     {
     }
 }
-

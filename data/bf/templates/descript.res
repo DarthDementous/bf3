@@ -18,6 +18,51 @@
 //if you want to use them on the gibs after they are created the dofs must also be under the B_Gib transform too
 
 
+//stolen wholesale from flying_vehicles.res
+template iongibdesc : descriptcomponent
+{
+    // wont be serialised just for preloading
+    soundArray-field extraPreloadSounds
+    {
+    }
+
+    propid-field forceTriggerProp
+    {
+	default = ""
+	views = "basic setup"
+	tip = "set a propID to be force triggered in descript via descript function forceTriggerTriggered()"
+    }
+
+    script = " 
+    * 
+    {
+	event init
+	{
+	    setdmgstate(normal)
+	    particleeffectimmediate(dmg_trail_gib, explo,  0, false)
+	}
+
+	event collision
+	{
+	    if comparedmgstate(normal)
+	    {
+		setdmgstate(collidedonce)
+		particleeffectimmediate(dmg_trail_gib, explo,  0, false)
+	    }
+	}
+
+	event dead
+	{
+	    setdmgstate(died)
+	    killallcurrentparticleeffects()
+	    particleeffectimmediate(aw_fly_exp_med, explo,  0, false)
+     	    makevisible_wc(*, false)
+	}
+    }
+
+   "
+}
+
 //bf descript component for props - no explosions or hit effects, just gibs
 //shatter on zero health
 template bfsimplepropdescript : descriptcomponent
@@ -42,7 +87,7 @@ template bfsimplepropdescript : descriptcomponent
 	}
 	event zerohealth
 	{	    	  
-		explode_wc_launch( B_GIB* , 10.0, 10.0, 1.0)   
+		explode_wc_launch( B_GIB* , 4.0, 10.0, 1.0, NULL)   
 		makevisible_wc( BTOP, false )
 		deleteprop()
 	}
@@ -51,80 +96,13 @@ template bfsimplepropdescript : descriptcomponent
     "	
 }
 
-//shoot parts off, and shatter on zero helath
-template bfshootablepropdescript : descriptcomponent
-{    
-    script = "
-   
-    BTOP
-    {
-	event init
-	{
-	    setdmgstate( normal )
-	    makevisible_wc( BTOP, true )
-	    makevisible_wc( B_GIB*, false )
-	    //debugprintf(init)
-	}
-    }
-
-    //TEST ME from destructiblestaticprop
-    B_Gib*
-    {
-	//this bit should allow you to shoot parts off
-	event bullethit
-	{
-	    if isvisible( $0.i )
-	    {
-		creategib( $0.i, $1.v, $2.v, 25.0 )
-		makevisible( $0.i, false )
-	    }
-	}
-	event explosionhit
-	{
-	    creategib( $0.i, $1.v, $2.v, 25.0 )
-	    makevisible( $0.i, false )
-	}
-
-    }
-    
-    * 
-    {
-	//this part will make prop shatter on zero health	    
-	event damage
-	{
-	    setdmgstate( damaged )
-	    //debugprintf(damage)
-	}
-	    
-	//these events require the health to be ticked
-	event zerohealth
-	{	    	  
-	    if comparedmgstate(dead) //second tick
-	    {
-		setdmgstate( deleted ) //never gets called again
-		deleteprop()
-	    }
-
-	    if comparedmgstate(damaged) //first tick
-	    {
-		//particleeffect( ship_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2 )
-		explode_wc_launch( B_GIB* , 25.0, 10.0, 1.0 ) 
-		makevisible_wc( BTOP, false )
-		setdmgstate( dead )
-	    }
-	    //debugprintf(zerohealth)
-
-	}
-
-	
-    }
-    "	
-}
-
-// ground vehicles specific damage and death effects
-template bfgroundvehicledescript : descriptcomponent
+//bf descript component for exploding props - with gibs and particle effect
+//explodes on zero health
+//Medium Explosion, Medium Force on GIB parts (explosive barrels and medium props)
+template bfsimpleexpropdes : descriptcomponent
 {
-    script = "
+
+        script = "
    
     BTOP
     {
@@ -133,6 +111,7 @@ template bfgroundvehicledescript : descriptcomponent
 	    setdmgstate( normal )
 	    makevisible_wc( BTOP, true )
 	    makevisible_wc( B_GIB*, false )
+	    makevisible_wc( B_DAMAGED*, false )
 	    //debugprintf(init)
 	}
     }
@@ -141,12 +120,11 @@ template bfgroundvehicledescript : descriptcomponent
     {
 	event bullethit
 	{
-	    particleeffect( ship_sparks, true, 0.0, 0.0, 0.0, $1.v, 0, 0 )
+	    particleeffect( hit_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false )
 	    
 	    if comparedmgstate( damaged )
 	    {
-		particleeffect( dmg_explode, true, 0.0, 2.0, 0.0, $1.v, 0, 0 )
-		
+		particleeffect( dmg_explode, true, 0.0, 2.0, 0.0, $1.v, 0, 0, false )
 	    }
   	    
 	}
@@ -166,7 +144,7 @@ template bfgroundvehicledescript : descriptcomponent
 	{	    	  
 	    if comparedmgstate(dead) //second tick
 	    {
-		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 1 )
+		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 1, false )
 		
 		setdmgstate( deleted ) //never gets called again
 		deleteprop()
@@ -174,28 +152,63 @@ template bfgroundvehicledescript : descriptcomponent
 
 	    if comparedmgstate(damaged) //first tick
 	    {
-		particleeffect( gveh_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2 )
-		explode_wc_launch( B_GIB* , 50.5, 10.0, 1.0 ) 
+		particleeffect( csi_exp_medium, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true )
+		explode_wc_launch( B_GIB* , 10.0, 4.0, 0.5,NULL) 
 		makevisible_wc( BTOP, false )
+		detonate()
 		setdmgstate( dead )
-        serverForceTriggerTriggered( false )
+		serverForceTriggerTriggered( false )
 	    }
 	    
 	    if comparedmgstate(normal) //because sometimes the game forces zero health
 	    {
-		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 0)// no idea why this effect wont show
-		particleeffect( gveh_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2)
-		explode_wc_launch( B_GIB* , 50.5, 10.0, 1.0 ) 
+		particleeffect( csi_exp_medium, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true)
+		explode_wc_launch( B_GIB* , 10.0, 4.0, 0.5,NULL) 
 		makevisible_wc( BTOP, false )
 		setdmgstate( dead )
 	    }
 	}	
     }
     "	
+/*
+    script = "
+   
+    BTOP
+    {
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( BTOP, true )
+	    makevisible_wc( B_GIB*, false )
+	    //debugprintf(init)
+	}
+    }
 
+    * 
+    {	 
+	event bullethit
+	{
+	}
+
+	event zerohealth
+	{	    	  
+		explode_wc_launch( B_GIB* , 10.0, 10.0, 1.0, NULL)
+		particleeffect( csi_exp_medium, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false )   
+		makevisible_wc( BTOP, false )
+		deleteprop()
+	}
+	
+    }
+    "
+*/
 }
 
-//generic explosion, like vehicle props
+//shoot parts off, and shatter on zero helath
+
+// ground vehicles specific damage and death effects
+
+//  Generic Non-Repairable Prop Descript
+//  Large Explosion, Large Force on GIB parts (Turrets, large props)
 template bfexplodingpropdescript : descriptcomponent
 {
     script = "
@@ -207,6 +220,7 @@ template bfexplodingpropdescript : descriptcomponent
 	    setdmgstate( normal )
 	    makevisible_wc( BTOP, true )
 	    makevisible_wc( B_GIB*, false )
+	    makevisible_wc( B_DAMAGED*, false )
 	    //debugprintf(init)
 	}
     }
@@ -215,11 +229,728 @@ template bfexplodingpropdescript : descriptcomponent
     {
 	event bullethit
 	{
-	    particleeffect( ship_sparks, true, 0.0, 0.0, 0.0, $1.v, 0, 0 )
+	    particleeffect( hit_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false )
 	    
 	    if comparedmgstate( damaged )
 	    {
-		particleeffect( dmg_explode, true, 0.0, 2.0, 0.0, $1.v, 0, 0 )
+		particleeffect( dmg_explode, true, 0.0, 2.0, 0.0, $1.v, 0, 0, false )
+	    }
+  	    
+	}
+
+	event damage
+	{
+	    if comparedmgstate( normal )
+	    {
+		if healthlessthan( 0.5 ) 
+		{
+		    setdmgstate( damaged )
+    		}
+	    }	    
+	}
+	    
+	event zerohealth
+	{	    	  
+	    if comparedmgstate(dead) //second tick
+	    {
+		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 1, false )
+		
+		setdmgstate( deleted ) //never gets called again
+		deleteprop()
+	    }
+
+	    if comparedmgstate(damaged) //first tick
+	    {
+		particleeffect( aw_fly_exp_med, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true )
+		explode_wc_launch( B_GIB* , 30.5, 10.0, 0.5,NULL) 
+		makevisible_wc( BTOP, false )
+		setdmgstate( dead )
+		serverForceTriggerTriggered( false )
+	    }
+	    
+	    if comparedmgstate(normal) //because sometimes the game forces zero health
+	    {
+		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false)// no idea why this effect wont show
+		particleeffect( aw_fly_exp_med, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true)
+		explode_wc_launch( B_GIB* , 30.5, 10.0, 0.5,NULL) 
+		makevisible_wc( BTOP, false )
+		setdmgstate( dead )
+	    }
+	}	
+    }
+    "	
+}
+
+//  Generic Repairable Prop Descript
+template repairpropdesc : descriptcomponent
+{
+    script = "
+
+    BTOP
+    {
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( BTOP, true )
+	    makevisible_wc( B_GIB*, false )
+	    makevisible_wc( B_DAMAGED, false )
+	    setStayAliveEvenWithNoHealth( true )
+	    //debugprintf(init)
+	}
+    }
+
+    * 
+    {
+	event damage
+	{
+    	    if healthlessthan( 0.1 ) 
+	    {
+		if comparedmgstatenot(needsrepairs)
+		{
+    		    setdmgstate( needsrepairs )							// set state
+		    particleeffect( prop_dam_50, true, 0.0, 0.0, 0.0, $1.v, 0, 0, true )	// play particle effect
+		    latent(unusable, 0.0001)
+		}
+	    }
+	}
+	
+	event heal
+	{
+	    if comparedmgstatenot( normal )
+	    {
+		if healthgreaterthan( 0.9 )
+		{
+		    makevisible_wc( *, true)							// turn on full prop
+		    makevisible_wc( B_GIB*, false)						// turn off GIB parts
+		    makevisible_wc( B_DAMAGED*, false)						// turn off damaged husk
+		    setdmgstate( normal )
+		}
+	    }
+	}
+	
+	event unusable
+	{
+	    makevisible_wc( *, false )
+	    makevisible_wc( B_DAMAGED*, true )
+	    explode_wc_launch( B_GIB* , 8.0,  7.0, 0.2, NULL) //name of the gib, length of the force vector, life, angular velocity factor, name of the descript to use for the bits
+	}
+	
+    	event zerohealth
+	{
+	    if comparedmgstate(normal)
+	    {
+		setdmgstate( needsrepairs )
+		particleeffect( prop_dam_50, true, 0.0, 0.0, 0.0, $1.v, 0, 0, true )
+		latent(unusable, 0.0001)
+	    }
+	}
+    }
+    "	  
+}
+
+//  Repairable LARGE Turrets Descript
+template repaircptur : descriptcomponent
+{
+    script = "
+
+    BTOP
+    {
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( BTOP, true )
+	    makevisible_wc( B_GIB*, false )
+	    makevisible_wc( B_DAMAGED, false )
+	    setStayAliveEvenWithNoHealth( true )
+	    //debugprintf(init)
+	}
+    }
+
+    * 
+    {
+	event damage
+	{
+    	    if healthlessthan( 0.1 ) 
+	    {
+		if comparedmgstatenot(needsrepairs)
+		{
+    		    setdmgstate( needsrepairs )
+		    particleeffect( csi_exp_large, true, 0.0, 0.0, 0.0, $1.v, 0, 0, true )
+		    latent(unusable, 0.0001)
+		}
+	    }
+	}
+	
+	event heal
+	{
+	    if comparedmgstatenot( normal )
+	    {
+		if healthgreaterthan( 0.9 )
+		{
+		    makevisible_wc( *, true)
+		    makevisible_wc( B_GIB*, false)
+		    makevisible_wc( B_DAMAGED*, false)
+		    setdmgstate( normal )
+		}
+	    }
+	}
+	
+	event unusable
+	{
+	    makevisible_wc( *, false )
+	    makevisible_wc( B_DAMAGED*, false ) // TO DO: Make visible when turret parts are named correctly. Turrets require DAMAGED component to be joined to ship, not currently the case.
+	    //particleeffect( ship_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2, false )
+	    explode_wc_launch( B_GIB* , 40.0,  7.0, 0.2, NULL) //name of the gib, length of the force vector, life, angular velocity factor, name of the descript to use for the bits
+	}
+	
+    	event zerohealth
+	{
+	    if comparedmgstate(normal)
+	    {
+		setdmgstate( needsrepairs )
+		particleeffect( csi_exp_large, true, 0.0, 0.0, 0.0, $1.v, 0, 0, true )
+		latent(unusable, 0.0001)
+	    }
+	}
+    }
+    "	  
+}
+
+//TODO: The particles for this and the gibs need reviewing, Eddie is away and not really sure what to use
+// Non-Repairable LARGE Turrets Descript
+template ioncannonrepair : descriptcomponent
+{
+    script = "
+
+    BTOP
+    {
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( BTOP, true )
+	    makevisible_wc( B_GIB*, false )
+	    makevisible_wc( B_DAMAGED, false )
+	    setStayAliveEvenWithNoHealth( true )
+	    //debugprintf(init)
+	}
+    }
+
+    * 
+    {
+	event damage
+	{
+	
+    	    if healthlessthan( 0.5 ) 
+	    {
+		if comparedmgstatenot(needsrepairs)
+		{
+		    //particleeffect( hit_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, true )
+		    particleeffect( dmg_spark_tiny, true, 0.0, 0.0, 0.0, $1.v, 0, 0, true )			
+		    particleeffect( dmg_smoke_mid, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false )				
+		}
+	    }
+	    if healthlessthan( 0.1 ) 
+	    {
+		if comparedmgstatenot(needsrepairs)
+		{
+    		    setdmgstate( needsrepairs )
+		    //particleeffect( hit_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, true )
+		    particleeffect( dmg_spark_tiny, true, 0.0, 0.0, 0.0, $1.v, 0, 0, true )	
+		    latent(unusable, 0.0001)
+		}
+	    }
+	}
+	
+	event heal
+	{
+	    if comparedmgstatenot( normal )
+	    {
+		if healthgreaterthan( 0.9 )
+		{
+		    makevisible_wc( *, true)
+		    makevisible_wc( B_GIB*, false)
+		    makevisible_wc( B_DAMAGED*, false)
+		    setdmgstate( normal )
+		}
+	    }
+	}
+	
+	event unusable
+	{
+	    makevisible_wc( *, false )
+	    makevisible_wc( B_DAMAGED*, true )
+	    particleeffect( ion_gib_exp, true, 0.0, 0.0, 0.0, $1.v, 0, 2, false )
+	    explode_wc_launch( B_GIB* , 15.0,  7.0, 0.2, iongibdesc) //name of the gib, length of the force vector, life, angular velocity factor, name of the descript to use for the bits
+	}
+	
+    	event zerohealth
+	{
+	    if comparedmgstate(normal)
+	    {
+		setdmgstate( needsrepairs )
+		particleeffect( dmg_spark_tiny, true, 0.0, 0.0, 0.0, $1.v, 0, 0, true )
+		latent(unusable, 0.0001)
+	    }
+	}
+    }
+    "
+}
+
+
+// Non-Repairable LARGE Turrets Descript
+template bfnonrepturret : descriptcomponent
+{
+    script = "
+   
+    BTOP
+    {
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( BTOP, true )
+	    makevisible_wc( B_GIB*, false )
+	    makevisible_wc( B_DAMAGED*, false )
+	    //debugprintf(init)
+	}
+    }
+
+    * 
+    {
+	event bullethit
+	{
+	    particleeffect( hit_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false )
+	    
+	    if comparedmgstate( damaged )
+	    {
+		particleeffect( dmg_explode, true, 0.0, 2.0, 0.0, $1.v, 0, 0, false )
+		
+	    }
+  	    
+	}
+
+	event damage
+	{
+	    if comparedmgstate( normal )
+	    {
+		if healthlessthan( 0.5 ) 
+		{
+		    setdmgstate( damaged )
+    		}
+	    }	    
+	}
+
+	event extra
+	{
+	    particleeffect( aw_fly_exp_med, true, 0.0, 30.0, 0.0, $1.v, 0, 1, true )
+	}
+	event delete
+	{
+            setdmgstate( deleted ) //never gets called again
+	    deleteprop()
+	}
+	    
+	event zerohealth
+	{	    	  
+	    if comparedmgstate(dead) //second tick
+	    {
+		latent(delete, 1.0)
+	    }
+
+	    if comparedmgstate(damaged) //first tick
+	    {
+		particleeffect( cap_ext_split, true, 0.0, 20.0, 0.0, $1.v, 0, 0, true )
+		makevisible_wc( *, false )
+		explode_wc_launch( B_GIB* , 10.5, 2.0, 0.5,NULL) 
+		setdmgstate( dead )
+		latent(extra, 0.8)
+		serverForceTriggerTriggered( false )
+	    }
+	    
+	    if comparedmgstate(normal) //because sometimes the game forces zero health
+	    {
+		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false)// no idea why this effect wont show
+		particleeffect( csi_exp_large, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true)
+		explode_wc_launch( B_GIB* , 30.5, 10.0, 0.5,NULL) 
+		makevisible_wc( BTOP, false )
+		setdmgstate( dead )
+	    }
+	}	
+    }
+    "	
+}
+
+//  Repairable Droid Descript
+template repairdroiddesc : descriptcomponent
+{
+    script = "
+
+    BTOP
+    {
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( BTOP, true )
+	    makevisible_wc( B_GIB*, false )
+	    makevisible_wc( B_DAMAGED, false )
+	    setStayAliveEvenWithNoHealth( true )
+	    //debugprintf(init)
+	}
+    }
+
+    * 
+    {
+	event damage
+	{
+    	    if healthlessthan( 0.1 ) 
+	    {
+		if comparedmgstatenot(needsrepairs)
+		{
+    		    setdmgstate( needsrepairs )
+		    particleeffect( droid_exp_med, true, 0.0, 0.0, 0.0, $1.v, 0, 0, true )	// play explosion
+		    particleeffect( smoke_calm_015, true, 0.0, 0.2, 0.0, $1.v, 0, 1, false )	// turn on smoke
+		    latent(unusable, 0.0001)
+		}
+	    }
+	}
+	
+	event heal
+	{
+	    if comparedmgstatenot( normal )
+	    {
+		if healthgreaterthan( 0.9 )
+		{
+		    makevisible_wc( *, true)							// turn on full prop
+		    makevisible_wc( B_GIB*, false)						// turn off GIB parts
+		    makevisible_wc( B_DAMAGED*, false)						// turn off damaged husk
+		    particleeffect( hit_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 1, false )	// turn off smoke TO DO: Turn OFF smoke rather than overwrite it!
+		    setdmgstate( normal )
+		}
+	    }
+	}
+	
+	event unusable
+	{
+	    makevisible_wc( *, false )
+	    makevisible_wc( B_DAMAGED*, true )
+	    //particleeffect( ship_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2, false )
+	    explode_wc_launch( B_GIB* , 10.0,  7.0, 0.2, NULL) //name of the gib, length of the force vector, life, angular velocity factor, name of the descript to use for the bits
+	}
+	
+    	event zerohealth
+	{
+	    if comparedmgstate(normal)
+	    {
+		setdmgstate( needsrepairs )
+		particleeffect( hit_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, true )
+		latent(unusable, 0.0001)
+	    }
+	}
+    }
+    "	  
+}
+
+//  Non-Repairable Frigate Component Prop Descript
+template frigcompdescript : descriptcomponent
+{
+    script = "
+   
+    BTOP
+    {
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( BTOP, true )
+	    makevisible_wc( B_GIB*, false )
+	    makevisible_wc( B_DAMAGED*, false )
+	    //debugprintf(init)
+	}
+    }
+
+    * 
+    {
+	event bullethit
+	{
+	    particleeffect( hit_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false )
+	    
+	    if comparedmgstate( damaged )
+	    {
+		particleeffect( dmg_explode, true, 0.0, 2.0, 0.0, $1.v, 0, 0, false )
+		
+	    }
+  	    
+	}
+
+	event damage
+	{
+	    if comparedmgstate( normal )
+	    {
+		if healthlessthan( 0.5 ) 
+		{
+		    setdmgstate( damaged )
+		    particleeffect( smoke_activ_310, true, 0.0, 0.0, 0.0, $1.v, 0, 1, false )
+    		}
+	    }	    
+	}
+	    
+	event zerohealth
+	{
+	    if comparedmgstatenot(needsrepairs)
+	    {
+		serverForceTriggerTriggered( false )
+		particleeffect( fly_exp_medium, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true)
+		explode_wc_launch( B_GIB* , 30.5, 10.0, 0.5,NULL) 
+		makevisible_wc( BTOP, false )
+		setdmgstate( dead )
+    		makevisible_wc( B_DAMAGED*, true )
+    		makevisible_wc( BTOP, false )
+    		makevisible_wc( B_GIB*, false )
+		setdmgstate( needsrepairs )
+	    }
+	}	
+    }
+    "	
+}
+
+//  Non-Repairable Bespin Story Cell Controls
+template bescelldesc : descriptcomponent
+{
+    script = "
+   
+    BTOP
+    {
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( BTOP, true )
+	    makevisible_wc( B_GIB*, false )
+	    makevisible_wc( B_DAMAGED*, false )
+	    //debugprintf(init)
+	}
+    }
+
+    * 
+    {
+	event bullethit
+	{
+	    particleeffect( hit_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false )
+	    
+	    if comparedmgstate( damaged )
+	    {
+		particleeffect( dmg_explode, true, 0.0, 2.0, 0.0, $1.v, 0, 0, false )
+		
+	    }
+  	    
+	}
+	    
+	event zerohealth
+	{
+	    if comparedmgstatenot(needsrepairs)
+	    {
+		serverForceTriggerTriggered( false )
+		//particleeffect( sparks_100, true, 0.0, 0.55, 0.0, $1.v, 0, 2, true)
+		particleeffectimmediate(sparks_100, SPARKS, 1, true)
+		explode_wc_launch( B_GIB* , 30.5, 10.0, 0.5,NULL) 
+		makevisible_wc( BTOP, false )
+		setdmgstate( dead )
+    	        makevisible_wc( B_DAMAGED*, true )
+    	        makevisible_wc( BTOP, false )
+    	        makevisible_wc( B_GIB*, false )
+		setdmgstate( needsrepairs )
+	    }
+	}	
+    }
+    "	
+}
+
+//  Non-Repairable Rector Shield Console Prop Descript
+template shieldconsdescript : descriptcomponent
+{
+    script = "
+   
+    BTOP
+    {
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( BTOP, true )
+	    makevisible_wc( B_GIB*, false )
+	    makevisible_wc( B_DAMAGED*, false )
+	    //debugprintf(init)
+	}
+    }
+
+    * 
+    {
+	event bullethit
+	{
+	    particleeffect( hit_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false )
+	    
+	    if comparedmgstate( damaged )
+	    {
+		particleeffect( dmg_explode, true, 0.0, 2.0, 0.0, $1.v, 0, 0, false )
+		
+	    }
+  	    
+	}
+
+	event damage
+	{
+	    if comparedmgstate( normal )
+	    {
+		if healthlessthan( 0.5 ) 
+		{
+		    setdmgstate( damaged )
+		    particleeffect( smoke_calm_015, true, 0.0, 0.0, 0.0, $1.v, 0, 1, false )
+    		}
+	    }	    
+	}
+	    
+	event zerohealth
+	{	    	  
+	    if comparedmgstate(dead) //second tick
+	    {
+		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 1, false )
+		
+		setdmgstate( deleted ) //never gets called again
+		deleteprop()
+	    }
+
+	    if comparedmgstate(damaged) //first tick
+	    {
+		particleeffect( csi_exp_medium, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true )
+		explode_wc_launch( B_GIB* , 8.5, 2.0, 0.5,NULL) 
+		makevisible_wc( BTOP, false )
+		setdmgstate( dead )
+		serverForceTriggerTriggered( false )
+	    }
+	    
+	    if comparedmgstate(normal) //because sometimes the game forces zero health
+	    {
+		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false)// no idea why this effect wont show
+		particleeffect( csi_exp_medium, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true)
+		explode_wc_launch( B_GIB* , 8.5, 2.0, 0.5,NULL) 
+		makevisible_wc( BTOP, false )
+		setdmgstate( dead )
+	    }
+	}	
+    }
+    "	
+}
+
+//these are for simple props, either bits get 
+//blown away by guns, or shatters when dead, no effects
+
+
+//for static props
+
+//
+///other descripts
+//
+
+
+template repairpropdesdesc : descriptcomponent
+{
+    script = "
+
+    BTOP
+    {
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( BTOP, true )
+	    makevisible_wc( B_GIB*, false )
+	    makevisible_wc( B_DAMAGED, false )
+	    setStayAliveEvenWithNoHealth( true )
+	    //debugprintf(init)
+	}
+    }
+
+    * 
+    {
+	event damage
+	{
+	
+    	    if healthlessthan( 0.5 ) 
+	    {
+		if comparedmgstatenot(needsrepairs)
+		{
+		    //particleeffect( hit_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, true )
+		    particleeffect( dmg_spark_tiny, true, 0.0, 0.0, 0.0, $1.v, 0, 0, true )			
+		    particleeffect( dmg_smoke_mid, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false )				
+		}
+	    }
+	    if healthlessthan( 0.1 ) 
+	    {
+		if comparedmgstatenot(needsrepairs)
+		{
+    		    setdmgstate( needsrepairs )
+		    //particleeffect( hit_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, true )
+		    particleeffect( dmg_spark_tiny, true, 0.0, 0.0, 0.0, $1.v, 0, 0, true )	
+		    latent(unusable, 0.0001)
+		}
+	    }
+	}
+	
+	event heal
+	{
+	    if comparedmgstatenot( normal )
+	    {
+		if healthgreaterthan( 0.9 )
+		{
+		    makevisible_wc( *, true)
+		    makevisible_wc( B_GIB*, false)
+		    makevisible_wc( B_DAMAGED*, false)
+		    setdmgstate( normal )
+		}
+	    }
+	}
+	
+	event unusable
+	{
+	    makevisible_wc( *, false )
+	    makevisible_wc( B_DAMAGED*, true )
+	    //particleeffect( aw_fly_exp_med, true, 0.0, 0.0, 0.0, $1.v, 0, 2, false )
+	    explode_wc_launch( B_GIB* , 10.0,  7.0, 0.2, NULL) //name of the gib, length of the force vector, life, angular velocity factor, name of the descript to use for the bits
+	}
+	
+    	event zerohealth
+	{
+	    if comparedmgstate(normal)
+	    {
+		setdmgstate( needsrepairs )
+		particleeffect( dmg_spark_tiny, true, 0.0, 0.0, 0.0, $1.v, 0, 0, true )
+		latent(unusable, 0.0001)
+	    }
+	}
+    }
+    "	  
+}
+
+template shipyardcapdes : descriptcomponent
+{
+    script = "
+   
+    BTOP
+    {
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( B_COMPLETE, true )
+	    makevisible_wc( B_GIB*, false )
+	    makevisible_wc( B_DEAD*, false )
+	    //debugprintf(init)
+	}
+    }
+
+    * 
+    {
+	event bullethit
+	{
+	    particleeffect( hit_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false )
+	    
+	    if comparedmgstate( damaged )
+	    {
+		particleeffect( dmg_explode, true, 0.0, 2.0, 0.0, $1.v, 0, 0, false )
 		
 	    }
   	    
@@ -240,27 +971,31 @@ template bfexplodingpropdescript : descriptcomponent
 	{	    	  
 	    if comparedmgstate(dead) //second tick
 	    {
-		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 1 )
+		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 1, false )
 		
 		setdmgstate( deleted ) //never gets called again
-		deleteprop()
+		//deleteprop()
 	    }
 
 	    if comparedmgstate(damaged) //first tick
 	    {
-		particleeffect( ship_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2 )
-		explode_wc_launch( B_GIB* , 50.5, 10.0, 1.0 ) 
-		makevisible_wc( BTOP, false )
+		particleeffect( aw_fly_exp_med, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true )
+		explode_wc_launch( B_GIB* , 30.5, 10.0, 0.5,NULL) 
+		makevisible_wc( B_COMPLETE, false )
+		makevisible_wc( B_DEAD, true )
+		
 		setdmgstate( dead )
         serverForceTriggerTriggered( false )
 	    }
 	    
 	    if comparedmgstate(normal) //because sometimes the game forces zero health
 	    {
-		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 0)// no idea why this effect wont show
-		particleeffect( ship_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2)
-		explode_wc_launch( B_GIB* , 50.5, 10.0, 1.0 ) 
-		makevisible_wc( BTOP, false )
+		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false)// no idea why this effect wont show
+		particleeffect( aw_fly_exp_med, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true)
+		explode_wc_launch( B_GIB* , 30.5, 10.0, 0.5,NULL) 
+		makevisible_wc( B_COMPLETE, false )
+		makevisible_wc( B_DEAD, true )
+
 		setdmgstate( dead )
 	    }
 	}	
@@ -288,11 +1023,11 @@ template hothshieldgendescript : descriptcomponent
     {
 	event bullethit
 	{
-	    particleeffect( ship_sparks, true, 0.0, 0.0, 0.0, $1.v, 0, 0 )
+	    particleeffect( hit_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false )
 
 		if comparedmgstate( damaged )
 		{
-		    particleeffect( dmg_explode, true, 0.0, 2.0, 0.0, $1.v, 0, 0 )
+		    particleeffect( dmg_explode, true, 0.0, 2.0, 0.0, $1.v, 0, 0, false )
 
 		}
 
@@ -313,7 +1048,7 @@ template hothshieldgendescript : descriptcomponent
 	{	    	  
 	    if comparedmgstate(dead) //second tick
 	    {
-		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 1 )
+		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 1, false )
 
 		//setdmgstate( deleted ) //never gets called again
 		//deleteprop()
@@ -321,8 +1056,8 @@ template hothshieldgendescript : descriptcomponent
 
 	    if comparedmgstate(damaged) //first tick
 	    {
-		particleeffect( ship_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2 )
-		    explode_wc_launch( B_GIB* , 50.5, 10.0, 1.0 ) 
+		particleeffect( aw_fly_exp_med, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true )
+		    explode_wc_launch( B_GIB* , 50.5, 10.0, 1.0,NULL) 
 		    makevisible_wc( BTOP, false )
 		    makevisible_wc( B_brokengenerator, true ) 
 		    makevisible_wc( B_brokengenerator_high, true )
@@ -337,9 +1072,9 @@ template hothshieldgendescript : descriptcomponent
 
 	    if comparedmgstate(normal) //because sometimes the game forces zero health
 	    {
-		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 0)// no idea why this effect wont show
-		particleeffect( ship_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2)
-		    explode_wc_launch( B_GIB* , 50.5, 10.0, 1.0 ) 
+		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false)// no idea why this effect wont show
+		particleeffect( aw_fly_exp_med, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true)
+		    explode_wc_launch( B_GIB* , 50.5, 10.0, 1.0,NULL) 
 		    makevisible_wc( BTOP, false )
 		    makevisible_wc( B_brokengenerator, true )
 		    makevisible_wc( B_brokengenerator_high, true )
@@ -356,6 +1091,7 @@ template hothshieldgendescript : descriptcomponent
     "	
 }
 
+/* --- auto commented out by commentOutTemplate
 template dathDoorgendescript : descriptcomponent
 {
     script = "
@@ -377,11 +1113,11 @@ template dathDoorgendescript : descriptcomponent
     {
 	event bullethit
 	{
-	    particleeffect( ship_sparks, true, 0.0, 0.0, 0.0, $1.v, 0, 0 )
+	    particleeffect( hit_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false )
 
 		if comparedmgstate( damaged )
 		{
-		    particleeffect( dmg_explode, true, 0.0, 2.0, 0.0, $1.v, 0, 0 )
+		    particleeffect( dmg_explode, true, 0.0, 2.0, 0.0, $1.v, 0, 0, false )
 
 		}
 
@@ -408,8 +1144,8 @@ template dathDoorgendescript : descriptcomponent
 
 	    if comparedmgstate(damaged) //first tick
 	    {
-		particleeffect( ship_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2 )
-		explode_wc_launch( B_GIB* , 10.5, 10.0, 1.0 ) 
+		particleeffect( grenadeAlum, true, 0.0, 0.0, 0.0, $1.v, 0, 2, false )
+		explode_wc_launch( B_GIB* , 10.5, 10.0, 1.0,NULL) 
 		makevisible_wc( B_genControl, false ) 
 		makevisible_wc( B_genControl_DEAD, true ) 
 		setdmgstate( dead )
@@ -417,8 +1153,8 @@ template dathDoorgendescript : descriptcomponent
 
 	    if comparedmgstate(normal) //because sometimes the game forces zero health
 	    {
-		particleeffect( ship_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2 )
-		explode_wc_launch( B_GIB* , 50.5, 10.0, 1.0 ) 
+		particleeffect( grenadeAlum, true, 0.0, 0.0, 0.0, $1.v, 0, 2, false )
+		explode_wc_launch( B_GIB* , 50.5, 10.0, 1.0,NULL) 
 		makevisible_wc( B_genControl, false )
 		makevisible_wc( B_genControl_DEAD, true )
 		setdmgstate( dead )
@@ -427,6 +1163,7 @@ template dathDoorgendescript : descriptcomponent
     }
     "	
 }
+*/ // --- auto commented out by commentOutTemplate
 
 template muspoddescript : descriptcomponent
 {
@@ -439,6 +1176,7 @@ template muspoddescript : descriptcomponent
 		setdmgstate( normal )
 		    makevisible_wc( BTOP, true )
 		    makevisible_wc( B_glass, true )
+		    makevisible_wc( B_GIB*, false )
 		    //makevisible_wc( B_brokengenerator, false )
 		    //debugprintf(init)
 	    }
@@ -452,7 +1190,7 @@ template muspoddescript : descriptcomponent
 	    {	    	  
 		if comparedmgstate(dead) //second tick
 		{
-		    //particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 1 )
+		    //particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 1, false )
 
 		    //setdmgstate( deleted ) //never gets called again
 		    //deleteprop()
@@ -482,7 +1220,7 @@ template muspoddescript : descriptcomponent
 	{	    	  
 	    if comparedmgstate(dead) //second tick
 	    {
-		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 1 )
+		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 1, false )
 
 		//setdmgstate( deleted ) //never gets called again
 		//deleteprop()
@@ -505,21 +1243,177 @@ template muspoddescript : descriptcomponent
 
 }
 
-//these are for simple props, either bits get 
-//blown away by guns, or shatters when dead, no effects
+template muspoddescriptexplode : descriptcomponent
+{
+    script = "
 
-template bfdesctructablephysicsprop : simplephysicsprop
-{    
-    ticktype		= "k_tickAlways"  
-    
-    bfshootablepropdescript descript
+    BTOP
     {
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( BTOP, true )
+	    makevisible_wc( B_glass, true )
+	    makevisible_wc( B_GIB*, false )
+	}
+
+	event meleehit
+	{
+	    makevisible_wc( B_glass, false )
+	}
     }
-    dmghealthcomponentbf health
-    {
-    }    
+
+    *{
+	event meleehit
+	{
+	    makevisible_wc( B_glass, false )
+	}
+
+	event waitup
+	{
+	    setdmgstate( dead )
+	}
+
+	event zerohealth
+	{
+	    if comparedmgstate( normal )
+	    {
+		setdmgstate( waitup )
+		latent(waitup, 3.0)
+		makevisible_wc( B_glass, false )
+
+		//TODO - Glass blowout effect
+		//particleeffect( pod_glass, true, 0.0, 0.0, 0.0, $1.v, 0, 2, false )
+	    }
+
+	    if comparedmgstate( dead )
+	    {
+		//TODO - Pod explode effect
+		//particleeffect( pod_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2, false )
+
+		explode_wc_launch( B_GIB* , 10.0, 10.0, 1.0, NULL)        
+		makevisible_wc( BTOP, false )
+		deleteprop()
+	    }
+	}
+    }
+    "
 }
 
+template bfdeployableshielddescript : descriptcomponent
+{
+    script = "
+   
+    BTOP
+    {
+	event init
+	{
+	    setdmgstate( normal )
+	}
+    }
+
+    * 
+    {	 
+	event damage
+	{
+	    flicker()
+	}
+	event zerohealth
+	{	    	  
+	    if comparedmgstatenot( dead )
+	    {
+		flicker_and_delete()
+		setdmgstate( dead )
+	    }
+	}
+	
+    }
+    "	
+}
+
+template bfdescriptcomponent : descriptcomponent
+{
+    class-id = "bfdescript"
+}
+
+template bfswitchdescript : descriptcomponent
+{
+    script = "
+   
+    BTOP
+    {
+	event init
+	{
+	    setdmgstate( normal )
+	    makevisible_wc( BTOP, true )
+	    makevisible_wc( B_GIB*, false )
+	    makevisible_wc( B_DAMAGED*, false )
+	    //debugprintf(init)
+	}
+    }
+
+    * 
+    {
+	event bullethit
+	{
+	    particleeffect( hit_generic, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false )
+	    
+	    if comparedmgstate( damaged )
+	    {
+		particleeffect( dmg_explode, true, 0.0, 2.0, 0.0, $1.v, 0, 0, false )
+		
+	    }
+  	    
+	}
+
+	event damage
+	{
+	    if comparedmgstate( normal )
+	    {
+		if healthlessthan( 0.5 ) 
+		{
+		    setdmgstate( damaged )
+    		}
+	    }	    
+	}
+	    
+	event zerohealth
+	{	    	  
+	    if comparedmgstate(dead) //second tick
+	    {
+		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 1, false )
+		
+		setdmgstate( deleted ) //never gets called again
+		deleteprop()
+	    }
+
+	    if comparedmgstate(damaged) //first tick
+	    {
+		particleeffect( aw_fly_exp_med, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true )
+//		explode_wc_launch( B_GIB* , 30.5, 10.0, 0.5,NULL) 
+		makevisible_wc( BTOP, false )
+		setdmgstate( dead )
+        serverForceTriggerTriggered( false )
+	    }
+	    
+	    if comparedmgstate(normal) //because sometimes the game forces zero health
+	    {
+		//particleeffect( mun_explo, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false)// no idea why this effect wont show
+		particleeffect( aw_fly_exp_med, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true)
+//		explode_wc_launch( B_GIB* , 30.5, 10.0, 0.5,NULL) 
+		makevisible_wc( BTOP, false )
+		setdmgstate( dead )
+	    }
+	}	
+    }
+    "	
+}
+
+//////////////////////
+//  PROP TEMPLATES  //
+//////////////////////
+
+// Shattering Static Prop Template
 template bfshatteringstaticprop : staticprop 
 {
     ticktype		= "k_tickAlways"  
@@ -530,13 +1424,24 @@ template bfshatteringstaticprop : staticprop
     dmghealthcomponentbf health
     {
 	fullhealth	= 2.0 //10.f
-    }    
+    }  
+    
+    soundeventsystem sndeventsystem
+    {
+	definition = "props"
+    }	    
 }
 
+// Shattering Physics Prop Template
 template bfshatteringphysicsprop : simplephysicsprop 
 {
     ticktype		= "k_tickAlways"  
     
+    soundeventsystem sndeventsystem
+    {
+	definition = "props"
+    }
+
     bfsimplepropdescript descript
     {
     }
@@ -546,462 +1451,31 @@ template bfshatteringphysicsprop : simplephysicsprop
     }    
 }
 
-//for static props
-template bfdestructablestaticprop : staticprop
+// Exploding Static Prop Template
+template bfexplodingstaticprop : bfshatteringstaticprop 
 {
-    //bfshootablepropdescript descript   
-    descriptcomponent descript
+    soundeventsystem sndeventsystem
     {
+	definition = "props"
     }
-    dmghealthcomponentbf health
-    {
-    }    
-}
 
-template bfexplodingstaticprop : staticprop 
-{
-    ticktype		= "k_tickAlways"  
-    
     bfexplodingpropdescript descript
     {
     }
-    dmghealthcomponentbf health
+}
+
+// Exploding Physics Prop Template
+// Will cause damage on explosion!
+template bfexplodingphysicsprop : bfshatteringphysicsprop
+{
+    detonatorcomponent detonator
     {
-	fullhealth	= 2.0 //10.f
-    }    
-}
-
-
-
-///other descripts 
-
-template emptydescriptcomponent : descriptcomponent
-{
-    script = "
-   
-    BTOP
+	explosion
+	{
+	    explosionInfo = "bomb"
+	}
+    }
+    bfsimpleexpropdes descript
     {
-	event init
-	{
-	    setdmgstate( normal )
-	    makevisible_wc( BTOP, true )
-	    makevisible_wc( B_GIB*, false )
-	}
     }
-
-    "
-}
-
-
-/*
-//TEST VERSIONS ONLY OR DUPLICATES OF FLYINGVEHICLE-DESCRIPT AND CAPITALSHIP-DESCRIPT
-
-//fullest example, same as original bfvehicledescriptcomponent in templates/vehicles.res
-template bfbigexplosiondescriptcomponent : descriptcomponent
-{
-    script = "
-   
-    BTOP
-    {
-	event init
-	{
-	    setdmgstate( normal )
-	    makevisible_wc( BTOP, true )
-	    makevisible_wc( B_GIB*, false )
-	    debugprintf(init)
-	}
-    }
-
-    * 
-    {
-	//these are example effects, need some new ones
-	event bullethit
-	{
-	    particleeffect( ship_sparks, true, 0.0, 1.5, 0.0, $1.v, 1, 2 )
-	    debugprintf(bullethit)
-	}
-
-	event damage
-	{
-	    if comparedmgstate( damaged )
-	    {
-	//	particleeffect( dmg_generic, true, 0.0, 1.0, 0.5, $1.v, 0, 0 )
-		particleeffect( dmg_explode, true, 0.0, 1.5, 0.0, $1.v, 1, 1 )
-	//	particleeffect( dmg_barrelfire, true, 0.0, 0.0, 0.0, $1.v, 1, 2 )
-	    }
-	
-	    if comparedmgstate( normal )
-	    {
-		if healthlessthan( 0.5 ) 
-		{
-		    setdmgstate( damaged )
-		    particleeffect( dmg_generic, true, 0.0, 1.0, 0.5, $1.v, 1, 0 )
-		    //electrify() //this is pants, happens at the centre of the prop, want hit position
-		    //	makevisible_wc( B_GIB* B_DMG, true ) //if gibs matched ship better this could be used as dmg state also
-		    //	makevisible_wc( BTOP, false ) 
-		}
-	    }	    
-	    
-	    debugprintf(damage)
-	}
-	    
-	event zerohealth
-	{	    	  
-	    if comparedmgstate(dead) //second tick
-	    {
-		setdmgstate( deleted ) //never gets called again
-		deleteprop()
-	    }
-
-	    if comparedmgstate(damaged) //first tick
-	    {
-		particleeffect( ship_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2 )
-//		explode_fxhealth_wc( B_GIB* , 0.01, true, 0.75 ) //this one allows gibs to have some health and be shot away, inherits effects from parent
-		explode_wc_launch( B_GIB* , 75.5, 10.0, 1.0) 
-		makevisible_wc( BTOP, false )
-		setdmgstate( dead )
-	    }
-
-	}
-
-	
-    }
-    "
-}
-
-
-//experimental - for the capital ship and frigates 
-//and other large props with few gibs which are not necessarily called b_gib
-
-//hit events - event bullethit, explosionhit
-//addeventvar( "$0", pn );addeventvar( "$1", hp );addeventvar( "$2", hd )
-	
-//health events - if the prop has a health component
-//addeventvar( "$0", amount );
-//todo, similarly add an anydamage event to match the input parameters
-//event collision, event damage, even zerohealth (no vars)
-
-template bflvsecdescript : descriptcomponent
-{
-    script = "
-        
-    //for destroyable gibs, if only we had bullet hit stuff in the health listener...
-    
-    * 
-    {	
-  	event init
-	{
-	    //debugprintf(SECONDARY_EVENT_INIT)
-	    //debugprintf(SERIES_ON_GIBS)
-	    
-	    setcollisiondelayhack(1) //number of ticks to wait
-	   // debugprintf(EVENT_INIT_bfsecondarydescript_EVENT_INIT_EVENT_INIT_EVENT_INIT_EVENT_INIT_EVENT_INIT)
-	   setgibextras(0.0, 0, mun_ptrail, 0) //use 0 for NULL string, doesnt work for vec pointers sadly
-		    
-	   //setgibextras(0.0, 0, mun_firewor, 0) //use 0 for NULL string, doesnt work for vec pointers sadly
-	    //setcollisiondelayhack(1) //because it also switches off gravity and resistance
-	    particleeffectseries(  mun_explo, 3 , 1.0, 0)
-	}
-	event bullethit
-	{
-	    particleeffectnew( testflame, 0.0, 0.0, 0.0, $1.v,$2.v, 0 )
-	    
-	    //debugprintf(SECONDARY_EVENT_BULLETHIT)
-	    //particleeffectseries(  ship_explode,  3 , 1.0, 0)
-	    //explodegibchunks(3, 180.0, $1.v, $2.v)
-	}
-	event explosionhit
-	{
-	    //debugprintf(SECONDARY_EVENT_BULLETHIT)	    
-	    //particleeffectseries(  ship_explode, 3 , 1.0, 0)
-	    //explodegibchunks(3, 180.0, $1.v, $2.v)
-	}
-	//dont need to delete on zero health becaue the gib code has it in the health listener
-	event zerohealth
-	{
-	    //debugprintf(SECONDARY_EVENT_ZEROHEALTH)	    
-	}
-    }
-
-    "
-
-}
-
-template bflargevehicledescript : descriptcomponent
-{
-    script = "
-        
-    //because some of our props think the BTop is being hit so we need a total wildcard for all of it
-
-    * 
-    {	
-	event init
-	{
-	    setdmgstate( normal )
-	    //makevisible_wc( BTOP, true )
-	    //makevisible_wc( B_GIB*, false )
-	    makevisible_wc( B_broken*, true ) 
-	    makevisible_wc( BTOP, false ) 
-  
-	    //no health listener, no fx, extra particle effect	
-	    setgibextras(0.0, 0, smoke_gibs, 0) //use 0 for NULL string, doesnt work for vec pointers sadly
-	    //setgibextras(0.0, 0, mun_ptrail, 0)	
-	    setgibextras(0.0, 0, 0, 0)	
-	   // setgibextras(0.0, 0, 0)	
-	    
-	    //debugprintf(LARGEVEHICLE_EVENT_INIT)
-	    
-  	}
-
-    	event bullethit
-	{
-	    //debugprintf(LARGEVEHICLE_EVENT_BULLET_HIT)
-	    explodegibchunks(5, 180.0, $1.v, $2.v)
-	    
-	    //particleeffectnew( ship_explode, 0.0, 0.0, 0.0, $1.v,$2.v, 0 )
-	    //particleeffectnew( mun_explo, 0.0, 0.0, 0.0, $1.v,$2.v, 0 )
-	       	    	    
-	    if comparedmgstate( damaged )
-	    {
-		//set off a series of explosions near the hit pos
-
-		particleeffectseries( ship_explode, 3, 1.0, 0 )
-
-	    }
-
-	}
-	
-    	event explosionhit
-	{
-	    //debugprintf(LARGEVEHICLE_EVENT_EXPLOSION_HIT)
-	    
-	    //set off a series of explosions near the hit pos
-	    
-	    particleeffectseries(  mun_explo, 5, 1.0, 0 )
-	}
-
-	event damage //CHealthComponent
-	{
-	    //debugprintf(LARGEVEHICLE_EVENT_DAMAGE)
-	    
-	    if comparedmgstate( normal )
-	    {
-		if healthlessthan( 0.25 )  //a ratio
-		{
-		    //debugprintf(LOTSOF_DAMAGE_STATE)
-		    
-		    setdmgstate( damaged )	    
-    		}
-	    }
-	    
-	    debugprintf(damage)
-	}
-	
-	event die
-	{
-	    debugprintf(LARGEVEHICLE_LATENT_GIB_FUNCTION_DIE)
-	    
-	    cleargibextras()
-	    deleteprop()   
-	}
-	
-	//no input parameters so events called here with hit pos etc will be interpreted as null/default/junk parameters 
-	event zerohealth
-	{
-	    debugprintf(LARGEVEHICLE_EVENT_DAMAGE)
-	    
-	    if comparedmgstate( damaged )
-	    {
-		setgibextras(1.0, 0, mun_ptrail, bflvsecdescript) //use 0 for NULL string
-		
-		setcollisiondelayhack(300) //number of ticks to wait
-		explode_wc_launch( B_broken* , 5.0,  10.0 , 1.0) 
-		
-		//makevisible_wc( BTOP, false )
-		makevisible_wc( B_broken*, false )
-		setdmgstate( dead ) 		
-	    }
-	    if comparedmgstate( dead )
-	    {
-		debugprintf(SETTING_LATENT_GIB_FUNCTION)
-
-		latent(die, 3.0)
-		setdmgstate( latentdead ) 
-	    }
-		
-	}
-
-    }
-    
-    "
-}
-
-
-
-
-//for if your B_Gib parts have within their tranforms, dofs called DOF_GIB_*
-template bfminigibdescript : descriptcomponent
-{
-    script = "
-        
-    //for destroyable gibs, if only we had bullet hit stuff in the health listener...
-    
-    * 
-    {	
-  	event init
-	{
-	    debugprintf(SECONDARY_EVENT_INIT)
-	    //setgibextras(0.0, 0, mun_ptrail, 0) //use 0 for NULL string, doesnt work for vec pointers sadly    
-	    setgibextras(0.0, 0, trailGib, 0) //use 0 for NULL string, doesnt work for vec pointers sadly    
-	    //setcollisiondelayhack(1) //because it also switches off gravity and resistance
-	    
-	    particleeffectseries( ship_sparks, 10 , 0.5, 0)
-	    
-	}
-	event bullethit
-	{
-	    debugprintf(SECONDARY_EVENT_BULLETHIT)
-	    //particleeffectseries(  ship_explode,  3, 1.0, 0 )
-	    explodegibchunks(5, 100.0, $1.v, $2.v)
- 
-	}
-	event explosionhit
-	{
-	    debugprintf(SECONDARY_EVENT_BULLETHIT)	    
-	    //particleeffectseries(  ship_explode,  3 , 1.0, 0)
-	    //explodegibchunks(3, 180.0, $1.v, $2.v)
-	}
-	//dont need to delete on zero health because the gib code has it in the health listener
-	event zerohealth
-	{
-	    debugprintf(SECONDARY_EVENT_ZEROHEALTH)	    
-	}
-    }
-
-    "
-
-}
-
-template bfspecialgibdescript : descriptcomponent
-{
-    //TODO put the extras settings like particle effect on gib creation in here as a normal serialise thing
-    
-    script = "
-        
-    //because some of our props think the BTop is being hit so we need a total wildcard for all of it
-
-    * 
-    {	
-	event init
-	{
-	    setdmgstate( normal )
-	    makevisible_wc( BTOP, true )
-	    makevisible_wc( B_GIB*, false )
-	    //makevisible_wc( B_GIB*, true ) 
-	    //makevisible_wc( BTOP, false ) 
-	    //which stay visible depends on where the dofs are
-  
-  //these could be done outside the script on serialise
-  
-	    //no health listener, no fx, extra particle effect	
-	    setgibextras(0.0, 0, mun_ptrail, 0) //use 0 for NULL string, doesnt work for vec pointers sadly
-    	    //setgibextras(0.0, 0, 0, 0)
-	    //debugprintf(LARGEVEHICLE_EVENT_INIT)
-	    //setphysics(0,0,0,0,0) //doesnt do anything  - no physics component exists at this point
-	    
-  	}
-
-    	event bullethit
-	{
-	    //debugprintf(LARGEVEHICLE_EVENT_BULLET_HIT)
-	    explodegibchunks(2, 100.0, $1.v, $2.v)
-	    
-	    //setphysics(0,1,0,0,0) 
-	    
-	    //particleeffectnew( ship_explode, 0.0, 0.0, 0.0, $1.v,$2.v, 0 )
-	    particleeffectnew( testflame, 0.0, 0.0, 0.0, $1.v, $2.v, 3 )
-    	    
-   	    	    
-	    if comparedmgstate( damaged )
-	    {
-		//set off a series of explosions near the hit pos
-
-		//particleeffectseries( ship_explode,   3, 1.0 , 0)
-		particleeffectseries( testflame,  3, 1.0 , 0)
-
-	    }
-
-	}
-	
-    	event explosionhit
-	{
-	    //debugprintf(LARGEVEHICLE_EVENT_EXPLOSION_HIT)
-	    
-	    //set off a series of explosions near the hit pos
-	    //particleeffectseries(  testflamess, 3, 1.0 , 0)
-	}
-
-	event damage //CHealthComponent
-	{
-	    //debugprintf(LARGEVEHICLE_EVENT_DAMAGE)
-	    
-	    if comparedmgstate( normal )
-	    {
-		if healthlessthan( 0.25 )  //a ratio
-		{
-		    //debugprintf(LOTSOF_DAMAGE_STATE)
-		    
-		   // makevisible_wc( B_GIB*, true ) 
-		   // makevisible_wc( BTOP, false )
-
-		    setdmgstate( damaged )	    
-    		}
-	    }
-	    
-	    debugprintf(damage)
-	}
-	
-	event die
-	{
-	    debugprintf(LARGEVEHICLE_LATENT_GIB_FUNCTION_DIE)
-	    
-	    cleargibextras()
-	    deleteprop()   
-	}
-	
-	//no input parameters so events called here with hit pos etc will be interpreted as null/default/junk parameters 
-	event zerohealth
-	{
-	    debugprintf(LARGEVEHICLE_EVENT_DAMAGE)
-	    
-	    if comparedmgstate( damaged )
-	    {
-		//setgibextras(1.0, 0, mun_ptrail, bfminidescript) //use 0 for NULL string
-		
-		//setcollisiondelayhack(300) //number of ticks to wait
-		explode_wc_launch( B_GIB* , 5.0,  20.0, 1.0 ) 
-		makevisible_wc( BTOP, false )
-		//makevisible_wc( B_GIB*, false )
-		setdmgstate( dead ) 		
-	    }
-	    if comparedmgstate( dead )
-	    {
-		debugprintf(SETTING_LATENT_GIB_FUNCTION)
-
-		latent(die, 3.0)
-		setdmgstate( latentdead ) 
-	    }
-		
-	}
-	
-    }
-    
-    "
-}
-
-*/
-
-template bfdescriptcomponent : descriptcomponent
-{
-    class-id = "bfdescript"
 }

@@ -16,11 +16,11 @@ template npcDistributionTemplate
 
     // Unlike the roles/chr classes, these are probabilites rather than set percentages.
     k_chrRank_rookie	    = 100.0f	// 100% chance of being rookie or above
-    k_chrRank_sergeant	    = 20.0f	// 20% chance of being sergeant or above
-    k_chrRank_lieutenant    = 10.0f	// etc.
-    k_chrRank_captain	    = 5.0f
-    k_chrRank_major	    = 2.0f
-    k_chrRank_commander	    = 1.0f
+    k_chrRank_sergeant	    = 80.0f	// 80% chance of being sergeant or above
+    k_chrRank_lieutenant    = 60.0f	// etc.
+    k_chrRank_captain	    = 40.0f
+    k_chrRank_major	    = 20.0f
+    k_chrRank_commander	    = 5.0f
 }
 
 template gamemodecomponent
@@ -37,7 +37,6 @@ template gamemodecomponent
 
     maxBotWaitTime = 5.f
 
-    numAllowedPlayers = 0
     pickupsDroppedByChrsVanishAfterTime = -1.f
 
     healthMultiplier_Player = 1.0f
@@ -46,18 +45,21 @@ template gamemodecomponent
     swimDamagePerSec = 1.0f
     swimDamageAfterThisState = "kChrInWaterState_never"
     
+    // Default settings for freeplay.
     gamemode			    = "k_noGameMode"
     multiplayergamemode		    = "k_multiplayer_AllGameModes"
-    gameera			    = "k_allEras"
-}
+    gameera			    = "k_CloneWarsEra"
+    soundmap-field sceneSoundMap
+    {
+    }
 
-template bfgamemodecomponent : gamemodecomponent
-{
-    class-id = "bf gamemode component"
     name = "Freeplay"
     
     playerRespawnInventoryBehaviour = "k_playerRespawnInventoryBehaviour_nothing"
     numAllowedPlayers = 16
+
+    timeToRespawn = 5.0f
+    commandPostRespawnDelay = 0.0f
 
     overrideChrRank		    = "false"
     infantryKillValue		    = 0
@@ -67,142 +69,202 @@ template bfgamemodecomponent : gamemodecomponent
     standardGroundVehicleKillValue  = 0
     heavyGroundVehicleKillValue	    = 0
     standardStarFighterKillValue    = 0
+    transportFighterKillValue	    = 0
     heroVehicleKillValue	    = 0
     commandPostHeldValue	    = 0
     commandPostPointAwardInterval   = 0
     frigateDestroyValue		    = 0
+    hunterKillValue		    = 0
+    shieldConsoleDestroyValue	    = 0
+    frigateDestroyPlayerValue	    = 0
     starPointsRequiredToWin	    = 100
+    musicEventSystem = "music_arcade"
 }
 
-template dmGamemode : bfgamemodecomponent
-{
-    class-id = "deathmatch gamemode component" 
-    name = "Deathmatch"
-
-    timeRemaining = 20.0f
-    kill-limit = 20
-    vmComp vmcomp
-    {
-        active = "true"
-        scriptfile = "deathmatch.vms"
-    }
-    numAllowedPlayers = 16
-}
-
-template conquestGamemode : bfgamemodecomponent
+template conquestGamemode : gamemodecomponent
 {
     class-id = "conquest gamemode component" 
     name = "Conquest"
     gamemode = "k_conquestGameMode"
-    
+    timeToRespawn = 5.0f 
+    commandPostRespawnDelay = 10.0f
+    allEnemyCommandPostsOwnedEndGameTimer = 30.f
     giveInfiniteAmmo = "true" 
     starPointsRequiredToWin = 100
-    
+
     timeRemaining = 600.0f	    // Seconds
-/* 
-    vmComp vmcomp
-    {
-        active = "true"
-        scriptfile = "conquest.vms"
-    }
-*/
+// 
+//  vmComp vmcomp
+//  {
+//      active = "true"
+//      scriptfile = "conquest.vms"
+//  }
+//
     numAllowedPlayers = 16
-    
+
     npcDistributionTemplate npcDistribution
     {
-        multiplayergamemodes = "k_multiplayer_MaxPlayersGameMode|k_multiplayer_32PlayersGameMode"
-	npcRoleDistribution role0
+	npcChrClassDistribution chrClass0
 	{
-	    role	= "k_roleFighter"
-	    percentage	= 40.0f
-
-	    npcChrClassDistribution chrClass0
-	    {
-		chrClass    = "k_chrClassSoldier"
-		percentage  = 60.0f
-	    }
-	    npcChrClassDistribution chrClass1
-	    {
-		chrClass    = "k_chrClassHeavyWeapons"
-		percentage  = 20.0f
-	    }
-	    npcChrClassDistribution chrClass2
-	    {
-		chrClass    = "k_chrClassSniper"
-		percentage  = 20.0f
-	    }
+	    chrClass    = "k_chrClassSoldier"
+	    percentage  = 20.0f
 	}
-	npcRoleDistribution role1
+	npcChrClassDistribution chrClass1
 	{
-	    role	= "k_roleAttacker"
-	    percentage	= 35.0f
+	    chrClass    = "k_chrClassHeavyWeapons"
+	    percentage  = 20.0f
 	}
-	npcRoleDistribution role2
+	npcChrClassDistribution chrClass2
 	{
-	    role	= "k_roleTransportPilot"
-	    percentage	= 10.0f
-
-	    npcChrClassDistribution chrClass0
-	    {
-		chrClass    = "k_chrClassSupport"
-		percentage  = 100.0f
-	    }
+	    chrClass    = "k_chrClassSniper"
+	    percentage  = 20.0f
 	}
-        npcRoleDistribution role3
-        {
-            role = "k_roleFighterPilot"
-            percentage = 15.000000
-            npcChrClassDistribution chrClass0
-            {
-                chrClass = "k_chrClassSoldier"
-                percentage = 100.000000
-            }
-        }
+	npcChrClassDistribution chrClass3
+	{
+	    chrClass    = "k_chrClassSupport"
+	    percentage  = 20.0f
+	}
+	npcChrClassDistribution chrClass4
+	{
+	    chrClass    = "k_chrClassSpecialist"
+	    percentage  = 20.0f
+	}
     }
-    
-    npcDistributionTemplate npcDistribution1
+
+    aiCheating
     {
-        multiplayergamemodes = "k_multiplayer_16PlayersGameMode"
-	npcRoleDistribution role0
-	{
-	    role	= "k_roleFighter"
-	    percentage	= 50.0f
+	class-id = "ai cheating component bf"
 
-	    npcChrClassDistribution chrClass0
-	    {
-		chrClass    = "k_chrClassSoldier"
-		percentage  = 60.0f
-	    }
-	    npcChrClassDistribution chrClass1
-	    {
-		chrClass    = "k_chrClassHeavyWeapons"
-		percentage  = 20.0f
-	    }
-	    npcChrClassDistribution chrClass2
-	    {
-		chrClass    = "k_chrClassSniper"
-		percentage  = 20.0f
-	    }
-	}
-	npcRoleDistribution role1
+	// For each player area, these numbers can add up to anything below 256.
+	// They determine the fraction of NPCs allocated to each NPC area; the total is unimportant.
+	// TODO: Don't use takeoff yet, as transitions aren't done.
+	k_playerOnGround
 	{
-	    role	= "k_roleAttacker"
-	    percentage	= 50.0f
+	    k_npcOnGround		= 65
+	    k_npcGroundLanding		= 5
+	    k_npcGroundTakeOff		= 0
+	    k_npcGeneralFlying		= 25
+	    k_npcCapitalShipLanding	= 0
+	    k_npcCapitalShipTakeOff	= 0
+	    k_npcInEscapePod		= 5
+	    k_npcOnCapitalShip0		= 0
+	    k_npcOnCapitalShip1		= 0
+	}
+	k_playerFlyingNearGround
+	{
+	    k_npcOnGround		= 30
+	    k_npcGroundLanding		= 5
+	    k_npcGroundTakeOff		= 0
+	    k_npcGeneralFlying		= 60
+	    k_npcCapitalShipLanding	= 0
+	    k_npcCapitalShipTakeOff	= 0
+	    k_npcInEscapePod		= 5
+	    k_npcOnCapitalShip0		= 0
+	    k_npcOnCapitalShip1		= 0
+	}
+	k_playerFlyingInSpace
+	{
+	    k_npcOnGround		= 0
+	    k_npcGroundLanding		= 0
+	    k_npcGroundTakeOff		= 0
+	    k_npcGeneralFlying		= 50
+	    k_npcCapitalShipLanding	= 0
+	    k_npcCapitalShipTakeOff	= 0
+	    k_npcInEscapePod		= 0
+	    k_npcOnCapitalShip0		= 25
+	    k_npcOnCapitalShip1		= 25
+	}
+	k_playerOnCapitalShip0
+	{
+	    k_npcOnGround		= 0
+	    k_npcGroundLanding		= 0
+	    k_npcGroundTakeOff		= 0
+	    k_npcGeneralFlying		= 45
+	    k_npcCapitalShipLanding	= 10
+	    k_npcCapitalShipTakeOff	= 0
+	    k_npcInEscapePod		= 0
+	    k_npcOnCapitalShip0		= 30
+	    k_npcOnCapitalShip1		= 15
+	}
+	k_playerOnCapitalShip1
+	{
+	    k_npcOnGround		= 0
+	    k_npcGroundLanding		= 0
+	    k_npcGroundTakeOff		= 0
+	    k_npcGeneralFlying		= 45
+	    k_npcCapitalShipLanding	= 10
+	    k_npcCapitalShipTakeOff	= 0
+	    k_npcInEscapePod		= 0
+	    k_npcOnCapitalShip0		= 15
+	    k_npcOnCapitalShip1		= 30
+	}
+	k_playerNearCapitalShipCannonConsole
+	{
+	    k_npcOnGround		= 70
+	    k_npcGroundLanding		= 0
+	    k_npcGroundTakeOff		= 0
+	    k_npcGeneralFlying		= 10
+	    k_npcCapitalShipLanding	= 0
+	    k_npcCapitalShipTakeOff	= 0
+	    k_npcInEscapePod		= 0
+	    k_npcOnCapitalShip0		= 10
+	    k_npcOnCapitalShip1		= 10
 	}
     }
-    
-    infantryKillValue = 1
-    tier1HeroKillValue = 5
-    tier2HeroKillValue = 3
-    lightGroundVehicleKillValue = 1
-    standardGroundVehicleKillValue = 2
-    heavyGroundVehicleKillValue = 4
-    standardStarFighterKillValue = 2
-    heroVehicleKillValue = 5
+
+    aiConquestObjectives
+    {
+	class-id = "ai conquest objectives component bf"
+
+	// For each group, these numbers can add up to anything below 256.
+	// They determine the fraction of NPCs allocated to each objective; the total is unimportant.
+	friendlyTeam
+	{
+	    rank0   = 40
+	    rank1   = 20
+	    rank2   = 10
+	    rank3   = 5
+	}
+	friendlyTeamOwnCapitalShip
+	{
+	    rank0   = 5
+	    rank1   = 5
+	    rank2   = 5
+	    rank3   = 75
+	}
+	enemyTeam
+	{
+	    rank0   = 40
+	    rank1   = 20
+	    rank2   = 10
+	    rank3   = 5
+	}
+	enemyTeamOwnCapitalShip
+	{
+	    rank0   = 5
+	    rank1   = 5
+	    rank2   = 5
+	    rank3   = 75
+	}
+    }
+
+    infantryKillValue = 2
+    tier1HeroKillValue = 6
+    tier2HeroKillValue = 4
+    lightGroundVehicleKillValue = 3
+    standardGroundVehicleKillValue = 4
+    heavyGroundVehicleKillValue = 5
+    standardStarFighterKillValue = 3
+    transportFighterKillValue = 4   
+    heroVehicleKillValue = 6
     commandPostHeldValue = 1
     commandPostPointAwardInterval = 10.f
-    frigateDestroyValue = 20
+    frigateDestroyValue = 100
+    shieldConsoleDestroyValue = 5
+    frigateDestroyPlayerValue = 25
+    timeEndRemaining = 0.0f
 
+    aiPerTeam = 25
     galacticConquest = "false"
 
     gamemode	    = "k_conquestGameMode"
@@ -213,7 +275,7 @@ template quickmatchGamemode : conquestGamemode
     aiPerTeam = 25
     starPointsRequiredToWin = 300
     multiplayergamemode		    = "k_multiplayer_MaxPlayersGameMode"
-    gameera			    = "k_CloneWarsEra"
+    gameera			    = "k_GalacticCivilWarEra" // "k_CloneWarsEra"
 }
 
 template quickmatchGamemode_wii : conquestGamemode
@@ -231,9 +293,22 @@ template galacticConquestGamemode : conquestGamemode
 
     galacticConquest = "true"
     multiplayergamemode = "k_multiplayer_MaxPlayersGameMode" 
+
+    forceshields
+    {
+	shieldnames []
+	{
+	    "HothShield1"
+	}
+
+	shieldteams []
+	{
+	    0
+	}
+    }
 }
 
-template storyGamemode : bfgamemodecomponent
+template storyGamemode : gamemodecomponent
 {
     class-id = "story gamemode component" 
     name = "Story"
@@ -249,9 +324,11 @@ template storyGamemode : bfgamemodecomponent
     numAllowedPlayers = 1    
 
     gamemode = "k_StoryGameMode"
+    
+    musicEventSystem = "music_story"
 }
 
-template heroesVillainsGamemode : bfgamemodecomponent
+template heroesVillainsGamemode : gamemodecomponent
 {
     class-id = "heroes v villains gamemode component" 
     name = "Heroes vs Villains"
@@ -265,7 +342,7 @@ template heroesVillainsGamemode : bfgamemodecomponent
     tier2HeroKillValue = 1
 }
 
-template huntGamemode : bfgamemodecomponent
+template huntGamemode : gamemodecomponent
 {
     class-id = "hunt gamemode component" 
     name = "Hunt"
@@ -283,48 +360,5 @@ template huntGamemode : bfgamemodecomponent
     heavyGroundVehicleKillValue = 1
     standardStarFighterKillValue = 1
     heroVehicleKillValue = 1
-}
-
-template assaultGamemode : bfgamemodecomponent
-{
-    class-id = "bf assault gamemode component" 
-    name = "Assault"
-    gamemode = "k_assaultGameMode"
-    
-    timeRemaining = 60.0f
-    aiPerTeam	  = 10
-    
-    /*vmComp vmcomp
-    {
-        active = "true"
-        scriptfile = "conquest.vms"
-    }*/
-
-    gamemode = "k_assaultGameMode"
-}
-
-template challengeGamemode : bfgamemodecomponent
-{
-    class-id = "bf challenge gamemode component"
-
-    name = "Challenge"
-    gamemode = "k_challengeGameMode"
-
-    // Like in story mode
-    healthMultiplier_Player = 2.0f
-    numAllowedPlayers = 1
-
-    // The name of the challenge as defined in challengelevels.res
-    challenge = ""
-
-    gamemode = "k_challengeGameMode"
-}
-
-template jediArenaGamemode : bfgamemodecomponent
-{
-    class-id = "bf jedi arena gamemode component"
-
-    name = "Jedi arena"
-
-    gamemode = "k_jediArenaGameMode"
+    hunterKillValue = 1 // used to be 2 - changed by Leigh G for bug fix
 }

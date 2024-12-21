@@ -53,10 +53,13 @@ template RagBone
     skel=""					// The skeleton bone that this physics bone should directly control
     type="obb"					// cap, obb, or sphere
     float pos[] = {0.f, 0.f, 0.f}		// Position tweak/or manual override of bone position
+    float posdelta[] = {0.f, 0.f, 0.f}	// PositionTo (pos2-pos1) tweak/or manual override of bone position
     autopos1=""					// Name of skel bone to measure from
     autopos2=""					// Name of skel bone to measure from	    
+    explosionForceMult=1.0f
     
-    float extent[] = {0.0, 0.0, 0.0}		// Bone extent (which is added to the auto measured length)
+    float extent[]  = {0.0, 0.0, 0.0}		// Bone extent (which is added to the auto measured length)
+    float offset[]  = {0.0, 0.0, 0.0}		// Bone offset in prop space
     yoffset = 0.0f				// Translate the physics bone along its y-axis
     yrot = 0.f					// Additional bone rotation about its y-axis
     mass = 0.3f					// Mass
@@ -98,6 +101,18 @@ template ragdolljoint
     motor_2_force_2 = 0.f			    // Motor2 ending force limit
     
     copyfrom=""			// Generate symetrical joints automatically
+    
+    randomchancetobreak = 0.0			// Will break joint if > 0
+
+    min = 0.0f
+    max = 0.0f
+    swing1 = 0.0f
+    swing2 = 0.0f		
+
+    twistMin= 0.0f
+    twistMax= 0.0f
+    spring = 0.0f
+    damping = 0.0f
 }
 
 template ragdollhingejoint : ragdolljoint
@@ -112,11 +127,26 @@ template ragdollhingejoint : ragdolljoint
     damping = 0.0f
 }
 
-template ragdollfixedjoint : ragdolljoint
+template ragdollhkrdjoint : ragdolljoint
 {
-    type = "fixed"
+    type = "hkrd"
+    min		= 20.0f		// coneAngle
+    max		= 0			// unused
+    swing1	= -15.0f	// planeMin
+    swing2	= 15.0f		// planeMax
+    
+    twistMin= -5.0f
+    twistMax= 5.0f
+
+    spring = 0.0f		// FIXME! needs proper value! this is just here to stop game asserting...
+    damping = 0.0f		// FIXME! needs proper value! this is just here to stop game asserting...
 }
 
+
+template ragdollignorecollisionsfakejoint : ragdolljoint
+{
+    type = "igncol"
+}
 
 // This structure specifies a radgoll, the ragdollmgr holds a list of these
 template ragdollinfo
@@ -147,48 +177,7 @@ template ragdollinfo
 }
 
 
-template ragdollprop : simpleragdollprop
-{
-    ragdollphysics physics
-    {
-    }
-    
-    obinstrenderer render
-    {
-    }
-
-    meta
-    {
-	editorPath	     = "common/test/ragdoll"    
-    }
-}
-template johnragdoll : ragdollprop
-{
-    render
-    {
-	model	    =	"characters/legacy/john/jasylum"
-    }
-    meta
-    {
-	canCreateInEditor   =	1
-    }
-}
 
 
-template supjohn : johnragdoll
-{
-    physics
-    {
-	pinned = "head"
-    }
-    render
-    {
-	model	    =	"characters/legacy/john/jasylum"
-    }
-    meta
-    {
-	canCreateInEditor   =	1
-    }
-}
 
 

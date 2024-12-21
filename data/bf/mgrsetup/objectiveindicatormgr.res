@@ -1,5 +1,5 @@
 objectiveIndicatorMgrTemplate objectiveIndicatorMgr
 {
-    class-id = "objective indicator mgr bf"
+    class-id = "objective indicator mgr"
 }
 

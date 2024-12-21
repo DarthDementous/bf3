@@ -39,28 +39,23 @@ template allGunsInventory : inventoryComponent
     {
 	objectType = "o_gun_rep_rl"
     }
-    // Diffusion Blaster
-    maxInventoryEntry entry4
-    {
-	objectType = "o_gun_diff_blst"
-    }
     // Republic Minigun
-    maxInventoryEntry entry5
+    maxInventoryEntry entry4
     {
 	objectType = "o_gun_rep_mg"
     }
     // Republic Shotgun
-    maxInventoryEntry entry6
+    maxInventoryEntry entry5
     {
 	objectType = "o_gun_rep_sgun"
     }
     // Sonic Charge Launcher
-    maxInventoryEntry entry7
+    maxInventoryEntry entry6
     {
 	objectType = "o_gun_scl"
     }
     // Fusion Cutter
-    maxInventoryEntry entry8
+    maxInventoryEntry entry7
     {
 	objectType = "o_gun_fcutter"
     }
@@ -70,32 +65,27 @@ template allGunsInventory : inventoryComponent
     //===============================================
     
     // Imperial Blaster Rifle (e11)
-    maxInventoryEntry entry9
+    maxInventoryEntry entry8
     {
 	objectType = "o_gun_e11_br"
     }
     // Boba Fett's e3 Blaster
-    maxInventoryEntry entry10
+    maxInventoryEntry entry9
     {
 	objectType = "o_gun_bfe3blst"
     }
     // Imperial Sniper Rifle (e11)
-    maxInventoryEntry entry11
+    maxInventoryEntry entry10
     {
 	objectType = "o_gun_e11s_sr"
     }
-    // Imperial Disruptor Pistol
-    maxInventoryEntry entry12
-    {
-	objectType = "o_gun_idsru_pstl"
-    }
     // Imperial Minigun
-    maxInventoryEntry entry13
+    maxInventoryEntry entry11
     {
 	objectType = "o_gun_imp_mg"
     }
     // Imperial Sonic Charge Launcher
-    maxInventoryEntry entry14
+    maxInventoryEntry entry12
     {
 	objectType = "o_gun_imp_scl"
     }
@@ -105,42 +95,37 @@ template allGunsInventory : inventoryComponent
     //===============================================
     
     // Han Solo's Blaster
-    maxInventoryEntry entry15
+    maxInventoryEntry entry13
     {
 	objectType = "o_gun_hs_blst"
     }
     // Rebel Blaster Rifle (dh17)
-    maxInventoryEntry entry16
+    maxInventoryEntry entry14
     {
 	objectType = "o_gun_dh17_br"
     }
-    // Rebel Disruptor Pistol
-    maxInventoryEntry entry17
-    {
-	objectType = "o_gun_disrp_pist"
-    }
     // Rebel Sniper Rifle (e17d)
-    maxInventoryEntry entry18
+    maxInventoryEntry entry15
     {
 	objectType = "o_gun_e17d_sr"
     }
     // Rebel Rocket Launcher (hh15)
-    maxInventoryEntry entry19
+    maxInventoryEntry entry16
     {
 	objectType = "o_gun_reb_rl"
     }
     // Rebel Minigun
-    maxInventoryEntry entry20
+    maxInventoryEntry entry17
     {
 	objectType = "o_gun_reb_mg"
     }
     // Rebel Shotgun
-    maxInventoryEntry entry21
+    maxInventoryEntry entry18
     {
 	objectType = "o_gun_reb_sgun"
     }
     // Rebel Sonic Charge Launcher
-    maxInventoryEntry entry22
+    maxInventoryEntry entry19
     {
 	objectType = "o_gun_reb_scl"
     }
@@ -150,7 +135,7 @@ template allGunsInventory : inventoryComponent
     //===============================================
    
     // Zam Wessel's Sniper Rifle
-    maxInventoryEntry entry23
+    maxInventoryEntry entry20
     {
 	objectType = "o_gun_zwess_sr"
     }
@@ -186,83 +171,41 @@ template allAmmoInventory : inventoryComponent
     }
     maxInventoryEntry entry5
     {
-	objectType = "o_gun_diff_blst"
+	objectType = "o_ammo_shotgun"
     }
     maxInventoryEntry entry6
     {
-	objectType = "o_ammo_shotgun"
+	objectType = "o_ammo_scl"
     }
     maxInventoryEntry entry7
     {
-	objectType = "o_ammo_scl"
+	objectType = "o_ammo_bfe3blst"
     }
     maxInventoryEntry entry8
     {
-	objectType = "o_ammo_bfe3blst"
+	objectType = "o_ammo_fcutter"
     }
     maxInventoryEntry entry9
     {
-	objectType = "o_ammo_fcutter"
+	objectType = "o_ammo_hs_blst"
     }
     maxInventoryEntry entry10
     {
-	objectType = "o_ammo_hs_blst"
-    }
-    maxInventoryEntry entry11
-    {
 	objectType = "o_ammo_e11s_sr"
     }
-    maxInventoryEntry entry12
+    maxInventoryEntry entry11
     {
 	objectType = "o_ammo_reb_rl"
     }
 }
 
-template allGunsInventoryCIS : inventoryComponent
-{
-/*
-   maxInventoryEntry entry0
-    {
-	objectType = "o_gun_e5blast_b"
-    }
-*/    
-    maxInventoryEntry entry0
-    {
-	objectType = "o_gun_e11_br_b"
-    }    
-  /*  
-    maxInventoryEntry entry0
-    {
-	objectType = "o_gun_dc15_sr_b"
-    }   
-   */ 
-}
 
-template allAmmoInventoryCIS : inventoryComponent
-{
-    /*
-    maxInventoryEntry entry0
-    {
-	objectType = "o_ammo_e5blast"
-    }    
 
-    */
-    maxInventoryEntry entry0
-    {
-	objectType = "o_ammo_e11_br"
-    } 
- /*
-    maxInventoryEntry entry0
-    {
-	objectType = "o_ammo_dc15_sr"
-    }    
-    */
-}
-
+// 'grenades' cheat
 template allGrenadesInventory : inventoryComponent
 {
     maxInventoryEntry entry0
     {
-	objectType = "o_thrml_det_v1"
+	objectType = "o_rep_thrml_det"
     }
 }

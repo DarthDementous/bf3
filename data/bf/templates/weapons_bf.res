@@ -6,96 +6,31 @@ template reactmap_generic
 
 template gunReticuleInfo
 {
-    reticuleTexture = "weaponReticuleDefaultOuter"
-    reticuleSizeVisible = 0.06f
-    reticuleSizeFadeOut = 0.08f
+    drawOuterReticule		= "true"
+    drawInnerReticule		= "true"
+    drawNotches			= "false"
+    drawHitPosReticule		= "true"
+    fadeOutWhenMoving		= "true"
+    sizeVisible			= 0.04f
+    sizeFadeOut			= 0.06f
+    aspectRatio			= 1.f
+    imageSizeFraction		= 1.f
+    imageLockonOffsetFraction   = 1.3f
 }
 
 template gunReticuleInfoWii : gunReticuleInfo
 {
-    reticuleSizeVisible = 0.08f
-    reticuleSizeFadeOut = 0.1f
-}
-
-template gunplugin_bury
-{
-    class-id = "gun plugin - bury"
-
-    autoRecurseTemplateName-field buriedPropTemplateName
-    {
-	default = ""
-    }
-}
-
-template pickup_gun : simplePickupProp
-{
-    propSoundComponent soundinfo
-    {
-//	bulletImpactSoundName	= "gun_hit_floor_grass" //"bi_mtSld"
-//	playerBulletImpactSoundName	= "gun_hit_floor_grass" //"bi_mtSld"
-//	collisionSoundName	= "gun_hit_floor_grass"
-    }   
-}
-
-template ubiks_clone
-{
-    channels = "waist+"
-}
-
-template ubiks_btldroid	    
-{
-    // Ubik channels for characters using the same skeleton as the battledroid
-    channels = "waist+" 
-}
-
-template ubiks_sprbtl	    
-{
-    // Ubik channels for characters using the same skeleton as the super battledroid
-    channels = "middle+" 
-}
-
-template ubiks_drdka	    
-{
-    // Ubik channels for characters using the same skeleton as the droideka
-    channels = "spinejoint1+" 
-}
-
-template ubiks_spidrd    
-{
-    // Ubik channels for characters using the same skeleton as the spider droid
-    channels = "B_top_gun+" 
-}
-
-template weaponGlowStickProp
-{
-    class-id = "glow stick";
-}
-
-template g6hack_render : obinstrenderer
-{
-    class-id = "glow stick render"
-
-    glowcol[] { 0.f, 1.f, 0.f, 1.f }
-    corecol[] { 1.f, 1.f, 1.f, 1.f }
-    texName = "misctex/lightsaber_fx/lightsaber_side_glow_new"
-    texCoreName = "misctex/lightsaber_fx/lightsaber_side_core_new"
-}
-
-template mattest_g6hack : staticprop
-{
-    class-id = "glow stick";
-    g6hack_render render
-    {
-	model	    =	"misc/mattest"
-    }
-    meta
-    {
-	canCreateInEditor   =	1
-	editorPath          = "common/test/material"
-    }
-    weaponGlowStickProp glowstick
-    {
-    }
+    drawOuterReticule		= "true"
+    drawInnerReticule		= "true"
+    drawHitPosReticule		= "true"
+    drawNotches			= "false"
+    fadeOutWhenMoving		= "false"
+    sizeVisible			= 0.04f
+    sizeFadeOut			= 0.06f
+    aspectRatio			= 1.f
+    imageSizeFraction		= 1.f
+    imageLockonOffsetFraction   = 1.3f
+    outerReticuleImage		= "reticule_blaster"
 }
 
 template guncomponent_linetest_bf : guncomponent_linetest
@@ -106,10 +41,6 @@ template guncomponent_linetest_bf : guncomponent_linetest
 	
     mustBeOnGroundToFire = "true" // Firing is not allowed when the character jumps
 
-    ubiks = "ubiks_clone"
-
-    hudDisplayType = "k_hudDisplayType_ammoWithClip"
-
     stateAfterGrenadeThrow = "idle"
     
     simpleLaser = "false"
@@ -117,7 +48,7 @@ template guncomponent_linetest_bf : guncomponent_linetest
     gunZoomComponent_justChangeFov zoom
     {
 	scaleFovWhenActivated	    = 0.6f
-	scaleTurnSpeedWhenActivated = 0.6f
+	scaleTurnSpeedWhenActivated = 0.3f
 	timeToZoomInAndOut	    = 0.5f
     }
 }
@@ -126,518 +57,1038 @@ template guncomponent_fusioncutter : guncomponent_linetest_bf
 {
     class-id	    =	"gun fusion cutter"
     raylength	    =	10.0f	// length of action/electric ray
-    healing	    =	0.25f	// amount of health restored per second
-    damage	    =	0.25f	// amount of damage done per second
-    float ammoCore[]	{1.0f,1.0f,1.0f,1.0f}
-    float ammoGlow[]	{0.2f,0.2f,1.0f,1.0f}
-    hudDisplayType  =	"k_hudDisplayType_iconOnly"
+    healing	    =	0.15f	// amount of health restored per second
+    damage	    =	0.7042f	// amount of damage done per second
+    maxEnergyCharge =	1.0f
+    rechargeDelay   =	2.0f
+
+    fc_Lightning_Colour[] {0.45f,0.45f,0.86f}
+    fc_Healing_Colour[] {0.86f,0.86f,0.45f} //yellow is the default healing colour for the fusion cutter
+    fc_Damage_Colour[] {0.86f,0.45f,0.45f} //red is the default damage colour for the fusion cutter
+    lowEnergyColour[] {0.1f,0.4f,0.1f}
 }
 
-
-//fabio suriano: added a custom guncomponent for the sniper rifle in order to manage the fx in a custom way
-template guncomponent_sniperrifle : guncomponent_linetest_bf
+// *****************************************************
+// MELEE WEAPONS
+// *****************************************************
+template guncomponent_meleeweapon : guncomponent_base
 {
-    class-id	    =	"gun sniper rifle"
-    healing	    =	0.25f	// amount of health restored per second
-    damage	    =	0.25f	// amount of damage done per second
-    scaleRadius     =   2.0f //1.23f
-    raylength       =   10.f
-    float ammoCore[]	{1.0f,1.0f,1.0f,1.0f}
-    float ammoGlow[]	{0.2f,0.2f,1.0f,1.0f}
-    hudDisplayType  =	"k_hudDisplayType_iconOnly"
-}
-//
+    // MELEE WEAPON
+    class-id	       = "gun melee weapon"
+    useUbiks	       = "false"
 
-template guncomponent_disruptorpistol : guncomponent_linetest_bf
+    numOfBlades        = 1 // This is a single-bladed weapon
+    bladeStartOffset   = -0.022f
+    aimDir[] {0.0f, 1.0f, 0.0f}
+
+    sndeventsystem
+    {
+	definition = "sndevt_lightsaber"
+    }
+
+    igniteStandardOnTime  = 0.30f
+    igniteStandardOffTime = 0.30f
+
+    igniteActionOnTime    = 0.20f
+    igniteActionOffTime   = 0.20f
+
+    isDoubleEndedWeapon	  = "false"
+
+    deathBlowMagnitude	  = 10.0f
+}
+
+template guncomponent_doubleendedmeleeweapon : guncomponent_meleeweapon
 {
-    class-id	    =	"gun disruptor pistol"
-    healing	    =	0.25f	// amount of health restored per second
-    damage	    =	0.25f	// amount of damage done per second
-    scaleRadius     =   2.0f //1.23f
-    raylength       =   20.f
-    float ammoCore[]	{1.0f,1.0f,1.0f,1.0f}
-    float ammoGlow[]	{0.2f,0.2f,1.0f,1.0f}
-    hudDisplayType  =	"k_hudDisplayType_iconOnly"
+    // DOUBLE ENDED MELEE WEAPON
+    numOfBlades = 2 // This is effectively a double-bladed weapon
+    isDoubleEndedWeapon  = "true"
 }
 
-
-template guncomponent_lightsaber : guncomponent_base
+// *****************************************************
+// LIGHTSABERS
+// *****************************************************
+template guncomponent_lightsaber : guncomponent_meleeweapon
 {
-    class-id	    =	"gun glowstick"
-    useUbiks	    =	"false"
-    hudDisplayType  = "k_hudDisplayType_iconOnly"  
-}
+    // LIGHTSABER
+    class-id	      = "gun lightsaber"    
+    weaponType = "k_lightsaber"
 
-template guncomponent_lightsaber_cutscene : guncomponent_base
-{
-    class-id	    =	"gun cutscene glowstick"
-    useUbiks	    =	"false"
-    hudDisplayType  = "k_hudDisplayType_iconOnly"  
-}
-
-template gunInfo_bfdefault : gunInfo
-{   
-    //THIS is the default handgun for bf
-    nameForHud = "BLASTECH E11"
+    saberBladeLength	  = 1.0f // The drawn length of the lightsaber when it is fully extended
+    saberCollisionLength  = 2.0f // The effective length of the lightsaber used to detect collisions when swinging
     
-    barrelLength = 0.0f
-    neverFirstFrameTest = "false"   //never first frame test a bullet even if barrel length id specified (i.e. never lanch from back of gun, only muzzle)
+    sndeventsystem
+    {
+	definition = "sndevt_lightsaber"
+    }
+}
 
+template guncomponent_doublebladedlightsaber : guncomponent_lightsaber
+{
+    // DOUBLE ENDED LIGHTSABER
+    numOfBlades = 2 
+    isDoubleEndedWeapon = "true"
+}
+
+template guncomponent_duallightsabers : guncomponent_lightsaber
+{
+    // DUAL LIGHTSABER
+    class-id = "gun dual lightsabers"
+    numOfBlades = 2 
+}
+
+template guncomponent_quadlightsabers : guncomponent_duallightsabers
+{
+    // QUAD LIGHTSABER
+    class-id = "gun quad lightsabers"
+    numOfBlades = 4
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------- GENERIC VEHICLE WEAPONS ---------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+
+template gunInfoCore : gunInfo
+{
+    gunReticuleInfo reticuleInfo
+    {
+	drawOuterReticule   = "false"
+	drawNotches	    = "true"
+    }
+    
+    gunReticuleInfoWii reticuleInfoWii
+    {
+	drawOuterReticule   = "false"
+	drawNotches	    = "true"
+        sizeVisible	    = 0.08f
+	sizeFadeOut	    = 0.12f
+    }
+
+}
+
+template gunInfo_singlefire : gunInfoCore
+{
     fireInfo
     {
-	bulletExpireTime    = 1.f
-	bulletDamage	    = 0.15f
-	bulletSpeed	    = 230.0f //3330.0f
-	bulletType	    = "k_bultypeLaser"	 
+	bulletExpireTime    = 0.7f
+	bulletDamage	    = 0.75f
+	bulletSpeed	    = 1.0f
+	bulletType	    = "k_bultypeLaser"	
 	decalAge	    = 5.0f
-	bulletEffect	    = "lImpHHTra"
-	bulletHitEffect	    = "lImpHHHit"
-	clipSize	    = 50
 	dofname		    = "SHOOTPOS_PRIMARY" 
-	bulletRadius	    = 0.12f
-	glowRadius	    = 0.24f
+	bulletPenetration   = 2.0f
+    
+	bulletHitEffect	    = "hit_generic"
+	createBulletScript  = "doBullet"
 
-	autoFireTime	    =	0.333333f
-	manualFireTime	    =	0.333333f
+	wiiLightColour[]	    = {1.0f, 0.8f, 0.8f}
+	
 	bulletTexture1	    = "misctex/laser_fx/laser_red_end"
 	bulletTexture2	    = "misctex/laser_fx/laser_red_end_glow"
-	bulletLength = 1.1f
+	bulletRadius	    = 0.35f
+	bulletLength	    = 20.f
 
-	shootFromCamPos = "true"
+	manualFireTime	    = 1.0   // fire rate if hammering button
+	autoFireTime	    = 1.0   // fire rate if holding button down
+
+	laserSliding	    = 1.0f
+    }	
+}
+
+template gunInfo_dualfire : gunInfoCore
+{
+    fireInfo
+    {
+	bulletType	    = "k_bultypeLaser"	
+	    
+	bulletDamage	    = 0.75f
+	bulletPenetration   = 2.0f
+
+	autoFireTime	    = 1.0   // fire rate if holding button down
+	manualFireTime	    = 1.0   // fire rate if hammering button
+	
+	bulletSpeed	    = 1.0f
+	bulletExpireTime    = 1.0f
+	
+	decalAge	    = 5.0f
+	dofname		    = "SHOOTPOS_PRIMARY" 
+
+	createBulletScript  = "doBullet"
+	
+	bulletRadius	    = 0.35f
+	bulletLength	    = 20.f
+	clipSize	    = 50
+
+	laserSliding	    = 1.0f
+	
+	tooCloseNoAutoAimDist		= 2.0f
+	startTooCloseAutoAimFalloffDist = 4.0f
+	tooFarNoAutoAimDist		= 500.0f
+	startTooFarAutoAimFalloffDist   = 550.0f
+    }	
+    
+    gunFireInfo fireInfoSecondary 
+    {
+	bulletType	    = "k_bultypeRocket"	
+	bulletEffect	    = "proj_rocket"
+	muzzleFlash	    = "smoke"
+	
+	bulletDamage	    = 0.00f	//does not effect rocket damage (use the detonator component)
+	autoFireTime	    = 0.2f   
+	manualFireTime	    = 0.2f	// fire rate if hammering button
+	
+	bulletSpeed	    = 300.0f	// make sure this is the same as the proj_rocket speed in gun_concussion_missiles.res
+	bulletExpireTime    = 0.5f	// make sure this is the same as the proj_rocket speed in gun_concussion_missiles.res
+
+	decalAge	    = 5.0f
+	dofname		    = "SHOOTPOS_SECONDARY" 
+	createBulletScript  = "doBullet"
+
+	clipSize			= 4
+	tooCloseNoAutoAimDist		= 2.0f
+	startTooCloseAutoAimFalloffDist = 4.0f
+	tooFarNoAutoAimDist		= 300.0f
+	startTooFarAutoAimFalloffDist   = 350.0f
+    }
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------- GROUND VEHICLE WEAPONS ---------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+template gunInfo_scoutfire : gunInfo_singlefire
+{
+    statesTemplate  = "ga_vehicle"
+    animmap	    = ""
+    
+    fireInfo
+    {
+	bulletDamage	    = 0.14f
+	bulletPenetration   = 1.6f	
+	
+	manualFireTime	    = 0.2f  // fire rate if hammering button
+	autoFireTime	    = 0.2f  // fire rate if holding button down
+	
+	bulletSpeed	    = 270.0f
+	bulletExpireTime    = 1.0f
+	
+    	bulletLength	    = 10.0f
+	bulletRadius	    = 0.12f
+	glowRadius	    = 0.17f
+
+	explosiondetonator detonator
+	{
+	    explosionInfo = "speeder_exp"
+	}
+
+	recoilInfo
+        {
+	    recoilAnim	    = "blaster1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.5f
+        }
+	useHeightMultiplier = "true"
+    }
+}
+
+template gunInfo_medtankfire : gunInfo_dualfire
+{
+    statesTemplate  = "ga_vehicle"
+    animmap	    = ""
+	    
+    fireInfo
+    {
+	bulletDamage	    = 0.275f
+	bulletPenetration   = 2.0f
+		
+	manualFireTime	    = 0.3f   // fire rate if hammering button
+	autoFireTime	    = 0.3f   // fire rate if holding button down
+		
+	bulletSpeed	    = 270.0f
+	bulletExpireTime    = 1.0f
+
+	bulletLength	    = 25.0f
+	bulletRadius	    = 0.18f
+	glowRadius	    = 0.23f
+
+	explosiondetonator detonator
+	{
+	    explosionInfo = "medtank_exp"
+	}
+
+	recoilInfo
+        {
+	    recoilAnim	    = "blaster1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.55f
+        }
+    }	
+}
+
+template gunInfo_heavytankfire : gunInfo_dualfire
+{
+    statesTemplate  = "ga_vehicle"
+    animmap	    = ""
+    
+    fireInfo
+    {
+	bulletDamage	    = 0.2f
+	autoFireTime	    = 0.15f	// fire rate if holding button down
+	manualFireTime	    = 0.15f	// fire rate if hammering button
+
+	bulletType	    = "k_bultypeLaser"	
+	bulletSpeed	    = 160.0f
+	bulletExpireTime    = 0.625f
+	bulletLength	    = 10.0f
+
+	clipSize	    = 20
+
+	bulletPenetration   = 2.0f
+
+	bulletStartInaccuracy                   = 0.03f
+	bulletEndInaccuracy                     = 0.03f
+	damageFallOffStartDistance              = 20.0f     // defines at what distance damage begins to fall off
+	loseFractionOfDamagePerMetreTravelled   = 0.0125f    // defines how much damage is lost every metre
+
+	bulletRadius	    = 0.15f
+	glowRadius	    = 0.20f
+
+	explosiondetonator detonator 
+	{
+	    explosionInfo   = "heavytank_exp"
+	}	
+
+	recoilInfo
+        {
+            recoilAnim      = "minigun1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.35f
+        }
+    }
+
+    fireInfoSecondary 
+    {
+	bulletEffect	    = "proj_rocket"  
+	
+	bulletSpeed	    = 150.0f	// make sure this is the same as the proj_rocket speed in gun_rocket.res
+	bulletExpireTime    = 5.0f	// make sure this is the same as the proj_rocket timer in gun_rocket.res
+		
+	autoFireTime	    = 2.0f	// fire rate if holding button down
+	manualFireTime	    = 2.0f	// fire rate if hammering button
+
+	recoilInfo
+        {
+	    recoilAnim	    = "rocket1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.6f
+        }
+    }   
+}
+
+template gunInfo_transportfire : gunInfo_dualfire
+{
+    fireInfo
+    {	    
+	bulletDamage	    = 0.55f
+	bulletPenetration   = 2.2f	// vehicle armour penetration
+	
+	manualFireTime	    = 0.4f	// fire rate if hammering button
+	autoFireTime	    = 0.4f	// fire rate if holding button down
+	
+	bulletSpeed	    = 270.0f
+	bulletExpireTime    = 0.5f
+    
+	bulletTexture1	    = "misctex/laser_fx/laser_red_end"
+	bulletTexture2	    = "misctex/laser_fx/laser_red_end_glow"
+	
+    	bulletLength	    = 40.f
+	bulletRadius	    = 0.30f
+	glowRadius	    = 0.35f
+
+	explosiondetonator detonator 
+	{
+	    explosionInfo   = "transport_exp"
+	}
+
+	recoilInfo
+        {
+	    recoilAnim	    = "blaster1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.8f
+        }
+    }
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------- FLYING VEHICLE WEAPONS ---------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+template gunInfo_scoutfighter : gunInfo_dualfire
+{
+    statesTemplate  = "ga_vehicle"
+    animmap	    = ""
+    
+    fireInfo
+    {
+	bulletDamage	    = 0.25f
+	bulletPenetration   = 2.0f	// vehicle armour penetration
+
+	bulletType	    = "k_bultypeFlak"	
+	autoFireTime	    = 0.2f	// fire rate if holding button down
+	manualFireTime	    = 0.2f	// fire rate if hammering button
+
+	bulletSpeed	    = 800.0f	// Lucasarts(tm) Approved Bullet Speed
+	bulletExpireTime    = 0.5f	// 400 Meter First Pass Laser Range
+	
+	bulletRadius	    = 0.4f
+	bulletLength	    = 30.0f
+	glowRadius	    = 0.7f
+
+	explosiondetonator detonator
+	{
+	    explosionInfo = "scoutfighter_exp"
+	}
+
+	recoilInfo
+        {
+	    recoilAnim	    = "blaster1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.3f
+        }
+	useHeightMultiplier = "true"
+    }	
+
+    fireInfoSecondary 
+    {
+	autoFireTime	    = 1.5f	// fire rate if holding button down
+	manualFireTime	    = 1.5f	// fire rate if hammering button
+	
+	bulletType	    = "k_bultypeHoming"	
+	bulletEffect	    = "scout_homing"
+
+	bulletSpeed	    = 600.0f	// make sure this is the same as the 'scout_homing' speed in gun_rocket.res
+	bulletExpireTime    = 3.0f	// make sure this is the same as the 'scout_homing' timer in gun_rocket.res
+	bulletDamage	    = 0.0f	// does not effect rocket damage (use the detonator component)
+	clipSize	    = 2
+
+	recoilInfo
+        {
+	    recoilAnim	    = "rocket1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.6f
+        }
+   }
+
+    aiFireInfo
+    {
+	minBurstFireTime    = 1.0f
+	maxBurstFireTime    = 2.0f
+	minLullFireTime     = 1.0f
+	maxLullFireTime     = 4.0f
+    }
+}
+
+template gunInfo_mediumfighter : gunInfo_dualfire
+{
+    statesTemplate  = "ga_vehicle"
+    animmap	    = ""
+    
+    fireInfo
+    {
+	bulletDamage	    = 0.325f
+	bulletPenetration   = 2.0f	// vehicle armour penetration
+
+	autoFireTime	    = 0.18f	// fire rate if holding button down
+	manualFireTime	    = 0.15f	// fire rate if hammering button
+	
+	bulletSpeed	    = 800.0f	// Lucasarts(tm) Approved Bullet Speed
+	bulletExpireTime    = 0.5f	// 400 Meter First Pass Laser Range
+	
+	bulletRadius	    = 0.4f
+	bulletLength	    = 35.f
+	glowRadius	    = 0.8f
+
+	explosiondetonator detonator
+	{
+	    explosionInfo = "starfighter_exp"
+	}
+
+	recoilInfo
+        {
+	    recoilAnim	    = "blaster1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.4f
+        }
+    }	
+    
+    fireInfoSecondary 
+    {
+	autoFireTime	    = 1.5f	// fire rate if holding button down
+	manualFireTime	    = 1.5f	// fire rate if hammering button
+	
+	bulletType	    = "k_bultypeHoming"	
+	bulletEffect	    = "proj_homing" 
+
+	bulletSpeed	    = 500.0f	// make sure this is the same as the 'proj_homing' speed in gun_rocket.res
+	bulletExpireTime    = 3.5f	// make sure this is the same as the 'proj_homing' timer in gun_rocket.res
+	bulletDamage	    = 0.0f	// does not effect rocket damage (use the detonator component)
+
+	recoilInfo
+        {
+	    recoilAnim	    = "rocket1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.6f
+        }
     }
 
     aiFireInfo
     {
-	minEffectiveFireDistance    = 1.f
-	maxEffectiveFireDistance    = 60.f
-	minDamagingFireDistance	    = 1.f
-	maxDamagingFireDistance	    = 60.f
-    }
-   
-    firstPersonPivotDistance	= 0.1f
-
-    // The following properties are skeleton specific and are set when the template is used
-    //thirdPersonAttachPos[] {0.0f, -0.0f, 0.00f}
-    //thirdPersonAttachRot[] {27.f, 90.f, 180.f}     
-    //thirdPersonAttachBone = "rwrist"	       
-
-    firstPersonArmsPropDrawnParts = "b_arms"
-    firstPersonPropPos []	{-0.073f, -0.135f, 0.064f}
-    firstpersonPropRot []	{1.5f,	1.5f,	0.f}
-
-    gunReticuleInfo reticuleInfo
-    {
-    }
-
-    gunReticuleInfoWii reticuleInfoWii
-    {
-    }
-
-    gunRecoilInfo recoilInfo
-    {
-	cameraBlur	    = 0.f	
-	cameraPushBack	    = 0.08f		// Camera shunt distance (first person view only, no effect on anything but gfx)
-
-	// THINGS YOU'LL PROBABLY WANT TO CHANGE:
-
-	chrRotChangeX []	    { 0.0f,  0.0f}	// Recoil vertically (ie. around X axis) a random value in this range	
-	chrRotChangeY []	    { 0.0f,  0.0f}	// Recoil horizontally (ie. around Y axis) a random value in this range
-	recoilMaximumAngle	    = 0.0f		// radians
-	settleSpeed		    = 0.18f		// radians per second
-	fractionToAutoRecover	    = 1.0f		// (0 to 1) amount of recoil which is automatically undone
-
-	// THINGS YOU MIGHT NOT NEED TO:
-	smoothness		    = 0.003f		// (0 to 1) lower value = snappy recoil, higher value = gradual recoil
-	autoRecoverIsDelayed	    = "false"		// Whether we start auto-recovering immedately, or wait until firetime_manual has elapsed
-    }
+	minBurstFireTime    = 0.5f
+	maxBurstFireTime    = 1.5f
+	minLullFireTime	    = 0.75f
+	maxLullFireTime	    = 3.0f
+    }     
 }
 
-template gunInfo_singlefire : gunInfo
-{
-    fireInfo
-    {
-	bulletExpireTime    = 0.7f  //1.5
-	bulletDamage	    = 0.75f
-	bulletSpeed	    = 800.0f //1400.0f  
-	bulletType	    = "k_bultypeLaser"	
-	decalAge	    = 5.0f
-	//bulletEffect	    = "lRebSSTra"
-	bulletsPerShot	    = 1
-	dofname		    = "SHOOTPOS_PRIMARY" 
-	bulletPenetration   = 2.0f
-    
-	bulletHitEffect	    = "lImpHHHit"
-	createBulletScript  = "doBullet"
-
-	bulletTexture1	    = "misctex/laser_fx/laser_red_end"
-	bulletTexture2	    = "misctex/laser_fx/laser_red_end_glow"
-	bulletRadius	    = 0.35f
-	bulletLength	    = 20.f
-
-	manualFireTime	    = 0.100000 // fire rate if hammering button
-	autoFireTime	    = 0.100000 // fire rate if holding button down
-    }	
-
-    gunReticuleInfo reticuleInfo
-    {
-    }
-    
-    gunReticuleInfoWii reticuleInfoWii
-    {
-    }
-
-    gunRecoilInfo recoilInfo
-    {
-	cameraBlur	    = 0.f
-    }
-   
-}
-
-template gunInfo_dualfire : gunInfo
-{
-    
-    fireInfo
-    {
-	bulletExpireTime    = 0.7f  //1.5
-	bulletDamage	    = 0.75f
-	bulletSpeed	    = 800.0f //1400.0f  
-	bulletType	    = "k_bultypeLaser"	
-	decalAge	    = 5.0f
-	//bulletEffect	    = "lRebSSTra"
-	bulletsPerShot	    = 1
-	dofname		    = "SHOOTPOS_PRIMARY" 
-	bulletPenetration   = 2.0f
-    
-	bulletHitEffect	    = "lImpHHHit"
-	createBulletScript  = "doBullet"
-
-	bulletTexture1	    = "misctex/laser_fx/laser_red_end"
-	bulletTexture2	    = "misctex/laser_fx/laser_red_end_glow"
-	bulletRadius	    = 0.35f
-	bulletLength	    = 20.f
-
-	manualFireTime	    = 0.100000 // fire rate if hammering button
-	autoFireTime	    = 0.100000 // fire rate if holding button down
-    }	
-
-    gunFireInfo fireInfoSecondary 
-    {
-	bulletExpireTime    = 0.5f  //1.5
-	bulletDamage	    = 5.00f
-	bulletSpeed	    = 300.0f //1400.0f  //make sure this is the same as the proj_rocket speed
-	bulletType	    = "k_bultypeRocket"	
-	decalAge	    = 5.0f
-	bulletEffect	    = "proj_rocket"  
-	bulletsPerShot	    = 1
-	autoFireTime	    = 2.0f   
-	dofname		    = "SHOOTPOS_SECONDARY" 
-	bulletPenetration   = 2.0f
- 
-	createBulletScript  = "doBullet"
-   }
-
-    gunReticuleInfo reticuleInfo
-    {
-    }
-
-    gunReticuleInfoWii reticuleInfoWii
-    {
-    }
-
-    gunRecoilInfo recoilInfo
-    {
-	cameraBlur	    = 0.f
-    }
-   
-}
-
-template laserConcussion : gunInfo_dualfire
-{
-    
-    fireInfo
-    {
-	bulletExpireTime    = 0.7f  //1.5
-	bulletDamage	    = 0.75f
-	bulletSpeed	    = 800.0f //1400.0f  
-	bulletType	    = "k_bultypeLaser"	
-	decalAge	    = 5.0f
-	//bulletEffect	    = "lRebSSTra"
-	bulletsPerShot	    = 1
-	dofname		    = "SHOOTPOS_PRIMARY" 
-    
-	bulletHitEffect	    = "lImpHHHit"
-	createBulletScript  = "doBullet"
-
-	bulletTexture1	    = "misctex/laser_fx/laser_red_end"
-	bulletTexture2	    = "misctex/laser_fx/laser_red_end_glow"
-	bulletRadius	    = 0.35f
-	bulletLength	    = 20.f
-
-	manualFireTime	    = 0.100000 // fire rate if hammering button
-	autoFireTime	    = 0.100000 // fire rate if holding button down
-    }	
-
-    gunFireInfo fireInfoSecondary 
-    {
-	bulletExpireTime    = 0.5f  //1.5
-	bulletDamage	    = 0.00f
-	bulletSpeed	    = 300.0f //1400.0f  //make sure this is the same as the proj_rocket speed
-	bulletType	    = "k_bultypeRocket"	
-	decalAge	    = 5.0f
-	bulletEffect	    = "proj_conc"  
-	bulletsPerShot	    = 1
-	autoFireTime	    = 2.0f   
-	dofname		    = "SHOOTPOS_SECONDARY" 
- 	
-	createBulletScript  = "doBullet"
-    }
-
-    gunReticuleInfo reticuleInfo
-    {
-    }
-
-    gunReticuleInfoWii reticuleInfoWii
-    {
-    }
-
-    gunRecoilInfo recoilInfo
-    {
-	cameraBlur	    = 0.f
-    }
-   
-}
-
-template laserTorpedo : gunInfo_dualfire
+template gunInfo_medfghtr_st : gunInfo_dualfire
 { 
     fireInfo
     {
-	bulletExpireTime    = 0.7f  //1.5
-	bulletDamage	    = 0.75f
-	bulletSpeed	    = 800.0f //1400.0f  
-	bulletType	    = "k_bultypeLaser"	
-	decalAge	    = 5.0f
-	//bulletEffect	    = "lRebSSTra"
-	bulletsPerShot	    = 1
-	dofname		    = "SHOOTPOS_PRIMARY" 
-    
-	bulletHitEffect	    = "lImpHHHit"
-	createBulletScript  = "doBullet"
+	bulletHitEffect	    = "hit_generic"
+	bulletDamage	    = 1.f
+	bulletPenetration   = 1.0f	// vehicle armour penetration
 
-	bulletTexture1	    = "misctex/laser_fx/laser_red_end"
-	bulletTexture2	    = "misctex/laser_fx/laser_red_end_glow"
-	bulletRadius	    = 0.35f
-	bulletLength	    = 20.f
+	autoFireTime	    = 0.17	// fire rate if holding button down
+	manualFireTime	    = 0.17	// fire rate if hammering button
+	
+	bulletSpeed	    = 800.0f	// Lucasarts(tm) Approved Bullet Speed
+	bulletExpireTime    = 0.5f	// 400 Meter First Pass Laser Range
+	
+	bulletRadius	    = 0.4f
+	bulletLength	    = 35.f
+	glowRadius	    = 0.8f
 
-	manualFireTime	    = 0.100000 // fire rate if hammering button
-	autoFireTime	    = 0.100000 // fire rate if holding button down
+	recoilInfo
+        {
+	    recoilAnim	    = "blaster1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.4f
+        }
+	useHeightMultiplier = "true"
     }	
-
-    gunFireInfo fireInfoSecondary 
-    {
-	bulletType	    = "k_bultypeRocket"	
-	bulletEffect	    = "proj_torpedo"
-       
-	bulletSpeed	    = 200.0f	// make sure this is the same as the proj_rocket speed in gun_concussion_missiles.res
-	bulletExpireTime    = 5.000f	// make sure this is the same as the proj_rocket timer in gun_concussion_missiles.res
-	bulletDamage	    = 0.000f	// does not effect rocket damage (use the detonator component)
-		
-	decalAge	    = 5.0f
-	bulletsPerShot	    = 1
-	autoFireTime	    = 2.0f   
-	dofname		    = "SHOOTPOS_SECONDARY" 
- 
-	createBulletScript  = "doBullet"
-   }
-
-    gunReticuleInfo reticuleInfo
-    {
-    }
-
-    gunReticuleInfoWii reticuleInfoWii
-    {
-    }
-
-    gunRecoilInfo recoilInfo
-    {
-	cameraBlur	    = 0.f
-    }
-     
-}
-
-
-template laserbomber : gunInfo_dualfire
-{ 
-    fireInfo
-    {
-	bulletExpireTime    = 0.5f  //1.5
-	bulletDamage	    = 0.75f
-	bulletSpeed	    = 1000.0f //1400.0f  
-	bulletType	    = "k_bultypeLaser"	
-	decalAge	    = 5.0f
-	bulletsPerShot	    = 1
-	dofname		    = "SHOOTPOS_PRIMARY" 
-	bulletHitEffect	    = "lImpHHHit"
     
-	createBulletScript  = "doBullet"
-
-	manualFireTime	    = 0.100000 // fire rate if hammering button
-	autoFireTime	    = 0.100000 // fire rate if holding button down
-
-	bulletTexture1	    = "misctex/laser_fx/laser_red_end"
-	bulletTexture2	    = "misctex/laser_fx/laser_red_end_glow"
-	bulletRadius	    = 0.25f
-	bulletLength	    = 5.f
-    }	
-
-    gunFireInfo fireInfoSecondary 
+    fireInfoSecondary 
     {
-	bulletType	    = "k_bultypeRocket"	
-	bulletEffect	    = "proj_bomb"  
-
-	bulletSpeed	    = 140.0f	// make sure this is the same as the proj_rocket speed in gun_concussion_missiles.res
-	bulletExpireTime    = 4.000f	// make sure this is the same as the proj_rocket timer in gun_concussion_missiles.res
-	bulletDamage	    = 0.000f	// does not effect rocket damage (use the detonator component)
-
-	decalAge	    = 1.0f
-	bulletsPerShot	    = 1
-	autoFireTime	    = 1.50f   
-	dofname		    = "SHOOTPOS_SECONDARY" 
- 
-	createBulletScript  = "doBullet"
-   }
-
-    gunReticuleInfo reticuleInfo
-    {
-    }
-
-    gunReticuleInfoWii reticuleInfoWii
-    {
-    }
-
-    gunRecoilInfo recoilInfo
-    {
-	cameraBlur	    = 0.f
-    }
-   
-}
-
-
-template laserHoming : gunInfo
-{
-    fireInfo
-    {
-	bulletExpireTime    = 0.7f  //1.5
-	bulletDamage	    = 0.75f
-	bulletSpeed	    = 800.0f //1400.0f  
-	bulletType	    = "k_bultypeLaser"	
-	decalAge	    = 5.0f
-	//bulletEffect	    = "lRebSSTra"
-	bulletsPerShot	    = 1
-	dofname		    = "SHOOTPOS_PRIMARY" 
-    
-	bulletHitEffect	    = "lImpHHHit"
-	createBulletScript  = "doBullet"
-
-	bulletTexture1	    = "misctex/laser_fx/laser_red_end"
-	bulletTexture2	    = "misctex/laser_fx/laser_red_end_glow"
-	bulletRadius	    = 0.35f
-	bulletLength	    = 20.f
-
-	manualFireTime	    = 0.100000 // fire rate if hammering button
-	autoFireTime	    = 0.100000 // fire rate if holding button down
-    }	
-
-    gunFireInfo fireInfoSecondary 
-    {
+	autoFireTime	    = 0.4f	// fire rate if holding button down
+	manualFireTime	    = 0.2f	// fire rate if hammering button
+	
 	bulletType	    = "k_bultypeHoming"	
-	bulletEffect	    = "proj_homing"  
+	bulletEffect	    = "proj_homing_st"  
 
-	bulletSpeed	    = 150.0f	// make sure this is the same as the proj_rocket speed in gun_rocket.res
-	bulletExpireTime    = 7.00f	// make sure this is the same as the proj_rocket timer in gun_rocket.res
-	bulletDamage	    = 0.00f	// does not effect rocket damage (use the detonator component)
-	
-	decalAge	    = 5.0f
-	bulletsPerShot	    = 1
-	autoFireTime	    = 1.0f   
-	dofname		    = "SHOOTPOS_SECONDARY"
- 
-	createBulletScript  = "doBullet"
-   }
+	bulletSpeed	    = 125.0f	// make sure this is the same as the 'proj_homing' speed in gun_rocket.res
+	bulletExpireTime    = 7.f	// make sure this is the same as the 'proj_homing' timer in gun_rocket.res
+	bulletDamage	    = 0.000f	// does not effect rocket damage (use the detonator component)
 
-    gunReticuleInfo reticuleInfo
-    {
+	recoilInfo
+        {
+	    recoilAnim	    = "rocket1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.6f
+        }
     }
 
-    gunReticuleInfoWii reticuleInfoWii
+    aiFireInfo
     {
+	minBurstFireTime    = 0.5f
+	maxBurstFireTime    = 1.5f
+	minLullFireTime	    = 0.75f
+	maxLullFireTime	    = 3.0f
     }
-
-    gunRecoilInfo recoilInfo
-    {
-	cameraBlur	    = 0.f
-    }
-   
 }
 
-template laserHSeeking : gunInfo
+template gunInfo_fighterbomber : gunInfo_dualfire
 {
+    statesTemplate  = "ga_vehicle"
+    animmap	    = ""
+     
+    fireInfo
+    {
+	bulletHitEffect	    = "hit_generic"
+	bulletDamage	    = 0.2f
+	bulletPenetration   = 2.0f	// vehicle armour penetration
+
+	manualFireTime	    = 0.2f	// fire rate if hammering button
+	autoFireTime	    = 0.2f	// fire rate if holding button down
+	
+	bulletSpeed	    = 800.0f	// Lucasarts(tm) Approved Bullet Speed
+	bulletExpireTime    = 0.5f	// 400 Meter First Pass Laser Range
+	
+	wiiLightColour[]    = {1.0f, 0.8f, 0.8f}
+	bulletTexture1	    = "misctex/laser_fx/laser_red_end"
+	bulletTexture2	    = "misctex/laser_fx/laser_red_end_glow"
+	
+	bulletLength	    = 30.0f
+	bulletRadius	    = 0.3f
+	glowRadius	    = 0.8f
+
+	explosiondetonator detonator
+	{
+	    explosionInfo = "bomber_exp"
+	}
+
+	recoilInfo
+        {
+	    recoilAnim	    = "blaster1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.35f
+        }
+	useHeightMultiplier = "true"
+    }	
+
+    fireInfoSecondary 
+    {
+	autoFireTime	    = 1.0f	// fire rate if holding button down
+	manualFireTime	    = 1.0f	// fire rate if hammering button
+
+	bulletEffect	    = "proj_bomb"
+	    
+	bulletSpeed	    = 140.0f	// make sure this is the same as the 'proj_bomb' speed in gun_bomb.res
+	bulletExpireTime    = 8.0f	// make sure this is the same as the 'proj_bomb' timer in gun_bomb.res
+	bulletDamage	    = 0.0f	// does not effect rocket damage (use the detonator component)
+
+	recoilInfo
+        {
+	    recoilAnim	    = "rocket1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.6f
+        }
+   }
+
+    aiFireInfo
+    {
+	minBurstFireTime    = 0.3f
+	maxBurstFireTime    = 0.5f
+	minLullFireTime	    = 1.0f
+	maxLullFireTime	    = 2.0f
+    }
+}
+
+template gunInf_bombr_trt : gunInfoCore
+{
+    statesTemplate  = "ga_aat"
+    animmap	    = "animmap_rem_bf"
+        
+    neverFirstFrameTest = "true"
+    
+    fireInfo 
+    {
+	bulletDamage	    = 0.25f
+	bulletPenetration   = 2.0f	    // vehicle armour penetration
+
+	autoFireTime	    = 0.4f
+	manualFireTime	    = 0.4f
+	
+	bulletSpeed	    = 800.0f    // make sure this is the same as the proj_rocket speed
+	bulletExpireTime    = 0.5f	
+	
+	bulletsPerShot	    = 1
+	bulletType	    = "k_bultypeLaser"	
+	decalAge	    = 5.0f
+	
+	bulletHitEffect	    = "hit_generic"
+	dofname		    = "SHOOTPOS_SECONDARY" 
+
+	wiiLightColour[]    = {0.8f, 1.0f, 0.8f}
+	bulletTexture1	    = "misctex/laser_fx/laser_green_end"
+	bulletTexture2	    = "misctex/laser_fx/laser_green_end_glow"
+	
+	bulletLength	    = 15.0f
+	bulletRadius	    = 0.12f
+	glowRadius	    = 0.26f
+
+	explosiondetonator detonator
+	{
+	    explosionInfo   = "bombtrt_exp"
+	}
+
+	recoilInfo
+        {
+	    recoilAnim	    = "blaster1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.6f
+        }
+	useHeightMultiplier = "true"
+    }
+
+    aiFireInfo
+    {
+	minBurstFireTime    = 2.3f
+	maxBurstFireTime    = 2.5f
+	minLullFireTime	    = 1.0f
+	maxLullFireTime	    = 2.0f
+    } 
+}
+
+
+template gunInfo_gunships : gunInfo_dualfire
+{
+    statesTemplate  = "ga_vehicle"
+    animmap	    = ""
     
     fireInfo
     {
-	bulletExpireTime    = 0.7f  //1.5
-	bulletDamage	    = 0.75f
-	bulletSpeed	    = 800.0f //1400.0f  
-	bulletType	    = "k_bultypeLaser"	
-	decalAge	    = 5.0f
-	//bulletEffect	    = "lRebSSTra"
-	bulletsPerShot	    = 1
-	dofname		    = "SHOOTPOS_PRIMARY" 
-    
-	bulletHitEffect	    = "lImpHHHit"
-	createBulletScript  = "doBullet"
+	bulletDamage	    = 0.25f
+	bulletPenetration   = 1.8f	// vehicle armour penetration
+	
+	manualFireTime	    = 0.2f	// fire rate if hammering button
+	autoFireTime	    = 0.2f	// fire rate if holding button down
+	
+	bulletSpeed	    = 800.0f	// Lucasarts(tm) Approved Bullet Speed
+	bulletExpireTime    = 0.5f	// 400 Meter First Pass Laser Range
 
+	glowRadius	    = 0.8f
+	bulletRadius	    = 0.3f
+	bulletLength	    = 30.f
+
+	explosiondetonator detonator
+	{
+	    explosionInfo   = "gunship_exp"
+	}
+
+	recoilInfo
+        {
+	    recoilAnim	    = "blaster1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.3f
+        }
+	useHeightMultiplier = "true"
+    }	
+    
+    fireInfoSecondary 
+    {
+	autoFireTime		= 0.8f
+	manualFireTime		= 0.8f	    // fire rate if hammering button
+
+	bulletStartInaccuracy 	= 0.025f
+
+	bulletSpeed		= 450.0f
+	clipSize		= 6
+
+	bulletEffect		= "gship_rocket"
+
+	recoilInfo
+        {
+	    recoilAnim	    = "rocket1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.7f
+        }
+   }   
+
+    aiFireInfo
+    {
+	minBurstFireTime    = 0.3f
+	maxBurstFireTime    = 1.0f
+	minLullFireTime	    = 1.0f
+	maxLullFireTime	    = 3.0f
+    }
+}
+
+template gunInf_gnshp_trt : gunInfoCore
+{
+    statesTemplate  = "ga_aat"
+    animmap	    = "animmap_rem_bf"
+   	    		
+    fireInfo
+    {	
+	bulletDamage		= 0.255f
+	bulletPenetration	= 2.0f	// vehicle armour penetration
+	
+	autoFireTime		= 0.3f
+	manualFireTime		= 0.3f
+	
+	bulletStartInaccuracy 	= 0.0f
+	bulletEndInaccuracy 	= 0.0f
+	
+	bulletSpeed		= 800.0f
+	bulletExpireTime	= 0.5f
+	
+	bulletType		= "k_bultypeLaser"
+	decalAge		= 5.0f //optional, default is 0  for permanent decals
+	bulletHitEffect		= "hit_generic"
+
+	wiiLightColour[]	= {1.0f, 0.8f, 0.8f}
+    	bulletTexture1		= "misctex/laser_fx/laser_red_end"
+	bulletTexture2		= "misctex/laser_fx/laser_red_end_glow"
+
+	bulletLength		= 5.0f
+	bulletRadius		= 0.12f
+	glowRadius		= 0.26f
+
+	explosiondetonator detonator
+	{
+	    explosionInfo	= "gshiptrt_exp"
+	}
+
+	recoilInfo
+        {
+	    recoilAnim	    = "blaster1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.3f
+        }
+    }
+
+    aiFireInfo
+    {
+	minBurstFireTime    = 1.0f
+	maxBurstFireTime    = 6.0f
+    	minLullFireTime	    = 1.0f
+	maxLullFireTime	    = 3.0f
+    }   
+}
+
+template gunInfo_herofighter : gunInfo_dualfire 
+{
+    statesTemplate  = "ga_vehicle"
+    animmap	    = ""
+    
+    fireInfo
+    {
+	bulletDamage	    = 0.6f
+	bulletPenetration   = 2.1f	// vehicle armour penetration
+
+	bulletType	    = "k_bultypeFlak"	
+	bulletHitEffect	    = "hit_generic"
+	autoFireTime	    = 0.3f	// fire rate if holding button down
+	manualFireTime	    = 0.3f	// fire rate if hammering button
+
+	bulletSpeed	    = 800.0f	// Lucasarts(tm) Approved Bullet Speed
+	bulletExpireTime    = 0.5f	// 400 Meter First Pass Laser Range
+	
+	wiiLightColour[]    = {1.0f, 0.8f, 0.8f}
 	bulletTexture1	    = "misctex/laser_fx/laser_red_end"
 	bulletTexture2	    = "misctex/laser_fx/laser_red_end_glow"
-	bulletRadius	    = 0.35f
-	bulletLength	    = 20.f
+	
+	bulletRadius	    = 0.5f
+	bulletLength	    = 40.f
+	glowRadius	    = 1.0f
 
-	manualFireTime	    = 0.100000 // fire rate if hammering button
-	autoFireTime	    = 0.100000 // fire rate if holding button down
+	explosiondetonator detonator
+	{
+	    explosionInfo = "herovehicle_exp"
+	}
+
+	recoilInfo
+        {
+	    recoilAnim	    = "blaster1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.4f
+        }
     }	
 
-    gunFireInfo fireInfoSecondary 
+    fireInfoSecondary 
     {
-	bulletType	    = "k_bultypeHeatSeeking"	
-	bulletEffect	    = "proj_hseeking"  
-
-	bulletSpeed	    = 150.0f	// make sure this is the same as the proj_rocket speed in gun_rocket.res
-	bulletExpireTime    = 7.00f	// make sure this is the same as the proj_rocket timer in gun_rocket.res
-	bulletDamage	    = 0.00f	// does not effect rocket damage (use the detonator component)
+	autoFireTime	    = 2.5f	// fire rate if holding button down
+	manualFireTime	    = 2.5f	// fire rate if hammering button
 	
-	decalAge	    = 5.0f
-	bulletsPerShot	    = 1
-	autoFireTime	    = 1.0f   
-	dofname		    = "SHOOTPOS_SECONDARY"
- 
-	createBulletScript  = "doBullet"
+	bulletType	    = "k_bultypeHoming"	
+	bulletEffect	    = "jedi_homing"  
+
+	bulletSpeed	    = 230.0f	// make sure this is the same as the 'scout_homing' speed in gun_rocket.res
+	bulletExpireTime    = 5.f	// make sure this is the same as the 'scout_homing' timer in gun_rocket.res
+	bulletDamage	    = 0.0f	// does not effect rocket damage (use the detonator component)
+	clipSize	    = 2
+
+	recoilInfo
+        {
+	    recoilAnim	    = "rocket1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.7f
+        }
    }
+
+    aiFireInfo
+    {
+	minBurstFireTime    = 1.0f
+	maxBurstFireTime    = 2.0f
+	minLullFireTime     = 1.0f
+	maxLullFireTime     = 4.0f
+    }
+}
+
+template gunInfo_singlefirefighter : gunInfo_singlefire
+{
+    statesTemplate  = "ga_vehicle"
+    animmap	    = ""
+
+    fireInfo
+    {
+	bulletDamage	    = 1.0f
+	bulletPenetration   = 2.0f	// vehicle armour penetration
+    
+	bulletHitEffect	    = "hit_generic"
+	autoFireTime	    = 0.16	// fire rate if holding button down
+	manualFireTime	    = 0.16	// fire rate if hammering button
+
+	bulletSpeed	    = 800.0f	// Lucasarts(tm) Approved Bullet Speed
+	bulletExpireTime    = 0.5f	// 400 Meter First Pass Laser Range
+	
+	wiiLightColour[]    = {1.0f, 0.8f, 0.8f}
+	bulletTexture1	    = "misctex/laser_fx/laser_red_end"
+	bulletTexture2	    = "misctex/laser_fx/laser_red_end_glow"
+	
+	bulletRadius	    = 0.5f
+	bulletLength	    = 40.f
+	glowRadius	    = 1.0f
+
+	recoilInfo
+        {
+	    recoilAnim	    = "blaster1"        //Anim from BFCamAnims to play when fired
+            recoilScale     = 0.4f
+        }
+    }	
+
+    aiFireInfo
+    {
+	minBurstFireTime    = 1.0f
+	maxBurstFireTime    = 2.0f
+	minLullFireTime     = 1.0f
+	maxLullFireTime     = 4.0f
+    }
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------- ANTI INFANTRY / VEHICLE TURRETS ------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+template gunInfo_turret : gunInfoCore
+{
+    neverFirstFrameTest = "true"
+	    
+    fireInfo
+    {	
+	bulletDamage		= 0.3f
+	bulletPenetration	= 2.0f	    // vehicle armour penetration
+
+	autoFireTime		= 0.30f
+	manualFireTime		= 0.30f
+
+	bulletStartInaccuracy 	= 0.0f
+	bulletEndInaccuracy 	= 0.0f
+	
+	bulletSpeed		= 135.0f
+	bulletExpireTime	= 1.f
+
+	bulletType		= "k_bultypeLaser"
+	decalAge		= 5.0f
+	
+	bulletHitEffect	    = "hit_generic"
+	
+	wiiLightColour[]	= {1.0f, 0.8f, 0.8f}
+	bulletTexture1		= "misctex/laser_fx/laser_red_end"
+	bulletTexture2		= "misctex/laser_fx/laser_red_end_glow"
+
+	bulletLength		= 5.0f
+	bulletRadius		= 0.3f
+	glowRadius		= 0.4f
+    }
+
+    aiFireInfo
+    {
+	inaccuracy			    =   0.5f
+	inaccuracy-unawareAlwaysMissTime    =	2.0f
+
+	maxBurstFireTime = 0.3f
+	minBurstFireTime = 0.1f
+	maxLullFireTime  = 2.0f
+	minLullFireTime  = 0.5f
+    }
+
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------- CRUISER TURRETS ----------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+template gunInfo_cruiser : gunInfoCore
+{
+    statesTemplate  = "ga_tf"
+    animmap	    = "animmap_rem_bf"
+	    
+    fireInfo
+    {
+	bulletDamage		= 0.375f
+	bulletPenetration	= 2.0f
+	
+	autoFireTime		= 0.35f
+	manualFireTime		= 0.30f
+
+	bulletStartInaccuracy 	= 0.01f
+	bulletEndInaccuracy 	= 0.01f
+
+	bulletSpeed		= 800.0f
+	bulletExpireTime	= 1.0f
+	    
+	bulletType		= "k_bultypeLaser"
+	decalAge		= 5.0f
+	
+	bulletHitEffect		= "hit_generic"
+	
+	wiiLightColour[]	= {1.0f, 0.8f, 0.8f}
+	bulletTexture1		= "misctex/laser_fx/laser_red_end"
+	bulletTexture2		= "misctex/laser_fx/laser_red_end_glow"
+	
+	bulletLength		= 100.0f
+	bulletRadius		= 1.f
+	glowRadius		= 1.6f	
+
+	laserSliding		= 1.0f
+
+	tooCloseNoAutoAimDist		= 20.0f
+	startTooCloseAutoAimFalloffDist = 30.0f
+	tooFarNoAutoAimDist		= 800.0f
+        startTooFarAutoAimFalloffDist   = 850.0f
+
+	recoilInfo
+	{
+	    recoilAnim   = "blaster1"
+	    recoilScale  = 0.7f
+	}
+	useHeightMultiplier = "true"
+    }
+
+    aiFireInfo
+    {
+	inaccuracy				=   3.0f
+	inaccuracy-unawareAlwaysMissTime	=   5.0f // decreased from 7.0f
+		
+	maxBurstFireTime = 5.5f
+	minBurstFireTime = 0.5f
+	maxLullFireTime  = 2.0f
+	minLullFireTime  = 0.5f
+    }
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------- CRUISER TURRETS ----------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+template gunInfoIonCannon : gunInfoCore
+{
+    statesTemplate  = "ga_aat"
+    animmap	    = "animmap_rem_bf"
+
+    // Charge
+    fireInfo
+    {
+	bulletExpireTime    = 0.5f
+	bulletDamage	    = 50.f
+	bulletPenetration   = 2.2f
+	bulletSpeed	    = 300.0f
+	bulletType	    = "k_bultypeRocket"	
+	decalAge	    = 5.0f
+	bulletEffect	    = "plntCannon"  
+	bulletsPerShot	    = 1
+	autoFireTime	    = 8.0f
+	manualFireTime	    = 5.0f
+	useHeightMultiplier = "true"
+	muzzleFlash = "rem_blue"
+    }
 
     gunReticuleInfo reticuleInfo
     {
+	drawOuterReticule   = "false"
+	drawNotches	    = "true"
     }
-
+    
     gunReticuleInfoWii reticuleInfoWii
     {
+	drawOuterReticule   = "true"
+	drawNotches	    = "true"
+	sizeVisible	    = 0.08f
+	sizeFadeOut	    = 0.12f
     }
-
-    gunRecoilInfo recoilInfo
-    {
-	cameraBlur	    = 0.f
-    }
-   
 }
 
-template gI_SentryGun : gunInfo
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------- SENTRY GUNS --------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+
+template gI_SentryGun : gunInfoCore
 {
     fireInfo
     {
@@ -648,14 +1099,14 @@ template gI_SentryGun : gunInfo
         decalAge	    	= 5.0f
         clipSize	    	= 50
         bulletRadius	= 0.15f
-        bulletHitEffect	    = "lImpHHHit"
-	bulletPenetration = 1.0f
+        bulletHitEffect	    = "hit_generic"
+	bulletPenetration = 2.0f
 
         autoFireTime	= 0.333333f
         manualFireTime	= 0.333333f
-
-        bulletTexture1	= "misctex/laser_fx/laser_red_end"
-        bulletTexture2	= "misctex/laser_fx/laser_red_end_glow"
+	
+	colour = "red"
+	muzzleFlash = "rem_red"
 
         bulletRadius	= 0.12f
         glowRadius	= 0.26f
@@ -675,9 +1126,9 @@ template gI_SentryGun_Blue : gI_SentryGun
 
 	autoFireTime	= 0.333333f
         manualFireTime	= 0.333333f
+	
+	colour = "blue"
 
-	bulletTexture1	= "misctex/laser_fx/laser_blue_end"
-        bulletTexture2	= "misctex/laser_fx/laser_blue_end_glow"
    }
 }
 
@@ -685,25 +1136,10 @@ template gI_SentryGun_Green : gI_SentryGun
 {
    fireInfo
    {
-        bulletTexture1	= "misctex/laser_fx/laser_green_end"
-        bulletTexture2	= "misctex/laser_fx/laser_green_end_glow"
+	colour = "green"
    }
 }
 
-template guncomponent_rocketlauncher_bf : guncomponent_linetest_bf
-{
-    class-id = "gun rocket launcher"
-    
-    autoRecurseTemplateName-field rocket
-    {
-	default = "proj_rocket"
-    }
-
-    //emptyAnimChar = "E"
-    alignRocketUsingXAxis = "false"
-    float thirdPersonFirePos[] {0.0f, 0.f, 1.f}
-    hudDisplayType = "k_hudDisplayType_ammoNoClip" 
-}
 
 template guncomponent_hominglauncher_bf : guncomponent_linetest_bf
 {
@@ -717,8 +1153,7 @@ template guncomponent_hominglauncher_bf : guncomponent_linetest_bf
     //emptyAnimChar = "E"
     alignRocketUsingXAxis = "false"
     float thirdPersonFirePos[] {0.0f, 0.f, 1.f}
-    hudDisplayType = "k_hudDisplayType_ammoNoClip"
-    setMissileLockTime = 1.0f
+    setMissileLockTime = 0.35f
 }
 
 template guncomponent_grenadelauncher_bf : guncomponent_linetest_bf
@@ -734,7 +1169,6 @@ template guncomponent_grenadelauncher_bf : guncomponent_linetest_bf
     alignRocketUsingXAxis = "false"
     float thirdPersonFirePos[] {0.0f, 0.f, 1.f}
     float thirdPersonAttachRot[] {90.f, 90.f, 90.f}     
-    hudDisplayType = "k_hudDisplayType_ammoNoClip"
 }
 
 template guncomponent_schargelauncher_bf : guncomponent_linetest_bf
@@ -750,281 +1184,70 @@ template guncomponent_schargelauncher_bf : guncomponent_linetest_bf
     alignRocketUsingXAxis = "false"
     float thirdPersonFirePos[] {0.0f, 0.f, 1.f}
     float thirdPersonAttachRot[] {90.f, 90.f, 90.f}     
-    hudDisplayType = "k_hudDisplayType_ammoNoClip"
 }
 
-template landmineT : tickingcomponent
-{
-    class-id = "landmine"
 
-    singleSound-field explosion_soundid
-    {
-	default = "m_mrt_xs"
-    }
-
-    singleSound-field beep_soundid
-    {
-	default = "w_mine_be"
-    }
-
-    radiusdetonate = 4.8f	//should be referenced with detonatorcomponent maxRad
-    radiusbeep = 11.0f	//sound of beep is currently audible only within 8.0
-
-    detonatedelay = 1.0f
-
-    triggerIteratorChrs propIterator
-    {
-    }
-
-    enum-field state	
-    {
-	enumtype = "CLandmine_states"
-	default = "k_detonate_state_safe"
-	tip	= "these are the detonate states that the landmine can be in"
-	views	= "basic setup"
-    }    
-
-    float-field activateAfterDelay
-    {
-	default = 4.0f; // a suitable default.. only used if start in state 
-	tip = "if we are in state k_detonate_state_off we will activate after this amount of time"
-	views = "basic setup"
-    }
-}
-
-template landmineprop : staticprop
-{
-    healthcomponentbf health
-    {
-	fullhealth	= 0.1f	    //for detonate on shoot and collision
-    }
-
-    detonatorcomponent detonator
-    {
-	particleEffect	    = "expGrenade"
-	maxRad		    = 10.0f	// Maximum Physics Radius Effect
-	speed		    = 40.0f	// Explosion Growth Speed
-	force		    = 8.0f	// Maximum Force (18.5)
-	edgeForce	    = -32.0f	// Force Falloff (-210.00)
-	damageatcentre	    = 9.5f	// Maximum Damage (9.5)
-	damageradius	    = 9.5f	// Damage Radius and Falloff (9.5)
-    }
-
-    landmineT tick 
-    {
-    }
-    
-    ticktype = "k_tickAlways"
-
-    meta
-    {
-	canCreateInEditor   = 1
-	editorInstanceName  = "landmine"
-	editorPath = "bf/weapons/secondary/general"
-    }
-}
-
-template spidermineT : tickingProjectileComponent 
-{
-    class-id = "spidermine"
-
-    activateTime  =  5.0f 
-    detonateTime  =  5.0f
-    stimRadius    = 10.0f
-    relaunchSpeed = 30.0f
-    float hitNormal[] { 0.0f, 1.0f, 0.0f }
-
-    spin		     = 20.f
-    detonateAfterTimeElapsed = "false"
-    sticky		     = "true"
-    projectileState	     = "k_projectileState_held"
-    throwStrengthScale	     = 0.5f
-    throwArcScale	     = 1.0f
-    stickyDamage	     = 0.0f
-    visibility		     = 1.0f
-    explosion_soundid	     = "explosion_medium"
-    debris_soundid	     = "grenade_debris_default"
-
-    effectGeneratorStartWhenTimeRemaining = 1.5f
-    effectGeneratorStopWhenTimeRemaining  = 0.5f
-
-    approxGrenadeRadius	= 0.1f
-    stimCreateVelocity	= 1.0f
-}
-
-template spidermineprop : tickingphysicsprop 
-{
-    dmghealthcomponentbf health	
-    {
-	fullhealth	= 0.1f	    //for detonate on shoot and collision
-    }
-
-    genericshatteringcomponent descript
-    {
-    } 
-    
-    physics
-    {
-	material		= "gren"
-	enabled			= "true"
-	givesoncontactdamage	= "false"
-	type			= "k_physicsSphere"
-	gravity			= "true"
-	radius			= 0.1f
-	ignoreWhenFindingFloor	= "true"
-    }	
-    
-    spidermineT tick
-    {
-    }
-
-    detonatorcomponent detonator
-    {
-	particleEffect = "expGrenade"
-	maxRad	    = 5.0f
-	speed	    = 10.0f
-	force	    = 10.0f
-	edgeForce   = 0.25f
-	damageradius = 5.0f
-	reactmap    = ""
-    }
-
-    obinstrenderer render
-    {
-	model = "weapon/misc/spidermine"
-    }
-
-    soundcomponent soundPlayer
-    {
-    }
-
-    meta
-    {
-	canCreateInEditor   = 0
-	editorInstanceName  = "spidermine"
-	editorPath = "bf/weapons/secondary/general"
-    }
-}
-
-template proxmineT : tickingProjectileComponent 
-{
-    class-id = "proximitymine"
-
-    activateTime  =  5.0f 
-    detonateTime  =  5.0f
-    stimRadius    = 10.0f
-    float hitNormal[] { 0.0f, 1.0f, 0.0f }
-
-    spin		     = 20.f
-    detonateAfterTimeElapsed = "false"
-    sticky		     = "true"
-    projectileState	     = "k_projectileState_held"
-    throwStrengthScale	     = 0.5f
-    throwArcScale	     = 1.0f
-    stickyDamage	     = 0.0f
-    visibility		     = 1.0f
-    explosion_soundid	     = "explosion_medium"
-    debris_soundid	     = "grenade_debris_default"
-
-    effectGeneratorStartWhenTimeRemaining = 1.5f
-    effectGeneratorStopWhenTimeRemaining  = 0.5f
-
-    approxGrenadeRadius	= 0.1f
-    stimCreateVelocity	= 1.0f
-}
-
-template proxmineprop : tickingphysicsprop 
-{
-    dmghealthcomponentbf health	
-    {
-	fullhealth	= 0.1f	    //for detonate on shoot and collision
-    }
-
-    genericshatteringcomponent descript
-    {
-    } 
-    
-    physics
-    {
-	material		= "gren"
-	enabled			= "true"
-	givesoncontactdamage	= "false"
-	type			= "k_physicsSphere"
-	gravity			= "true"
-	radius			= 0.1f
-	ignoreWhenFindingFloor	= "true"
-    }	
-    
-    proxmineT tick
-    {
-    }
-
-    detonatorcomponent detonator
-    {
-	particleEffect	    = "expGrenade"
-	maxRad		    = 10.0f	// Maximum Physics Radius Effect
-	speed		    = 40.0f	// Explosion Growth Speed
-	force		    = 8.0f	// Maximum Force (18.5)
-	edgeForce	    = -32.0f	// Force Falloff (-210.00)
-	damageatcentre	    = 9.5f	// Maximum Damage (9.5)
-	damageradius	    = 9.5f	// Damage Radius and Falloff (9.5)
-
-	reactmap = ""
-    }
-
-    obinstrenderer render
-    {
-	model = "weapon/rep/rep_det_pack"
-    }
-
-    soundcomponent soundPlayer
-    {
-    }
-
-}
 
 template remotemineprop : tickingphysicsprop
 { 
     physics
     {
+    mayaphysics			= "false"
 	material		= "gren"
 	enabled			= "true"
 	givesoncontactdamage	= "false"
 	type			= "k_physicsBox"
 	float box-radius []
 	{
-	    0.1f, 0.1f, 0.1f
+	    0.12f, 0.12f, 0.12f
 	}
 	ignoreWhenFindingFloor	= "true"
+	collidableQualityCritical = "true"
     }	
 
     detonatorcomponent detonator
     {
-	particleEffect	    = "expGrenade"
-	maxRad		    = 10.0f	// Maximum Physics Radius Effect
-	speed		    = 40.0f	// Explosion Growth Speed
-	force		    = 8.0f	// Maximum Force (18.5)
-	edgeForce	    = -32.0f	// Force Falloff (-210.00)
-	damageatcentre	    = 9.5f	// Maximum Damage (9.5)
-	damageradius	    = 9.5f	// Damage Radius and Falloff (9.5)
-
-	reactmap = ""
+	explosion
+	{
+	    explosionInfo = "detpack"	
+	}
     }
 
-    soundcomponent soundPlayer
+
+    soundmap = "sndmap_gnd"
+    soundeventsystem sndeventsystem
     {
+	definition = "sndevt_mine"
     }
 
     tickingProjectileComponent tick 
     {
 	class-id = "remote mine"
 	
-	spin	= 0.f
+	spin	= 5.0f	//20.f
 	explosion_soundid = "explosion_medium"
 	debris_soundid	  = "grenade_debris_default"
+	sticky		     = "true"
+	
 	approxGrenadeRadius = 0.1f
-    }
+	throwStrengthScale = 0.6f   //0.3f
+	throwArcScale = 0.8f	//1.2f
+	timer = 0.1f //This is the time from hitting detonate to it actually exploding
+	activateTime = 1.f
+	
+	glow_onTime	= 0.1f
+	glow_offTime	= 0.2f
+	glow_fadeTime	= 0.05f
+	glow_timeScaleAtDetTime = 1.0f
+	
+	// dunno if we need this stuff, pasted from proxmineT
+	float hitNormal[] { 0.0f, 1.0f, 0.0f }
 
+	detonateAfterTimeElapsed = "true"
+	projectileState	     = "k_projectileState_held"
+	stickyDamage	     = 0.0f    
+    }
+    
     ticktype = "k_tickAlways"
 
     meta
@@ -1042,7 +1265,14 @@ template weaponGrenadeProp : tickingphysicsprop_nophysics
 		castshadows = "false"
 		receiveshadows = "false"
 	}
+	    
+	soundmap = "sndmap_grenade"
 	
+	soundeventsystem sndeventsystem
+	{
+	    definition = "sndevt_grenade"
+	}
+
 	tickingProjectileComponent tick
 	{
 		class-id	= "ticking grenade"
@@ -1052,42 +1282,40 @@ template weaponGrenadeProp : tickingphysicsprop_nophysics
 	
 		beep_rate = 4.0f
 		beep_timer = 0.0f
-		singleSound-field beep_soundid
-		{
-			default = ""
-		}
+
 		beep_minTime = 0.05f
 		stimCreateVelocity = 1.0f
 		approxGrenadeRadius = 0.1f
-		speedHitMultiplier = 0.70f;
+		speedHitMultiplier = 0.70f
 
-		throwStrengthScale = 1.0f
-		throwArcScale = 1.0f
+		throwStrengthScale = 1.1f
+		throwArcScale = 0.5f
+
+		timerCookingScale = 1.0f
 		removeDampingOnCreation = "true"
 		reintroduceDampingNumHits = 100
-	}
 
-	obstaclecomponent obstacle
-	{
-		primitive = "k_nmob_none"
+		glow_onTime	= 0.2f
+		glow_offTime	= 0.5f
+		glow_fadeTime	= 0.1f
+
+		//The above glow times scale down as the timer runs out, the value below states the minimum scale value used at the point of detonation
+	
+		glow_timeScaleAtDetTime = 0.2f  
 	}
 
 	healthcomponentbf health
 	{
 		fullhealth = 0.0f
-		ignoreDamageTypes = "k_DamageType_Collision"
+		ignoreDamageTypes = "k_DamageType_Collision|k_DamageType_Explosion|k_DamageType_Heat"
 	}
 
 	detonatorcomponent detonator
 	{
-		particleEffect = "expGrenade"
-		maxRad = 3.0f
-		speed = 10.0f
-		force = 10.0f
-		edgeForce = 0.25f
-		damageradius = 5.0f
-
-		reactmap = ""
+	    explosion
+	    {
+		explosionInfo = "thermaldet"	
+	    }
 	}
 
 	soundcomponent soundPlayer
@@ -1104,18 +1332,6 @@ template GunComponent_MultiFire : guncomponent_linetest_bf
     multiFire	  = 2 // Fire the guns 2 at a time
 }
 
-/*template GunComponent_Beam : guncomponent_linetest_bf
-{
-    class-id = "Gun Component Beam"
-
-    chargeTime	     = 2.0f
-    fireTime	     = 5.0f
-    cooldownTime     = 5.0f
-    laserSpeed	     = 160.0f
-    damageMultiplier = 0.25f
-    laserHitEffect = "lImpHHHit" //TODO - this is a temporary effect, it should be changed with something more appropriate for a laser
-}*/
-
 template GunComponent_Beam : guncomponent_base
 {
     class-id = "Gun Component Beam"
@@ -1127,245 +1343,17 @@ template GunComponent_Beam : guncomponent_base
     damageMultiplier = 0.25f
     glowcol[] { 1.f, 1.f, 0.f, 1.f }
     corecol[] { 1.f, 1.f, 1.f, 1.f }
-    texName = "misctex/laserbeam"
-    texCoreName = "misctex/laserbeam"
-    laserHitEffect = "lImpHHHit" //TODO - this is a temporary effect, it should be changed with something more appropriate for a laser
+    texture-field texName
+    {
+	default = "misctex/laserbeam"
+    }
+    texture-field texCoreName
+    {
+	default = "misctex/laserbeam"
+    }
+    laserHitEffect = "hit_generic" //TODO - this is a temporary effect, it should be changed with something more appropriate for a laser
 }
 
-template GunComponent_Cannon : guncomponent_linetest_bf
-{
-    class-id = "Gun Component Cannon"
-	
-    ammoID		    = "o_ammo_rep_rl"
-//  weaponID		    = "o_gun_rep_rl"
-
-    soundmap		    = "sndmap_blst"
-    soundmap_npc	    = "sndmap_fvw"
-    soundmap_player	    = "sndmap_fvwpla"
-    gunInfoFromMgr	    = "ionCannonInfo"
-       
-    state = "idle****"
-	
-    autoRecurseTemplateName-field rocket
-    {
-	default = "proj_rocket"
-    }
-
-//animations
-    gunAnimationGroup anims
-    {
-	set		    = "gunanims_vehicle"
-	animmap		    = "animmap_vehicle"
-	reactmap	    = "reactmap_vehicle"
-    }
-    emptyAnimChar = "N"
-}
-
-
-template ion_cannon_target : prop
-{
-    class-id = "ion cannon target"
-    
-    DrawOnMapComponent mapComponent
-    {
-	iconNameKey	    = "ioncannon_target"
-	displayOnMiniMap    = "false"
-	displayOnPerimeter  = "true"
-	iconScaleFactor	    = 1.5f
-    }
-
-    network
-    {
-	networkflags = "k_syncWithBg"
-    }
-}
-
-
-template ion_cannon_model : staticpropeditor
-{
-    class-id = "ion cannon prop model"
-    render
-    {
-	model = "props/misc/ion_cannon"
-    }
-    firePosDofName = "SHOOTPOS_PRIMARY1"
-    pivotPosDofName = "CANNON_PIVOT"
-    cameraPosDirDofName = "CAM_POS" 
-    cameraUpDirDofName = "CAM_UP_POS"
-
-    basePartName = "B_BASE"
-    cannonPartName = "B_CANNON"
-    muzzlePartName = "B_MUZZLE"
-    
-    network
-    {
-	networkflags = "k_syncWithBg"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "cannonmodel"
-	editorPath         = "bf/props/ion_cannon"
-    }
-    cameraOffsetFromVerticalPosition = 0.f
-}
-
-template tat_ion_cannon_model : ion_cannon_model
-{
-    render
-    {
-	model = "props/planet_cannons/tatooine/tatcannon"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "tatcanmodel"
-	editorPath         = "bf/props/ion_cannon"
-    }
-}
-
-template ion_cannon_prop : staticpropeditor
-{
-    class-id = "ion cannon prop"
-
-    ticktype = "k_tickAlways"
-
-    overrideMapData = "false"
-    
-    render
-    {
-	model = "props/misc/ion_cannon_console"
-    }
-
-    string-field targetToFireAtName
-    {
-	default = ""
-	views	= "basic setup"
-	tips = "The name of prop that the ion cannon will aim at by default"
-    }
-           	
-    SimpleActivate activate
-    {
-	disableWhenActivated = "true"
-	myNameStringHandle = "STR_ACTIVATENAME_IONCANNON_GENERIC"
-	pointA
-	{
-	    distance	= 2.5f
-	}
-    }
-
-    autoAimTargetComponentBF autoaim
-    {
-	nameKey				= "STR_IONCANNON"
-    }
-
-    timeToCharge		= 0.f
-    burstFireHeatFraction	= 0.2f
-    timeToCoolDownCompletely	= 0.f 
-    timeToRecoverFromOverheat	= 0.1f
-
-    timeBetweenFiringAndCameraSwitchToIonBeam	    = 0.5f
-    timeBetweenExplosionAndCameraSwitchBackToCannon = 2.f
-    lerpToFinalCameraPosRate			    = 0.25f
-    
-    GunComponent_Cannon cannonGun
-    {
-    }
-
-    StaticCamera camera
-    {
-    }
-
-    DrawOnMapComponent mapComponent
-    {
-	iconNameKey		= "map_ion_cannon"
-	shouldRotateIcon	= "false"
-    }
-}
-
-template ground_to_space_cannon : ion_cannon_prop
-{
-    string-field cannonModelName
-    {
-	default = ""
-	views	= "basic setup"
-	tips = "The name of the ion cannon model that the ion cannon will fire from"
-    }
-    
-    float-field maxRotationAngle
-    {
-	default		=	30.f
-	tip		=	"The angle in degrees about which the ion cannon can rotate about its default aiming direction"
-	views		=	"basic setup"
-    }
-
-    float-field aimSpeed
-    {
-	default		=	9.f
-	tip		=	"The speed in degrees per second at which the ion cannon will rotate"
-	views		=	"basic setup"
-    }
-    
-    float-field minZoomAmount
-    {
-	default		=	5.f
-	tip		=	"The current zoom amount"
-	views		=	"basic setup"
-    }
-    
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "ground2space"
-	editorPath         = "bf/props/ion_cannon"
-    }
-}
-
-template space_to_ground_cannon : ion_cannon_prop
-{
-    pos-array-field firePos
-    {
-	float default [] { 0.0f, 0.0f, 0.0f }
-	views	= "basic setup"
-    }
-    
-    float-field maxRotationAngle
-    {
-	default		=	15.f
-	tip		=	"The angle in degrees about which the ion cannon can rotate about its default aiming direction"
-	views		=	"basic setup"
-    }
-
-    float-field aimSpeed
-    {
-	default		=	4.5f
-	tip		=	"The speed in degrees per second at which the ion cannon will rotate"
-	views		=	"basic setup"
-    }
-
-    float-field minZoomAmount
-    {
-	default		=	20.f
-	tip		=	"The current zoom amount"
-	views		=	"basic setup"
-    }
-
-    float-field firePosCameraOffset
-    {
-	default		=	10.f
-	tip		=	"The y-offset from the fire position that the initial viewing ion beam camera will be set at"
-	views		=	"basic setup"
-    }
-    
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "space2ground"
-	editorPath         = "bf/props/ion_cannon"
-    }
-}
 
 template static_terminal01 : staticprop
 {
@@ -1373,6 +1361,9 @@ template static_terminal01 : staticprop
     {
 	model = "props/misc/ion_cannon_console"
    	numLods = 0//2
+	castshadows = "true"
+	receiveshadows = "true"
+	castReflections = "true"
     }
 
     meta
@@ -1390,26 +1381,54 @@ template remote_gun_control_prop : staticprop
     ticktype = "k_tickAlways"
 
     capitalShip = "" 
+    useIonCannonFromCapShip = "false"
 
     render
     {
-	model = "props/misc/ion_cannon_console"
+	model = "props/misc/remote_turret_console"
+	castshadows = "true"
+	receiveshadows = "true"
+	castReflections = "true"
     }
 
     cycle_gun = "true"
+
+    bool-field aiCanUse
+    {
+	views   = "basic setup"
+	tips    = "If set to false no stim will be created to attract npcs to console (remotes brain will stuff funtion for remotes attached to console)"
+	default = "true"
+    }
     
     string valid_guns[] = 
     {
     }
-    
-    SimpleActivate activate
+
+    //so we can specify any list of guns we want this console to control
+    //the valid gun list deals with specifying which cruiser guns are valid
+    string gunList []
     {
-        disableWhenActivated = "true"
+    }
+    
+	healthcomponentbf health
+    {
+		fullhealth	= 30.0f
+		healthComponentSettings |= "k_healthComponentSetting_isRepairable"
+    }	
+
+	repairpropdesc descript
+    {
+    }    
+
+	SimpleActivate activate
+    {
+	class-id = "remote gun control activate component bf"
+
         myNameStringHandle = "STR_ACTIVATENAME_REMOTEGUNCONTROL_GENERIC" 
         pointA
         {
-            float pos[]	{0.f, 0.f, 1.f} 
-            distance	= 1.f
+            float pos[]	{0.f, 0.f, 1.0f} 
+            distance	= 1.6f
         }
     }
 
@@ -1425,59 +1444,119 @@ template remote_gun_control_prop : staticprop
 	playerTurnToFaceAutomatically	= "false"
 	playerBulletsAttractedToTarget	= "false"
 	nameKey				= "STR_CAPITALSHIPGUNTURRET"
+        flags				= "k_autoAimBF_displayAsPointOfInterestOnHud|k_autoAimBF_displaySeparatePoiIcon|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"
+    	minimap_flags			= "k_guiMapRenderConsolesIcons"
+	minimap_icon			= 1
+   }
+
+     dynamicNetworkComponent network {}
+
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_console_cis"
+    }   
+}
+
+template remote_gun_control_prop_sec : remote_gun_control_prop
+{
+	activate
+    {
+        myNameStringHandle = "STR_ACTIVATENAME_REMOTEGUNCONTROL_SECURITY" 
     }
 }
 
-template remote_control_munificent_left : remote_gun_control_prop
+template remote_gun_control_prop_ext : remote_gun_control_prop
 {
-    string valid_guns[] = 
+	activate
     {
- 	        "topgun2",
-		"lwinggun1",
-		"lwinggun2",
-	        "lbackgun1",
-	        "bottomgun1",
-	    	"bottomgun2"
+        myNameStringHandle = "STR_ACTIVATENAME_REMOTEGUNCONTROL_EXTERNAL" 
+    }
+	
+	autoaim
+    {
+	nameKey				= "STR_CAPITALSHIPGUNTURRETCON"
     }
 }
 
-template remote_control_acclamator_right : remote_gun_control_prop
+template ion_cannon_remote_control : remote_gun_control_prop
 {
-    string valid_guns[] = 
+    render
     {
-		"gun7",
-	        "gun9",
-	      	"gun10",
-		"gun13",
-	        "gun14"
+	model = "props/misc/ion_cannon_console"
+    }    
+
+	activate
+    {
+	myNameStringHandle = "STR_ACTIVATENAME_IONCANNON_GENERIC"
     }
+
+    autoAimTargetComponentBF autoaim
+    {
+	nameKey				= "STR_IONCANNON"
+        flags = "k_autoAimBF_displayAsPointOfInterestOnHud|k_autoAimBF_displaySeparatePoiIcon|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"		
+    	minimap_flags			= "k_guiMapRenderConsolesIcons"
+	minimap_icon			= 1
+    }
+    
+  
 }
 
-template remote_control_interdictor_right : remote_gun_control_prop
+template frig_cannon_remote_control : ion_cannon_remote_control
 {
-    string valid_guns[] = 
+    activate
     {
-                "GUN9",
-                "GUN11",
-                "GUN12",
-                "GUN13",
-                "GUN14",
-                "GUN15",
-                "GUN16"   
+    myNameStringHandle = "STR_ACTIVATENAME_FRIGCANNON_GENERIC"
     }
+
+    autoAimTargetComponentBF autoaim
+    {
+	nameKey                = "STR_FRIGCANNON"
+        flags = "k_autoAimBF_displayAsPointOfInterestOnHud|k_autoAimBF_displaySeparatePoiIcon|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"    
+     	minimap_flags			= "k_guiMapRenderConsolesIcons"
+	minimap_icon			= 1
+   }
 }
 
-template remote_control_nebulon_right : remote_gun_control_prop
+template planet_cannon_remote_control : ion_cannon_remote_control
 {
-    string valid_guns[] = 
+    activate
     {
-                "GUN3",
-                "GUN4",
-                "GUN7",
-                "GUN8",
-                "GUN10",
-                "GUN12",
-                "GUN14"
+    myNameStringHandle = "STR_ACTIVATENAME_PLANETCANNON_GENERIC"
+    }
+
+    autoAimTargetComponentBF autoaim
+    {
+	nameKey                = "STR_PLANETCANNON"
+        flags = "k_autoAimBF_displayAsPointOfInterestOnHud|k_autoAimBF_displaySeparatePoiIcon|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"	    
+     	minimap_flags			= "k_guiMapRenderConsolesIcons"
+	minimap_icon			= 1
+   }
+}
+
+template planet_cannon_mobile_control : planet_cannon_remote_control 
+{
+    render
+    {
+	model = "backgrounds/cor/props/ion_controls"
+    }
+
+    activate
+    {
+        pointA
+        {
+            float pos[]	{-1.2f, 0.f, 1.0f} 
+            distance	= 1.6f
+        }
+    }
+
+    autoaim
+    {
+        poiYOffset = -3.f
     }
 }
 
@@ -1488,26 +1567,26 @@ template temp_controls_with_health : bfexplodingstaticprop
     render
     {
 	model = "props/misc/ion_cannon_console"
+	castshadows = "true"
+	receiveshadows = "true"
+	castReflections = "true"
     }
     
     healthcomponentbf health
     {
-	fullhealth	= 5.0f
+	fullhealth	= 60.0f
     }
 
     teamNum = 0
     
-    autoaimtarget
-    {
-        nameKey    = "STR_GUN_TURRET_CONTROL_CONSOLE"
-    }
-
     autoAimTargetComponentBF autoaim
     {
         nameKey    = "STR_GUN_TURRET_CONTROL_CONSOLE"
-    }
+        flags = "k_autoAimBF_displayAsPointOfInterestOnHud|k_autoAimBF_displaySeparatePoiIcon|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"
+     	minimap_flags			= "k_guiMapRenderConsolesIcons"
+	minimap_icon			= 1
+   }
     
-
     vistableseercomp vtseer
     {
     }
@@ -1530,6 +1609,12 @@ template temp_controls_with_health : bfexplodingstaticprop
 	tips    = "Should destroying the console remove the reactor shield?"
     }
 
+    fractionRemovedFromShieldWhenDestroyed = 1.0f
+
+    repairpropdesc descript
+    {
+    }
+
     meta
     {
 	canCreateInEditor  = 1
@@ -1541,12 +1626,12 @@ template temp_controls_with_health : bfexplodingstaticprop
 template frig_reactor_shield_console : temp_controls_with_health
 {
     
-    autoaimtarget
+	render
     {
-        nameKey    = "STR_SHIELD_GEN_CONSOLE"
-    }
+	model = "props/misc/reactor_shield_console"
+    }    
 
-    autoAimTargetComponentBF autoaim
+	autoaim
     {
         nameKey    = "STR_SHIELD_GEN_CONSOLE"
     }
@@ -1557,9 +1642,102 @@ template frig_reactor_shield_console : temp_controls_with_health
 	editorInstanceName = "shldgencons"
 	editorPath         = "bf/props/terminal"
     }
-    
-
 }
+
+template new_shield_console : temp_controls_with_health
+{
+    
+    render
+    {
+	model = "props/misc/reactor_shield_console"
+    }    
+
+    healthcomponentbf health
+    {
+        fullhealth = 18.0f //increased from 15.0
+	
+        vehicleArmourDirectionModifier modifyReceivedDamage
+	{
+	   // Foward, backward, right, left, up, down
+	   armourValues[]  { 0.9f, 0.9f, 0.9f, 0.9f, 0.9f, 0.9f}
+	}
+    }
+
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }
+	
+    soundmap-field soundmap
+    {
+	default = "sndmap_console_republic"
+    } 
+    
+    shieldconsdescript descript
+    {
+    }
+
+/*
+    descript
+    {
+        script = "
+
+	BTOP
+    	{	    
+    	    event init
+    	    {
+		setdmgstate( normal )
+		makevisible_wc( BTOP, true )
+		makevisible_wc( B_GIB*, false )
+		makevisible_wc( B_DAMAGED, false )
+		//debugprintf(init)
+	    }
+	    
+	    event damage
+	    {
+		if healthlessthan( 0.5 ) 
+		{
+		    particleeffect( smoke_calm_015, true, 0.0, 0.4, 0.2, $1.v, 0, 0, false )	// play particle effect
+		    latent(unusable, 0.0001)
+		}
+	    }
+	
+	    event zerohealth
+	    {
+		if comparedmgstatenot(dead)
+		{
+		    setdmgstate(dead)
+		    particleeffect( csi_exp_medium, true, 0.0, 0.0, 0.0, $1.v, 0, 0, false )
+		    makevisible_wc( *, false )
+		    //particleeffect( ship_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2, false )
+		    explode_wc_launch( B_GIB* , 10.0,  7.0, 0.2, NULL) //name of the gib, length of the force vector, life, angular velocity factor, name of the descript to use for the bits
+		    deleteprop()
+		}
+	    }
+	}
+	"
+    }
+*/
+    
+    fractionRemovedFromShieldWhenDestroyed = 0.25f
+	
+    autoAimTargetComponentBF autoaim
+    {
+        nameKey		    = "STR_SHIELD_GEN_CONSOLE"
+        flags		    = "k_autoAimBF_displayAsPointOfInterestOnHud|k_autoAimBF_displayNameOnHud|k_autoAimBF_displayHealthOnHud"	
+     	minimap_flags	    = "k_guiMapRenderConsolesIcons"
+	minimap_icon	    = 1
+	overridePosition[]  = {0.f, 0.75f, 0.f}
+   }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "newshieldcon"
+	editorPath         = "bf/props/terminal"
+    }
+}
+
 
 template firstpersonanimatedpropbf : firstpersonanimatedprop
 {
@@ -1569,6 +1747,7 @@ template firstpersonanimatedpropbf : firstpersonanimatedprop
 	maxTime		= 10.0f	// Max time the cloak can be active
 	regenMultiplier = 2.0f  // Will be x times quick to regenerate the cloak time
 
+	activateFromInventory = "false"
     }
 }	
 

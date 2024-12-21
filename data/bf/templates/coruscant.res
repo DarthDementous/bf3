@@ -6,116 +6,6 @@
 
 // Flyable area buildings
 
-template pirbuilding : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/pirbuilding"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "pir_building"
-	editorPath         = "bf/props/coruscant/buildings"
-    }
-}
-
-template recbuilding : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/recbuilding"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "rec_building"
-	editorPath         = "bf/props/coruscant/buildings"
-    }
-}
-
-template cor_spire : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/cor_spire"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "cor_spire"
-	editorPath         = "bf/props/coruscant/buildings"
-    }
-}
-
-template squarebuilding : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/squarebuilding"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "sq_building"
-	editorPath         = "bf/props/coruscant/buildings"
-    }
-}
-
-template cor_tallspire : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/cor_tallspire"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "cor_tspire"
-	editorPath         = "bf/props/coruscant/buildings"
-    }
-}
-
-template crashed_laat : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/crashed_laat"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-//	castshadows = "true"
-//	receiveshadows = "true"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "crash_laat"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
-
 template ruined_tower : staticprop
 {
     obinstrenderer render
@@ -206,13 +96,27 @@ template Club_Bottle : bfshatteringstaticprop
 	lodDist[] 
 	{ 100.0, 300.0 }
     }
-
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 0.1f 
+    }  
     meta
     {
 	canCreateInEditor  = 1
 	editorInstanceName = "bottle"
 	editorPath         = "bf/props/coruscant/club"
     }
+
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_prop_glass_small"
+    } 
+
 }
 
 template Club_Chair : bfshatteringstaticprop
@@ -224,13 +128,27 @@ template Club_Chair : bfshatteringstaticprop
 	lodDist[] 
 	{ 100.0, 300.0 }
     }
-
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 0.1f
+    }  
     meta
     {
 	canCreateInEditor  = 1
 	editorInstanceName = "chair"
 	editorPath         = "bf/props/coruscant/club"
     }
+
+   soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_prop_smallfurniture"
+    } 
+
 }
 
 template Club_CupBar : bfshatteringstaticprop
@@ -242,13 +160,27 @@ template Club_CupBar : bfshatteringstaticprop
 	lodDist[] 
 	{ 100.0, 300.0 }
     }
-
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 0.1f
+    }  
     meta
     {
 	canCreateInEditor  = 1
 	editorInstanceName = "cupbar"
 	editorPath         = "bf/props/coruscant/club"
     }
+
+   soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_prop_glass_small"
+    } 
+
 }
 
 template Club_CupTable : bfshatteringstaticprop
@@ -260,13 +192,27 @@ template Club_CupTable : bfshatteringstaticprop
 	lodDist[] 
 	{ 100.0, 300.0 }
     }
-
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 0.1f
+    }  
     meta
     {
 	canCreateInEditor  = 1
 	editorInstanceName = "cuptable"
 	editorPath         = "bf/props/coruscant/club"
     }
+
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_prop_glass_small"
+    } 
+
 }
 
 template Club_CupTableTrans : bfshatteringstaticprop
@@ -278,13 +224,27 @@ template Club_CupTableTrans : bfshatteringstaticprop
 	lodDist[] 
 	{ 100.0, 300.0 }
     }
-
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 0.1f
+    }  
     meta
     {
 	canCreateInEditor  = 1
 	editorInstanceName = "cuptabletrans"
 	editorPath         = "bf/props/coruscant/club"
     }
+
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_prop_glass_small"
+    } 
+
 }
 
 template Club_GlassLiq : bfshatteringstaticprop
@@ -296,13 +256,30 @@ template Club_GlassLiq : bfshatteringstaticprop
 	lodDist[] 
 	{ 100.0, 300.0 }
     }
-
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 0.1f
+    }  
     meta
     {
 	canCreateInEditor  = 1
 	editorInstanceName = "glassliq"
 	editorPath         = "bf/props/coruscant/club"
     }
+
+
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_prop_glass_small"
+    } 
+
+
+
 }
 
 template Club_GlassTube : bfshatteringstaticprop
@@ -314,13 +291,28 @@ template Club_GlassTube : bfshatteringstaticprop
 	lodDist[] 
 	{ 100.0, 300.0 }
     }
-
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 0.1f
+    }  
     meta
     {
 	canCreateInEditor  = 1
 	editorInstanceName = "glasstube"
 	editorPath         = "bf/props/coruscant/club"
     }
+
+
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_prop_glass_small"
+    } 
+
 }
 
 template Club_GlassWet : bfshatteringstaticprop
@@ -332,13 +324,28 @@ template Club_GlassWet : bfshatteringstaticprop
 	lodDist[] 
 	{ 100.0, 300.0 }
     }
-
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 0.1f
+    }  
     meta
     {
 	canCreateInEditor  = 1
 	editorInstanceName = "glasswet"
 	editorPath         = "bf/props/coruscant/club"
     }
+
+
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_prop_glass_small"
+    } 
+
 }
 
 template Club_Shaker : bfshatteringstaticprop
@@ -350,13 +357,28 @@ template Club_Shaker : bfshatteringstaticprop
 	lodDist[] 
 	{ 100.0, 300.0 }
     }
-
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 0.1f
+    }  
     meta
     {
 	canCreateInEditor  = 1
 	editorInstanceName = "shaker"
 	editorPath         = "bf/props/coruscant/club"
     }
+
+
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_prop_glass_small"
+    } 
+
 }
 
 template Club_Table : bfshatteringstaticprop
@@ -368,7 +390,10 @@ template Club_Table : bfshatteringstaticprop
 	lodDist[] 
 	{ 100.0, 300.0 }
     }
-
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 0.1f
+    }  
     meta
     {
 	canCreateInEditor  = 1
@@ -381,6 +406,18 @@ template Club_Table : bfshatteringstaticprop
        maxgroups = 2
    }
 
+
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_prop_smallfurniture"
+    } 
+
+
 }
 
 template Club_TubeLiq : bfshatteringstaticprop
@@ -392,13 +429,27 @@ template Club_TubeLiq : bfshatteringstaticprop
 	lodDist[] 
 	{ 100.0, 300.0 }
     }
-
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 0.1f
+    }  
     meta
     {
 	canCreateInEditor  = 1
 	editorInstanceName = "tubeliq"
 	editorPath         = "bf/props/coruscant/club"
     }
+
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_prop_glass_small"
+    } 
+
 }
 
 template Club_CrapBar : bfshatteringstaticprop
@@ -410,6 +461,10 @@ template Club_CrapBar : bfshatteringstaticprop
 	lodDist[] 
 	{ 100.0, 300.0 }
     }
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 0.1f
+    }  
 
     meta
     {
@@ -417,313 +472,17 @@ template Club_CrapBar : bfshatteringstaticprop
 	editorInstanceName = "crapbar"
 	editorPath         = "bf/props/coruscant/club"
     }
-}
 
-template cor_hangsign : bfshatteringstaticprop
-{
-    obinstrenderer render
+ soundeventsystem sndeventsystem
     {
-	model = "props/cor/hang_sign"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
+        definition = "props"
     }
 
-    meta
+    soundmap-field soundmap
     {
-	canCreateInEditor  = 1
-	editorInstanceName = "hang_sign"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
+        default = "sndmap_prop_glass_small"
+    } 
 
-template cor_sign1 : bfshatteringstaticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/sign01"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "sign01"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
-
-template cor_sign2 : bfshatteringstaticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/sign02"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "sign02"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
-
-template cor_sign3 : bfshatteringstaticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/sign03"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "sign03"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
-
-template cor_bigbox : bfshatteringstaticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/big_box"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "bigbox"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
-
-template cor_longbox : bfshatteringstaticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/long_box"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "longbox"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
-
-template cor_bollard : bfshatteringstaticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/bollard"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "bollard"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
-
-template cor_blight : bfshatteringstaticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/b_light"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "b_light"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
-
-template cor_signpost1 : bfshatteringstaticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/sign_post_1"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "signpost1"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
-
-template cor_signpost2 : bfshatteringstaticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/sign_post_2"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "signpost2"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
-
-template cor_lamppost1 : bfshatteringstaticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/lamppost_1"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "lamppost1"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
-
-template cor_lamppost2 : bfshatteringstaticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/lamppost_2"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "lamppost2"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
-
-template cor_lamppost3 : bfshatteringstaticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/lamppost_3"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "lamppost3"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
-
-template cor_smallbox : bfshatteringstaticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/small_box"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "smallbox"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
-
-template cor_atm : bfshatteringstaticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/atm"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "atm"
-	editorPath         = "bf/props/coruscant/streets"
-    }
 }
 
 // CIS CRUISER PROPS
@@ -778,7 +537,10 @@ template reactor_core : bfexplodingstaticprop
 	views	= "basic setup"
 	tips	= "Should destroying the reactor blow up the ship?"
     }
-
+    
+    bfswitchdescript descript
+    {
+    }
     meta
     {
 	canCreateInEditor  = 1
@@ -787,12 +549,26 @@ template reactor_core : bfexplodingstaticprop
     }
 }
 
+// Static Reactor Core
+template static_reactor_core : staticprop
+{
+    obinstrenderer render
+    {
+	model = "props/cis_cruiser/reactor_core"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "cis_static_react"
+	editorPath         = "bf/props/capital_ships/cis_cruiser"
+    }
+}
+
 // Console
 template console : bfexplodingstaticprop
 {
-    class-id = "ship reactor controls prop bf"
-
-    obinstrenderer render
+     obinstrenderer render
     {
 	model = "props/cis_cruiser/console"
    	numLods = 2
@@ -822,21 +598,10 @@ template console : bfexplodingstaticprop
     {
 	ai_weighting = 100.0f
     }
-
-    propid-field shipReactorShieldPropID
+    groupingcomp grouping
     {
-        default = ""
-	views	= "basic setup"
-	tips	= "Prop ID of the associated ship reactor shield"
+	maxgroups = 2
     }
-
-    bool-field destroyShieldWhenDestroyed
-    {
-	default = "false"
-	views	= "basic setup"
-	tips	= "Should destroying the console remove the reactor shield?"
-    }
-
     meta
     {
 	canCreateInEditor  = 1
@@ -846,30 +611,6 @@ template console : bfexplodingstaticprop
 }
 
 // Damaged Console
-template damaged_console : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cis_cruiser/damaged_console"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-
-    }
-
-    autoAimTargetComponentBF autoaim
-    {
-        nameKey    = "STR_GUN_TURRET_CONTROL_CONSOLE"
-    }
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "cisivdmgcon"
-	editorPath         = "bf/props/capital_ships/cis_cruiser"
-    }
-}
 
 // Reactor Shield
 template reactor_shield : staticprop
@@ -907,6 +648,20 @@ template reactor_shield : staticprop
 	editorInstanceName = "cisreacshd"
 	editorPath         = "bf/props/capital_ships/cis_cruiser"
     }
+ 
+     soundeventsystem sndeventsystem
+    {
+    	definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_forcefield_cis"
+    }
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    }     
 }
 
 template barracade : staticprop
@@ -930,26 +685,66 @@ template barracade : staticprop
     }
 }
 
-template corridor_shield : staticprop
+template cis_cruise_crate_cover : staticprop
 {
     obinstrenderer render
     {
-	model = "props/cis_cruiser/corridor_shield"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-
+	model = "capitalships/cis/cis_cruiser_int/props/cis_crate_cover"
     }
 
     meta
     {
-	canCreateInEditor  = 1
-	editorInstanceName = "ciscorsld"
-	editorPath         = "bf/props/capital_ships/cis_cruiser"
+    	canCreateInEditor  = 1
+	editorInstanceName = "ih_crate_cover"
+    	editorPath         = "bf/props/coruscant/cover"
+    }
+
+    physics
+    {
+	useRBs = "true"
     }
 }
+
+template cis_cruise_crate_crouch : staticprop
+{
+    obinstrenderer render
+    {
+	model = "capitalships/cis/cis_cruiser_int/props/cis_crate_crouch"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "ih_crate_crouch"
+    	editorPath         = "bf/props/coruscant/cover"
+    }
+
+    physics
+    {
+	useRBs = "true"
+    }
+}
+
+template cis_cruise_crate_stand : staticprop
+{
+    obinstrenderer render
+    {
+	model = "capitalships/cis/cis_cruiser_int/props/cis_crate_stand"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "ih_crate_stand"
+    	editorPath         = "bf/props/coruscant/cover"
+    }
+
+    physics
+    {
+	useRBs = "true"
+    }
+}
+
 
 template red_light : staticprop
 {
@@ -970,6 +765,17 @@ template red_light : staticprop
 	editorInstanceName = "cisredlght"
 	editorPath         = "bf/props/capital_ships/cis_cruiser"
     }
+    
+    soundeventsystem sndeventsystem
+    {
+	definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_forcefield_cis"
+    } 
+
 }
 
 template green_light : staticprop
@@ -1082,28 +888,6 @@ template back_door_1 : staticprop
     }
 }
 
-template back_door_2 : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/back_door_2"
-   	numLods = 2
-	lodDist[] 
-	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "bckdoor2"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
-
-
 template street_shield : staticprop
 {
     obinstrenderer render
@@ -1123,48 +907,16 @@ template street_shield : staticprop
 	editorInstanceName = "sshield"
 	editorPath         = "bf/props/coruscant/streets"
     }
-}
 
-template street_shield_pillar : staticprop
-{
-    obinstrenderer render
+    soundeventsystem sndeventsystem
     {
-	model = "props/cor/street_shield_pillar"
-//   	numLods = 2
-//	lodDist[] 
-//	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-
+        definition = "props"
     }
 
-    meta
+    soundmap-field soundmap
     {
-	canCreateInEditor  = 1
-	editorInstanceName = "sshieldp"
-	editorPath         = "bf/props/coruscant/streets"
-    }
-}
-
-template street_shield_pillar_big : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/cor/street_shield_pillar_big"
-//   	numLods = 2
-//	lodDist[] 
-//	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "sshieldpb"
-	editorPath         = "bf/props/coruscant/streets"
-    }
+        default = "sndmap_forcefield_cis"
+    } 
 }
 
 
@@ -1180,7 +932,10 @@ template generator : staticprop
 	receiveshadows = "true"
 
     }
-
+    groupingcomp grouping
+    {
+	maxgroups = 2
+    }
     meta
     {
 	canCreateInEditor  = 1
@@ -1205,7 +960,7 @@ template generatorexpl :bfexplodingstaticprop
     
     healthcomponentbf health
     {
-	fullhealth	= 5.0f
+	fullhealth	= 2.f
 	damageMultiplierForWhenHitByNPC = 0.0f
     }
     
@@ -1213,7 +968,10 @@ template generatorexpl :bfexplodingstaticprop
     {
 	nameKey	= "STR_COR_SHIELD_GENERATOR"
     }
-    
+    groupingcomp grouping
+    {
+	maxgroups = 2
+    }    
     meta
     {
 	canCreateInEditor  = 1
@@ -1270,16 +1028,32 @@ template force_barricade_street_shield : staticprop
     obinstrenderer render
     {
 	model = "props/cor/street_shield_force"
+        worldRoom = "true"
     }
     
     shieldflags = "k_blockEnemyInfantry|k_blockEnemyGround|k_blockEnemyAir"
-    
+    static_obinst_physics physics
+    {
+	useRBs	    =	"true"
+    }     
+
     meta
     {
 	canCreateInEditor  = 1
 	editorInstanceName = "frc_sshield"
 	editorPath         = "bf/props/coruscant/streets"
     }
+
+    soundeventsystem sndeventsystem
+    {
+	definition = "props"
+    }
+
+    soundmap-field soundmap
+    {
+        default = "sndmap_forcefield_cis"
+    } 
+
 }
 template force_barricade_street_shield_big : staticprop
 {
@@ -1328,7 +1102,8 @@ template force_barricade_street_shield_big : staticprop
     
     obinstrenderer render
     {
-	model = "props/cor/street_shield_force_big" 
+	model = "props/cor/street_shield_force_big"
+        worldRoom = "true"
     }
     shieldflags = "k_blockEnemyInfantry|k_blockEnemyGround|k_blockEnemyAir"
     meta
@@ -1337,6 +1112,17 @@ template force_barricade_street_shield_big : staticprop
 	editorInstanceName = "frc_sshieldb"
 	editorPath         = "bf/props/coruscant/streets"
     }
+ 
+    soundeventsystem sndeventsystem
+    {
+        definition = "props"
+    }
+    useRBs	    =	"true"
+    soundmap-field soundmap
+    {
+        default = "sndmap_forcefield_cis"
+    } 
+
 }
 
 template clouds : staticprop
@@ -1381,11 +1167,157 @@ template billboard_sky_box : staticprop
     }
 }
 
-template cor_app_door : staticprop
+template cor_crate_cover : staticprop
 {
     obinstrenderer render
     {
-	model = "cor/props/cor_app_door"
+	    model = "backgrounds/cor/props/cor_crate_cover"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	    editorInstanceName = "crate_cover"
+    	editorPath         = "bf/props/coruscant/cover"
+    }
+}
+
+template cor_crate_crouch : staticprop
+{
+    obinstrenderer render
+    {
+	    model = "backgrounds/cor/props/cor_crate_crouch"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	    editorInstanceName = "crate_crouch"
+    	editorPath         = "bf/props/coruscant/cover"
+    }
+}
+
+template cor_crate_stand : staticprop
+{
+    obinstrenderer render
+    {
+	    model = "backgrounds/cor/props/cor_crate_stand"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	    editorInstanceName = "crate_stand"
+    	editorPath         = "bf/props/coruscant/cover"
+    }
+}
+
+template cor_ion_control : ion_cannon_remote_control
+{
+
+    render
+    {
+	model = "backgrounds/cor/props/ion_controls"
+    }
+
+    activate
+    {
+	myNameStringHandle = "STR_ACTIVATENAME_PLANETCANNON_GENERIC"
+        pointA
+        {
+            float pos[]	{-1.2f, 0.f, 1.0f} 
+            distance	= 1.6f
+        }
+    }
+
+    autoAimTargetComponentBF autoaim
+    {
+	nameKey                = "STR_PLANETCANNON"
+    }
+}
+
+template flakProp : Club_Bottle //temp - using bottle prop and hiding via script 
+{
+    class-id = "flak prop bf"
+
+    sphereRadius = 200.f
+//  minFrequency = 0.0005f
+//  maxFrequency = 0.00085f
+    minFrequency = 0.4f
+    maxFrequency = 0.9f
+    
+    dmghealthcomponentbf health
+    {
+	fullhealth	= 10000.f 
+    }  
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "flak_bottle"
+	editorPath         = "bf/props/coruscant/club"
+    }
+}
+
+template ion_cannon_generator : simplephysicsprop
+{
+    obinstrenderer render
+    {
+	model = "backgrounds/cor/props/ion_cover_generator"
+   	numLods = 2
+	lodDist[] 
+	{ 100.0, 300.0 }
+	castshadows = "true"
+	receiveshadows = "true"
+
+    }
+    odesimplephysics physics
+    {
+    	mayaphysics = "false"
+	moveable = "true"
+
+	bodyMass		= 300.0f
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "ion_gen"
+	editorPath         = "bf/props/coruscant/streets"
+    }
+}
+
+template ion_cannon_tools : simplephysicsprop
+{
+    obinstrenderer render
+    {
+	model = "backgrounds/cor/props/ion_cover_toolkit"
+   	numLods = 2
+	lodDist[] 
+	{ 100.0, 300.0 }
+	castshadows = "true"
+	receiveshadows = "true"
+
+    }
+    odesimplephysics physics
+    {
+    	mayaphysics = "true"
+	moveable = "true"
+
+	bodyMass		= 200.0f
+    }
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "ion_tool"
+	editorPath         = "bf/props/coruscant/streets"
+    }
+}
+/*
+template damaged_reactor : staticprop
+{
+    obinstrenderer render
+    {
+	model = "animation/story/cor/reactor/cor_reactor_explode"
    	numLods = 2
 	lodDist[] 
 	{ 100.0, 300.0 }
@@ -1397,9 +1329,200 @@ template cor_app_door : staticprop
     meta
     {
 	canCreateInEditor  = 1
-	editorInstanceName = "app_door"
+	editorInstanceName = "dam_reactor"
+	editorPath         = "bf/props/coruscant/streets"
+    }
+}
+*/
+
+template yellowcar : staticprop
+{
+    obinstrenderer render
+    {
+	model = "backgrounds/cor/props/yellow_car"
+   	numLods = 2
+	lodDist[] 
+	{ 100.0, 300.0 }
+	castshadows = "true"
+	receiveshadows = "true"
+
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "yellowcar"
+	editorPath         = "bf/props/coruscant/streets"
+    }
+}
+template redcar : staticprop
+{
+    obinstrenderer render
+    {
+	model = "backgrounds/cor/props/red_car"
+   	numLods = 2
+	lodDist[] 
+	{ 100.0, 300.0 }
+	castshadows = "true"
+	receiveshadows = "true"
+
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "redcar"
 	editorPath         = "bf/props/coruscant/streets"
     }
 }
 
+template fireSpeeder : staticprop
+{
+    obinstrenderer render
+    {
+	model = "backgrounds/cor/props/fire_speeder"
+   	numLods = 2
+	lodDist[] 
+	{ 100.0, 300.0 }
+	castshadows = "true"
+	receiveshadows = "true"
 
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "firespeeder"
+	editorPath         = "bf/props/coruscant/streets"
+    }
+}
+template jukebox: staticprop // simplephysicsprop
+{
+    obinstrenderer render
+    {
+	model = "backgrounds/cor/props/club_jukebox"
+   	numLods = 2
+	lodDist[] 
+	{ 100.0, 300.0 }
+	castshadows = "true"
+	receiveshadows = "true"
+
+    }
+/*    odesimplephysics physics
+    {
+    	mayaphysics = "true"
+	moveable = "true"
+
+	bodyMass		= 500.0f
+    }*/
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "jukebox"
+	editorPath         = "bf/props/coruscant/streets"
+    }
+}
+
+template simplePillar: staticprop
+{
+    obinstrenderer render
+    {
+	model = "backgrounds/cor/props/single_shield_pillar"
+   	numLods = 2
+	lodDist[] 
+	{ 100.0, 300.0 }
+	castshadows = "true"
+	receiveshadows = "true"
+
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "singlePillar"
+	editorPath         = "bf/props/coruscant/streets"
+    }
+}
+
+template endShield: force_barricade_street_shield_big
+{
+    obinstrenderer render
+    {
+	model = "backgrounds/cor/props/single_bit_on_the_end_shield"
+        worldRoom = "true"
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "endShield"
+	editorPath         = "bf/props/coruscant/streets"
+    }
+}
+
+template coloumShield: endShield
+{
+    obinstrenderer render
+    {
+	model = "backgrounds/cor/props/single_coloumn_shield"
+        worldRoom = "true"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "coloumShield"
+	editorPath         = "bf/props/coruscant/streets"
+    }
+}
+
+template roadShield: endShield
+{
+    obinstrenderer render
+    {
+	model = "backgrounds/cor/props/single_road_shield"
+        worldRoom = "true"
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "roadShield"
+	editorPath         = "bf/props/coruscant/streets"
+    }
+}
+
+template cor_cloud_layer : staticprop
+{
+    render
+    {
+	model	    =	"backgrounds/cor/props/cor_cloud_layer"
+    }
+}
+
+template cor_speaker : staticprop //simplephysicsprop
+{
+    obinstrenderer render
+    {
+	model = "backgrounds/cor/props/cor_speaker"
+ //  	numLods = 2
+//	lodDist[] 
+//	{ 100.0, 300.0 }
+	castshadows = "true"
+	receiveshadows = "true"
+
+    }
+/*    odesimplephysics physics
+    {
+    	mayaphysics = "true"
+	moveable = "true"
+
+	bodyMass		= 150.0f
+    }
+  */  meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "cor_cpeaker"
+	editorPath         = "bf/props/coruscant/streets"
+    }
+}

@@ -2,96 +2,50 @@
 
 //------------------------------------------------------------
 
-template fp_superbattledroid_wr_static : staticfirstpersongun //animfirstpersongun
-{
-    render
-    {
- model = "weapon/rep/rep_dc15_blaster_thirdperson"
- visibleParts =  "-"    // Make it invisible
-    }
-}
 
-template fp_superbattledroid_wr_boned : staticfirstpersongun //animfirstpersongun
+template fp_superbattledroid_wr_boned : animfirstpersongun
 {
     render
     {
- model = "weapon/rep/rep_dc15_blaster_firstperson"
- visibleParts =  "-"    // Make it invisible
+	model	= "weapon/rep/rep_dc15_blaster_firstperson"
+	visibleParts =  "-"				// Make it invisible
     }
 }
 
 template w_sbd_wr : gun
 {
-    dynamiclight light
+    guncomponent_hominglauncher_bf gun
     {
- exponent    = 1.f
- rotspeed    = 0.f
- offset[]    { 0.4f, 0.f, 0.f }
- light-type  = "k_lightSpot"
- colour[]    {3.75f, 3.75f, 3.75f}
- angle     = 70.f
- enabled     = "false"
-    }
+	emptyAnimChar = "N"
 
-    guncomponent_rocketlauncher_bf gun
-    {
- emptyAnimChar = "N"
- gunAnimationGroup anims
- {
-     //set      = "gunanims_static_bf"
-     set  = "ga_sprbtldroid"
-     animmap = "am_cis_sprbtl"
-     reactmap = "reactmap_generic" 
- }
- 
- ubiks          = "ubiks_sprbtl"
- gunInfoFromMgr = "bfsbd_wr" 
-
- hasFirePos = "true"
- firstPersonFireDof  = "SHOOTPOS"
- firstPersonFireBone = "B_gun"
-// firstPersonFireBone = "" 
- firstPersonFireDir [] {0.f, 0.f, 1.f}
- firstPersonFirePos [] {0.f, 0.05f, -0.30f}
-// firstPersonFirePos [] {-0.0023765948f, 0.040309835f, 0.31420904f}
- thirdPersonFireDir[]   {0.f, 0.f, 1.f}
- thirdPersonFirePos[]   {0.0, 0.12, 0.50}
-
- hasLightPos = "true"
- //hasLightPos = "false"
- firstPersonLightBone = "B_gun"
- firstPersonLightDir [] {0.f, 0.f, 1.f}
- firstPersonLightPos [] {0.f, 0.10f, -0.1f}
- thirdPersonLightDir[]   {0.f, 0.f, 1.f}
- thirdPersonLightPos[]   {0.0, 0.17, -0.40f}
-
- hasParticleUpPos     = "true"
- firstPersonParticleUpBone   = "B_gun"
- firstPersonParticleUpPos[]  {0.f, 0.05f, 0.40f}
- firstPersonParticleUpDir[]  {0.f, 1.f, 0.f}
- thirdPersonParticleUpPos[]  {0.0, 0.12, 0.16}
- thirdPersonParticleUpDir[]  {0.f, 1.f, 0.f}
-
-	hasCartridgePos	    = "true"
-	firstPersonCartridgeBone   = "B_gun"
-	firstPersonCartridgePos[]  {0.f, 0.05f, 0.40f}
-	firstPersonCartridgeDir[]  {1.f, 0.f, 0.f}
-	thirdPersonCartridgePos[]  {0.0, 0.12, 0.f}
-	thirdPersonCartridgeDir[]  {1.f, 0.f, 0.f}
+	autoRecurseTemplateName-field rocket
+	{
+	    default = "proj_infrocket"
+	}
+  
+	gunAnimationGroup anims
+	{
+	    set		= "ga_sprbtldroid"
+	    animmap	= "am_rck_sprbtl"
+	    reactmap	= "reactmap_generic" 
+	}
 	
-	// RS: There are no sounds, currently, use 'blaster' sounds
-	soundmap_npc	    =	"sndmap_sprbdrwr"
-	soundmap_player	    =	"sndmap_sprbdrwr"
+	gunInfoFromMgr = "bfsbd_wr"	
+	
+	soundmap	    =	"sndmap_sprbdrwr"
 	firstperson	    =	"fp_superbattledroid_wr_boned"
 	
-//	muzzleFlashEffect   = ""//"lImpHHMuz" //"empty" //"muzPistolaSide" //damn it i want no muzzle flash at all
-	muzzleFlashEffect   = "muzRedLsr1"
-	ammoID		    = "o_ammo_rep_rl"
+	ammoID		    = "o_ammo_sbd_wr"
 	weaponID	    = "o_gun_sbd_wr"	
-    	weaponType	    = "k_other"
+    	weaponType	    = "k_rocket"
 	
 	recoilComponent recoil
 	{
+	}
+
+	zoom
+	{
+     	    allowIronSightLockOn = "false"	    
 	}
     }
 
@@ -102,35 +56,100 @@ template w_sbd_wr : gun
     }
 }
 
+// Upgraded Rocket Launcher With Increased Clip Size
+template w_sbd_wr_v2 : w_sbd_wr
+{
+    gun
+    {
+	weaponID	    = "o_gun_sbd_wr_v2"
+	ammoID		    = "o_ammo_sbd_wr_up"
+    }
+}
+
+// Upgraded Rocket Launcher With Increased Reload Speed
+template w_sbd_wr_up : w_sbd_wr_v2
+{
+    gun
+    {
+	weaponID	    = "o_gun_sbd_wr_up"
+	gunInfoFromMgr	    = "bfsbd_wr_up"	
+	    
+	anims
+	{
+	    set		    = "ga_sprbtldrd_up"
+	}
+    }
+}
+
+// Story template
+template w_sbd_rs : w_sbd_wr
+{
+    gun
+    {
+	autoRecurseTemplateName-field rocket
+	{
+	    default = "proj_rocket_st"
+	}
+  
+	weaponID	    = "o_gun_sbd_rs"	
+    }
+}
+
 template o_gun_sbd_wr : inventoryObjectTypeWeapon 
 {
     details
     {
-        singular = "Wrist Rockets"
-	singularPrefix = "the"
+    	singularStrHandle   = "STR_PRIMARYWEAPON_CIS_SBDROID_ROCKET"
 	pickupTemplate_create = ""		
     }
 
     specialData
     {
         weaponID = "w_sbd_wr"
-	hudTextureName = "rep_dc15_blaster_rifle"
-	usesThisAmmo = "o_ammo_e11_br"
+	hudTextureName = "cis_bdroid_rocket"
+	hudTextureScale	= 0.7f
+	usesThisAmmo = "o_ammo_sbd_wr"
     }
 }
 
-// ------------------------------------------------------------
-
-template fp_superbattledroid_wb_static : staticfirstpersongun //animfirstpersongun
+// Upgraded Rocket Launcher Object - Increased clip size
+template o_gun_sbd_wr_v2 : o_gun_sbd_wr
 {
-    render
+    specialData
     {
-	model	= "weapon/rep/rep_dc15_blaster_thirdperson"
-	visibleParts =  "-"				// Make it invisible
+        weaponID	= "w_sbd_wr_v2"
+	usesThisAmmo	= "o_ammo_sbd_wr_up"
     }
 }
 
-template fp_superbattledroid_wb_boned : staticfirstpersongun //animfirstpersongun
+// ROCKET LAUNCHER upgrade - Increased reload speed
+template o_gun_sbd_wr_up : o_gun_sbd_wr_v2
+{
+    specialData
+    {
+        weaponID = "w_sbd_wr_up"
+    }
+}
+
+// Story only version
+template o_gun_sbd_rs : inventoryObjectTypeWeapon 
+{
+    details
+    {
+    	singularStrHandle   = "STR_PRIMARYWEAPON_CIS_SBDROID_ROCKET"
+	pickupTemplate_create = ""		
+    }
+
+    specialData
+    {
+        weaponID = "w_sbd_rs"
+	hudTextureName = "cis_bdroid_rocket"
+	hudTextureScale = 0.7f
+	usesThisAmmo = "o_ammo_sbd_wr"
+    }
+}
+
+template fp_superbattledroid_wb_boned : animfirstpersongun //animfirstpersongun
 {
     render
     {
@@ -150,52 +169,27 @@ template w_sbd_wb : gun
 	    animmap	= "am_cis_sprbtl"
 	    reactmap	= "reactmap_generic" 
 	}
-
-	ubiks          = "ubiks_sprbtl"
+/*
+	plugins
+	{
+	    sharedMinigunPlugins plugin
+	    {
+		spinningBoneName = "b_body" // Because the battledroid doesn't have a minigun or barrel
+	    }
+	
+	    cisGunPluginOverheat anotherPlugin	
+	    {
+	    }
+	}
+*/	
 	gunInfoFromMgr = "bfsbd_wb"
 
-/*	hasFirePos = "true"
-	firstPersonFireDof  = "SHOOTPOS"
-	firstPersonFireBone = "B_gun"
-//	firstPersonFireBone = ""	
-	firstPersonFireDir []	{0.f, 0.f, 1.f}
-	firstPersonFirePos []	{0.f, 0.05f, -0.30f}
-//	firstPersonFirePos []	{-0.0023765948f, 0.040309835f, 0.31420904f}
-	thirdPersonFireDir[]   {0.f, 0.f, 1.f}
-	thirdPersonFirePos[]   {0.0, 0.12, 0.50}
-
-	hasLightPos = "true"
-	//hasLightPos = "false"
-	firstPersonLightBone = "B_gun"
-	firstPersonLightDir []	{0.f, 0.f, 1.f}
-	firstPersonLightPos []	{0.f, 0.10f, -0.1f}
-	thirdPersonLightDir[]   {0.f, 0.f, 1.f}
-	thirdPersonLightPos[]   {0.0, 0.17, -0.40f}
-
-	hasParticleUpPos	    = "true"
-	firstPersonParticleUpBone   = "B_gun"
-	firstPersonParticleUpPos[]  {0.f, 0.05f, 0.40f}
-	firstPersonParticleUpDir[]  {0.f, 1.f, 0.f}
-	thirdPersonParticleUpPos[]  {0.0, 0.12, 0.16}
-	thirdPersonParticleUpDir[]  {0.f, 1.f, 0.f}
-
-	hasCartridgePos	    = "true"
-	firstPersonCartridgeBone   = "B_gun"
-	firstPersonCartridgePos[]  {0.f, 0.05f, 0.40f}
-	firstPersonCartridgeDir[]  {1.f, 0.f, 0.f}
-	thirdPersonCartridgePos[]  {0.0, 0.12, 0.f}
-	thirdPersonCartridgeDir[]  {1.f, 0.f, 0.f}*/
-	
-	// RS: There are no sounds, currently, use 'blaster' sounds
-	soundmap_npc	    =	"sndmap_sprbdrwb"
-	soundmap_player	    =	"sndmap_sprbdrwb"
+	soundmap	    =	"sndmap_sprbdrwb"
 	firstperson	    =	"fp_superbattledroid_wb_boned"
 	
-//	muzzleFlashEffect   = "" //"empty" //"muzPistolaSide" //damn it i want no muzzle flash at all
-	muzzleFlashEffect   = "muzRedLsr1"
-	ammoID		    = "o_ammo_e5blast"
+	ammoID		    = "o_ammo_sbd_wb"
 	weaponID	    = "o_gun_sbd_wb"	
-    	weaponType	    = "k_other"
+    	weaponType	    = "k_shotgun"
 	
 	recoilComponent recoil
 	{
@@ -205,7 +199,7 @@ template w_sbd_wb : gun
     render
     {
 	model	    =	"weapon/rep/rep_dc15_blaster_thirdperson"
-	visibleParts =  "-"				// Make it invisible
+	visibleParts =  "-" // Make it invisible
     }
 }
 
@@ -213,83 +207,184 @@ template o_gun_sbd_wb : inventoryObjectTypeWeapon
 {
     details
     {
-        singular = "Wrist Blaster"
-	singularPrefix = "the"
-	pickupTemplate_create = ""		
+	singularStrHandle   = "STR_PRIMARYWEAPON_CIS_SBDROID_SHOTGUN"
+	pickupTemplate_create = ""
     }
 
     specialData
     {
         weaponID = "w_sbd_wb"
-	hudTextureName = "rep_dc15_blaster_rifle"
-	usesThisAmmo = "o_ammo_e5blast"
+	hudTextureName = "cis_bdroid_shotgun"
+	hudTextureScale = 0.65f
+	usesThisAmmo = "o_ammo_sbd_wb"
 	isSelectableAsSidearm	= 1
     }
 }
 
-template w_sbd_wbup : gun
+//TODO: Setup weapon
+// (WRIST) SHOTGUN upgrade - Increased damage
+template o_gun_sbd_wb_up : o_gun_sbd_wb
 {
-    guncomponent_linetest_bf gun
+}
+
+// Special Class minigun variant (for Super Battledroid)
+template w_sbd_wmg : w_sbd_wb
+{
+    gun
     {
-	gunAnimationGroup anims
+	anims
 	{
-	    //set		    = "gunanims_static_bf"
-	    set		= "ga_sprbtldroid"
-	    animmap	= "am_cis_sprbtl"
+	    set		= "ga_super_mini"
+	    animmap	= "am_mini_sprbtl"
 	    reactmap	= "reactmap_generic" 
 	}
-
-	ubiks          = "ubiks_sprbtl"
-	gunInfoFromMgr = "bfsbd_wbup"
 	
-	// RS: There are no sounds, currently, use 'blaster' sounds
-	soundmap_npc	    =	"sndmap_sprbdrwb"
-	soundmap_player	    =	"sndmap_sprbdrwb"
-	firstperson	    =	"fp_superbattledroid_wb_boned"
-	
-//	muzzleFlashEffect   = "" //"empty" //"muzPistolaSide" //damn it i want no muzzle flash at all
-	muzzleFlashEffect   = "muzOraLsr1"
- ammoID      = "o_ammo_sbdblup"
- weaponID     = "o_gun_sbd_wbup" 
- 
- recoilComponent recoil
- {
- }
-    }
+	weaponID	    = "o_gun_sbd_wmg"
+	gunInfoFromMgr	    = "bfsbd_wmg"
+    	weaponType	    = "k_minigun"
 
-    render
-    {
- model     = "weapon/rep/rep_dc15_blaster_thirdperson"
- visibleParts =  "-"    // Make it invisible
+	plugins
+	{
+	    sharedMinigunPlugins plugin
+	    {
+		spinningBoneName = "" // Because the battledroid doesn't have a minigun or barrel
+	    }
+	
+	    bfGunPluginOverheat anotherPlugin	
+	    {
+	    }
+	}
     }
 }
 
-template o_gun_sbd_wbup : inventoryObjectTypeWeapon 
+// CIS Minigun upgrade - Increased cooldown speed
+template w_sbd_wmg_v2 : w_sbd_wmg
+{
+    gun
+    {
+	plugins
+	{
+	    plugin
+	    {
+	    }
+	    
+	    anotherPlugin
+	    {
+		decreaseInHeatPerSecond		    = 0.4f	// 1.f/x = time taken to fire again once overheated, for things to look right
+								// the length of the overheat animation should match
+	    }
+	}
+	weaponID	 = "o_gun_sbd_wmg_v2"
+	//gunInfoFromMgr = "bfsbd_wmgup"    //TODO: Comment this back in when the overheat anim exists and gun state setup
+    }
+}
+
+// CIS Minigun upgrade - Reduced overheat rate
+template w_sbd_wmg_v3 : w_sbd_wmg_v2
+{
+    gun
+    {
+	plugins
+	{
+	    plugin
+	    {
+	    }
+	    
+	    anotherPlugin
+	    {
+		increaseInHeatPerBullet		    = 0.011f	//The amount of 'heat' added for every bullet
+	    }
+	}
+	weaponID	 = "o_gun_sbd_wmg_v3"
+    }
+}
+
+// (WRIST) MINIGUN
+template o_gun_sbd_wmg : inventoryObjectTypeWeapon 
 {
     details
     {
-        singular = "Power Wrist Blaster"
- singularPrefix = "the"
- pickupTemplate_create = ""  
+	singularStrHandle   = "STR_PRIMARYWEAPON_CIS_SBDROID_MINIGUN"
+	pickupTemplate_create = ""
     }
 
     specialData
     {
-        weaponID = "w_sbd_wbup"
- hudTextureName = "rep_dc15_blaster_rifle"
- usesThisAmmo = "o_ammo_e5blast"
+        weaponID = "w_sbd_wmg"
+	hudTextureName = "cis_bdroid_blaster"
+	hudTextureScale = 0.65f
+	usesThisAmmo = "o_ammo_sbd_wb"
+    }
+}
+
+// (WRIST) MINIGUN upgrade - Increased cooldown speed
+template o_gun_sbd_wmg_v2 : o_gun_sbd_wmg
+{
+    specialData
+    {
+        weaponID = "w_sbd_wmg_v2"
+    }
+}
+
+// (WRIST) MINIGUN upgrade - Reduced overheat rate
+template o_gun_sbd_wmg_v3 : o_gun_sbd_wmg_v2
+{
+    specialData
+    {
+        weaponID = "w_sbd_wmg_v3"
+    }
+}
+
+// Special Class pistol variant (for Super Battledroid)
+template w_sbd_wp : w_sbd_wb
+{
+    gun
+    {
+	weaponID	    = "o_gun_sbd_wp"
+	gunInfoFromMgr	    = "bfsbd_wp"
+    	weaponType	    = "k_pistol"
+	ammoID		    = "o_ammo_sbd_wp"
+
+	plugins = 42 // Magin disappear
+
+    }
+}
+
+// (WRIST) BLASTER PISTOL upgrade - Increased damage
+template w_sbd_wp_up : w_sbd_wp
+{
+    gun
+    {
+	weaponID	    = "o_gun_sbd_wp_up"
+	gunInfoFromMgr	    = "bfsbd_wpV2"
+    }
+}
+
+// (WRIST) BLASTER PISTOL
+template o_gun_sbd_wp : inventoryObjectTypeWeapon 
+{
+    details
+    {
+	singularStrHandle   = "STR_PRIMARYWEAPON_CIS_SBDROID_PISTOL"
+	pickupTemplate_create = ""
+    }
+
+    specialData
+    {
+        weaponID = "w_sbd_wp"
+	hudTextureName = "cis_bdroid_blaster"
+	hudTextureScale = 0.65f
+	usesThisAmmo = "o_ammo_sbd_wp"
 	isSelectableAsSidearm	= 1
     }
 }
 
-template o_ammo_sbdblup : inventoryObjectTypeAmmo 
+// (WRIST) BLASTER PISTOL upgrade - Increased damage
+template o_gun_sbd_wp_up : o_gun_sbd_wp 
 {
-    details
+    specialData
     {
- maxnum = 500
-        singular = "Blaster charge"
-        plural = "Blaster charges"
+        weaponID = "w_sbd_wp_up"
     }
 }
-
 

@@ -1,6 +1,6 @@
 // vim: set syntax=c :
 
-aiplanmgrTemplate aiplanmgr
+/*aiplanmgrTemplate aiplanmgr
 {
     conspire-settings
     {
@@ -40,4 +40,4 @@ aiplanmgrTemplate aiplanmgr
 	    maxobs  = 1		// max number of objects in this world instance
 	}
     }
-}
+}*/

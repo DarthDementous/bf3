@@ -3,90 +3,33 @@
 //------------------------------------------------------------
 // Sonic Charge Launcher
 
-// Sonic Charge launcher
-
-template weaponSChargeGrenadeProp : weaponGrenadeProp
-{
-	render
-	{
-		castshadows = "false"
-		receiveshadows = "false"
-	}
-	
-	tickingProjectileComponent tick
-	{
-		class-id	= "ticking schargegrenade"
-		visibility = 1.0f
-		explosion_soundid = "explosion_medium"
-		debris_soundid	  = "grenade_debris_default"
-	
-		beep_rate = 4.0f
-		beep_timer = 0.0f
-		singleSound-field beep_soundid
-		{
-			default = ""
-		}
-		beep_minTime = 0.05f
-		stimCreateVelocity = 1.0f
-		approxGrenadeRadius = 0.1f
-
-		throwStrengthScale = 1.0f
-		throwArcScale = 1.0f
-		removeDampingOnCreation = "true"
-		reintroduceDampingNumHits = 4
-	}
-
-	obstaclecomponent obstacle
-	{
-		primitive = "k_nmob_none"
-	}
-
-	healthcomponentbf health
-	{
-		fullhealth = 0.0f
-//		ignoreDamageTypes = "k_DamageType_NonPropCollision"
-	}
-
-	detonatorcomponent detonator
-	{
-//		particleEffect = "expGrenade"
-		particleEffect = "gren_sonic"
-		maxRad = 3.0f
-		speed = 10.0f
-		force = 10.0f
-		edgeForce = 0.25f
-		damageradius = 5.0f
-
-		reactmap = ""
-	}
-
-	soundcomponent soundPlayer
-	{
-	}
-}
-
-template proj_scharge : weaponSChargeGrenadeProp
+template proj_scharge : weaponGrenadeProp
 {
     detonator
     {
-	particleEffect	    = "gren_sonic"
-
-	maxRad		    = 5.0f
-	speed		    = 10.0f
-	force		    = 40.0f
-	edgeForce	    = 0.1f
-	damageatcentre	    = 0.0f
-	damageradius	    = 5.0f
+	explosion
+	{
+	    explosionInfo = "schargepri" 
+	}
     }
 
     render
     {
 	model		= "weapon/rep/merr_sonn_v1_thermaldet" //new model??
 	visibleParts	= "BTOP"
+	castshadows = "false"
+    	receiveshadows = "false"
+    }
+
+    healthcomponentbf health
+    {
+    	fullhealth = 0.0f
+//    	ignoreDamageTypes = "k_DamageType_NonPropCollision"
     }
 
     odesimplephysics physics
     {
+    mayaphysics			= "false"
 	material		= "gren"
 	enabled			= "true"
 	givesoncontactdamage	= "false"
@@ -96,19 +39,48 @@ template proj_scharge : weaponSChargeGrenadeProp
 	collidableQualityCritical = "true"
     }
 
-    tick
+	soundmap = "sndmap_repsc"
+	sndeventsystem
+	{
+	    definition = "sndevt_grenade"
+	}	
+    tickingProjectileComponent tick
     {
+	class-id	= "ticking schargegrenade"
+	visibility = 1.0f
+	
+
 	beep_soundid	= ""	//"w_fra_be"
-	beep_rate	= 3.5f
-	beep_timer	= 0.1f
-	beep_minTime	= 0.08f
+	beep_rate	= 4.0f
+	beep_timer	= 0.0f
+	beep_minTime	= 0.05f
 	timer		= 4.0f
 	speed		= 0.0f
+	
+	stimCreateVelocity = 1.0f
+	approxGrenadeRadius = 0.1f
 
 	trailEffect	= "trail_sonic"
-
 	effectGeneratorStartWhenTimeRemaining	= 1.5f
 	effectGeneratorStopWhenTimeRemaining	= 0.5f
+	throwStrengthScale = 1.4f
+	throwArcScale = 0.45f
+	removeDampingOnCreation = "true"
+	reintroduceDampingNumHits = 4
+	timerHitMultiplier  = 0.0f
+	speedHitMultiplier  = 0.0f
+	detonateOnContactWithProp = "true"
+	
+	detonatorcomponent secondaryDetonator
+	{
+	    explosion
+	    {
+		explosionInfo = "schargesec"
+	    }
+	    delay = 0.1f
+	}
+
+	lengthOfStunEffect = 3.f
     }
 
     soundcomponent soundPlayer
@@ -134,34 +106,21 @@ template fp_scharge_launcher_boned : animfirstpersongun
 
 template w_sclaun : gun
 {
-    dynamiclight light
-    {
-	exponent    = 1.f
-	rotspeed    = 0.f
-	offset[]    { 0.4f, 0.f, 0.f }
-	light-type  = "k_lightSpot"
-	colour[]    {3.75f, 3.75f, 3.75f}
-	angle	    = 70.f
-	enabled	    = "false"
-    }
-
     guncomponent_schargelauncher_bf gun
     {
 	gunAnimationGroup anims
 	{
-	    set		    = "ga_rep_sonic"
+	    set		    = "ga_bfweapon"
 	    animmap	    = "am_rsonic"
 	    reactmap	    = "reactmap_generic"
 	}
 
-	gunInfoFromMgr = "bfrepgl"	//new id??
+	gunInfoFromMgr = "bfrepgl"
 
 
-	soundmap_npc	    =	"sndmap_repsc"
-	soundmap_player	    =	"sndmap_repscpla"
+	soundmap	    =	"sndmap_repsc"
 	firstperson	    =	"fp_scharge_launcher_boned"
 	
-	muzzleFlashEffect   = "" //"empty" //"muzPistolaSide" //damn it i want no muzzle flash at all
 	ammoID		    = "o_ammo_scl"
 	weaponID	    = "o_gun_scl"	
     	weaponType	    = "k_explosive"
@@ -179,27 +138,13 @@ template w_sclaun : gun
     }
 }
 
-// Specific animation set for the battledroid
-template w_sclaun_b : w_sclaun
+// SONIC CHARGE LAUNCHER upgrade - Increased reload speed
+template w_sclaun_up : w_sclaun
 {
     gun
-    {
-	anims
-	{
-	    set		= "ga_cis_sonic"
-	    animmap	= "am_cis_sonicchar"
-	    reactmap	= "reactmap_generic" 
-	}
-
-	ubiks = "ubiks_btldroid"
-
-	gunInfoFromMgr = "bfrepgl_b" // new id??
-
-	weaponID       = "o_gun_scl_b"
-
-	// Weapons are skeleton specific, attach the weapon to the bone on the character
-	attachBoneRight = "rforearm"
-	attachBoneLeft  = "lforearm"
+    {	
+	gunInfoFromMgr	= "bfrepglup"
+	weaponID	= "o_gun_scl_up"
     }
 }
 
@@ -207,33 +152,70 @@ template o_gun_scl : inventoryObjectTypeWeapon
 {
     details
     {
-        singular = "Sonic Charge Launcher"
-	singularPrefix = "a"
-	pickupTemplate_create = ""		
+	singularStrHandle   = "STR_PRIMARYWEAPON_REP_SCHARGE_LAUNCHER" 
+	pickupTemplate_create = "singlepickup_gun_repscl"		
     }
 
     specialData
     {
         weaponID = "w_sclaun"
 	hudTextureName = "rep_grenade_launcher" // new texture??
+	hudTextureScale = 0.7f
 	usesThisAmmo = "o_ammo_scl"
     }
 }
 
-template o_gun_scl_b : inventoryObjectTypeWeapon 
+// SONIC CHARGE LAUNCHER upgrade - Increased reload speed
+template o_gun_scl_up : o_gun_scl
 {
-    details
-    {
-        singular = "Sonic Charge Launcher"
-	singularPrefix = "a"
-	pickupTemplate_create = ""		
-    }
-
     specialData
     {
-        weaponID = "w_sclaun_b"
-	hudTextureName = "rep_grenade_launcher" //new texture??
-	usesThisAmmo = "o_ammo_scl"
+        weaponID = "w_sclaun_up"
     }
 }
+
+template singlepickup_gun_repscl : simplePickupPropBF
+{
+
+    obinstrenderer render
+    {
+	model	    =	"weapon/rep/rep_grenadelauncher_thirdperson"
+    }
+   
+    objectType		= "o_gun_scl"
+    activate
+    {
+	myNameStringHandle  = "STR_PRIMARYWEAPON_REP_SCHARGE_LAUNCHER"
+    }
+    
+    pickupComponentWeapon pickupComponent
+    {
+	pickupflags = "k_pickupNoNPC"
+
+	    inventoryComponentBF contents
+	    {
+		inventoryEntryBF entry0
+		{
+		    carryingobisfirstparam	= "true"
+			objectType		= "o_gun_scl"
+		}
+
+		inventoryEntryBF entry1
+		{
+		    objectType  = "o_ammo_scl"
+			total	    = 5
+		}
+	    }
+    }
+
+     meta
+    {
+	canCreateInEditor    = 1
+	    editorInstanceName   = "SP_repscl"
+	    editorPath	     = "bf/pickups/guns/rep"
+	    renderDictPath	     = "render"
+    }
+
+}
+
 

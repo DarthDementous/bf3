@@ -9,4 +9,9 @@
 
 setupfilemgrTemplate setupfilemgr
 {
+    checkpointmgr
+    {
+	class-id = "check point mgr" 
+    }
+
 }

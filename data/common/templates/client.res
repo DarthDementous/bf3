@@ -11,28 +11,18 @@ template clientprop
 	statePreDeath { class-id = "client state - predeath" }
 	stateDriving { class-id = "client state - driving" }
 	statePassenger { class-id = "client state - passenger" }
-	stateOnLadder { class-id = "client state - on ladder" }
 	stateRemote { class-id = "client state - remote" }
-	stateVehicleCorpse { class-id = "client state - vehicle corpse" }
     }
+
+    propflags |= "k_explosionTest"
 }
 
+/* --- auto commented out by commentOutTemplate
 template clientweapon
 {
     class-id = "client weapon component"
 }
+*/ // --- auto commented out by commentOutTemplate
 
-template clientanim
-{
-    class-id = "client anim component"
-}
 
-template clientladder
-{
-    class-id = "client ladder component"
-}
 
-template clientstate
-{
-    class-id = "client state component"
-}

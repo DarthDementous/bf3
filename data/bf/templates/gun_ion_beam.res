@@ -5,27 +5,26 @@ template TickingComponent_IonBeam : tickingRocketComponent
 {
     class-id = "ticking component ion beam"
 
-    trailEffect		= "ionTrail"
-
-//    speed		= 250.0f //must be same as the bullet speed if its used as a bullet type, DUH!
+    trailEffect		= "ion_plasma_100"
+    //trailEffect		= "dmg_trail_gib"
+    //    speed		= 250.0f //must be same as the bullet speed if its used as a bullet type, DUH!
 
     fallTimeBeforeExploding = 0.f
     trailOffset[] { 0.f, 0.f, 0.f}
     startangvel [] { 0.0f, 0.0f, 0.0f }
     usedictangvel = "true"
-    timer = 20.f
+    timer = 45.f
 
-    acceleration		= 250.0f 
+    acceleration	= 1.0f 
     explosion_soundid	= "explosion_large"
     speedHitMultiplier	= 0.0f
     timerHitMultiplier	= 0.0f
     spin			= 0.f
     actuallyDetonate	= "true"	    // true: will detonate when finished; false: will just delete itself when finished
 
-    speed = 2000.0f; // this is actually the max speed...
+    speed = 200.0f; // this is actually the max speed...
 
 }
-
 
 template IonBeamCamera : baseCamera 
 {
@@ -48,16 +47,26 @@ template IonBeam : weaponRocketProp
 	model	    =	"weapon/misc_rocket_projectile"
     }
 
+    detonator
+    {
+	explosion
+	{
+	    explosionInfo = "ionbeam"
+	}
+    }
 
     physics
     {
+    mayaphysics			= "false"
 	type	    = "k_physicsBox"
 	material    = "stel"
 	enabled	    = "true"
 	gravity     = "false"
 	thickness   = 0.f
+	bodyMass    = 1.0f
 
 	highVelocityBody = "true"
+	collidableQualityCritical = "true"
 	
 	float box-radius []
 	{
@@ -65,6 +74,7 @@ template IonBeam : weaponRocketProp
 	}
     }
     
+    propflags |= "k_checkPointLoadFromOriginalSetup"
 
     soundcomponent soundPlayer
     {
@@ -78,3 +88,51 @@ template IonBeam : weaponRocketProp
     interpolateCameraToFinalPosCoefficient  = 0.5f
 }
 
+template tatIonBeam : IonBeam
+{
+    detonator
+    {
+	explosion
+	{
+	    explosionInfo = "storyionbeam"
+	}
+    }
+}
+
+template uberHotBeam : IonBeam
+{
+    tick
+    {
+        speed = 300.0f
+    }
+    
+    detonator
+    {
+	explosion
+	{
+	    explosionInfo = "storyionbeam"
+	}
+    }
+}
+
+template plntCannon : IonBeam
+{
+    detonator
+    {
+	explosion
+	{
+	    particleEffect	    = "aid_test"
+	}
+    }
+}
+
+template frigateCannon : IonBeam
+{
+    detonator
+    {
+	explosion
+	{
+	    explosionInfo	    = "ionbeamfrigate"
+	}
+    }
+}

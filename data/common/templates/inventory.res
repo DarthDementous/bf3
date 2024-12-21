@@ -1,3 +1,5 @@
+// vim: set syntax=c :
+
 // Put here because we may want objects other than chrs to have inventories
 // (vehicles? cabinets? ammo bags?)
 
@@ -5,16 +7,13 @@
 // Subclasses of CInventoryObjectTypeSpecialData
 //--------------------------------------------------
 
-template inventoryObjectTypeRechargeData
-{
-    class-id = "inventory object type recharge data"
-}
 
 template inventoryObjectTypeWeaponData
 {
     class-id = "inventory object type weapon data"
     isSelectableAsWeapon = 1
     hudTextureName = ""
+    hudTextureScale = 1.0f
     autoRecurseTemplateName-field weaponID
     {
     }
@@ -24,29 +23,18 @@ template inventoryObjectTypeGrenadeData
 {
     class-id = "inventory object type grenade data"
     
-    susceptibilityScore = "k_grenadeInventorySusceptibilityScore_default"
-    hudTextureName = ""
-    ammoHudTextureName = "" // Please leave this blank in this common file! Fill in in subtemplates where needed!
+    susceptibilityScore	= "k_grenadeInventorySusceptibilityScore_default"
+    hudTextureName	= ""
+    hudTextureScale	= 1.0f
+    ammoHudTextureName	= "" // Please leave this blank in this common file! Fill in in subtemplates where needed!
+    secondaryWeaponType	= "grenade"
     wiiMotionTrigger	= "throwSecondary"
+    wiiThrowLock	= "true"
 
     autoRecurseTemplateName-field grenadeID
     {
     }
 }
-
-template inventoryObjectTypeAmmoDropData
-{
-    class-id = "inventory object type ammo drop data"
-    
-    susceptibilityScore = "k_grenadeInventorySusceptibilityScore_default"
-
-    autoRecurseTemplateName-field grenadeID
-    {
-    }
-    
-    // Maybe stuff... maybe no stuff... who's to say?
-}
-
 
 //-------------------------------------------------------------------------
 // Templates for inventory object types (of class CInventoryObjectType)
@@ -71,7 +59,10 @@ template inventoryObjectTypeBasic
 	whenDroppedAlsoDrop = ""
 	streamFirstPersonObFilename = ""
     }
-    wiiMotionTrigger   = "clickSecondary"
+}
+
+template inventoryObjectTypeSecondary : inventoryObjectTypeBasic
+{
 }
 
 template inventoryObjectTypeWeapon : inventoryObjectTypeBasic
@@ -90,12 +81,11 @@ template inventoryObjectTypeAmmo : inventoryObjectTypeBasic
     }
 }
 
-template inventoryObjectTypeGrenade : inventoryObjectTypeBasic
+template inventoryObjectTypeGrenade : inventoryObjectTypeSecondary
 {
-    wiiMotionTrigger   = "throwSecondary"
     details
     {
-	inventorySlotName = "AMMO"
+	inventorySlotName = "GRENADES"
     }
     
     inventoryObjectTypeGrenadeData specialData
@@ -104,13 +94,20 @@ template inventoryObjectTypeGrenade : inventoryObjectTypeBasic
     }
 }
 
-template inventoryObjectTypeAmmoDrop : inventoryObjectTypeBasic
+template inventoryObjectTypeThrowableObject : inventoryObjectTypeSecondary
 {
-    wiiMotionTrigger    = "dropSecondary"
-    inventoryObjectTypeAmmoDropData specialData
+    details
     {
-	hudTextureName	    = "rep_healthpack"
-	ammoHudTextureName  = "grenade_icon"
+	inventorySlotName = "THROWOBJ"
+    }
+}
+
+template inventoryObjectTypeDropableObject : inventoryObjectTypeThrowableObject
+{
+    inventoryObjectTypeGrenadeData specialData
+    {
+	wiiMotionTrigger    = "dropSecondary"
+	wiiThrowLock	    = "false"
     }
 }
 
@@ -144,13 +141,6 @@ template inventoryEntry
     isSelectableAsWeapon = 1
 }
 
-template constInventoryEntry : inventoryEntry
-{
-    int-field total
-    {
-	editable = "false"
-    }
-}
 
 //---------------------------------------------------------------
 // Templates for an inventory component (of class CInventory)
@@ -181,32 +171,10 @@ template inventoryComponent
     }
 }
 
-//-------------------------------------------------------------------
-// This component was created for The Spy Game That Never Was...
-// Probably no longer used
-//-------------------------------------------------------------------
-
-/*
-template inventorySwitchComponent
-{
-    class-id = "inventory switch component"
-
-    switchToItem = ""
-    promptBeforeSwitch = "false"
-}
-*/
-
 //--------------------------
 // Templates for pickups
 //--------------------------
 
-template pickupPhysics : odesimplephysics
-{
-    enabled			= "true"
-    hirescol			= "false"
-    ignoreWhenFindingFloor	= "true"
-    givesOnContactDamage	= "false"
-}
 
 template pickupComponentBase
 {
@@ -218,11 +186,9 @@ template pickupComponentBase
     enableWhenUnderVelocity = 0.6f
 
     droppedByChr = "false"
+    
+    collectSound = ""
 
-    singleSound-field collectSound
-    {
-	default = "pic_misc"
-    }
     typeId = "UNKNOWN"
     subtypeId = "UNKNOWN"
      
@@ -236,17 +202,15 @@ template simplePickupProp : staticpropnophysics
 {
     class-id = "simple pickup prop"
     ticktype = "k_tickAlways"
-    addToPickupCollisionGroup = "true"
-
-    obinstrenderer editor-only-render
-    {
-    }
+    addToPickupCollisionGroup = "true" 
 
     obinstrenderer render
     {
 	castshadows="false"
     }
 
+    dynamicNetworkComponent network {}
+    
     meta
     {
 	editorPath	    = "props/pickups/unfiled"
@@ -256,20 +220,32 @@ template simplePickupProp : staticpropnophysics
 
 template pickupComponentWeapon : pickupComponentBase
 {
-    collectSound = "pic_weap"
     typeId = "WEAPON"
 }
 
 template pickupComponentGrenade : pickupComponentBase
 {
-    collectSound = "pic_gren"
     typeId = "GRENADE"
 }
 
 template pickupComponentHealth : pickupComponentBase
 {
-    collectSound = "pic_heal"
     typeId = "HEALTH"
+}
+
+template pickupComponentHolocron : pickupComponentBase
+{
+    typeId = "HOLOCRON"
+}
+
+template pickupComponentCloak	: pickupComponentBase
+{
+    typeId = "CLOAK"
+}
+
+template pickupComponentJetPack : pickupComponentBase
+{
+    typeId = "JETPACK"
 }
 
 template chrpickupcollector

@@ -27,5 +27,31 @@ strings
 	{
 	    filename		=   "french"
 	}
+	german
+	{
+	    filename		=   "german"
+	}
+	italien
+	{
+	    filename		=   "italien"
+	}
+	japanese
+	{
+	    filename		=   "japanese"
+	}
+	spanish
+	{
+	    filename		=   "spanish"
+	}
+	japanese
+	{
+	    filename		=   "japanese"
+
+	    fontstyle localstyle
+	    {
+	        font	= "bf-jap"
+		scale	= 1.0f
+	    }	    
+	}
     }
 }

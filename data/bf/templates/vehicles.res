@@ -19,6 +19,8 @@ template FlyingVehicleCamera : baseCamera
     float positionLerpVec[] { 2.0f, 5.0f, 2.75f, 5.0f }
     
     cameraDistance    = -10.15f
+
+    animset = "BFCamAnims"
     
     positionLerp = 2.5f
 
@@ -48,7 +50,8 @@ template FlyingVehicleCamera : baseCamera
     maxBrakingOffset = 4.0f //target braking offset...
     maxBrakingTime = 0.5f   //..for the first n seconds of braking
     maxBrakingLerp = 3.0f   //speed at which it moves to braking offset
-
+    
+    closePosHeightFraction = 0.75f // the fraction of the y offset the camera position will be from the vehicle when squashed in by collision
 }
 
 template HoverVehicleCamera : FlyingVehicleCamera
@@ -56,32 +59,142 @@ template HoverVehicleCamera : FlyingVehicleCamera
     class-id = "hover vehicle camera"
     keepUpright = "false"
     radius = 1.0f
-}
 
-template WalkingVehicleCamera : HoverVehicleCamera
-{
-    class-id = "walking vehicle camera"
+    disableWeaponRotXTilting = "false"   //stop camera getting behind tanks
+    rotationalCameraMode = "false"  //use a camera that rotates inside of slides
+    closePosHeightFraction = 0.75f // the fraction of the y offset the camera position will be from the vehicle when squashed in by collision
 }
 
 template AnimatedWalkingVehicleCamera : HoverVehicleCamera
 {
     class-id = "animated walking vehicle camera"
+    disableWeaponRotXTilting = "true"   //stop camera tilting strangly for walkers
+    rotationalCameraMode = "false"  //use a camera that rotates inside of slides
 }
 
-template emptyvehicledescriptcomponent : descriptcomponent
+template vehiclehealthcomponentbf : vehiclehealthcomponent
+{
+    class-id = "health component - bf vehicle"
+}
+
+
+template spiderDroidDescript : descriptcomponent
 {
     script = "
-   
+
     BTOP
     {
-	event init
+        event init
+        {
+            setdmgstate( normal )
+            makevisible_wc( BTOP, true )
+            makevisible_wc( B_GIB*, false )
+        }
+
+	event damage
 	{
-	    setdmgstate( normal )
-	    makevisible_wc( BTOP, true )
-	    makevisible_wc( B_GIB*, false )
+	    if healthlessthan(0.25)
+	    {
+		if healthgreaterthan(0.0)
+		{
+		    if comparedmgstatenot(damaged)
+		    {
+			killallcurrentparticleeffects()
+			stopallparticleeffectseries()
+			particleeffectseries(smoke_dmg_050, 5000, 20.6, small, 0, false)
+			particleeffectseries(smoke_dmg_025, 5000, 22.2, medium, 0, false)
+			particleeffectimmediate(smoke_dmg_025, large, 0, true)
+			particleeffectimmediate(atat_dmg_025, large, 0, true)
+			setdmgstate(damaged)
+		    }
+		}
+	    }
+
+	    if healthlessthan(0.5)
+	    {
+		if healthgreaterthan(0.25)
+		{
+		    if comparedmgstatenot(damaged_stage2)
+		    {
+			killallcurrentparticleeffects()				
+			stopallparticleeffectseries()
+			particleeffectseries(smoke_dmg_050, 5000, 20.6,small, 0, false)
+			particleeffectseries(smoke_dmg_025, 5000, 21.2,medium, 0, false)
+			particleeffectimmediate(atat_dmg_025, medium, 0, true)
+			setdmgstate(damaged_stage2)
+		    }
+		}
+	    }
+
+	    if healthlessthan(0.75)
+	    {
+		if healthgreaterthan(0.5)
+		{
+		    if comparedmgstatenot(damaged_stage1)
+		    {
+			killallcurrentparticleeffects()
+			stopallparticleeffectseries()
+			particleeffectseries(smoke_dmg_025, 5000 , 20.5, small, 0, false)
+			particleeffectimmediate(atat_dmg_025, small,  0, true)
+			setdmgstate(damaged_stage1)
+		    }
+		}
+	    }
+
+	    if healthgreaterthan(0.75)
+	    {
+    		if comparedmgstate_wc(damaged*)
+		{
+    		    killallcurrentparticleeffects()
+		    stopallparticleeffectseries()
+		    setdmgstate(normal)
+		}
+
+    		if comparedmgstate_wc(damaged)
+		{
+    		    killallcurrentparticleeffects()
+		    stopallparticleeffectseries()
+		    setdmgstate(normal)
+		}
+	    }
 	}
     }
+    *
+    {
+	event zerohealth
+	{
+	    if comparedmgstate(animation)
+	    {
+		if finishedSpiderDroidDeathAnim()
+		{
+		    setdmgstate(damaged)
+		}
+	    }
 
+	    if comparedmgstate(dead)
+	    {
+		setdmgstate(deleted)
+		deleteprop()
+	    }
+
+	    if comparedmgstate_wc(damaged*)
+	    {
+		if startSpiderDroidDeathAnim()
+		{
+		    setdmgstate(animation)
+		}
+		else
+		{
+		    particleeffect(csi_exp_large, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true )
+		    setgibextras(0.0, NULL, false, true, false)
+		    explode_wc_launch(B_GIB*, 20.0, 4.0, 1.0, bfgndvehgibdesc)
+		    shakeCamerasNearProp(18.0, 1.8, 0.1) 
+		    makevisible_wc(BTOP, false )
+		    setdmgstate(dead)
+		}
+	    }
+	}	
+    }	
     "
 }
 
@@ -91,31 +204,26 @@ template bfvehicledescriptcomponent : descriptcomponent
    
     BTOP
     {
-	event init
-	{
-	    setdmgstate( normal )
-	    makevisible_wc( BTOP, true )
-	    makevisible_wc( B_GIB*, false )
-	    debugprintf(init)
-	}
+        event init
+        {
+            setdmgstate( normal )
+            makevisible_wc( BTOP, true )
+            makevisible_wc( B_GIB*, false )
+            debugprintf(init)
+        }
     }
 
     * 
     {
-	//these are example effects, need some new ones
 	event bullethit
 	{
-	    particleeffect( ship_sparks, true, 0.0, 0.0, 0.0, $1.v, 0, 2 )
-	    
-	    //particleeffectnew( ship_sparks, 0.0, 0.0, 0.0, $1.v,$2.v, 2 )
-	    //particleeffectnew( testflame, 0.0, 0.0, 0.0, $1.v,$2.v, 2 )
+	    particleeffect( hit_flier, true, 0.0, 0.0, 0.0, $1.v, 0, 2, false )
 	    
 	    debugprintf(bullethit)
 	    
 	    if comparedmgstate( damaged )
 	    {
-		particleeffect( dmg_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2 )
-		//particleeffectnew( dmg_explode, 0.0, 0.0, 0.0, $1.v,$2.v, 1 )
+            particleeffect( dmg_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2, false )
 	    }
   	    
 	}
@@ -124,13 +232,12 @@ template bfvehicledescriptcomponent : descriptcomponent
 	{
 	    if comparedmgstate( normal )
 	    {
-		if healthlessthan( 0.5 ) 
-		{
-		    setdmgstate( damaged )
-		    //electrify() //this is pants, happens at the centre of the prop, want hit position
-		    //	makevisible_wc( B_GIB* /*B_DMG*/, true ) //if gibs matched ship better this could be used as dmg state also
-		    //	makevisible_wc( BTOP, false ) 
-		}
+            if healthlessthan( 0.5 ) 
+            {
+                setdmgstate( damaged )
+                //	makevisible_wc( B_GIB* /*B_DMG*/, true ) //if gibs matched ship better this could be used as dmg state also
+                //	makevisible_wc( BTOP, false ) 
+            }
 	    }	    
 	    
 	    debugprintf(damage)
@@ -138,29 +245,26 @@ template bfvehicledescriptcomponent : descriptcomponent
 	    
 	event zerohealth
 	{	    	  
-	    if comparedmgstate(dead) //second tick
+	    if comparedmgstate(dead)
 	    {
-		// debugprintf(killing-prop) this doesnt work inside if looop!
-		setdmgstate( deleted ) //never gets called again
-		deleteprop()
+            setdmgstate( deleted )
+            deleteprop()
 	    }
 
-	    if comparedmgstate(damaged) //first tick
+	    if comparedmgstate(damaged)
 	    {
-//		particleeffect( ship_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2 )
-		particleeffect( flexplosion, true, 0.0, 0.0, 0.0, $1.v, 0, 2 )
-		explode_wc_launch( B_GIB* , 75.5, 10.0, 1.0 ) 
-		makevisible_wc( BTOP, false )
-		setdmgstate( dead )
+            particleeffect( flexplosion, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true )
+            explode_wc_launch( B_GIB* , 75.5, 10.0, 1.0,NULL) 
+            makevisible_wc( BTOP, false )
+            setdmgstate( dead )
 	    }
 
-	    // This allows remote guns which have been set to zero health but not damaged to be blown up
-	    if comparedmgstate(normal) //first tick
+	    if comparedmgstate(normal)
 	    {
-		particleeffect( ship_explode, true, 0.0, 0.0, 0.0, $1.v, 0, 2 )
-		explode_wc_launch( B_GIB* , 75.5, 10.0, 1.0 ) 
-		makevisible_wc( BTOP, false )
-		setdmgstate( dead )
+            particleeffect( aw_fly_exp_med, true, 0.0, 0.0, 0.0, $1.v, 0, 2, true )
+            explode_wc_launch( B_GIB* , 75.5, 10.0, 1.0,NULL) 
+            makevisible_wc( BTOP, false )
+            setdmgstate( dead )
 	    }
 
 	}
@@ -183,7 +287,7 @@ template passengerData
 {
     class-id = "passenger data"
     float offsetFromDof[] {0.f, 0.f, 0.f}
-    flags = "k_passengerData_canShoot"
+    flags = ""
     bottleNeckID = -1
 
     rotY		    = 0.f	// In degrees!
@@ -192,122 +296,102 @@ template passengerData
     upRotLimit		    = 60.0f	// In degrees!
     downRotLimit	    = 60.0f	// In degrees!
 
-    matchLookDirectionWhileClimbIn  = 0.f   // Fraction (ie. 0 <= n <= 1)
-    amountToTurnWhileClimbIn	    = 0.f   // In degrees!
-    matchHeadPositionWhileAttached  = 0.f   // Fraction (ie. 0 <= n <= 1)
+    hudPromptStringHandle     = "STR_ACTIVATEPROMPT_VEHICLE_PASSENGER"
 
     propid-field spawnPropID 
     {
-	default = ""		// optional to allow passengerspaces to have spawnprops associated with each space
-	tips = "ID of a spawn prop to associate with this passenger space's data. This spawnprop will be teleported to the spaces world space DOF and then the spawn will occur to populate the vehicle with its passengers"
-	views = "basic setup"
+        default = ""		// optional to allow passengerspaces to have spawnprops associated with each space
+        tips = "ID of a spawn prop to associate with this passenger space's data. This spawnprop will be teleported to the spaces world space DOF and then the spawn will occur to populate the vehicle with its passengers"
+        views = "basic setup"
     }
 
     singleAnimOrAnimMapID-field animidle
     {
-	default = ""
+        default = ""
     }
     
     singleAnimOrAnimMapID-field animgetin
     {
-	default = ""
+        default = ""
     }
 
     singleAnimOrAnimMapID-field animgetout
     {
-	default = ""
+        default = ""
     }
 
     singleAnimOrAnimMapID-field animdeath
     {
-	default = ""
+        default = ""
     }
  
     autoRecurseTemplateName-field repelRopeTemplate 
     { 
-	default = "" 
+        default = "" 
     }
-}
-
-
-template VehicleLateTick
-{
-    class-id = "vehicle late tick component"
 }
 
 template VehiclePropBF : VehicleProp
 {
-    class-id = "bf vehicle prop"
-   
-    icon = "misctex/gui/spawnmenu/veh_rep_drgun"	
-   	
-    VehicleLateTick latetick
+    class-id = "vehicle prop"
+    dismountPrompt = "STR_VEHICLEPROMPTS_GETOUTPROMPT"
+    
+    texture-field icon
     {
-    }  
+	default = "misctex/gui/spawnmenu/veh_rep_drgun"
+    }
     
     VehicleActivate activate
     {
-	numActivatePoints	    = 0
+        heroesAllowedToActivate = "true"
+        class-id = "vehicle activate component bf"
+        numActivatePoints	    = 0
+	driverHudPromptStringHandle     = "STR_ACTIVATEPROMPT_VEHICLE_DRIVER"
     }
 
     autoAimTargetComponentBF autoaimtarget
     {
-	playerTurnToFaceAutomatically	= "true"
-	playerBulletsAttractedToTarget	= "true"
-	canOverrideSquadOrders		= "true"
-	flags				|= "k_autoAimBF_canBeLockedOnto|k_autoAimBF_canBeLockedOntoByGroundVehicle|k_autoAimBF_canBeLockedOntoByStarFighter"
+	isVehicle = "true"
+        playerTurnToFaceAutomatically	= "true"
+        playerBulletsAttractedToTarget	= "true"
+        canOverrideSquadOrders		= "true"
+	isEscapePod			= "false"
+        flags				|= "k_autoAimBF_canBeLockedOntoByGroundVehicle|k_autoAimBF_canBeLockedOntoByStarFighter"
     }
-    /*
-    extraComponents_squadActions extraComponents
+
+    render
     {
-	squadActionOptions_vehicle squadActions
-	{
-	}
+        numLods     = 2
+        lodDist[] 
+        { 40.0, 90.0 }
+	tickLods = "true"
     }
-    */
-    obstaclecomponent obstacle
-    {
-    }
+ 
+    propflags |= "k_aiDoAvoid"
 
     adjustMountPointToObstacleRayLength = 20.0f
     
     //the health and descript etc are serialised in VehicleProp,
     //but are optional so the haze vehicles will still not have any damage handlers 
 
-    /*dmghealthcomponentbf health */
-    vehiclehealthcomponent health 
+    vehiclehealthcomponentbf health 
     {
-	fullhealth	= 1.0 //10.f
-	invincibilityChannel = ""
-	healthComponentSettings |= "k_healthComponentSetting_isRepairable"
-    }
-
-    fxcomponent fx 
-    {
-	electricConductivity = 1.0
-	electricCharge = 1.0
-	flammability = 1.0
-	flame = 1.0
-	highlight = "true"
+        fullhealth	= 1.0 //10.f
+        invincibilityChannel = ""
+        healthComponentSettings |= "k_healthComponentSetting_isRepairable"
     }
   
     bfvehicledescriptcomponent descript
     {
     }
 
-    DrawOnMapComponent mapComponent
-    {
-	iconNameKey = "map_vehicle"
-    }
-
-    shouldBeDestroyedWhenPlayerDies = "true"
+    shouldBeDestroyedWhenPlayerDies = "false"
 
     evictChrsWhenVehicleFlipped = "false"
 
-    soundmap-field soundmap
-    {
-	default = "sndmap_spotted"
-    }
+    SpawnHeightOffset = 0.0f
+
+    soundmap = "sndmap_spotted"
     
     outsidePlayAreaPrompt = "STR_VEHICLEPROMPTS_OUTSIDEPLAYAREA"
     outsideTimerPrompt = "STR_VEHICLEPROMPTS_OUTSIDETIMER"
@@ -316,11 +400,39 @@ template VehiclePropBF : VehicleProp
 	    maxgroups = 2
     }
 
+    simpleGroupieComponent groupie
+    {
+    }
+
+    combat_modifiers combatModifier
+    {
+	track_target
+	{
+	    CloseInDistanceMax = 40.f
+	    CloseInDistanceMin = 20.f
+	    CanUseBackOff = "true"
+	    BackOffDistance = 10.f
+	    StrafePercentageChance = 0.4f
+	    StandShootPercentageChance = 0.6f 
+	}
+    
+	general_combat
+	{
+	    ShortTermMemory = 10.0f
+	    ChargeDistMin = 5.0f
+	    ChargeDistMax = 15.0f
+	    ForceUseCharge = "false"
+	    AllowTurretUsage = "false"
+	}
+    }
+
     topOfVehicleInHudImage = 0.03125f
     bottomOfVehicleInHudImage = 0.96875f
 
-    playerDrivable = "true"
+    vibrationMagnitudeScale = 1.0f  //scales vibration amount (damage amount also scales it) between k_vehicleVibration_min/maxMagnitude clamps
+    vibrationDurationScale = 1.0f   //scales vibration duration (damage amount also scales it) between k_vehicleVibration_min/maxDuration clamps
 
+    playerDrivable = "true"
 }
 
 template VehicleSpawnerBF : VehicleSpawner
@@ -333,9 +445,18 @@ template VehicleSpawnerBF : VehicleSpawner
 	tips = "Allows ships that take off from this spawn prop to have their vertical velocity scaled so spawners in odd locations can have taller or shallower take-offs"
 	views = "basic setup"
     }
-
+    
+   Team0VehicleSlot = -1
+   Team1VehicleSlot = -1 
+   
     editor_VS_render editor-only-render
     {	
+    }
+
+    propid-field commandPost
+    {
+        default = ""
+        views   = "basic setup"
     }
 
     meta
@@ -359,6 +480,10 @@ template VehicleSetupDescBF
     driverDofName   		= ""
     driverDieInSeat		= "false"
     useAnimMaps			= "true"
+    // The distance an AI character can see while using the vehicle.
+    aiVisionRange		= "k_ai_vehicle_vision_range_medium"
+    // How much more visible the vehicle is than normal objects.
+    aiVisibilityMultiplier	= "k_ai_vehicle_visibility_multiplier_default"
 
     /*
     animsteer			= ""
@@ -378,12 +503,12 @@ template VehicleSetupDescBF
     animhitreact    		= ""
     */
 
-    vehicleDiveDistanceMult	 = 0.25f
-    vehicleDiveWidthMult	 = 0.6f
-    vehicleAvoidDistanceMult	 = 1.f
+    vehicleDiveDistanceMult	 = 0.4f
+    vehicleDiveWidthMult	 = 1.0f
+    vehicleAvoidDistanceMult	 = 1.0f
     vehicleAvoidWidthMult	 = 1.5f
-    vehicleAvoidTriggerAngleMult = 0.5f
-    vehicleAvoidAngleLerp	 = 0.8f
+    vehicleAvoidTriggerAngleMult = 0.0f
+    vehicleAvoidAngleLerp	 = 0.0f
 }
 
 template vehicleSlotsTemplateClassic : vehicleSlotsTemplateEra

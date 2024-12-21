@@ -1,14 +1,9 @@
 // vim: set syntax=c :
 
-template EffectTemplate
-{
-    class-id	=   "effect"
-    enabled	=   "false"
-}
-
-template ElectricEffect : EffectTemplate
+template ElectricEffect
 {
     class-id = "elect effect"
+    enabled	=   "false"
 }
 
 template ElectricZone
@@ -23,7 +18,7 @@ template ElectricZone
     offset	    =   0.0f
 }
 
-template DustEffect : EffectTemplate 
+template DustEffect
 {
     class-id	=   "Dust Effect"
 
@@ -37,13 +32,15 @@ template DustEffect : EffectTemplate
     overallTransparency		= 0.0f
     panelTexture		= "misctex/sand02"
     groundTexture		= "misctex/grounddust"
+    enabled	=   "false"
 }
 
-template SpaceDustEffect : EffectTemplate 
+template SpaceDustEffect
 {
     class-id		= "Space Dust Effect"
     altitude_start	= 0.0f
     altitude_full	= 0.0f
     opacity		= 1.0f
     spaceDustTexture	= "misctex/space_dust_fx"
+    enabled	=   "false"
 }

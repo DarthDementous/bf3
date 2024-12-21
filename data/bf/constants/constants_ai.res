@@ -10,9 +10,6 @@
 
 #include "data/common/constants/constants_ai.res"
 
-// Effectively disable pickup and throwback, as we don't have the anims
-k_grenadereact_considerCrouchPickupDist   = 0.0f
-k_grenadereact_considerStandingPickupDist = 0.0f
 //Block targetting of individual chr for time after fail
 k_grenadeHelper_targettingFailureReconsiderThrowTimeMin	 = 10.0f //15.0f
 k_grenadeHelper_targettingFailureReconsiderThrowTimeMax  = 15.0f 

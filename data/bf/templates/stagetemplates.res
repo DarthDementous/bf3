@@ -22,6 +22,7 @@
 #include "data\bf\templates\jedi.res"
 #include "data\bf\templates\chrs.res"
 #include "data\bf\templates\weapons_bf.res"
+#include "data\bf\templates\weapons_bf_infantry.res"
 #include "data\bf\templates\gamemode.res"
 #include "data\bf\templates\scenes.res"
 #include "data\bf\templates\scene_descriptors_bf.res"

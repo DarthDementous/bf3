@@ -21,9 +21,3 @@ template levelmenus
 //    }
 }
 
-template leveldefaults
-{
-    levelmenus lvmenu
-    {
-    }
-}

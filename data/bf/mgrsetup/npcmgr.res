@@ -6,5 +6,7 @@
 
 npcmgrtemplate npcmgr
 {
+    maxCChrMotorComponents = 60
+    maxCDroidekaMotorComponents = 12
 }
 

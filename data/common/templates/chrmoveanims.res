@@ -17,6 +17,7 @@ template chrMoveAnimEntry
     }
 }
 
+/* --- auto commented out by commentOutTemplate
 template chrMoveAnimGroup
 {
     class-id = "chr move anim group"
@@ -29,3 +30,4 @@ template chrMoveAnimGroup
     {
     }
 }
+*/ // --- auto commented out by commentOutTemplate

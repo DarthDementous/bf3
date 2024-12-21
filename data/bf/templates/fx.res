@@ -1,8 +1,8 @@
 // vim: set syntax=c :
-
-template soundmap_fx_def
-{
-    electrify_loop	    = "m_elcZpL"
-    electrify_zaps	    = "m_elecZp"
-}
+//Soundmaps are unifies now through the world editor
+//template soundmap_fx_def
+//{
+//    electrify_loop	    = "m_elcZpL"
+//    electrify_zaps	    = "m_elecZp"
+//}
 

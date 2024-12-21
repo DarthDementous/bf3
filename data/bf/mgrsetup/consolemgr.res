@@ -4,6 +4,6 @@
 **06/05
 ********************************************************************************/
 
-consoleManagerTemplate consoleManager
+/*consoleManagerTemplate consoleManager
 {
-}
+}*/

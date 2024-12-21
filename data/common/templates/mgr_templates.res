@@ -13,6 +13,11 @@ template GTKDictionaryEditor
     }
 }
 
+template finlongerpreset
+{
+    class-id = "csg editor flp"
+}
+
 template GTKEditorSettings
 {
     class-id = "gtk editor"
@@ -34,6 +39,7 @@ template GTKEditorSettings
     cullPropBounds = "true"
     autoShowSelectedPropsInViews = "false"
     triggerTriggeredDebugging = "false"
+    serialiseDebugSettings = "false"
     
     GTKDictionaryEditor dictionaryEditor
     {
@@ -43,7 +49,7 @@ template GTKEditorSettings
     {
 	class-id = "Editor Plugin Group"
 	
-	maxNumPlugins = 12; // only needed for > 10 but put it here incase more are added so its easily increased
+	maxNumPlugins = 20; // only needed for > 10 but put it here incase more are added so its easily increased
 	
 	plugins
 	{
@@ -68,30 +74,10 @@ template GTKEditorSettings
 	    {
 		class-id = "Editor plugin sound component"
 	    }
-	    csgSound
-	    {
-		class-id = "editor plugin csg sound component"
-	    }
 	    csgTrigger
 	    {
 		class-id = "editor plugin csg trigger component"
 	    }
-	    aiActionPoint
-	    {
-		class-id = "editor plugin actionpoint component"
-	    }
-	    aiAnimpoint
-	    {
-		class-id = "editor plugin animpoint component"
-	    }
-	    patrol
-	    {
-		class-id = "editor plugin patrol component"
-	    }
-//	    consolePlugin
-//	    {
-//		class-id = "Editor plugin console component"
-//	    }
 	    doorPlugin
 	    {
 		class-id = "editor plugin for doors"
@@ -99,6 +85,10 @@ template GTKEditorSettings
 	    splinePlugin
 	    {
 		class-id = "editor plugin for splines"
+	    }
+	    aiJetpackPlugin
+	    {
+		class-id = "editor plugin ai jetpack bf"
 	    }
 	}
     }
@@ -115,12 +105,6 @@ template GTKEditorSettings
 	    {
 		class-id = "editor plugin brush placing component"
 	    }
-	    
-	    detailGeomPlacingPlugin
-	    {
-		class-id = "editor plugin detail geom placing component"
-	    }
-        
 	}
     }
     
@@ -135,6 +119,41 @@ template GTKEditorSettings
 	    csgNav
 	    {
 		class-id = "editor plugin csg nav component"
+
+		maxPresets = 100
+
+		finlongerpreset finglonger[] 
+		{
+		    {
+			id     = "ape-decendant beings"
+			height = 0.95
+			radius = 0.45
+			offset = 0.2
+
+			default = "true"
+		    },
+
+		    {
+			id     = "the tank"
+			height = 2.0
+			radius = 6.0
+			offset = 0.5
+		    },
+
+		    {
+			id     = "small walker"
+			height = 5.0
+			radius = 2.5
+			offset = 0.25
+		    },
+
+		    {
+			id     = "walker: texas ranger"
+			height = 5.0
+			radius = 5.0
+			offset = 0.5
+		    }
+		}
 	    }
 	    zone
 	    {
@@ -155,6 +174,14 @@ template GTKEditorSettings
 	    {
 		class-id = "editor plugin for bg name"
 	    }
+	    bgFunnelPlugin
+	    {
+		class-id = "editor plugin for bg funnel"
+	    }
+	    patrolZonePlugin
+	    {
+		class-id = "editor plugin for patrol zone"
+	    }	    
 	    qaflagsPlugin
 	    {
 		class-id = "editor plugin for qa flags"
@@ -216,10 +243,6 @@ template stageAnimSetWithSettings
 
 }
 
-template stageAnimSetAssaultRifle : stageAnimSet
-{
-    weapon  = "weapon/assaultrifle_static2"
-}
 
 template editorDofTemplate
 {

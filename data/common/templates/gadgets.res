@@ -55,6 +55,7 @@ template spyBot : prop
 
     odesimplephysics physics
     {
+    mayaphysics			= "false"
 	type	    = "k_physicsSphere"
 	material    = "stel"
 	enabled	    = "true"

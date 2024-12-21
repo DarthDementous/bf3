@@ -2,6 +2,6 @@
 
 inventorymanagerTemplate inventorymanager
 {
-    maxObjectTypesLoadedAtOnce = 60
+    maxObjectTypesLoadedAtOnce = 94
     ownerTypes = "pickup;bfChr"
 }

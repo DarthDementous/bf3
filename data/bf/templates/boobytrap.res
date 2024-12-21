@@ -4,12 +4,15 @@ template boobyTrap_frag : weaponGrenadeProp
 {
 	detonator
 	{
-		particleEffect		= "expGrenade"
+	    explosion
+	    {
+		particleEffect		= "gren_thermal"
 		maxRad				= 3.0f
 		speed				= 10.0f
 		force				= 10.0f
-		edgeForce			= 0.25f
+		edgeForce			= 1.0f
 		damageradius		= 5.0f
+	    }
 	}
 
 	render

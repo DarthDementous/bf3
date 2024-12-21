@@ -19,775 +19,958 @@ chrtemplatemgrTemplate chr_template_mgr
 	//
 	// REPUBLIC CLASS CHARACTERS
 	//
-	rep_clonetrooper
+	chrTemplateEntry rep_clonetrooper
 	{
 	    nameKey	    = "STR_CHRNAME_REPCLONETROOPER"	
 	    playerTemplate  = "rep_clonetrooper_player"
 	    npcTemplate	    = "rep_clonetrooper_npc"
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
 	}
 
-	rep_cloneheavytrooper
+	chrTemplateEntry rep_cloneheavytrooper
 	{
 	    nameKey	    = "STR_CHRNAME_REPHEAVYTROOPER"	
 	    playerTemplate  = "rep_cloneheavytrooper_player"
 	    npcTemplate	    = "rep_cloneheavytrooper_npc"	    
-	    icon	    = "misctex/gui/icons/rep/heavytrooper_icon"
+	    //icon	    = "misctex/gui/icons/rep/heavytrooper_icon"
 	}
 
-	rep_sharpshooter
+	chrTemplateEntry rep_sharpshooter
 	{
 	    nameKey	    = "STR_CHRNAME_SHARPSHOOTER"
 	    playerTemplate  = "rep_sharpshooter_player"
 	    npcTemplate	    = "rep_sharpshooter_npc"
-	    icon	    = "misctex/gui/icons/rep/sharpshooter_icon"
+	    //icon	    = "misctex/gui/icons/rep/sharpshooter_icon"
 	}
 
-	rep_engineer
+	chrTemplateEntry rep_engineer
 	{
 	    nameKey	    = "STR_CHRNAME_ENGINEER"
 	    playerTemplate  = "rep_engineer_player"
 	    npcTemplate	    = "rep_engineer_npc"
-	    icon	    = "misctex/gui/icons/rep/engineer_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/engineer_icon"	    
 	}
-	
-	rep_lancetrooper
+
+	chrTemplateEntry rep_specialtrooper
 	{
-	    nameKey	    = "STR_CHRNAME_LANCETROOPER"
-	    playerTemplate  = "rep_lance_trooper_player"
-	    npcTemplate	    = "rep_lance_trooper_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    nameKey	    = "STR_CHRNAME_REP_SPECIALIST"
+	    playerTemplate  = "rep_special_trooper_player"
+	    npcTemplate	    = "rep_special_trooper_npc"
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 
 	//
 	// CIS CLASS CHARACTERS
 	//
-	cis_battledroid
+	chrTemplateEntry cis_battledroid
 	{
 	    nameKey	    = "STR_CHRNAME_BATTLEDROID"
 	    playerTemplate  = "cis_battledroid_player"
 	    npcTemplate	    = "cis_battledroid_npc"
-	    icon	    = "misctex/gui/icons/cis/battledroid_icon"
+	    //icon	    = "misctex/gui/icons/cis/battledroid_icon"
 	}
 
-	cis_superdroid
+	chrTemplateEntry cis_superdroid
 	{
 	    nameKey	    = "STR_CHRNAME_SUPERBDROID"
 	    playerTemplate  = "cis_superdroid_player"
 	    npcTemplate	    = "cis_superdroid_npc"
-	    icon	    = "misctex/gui/icons/cis/superbattledroid_icon"
+	    //icon	    = "misctex/gui/icons/cis/superbattledroid_icon"
 	}
 
-	cis_assassindroid
+	chrTemplateEntry cis_assassindroid
 	{
 	    nameKey	    = "STR_CHRNAME_ASSASSIN_DROID"
 	    playerTemplate  = "cis_assassindroid_player"
 	    npcTemplate	    = "cis_assassindroid_npc"
-	    icon	    = "misctex/gui/icons/cis/assasindroid_icon"
+	    //icon	    = "misctex/gui/icons/cis/assasindroid_icon"
 	}
 
-	cis_engineerdroid
+	chrTemplateEntry cis_engineerdroid
 	{
 	    nameKey	    = "STR_CHRNAME_ENGINEER_DROID"
 	    playerTemplate  = "cis_engineerdroid_player"
 	    npcTemplate	    = "cis_engineerdroid_npc"
-	    icon	    = "misctex/gui/icons/cis/engineerdroid_icon"
+	    //icon	    = "misctex/gui/icons/cis/engineerdroid_icon"
 	}
 
-	cis_magnadroid
+	chrTemplateEntry cis_specialdroid
 	{
-	    nameKey	    = "STR_CHRNAME_MAGNADROID"
-	    playerTemplate  = "cis_magnadroid_player"
-	    npcTemplate	    = "cis_magnadroid_npc"
-	    icon	    = "misctex/gui/icons/cis/magnadroid_icon"
+	    nameKey	    = "STR_CHRNAME_DROID_LEADER"
+	    playerTemplate  = "cis_specialdroid_player"
+	    npcTemplate	    = "cis_specialdroid_npc"
+	    //icon	    = "misctex/gui/icons/cis/assasindroid_icon"
 	}
 
 	//
 	// REBEL CLASS CHARACTERS
 	//
-	reb_soldier
+	chrTemplateEntry reb_soldier
 	{
 	    nameKey	    = "STR_CHRNAME_REBSOLDIER"	
 	    playerTemplate  = "reb_soldier_player"
 	    npcTemplate	    = "reb_soldier_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
 	}
 
-	reb_hot_sld
+	chrTemplateEntry reb_hot_sld
 	{
 	    nameKey	    = "STR_CHRNAME_HOTH_REB_SOLDIER"	
 	    playerTemplate  = "reb_hot_snow_player"
 	    npcTemplate	    = "reb_hot_snow_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
 	}
 	
-	reb_heavy_trooper
+	chrTemplateEntry reb_heavy_trooper
 	{
 	    nameKey	    = "STR_CHRNAME_REBVANGUARD"	
 	    playerTemplate  = "reb_heavyvanguard_player"
 	    npcTemplate	    = "reb_heavyvanguard_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
 	}
 
-	reb_sniper
+	chrTemplateEntry reb_sniper
 	{
 	    nameKey	    = "STR_CHRNAME_REBSNIPER"	
 	    playerTemplate  = "reb_snipermarksman_player"
 	    npcTemplate	    = "reb_snipermarksman_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
 	}
 
-	reb_support
+	chrTemplateEntry reb_support
 	{
 	    nameKey	    = "STR_CHRNAME_REBSUPPORT"	
 	    playerTemplate  = "reb_smugglersupport_player"
 	    npcTemplate	    = "reb_smugglersupport_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
 	}
 	
-	reb_sup_no_jet
+	chrTemplateEntry reb_sup_no_j
 	{
 	    nameKey	    = "STR_CHRNAME_REBSUPPORT"	
 	    playerTemplate  = "reb_support_no_jet_player"
 	    npcTemplate	    = "reb_support_no_jet_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
 	}
-	reb_wookiegeneral
+	
+	chrTemplateEntry reb_wookiegeneral
 	{
 	    nameKey	    = "STR_CHRNAME_REBWOOKIEGENERAL"
-	    playerTemplate  = "reb_wookieemelee_player"
-	    npcTemplate	    = "reb_wookieemelee_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    playerTemplate  = "wookieeheavy_player"
+	    npcTemplate	    = "wookieeheavy_npc"
+	    //icon	    = "misctex/gui/icons/reb/melee_icon"	    
 	}
 
 	//
 	// IMPERIAL CLASS CHARACTERS
 	//
-	imp_stormtrooper
+	chrTemplateEntry imp_stormtrooper
 	{
 	    nameKey	    = "STR_CHRNAME_STORMTROOPER"
 	    playerTemplate  = "imp_stormtrooper_player"
 	    npcTemplate	    = "imp_stormtrooper_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 
-	imp_snowtrooper
+	chrTemplateEntry imp_snowtrooper
 	{
 	    nameKey	    = "STR_CHRNAME_SNOWTROOPER"
 	    playerTemplate  = "imp_hot_snow_player"
 	    npcTemplate	    = "imp_hot_snow_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 	
-	imp_heavytrooper
+	chrTemplateEntry imp_heavytrooper
 	{
 	    nameKey	    = "STR_CHRNAME_SHOCKTROOPER"
 	    playerTemplate  = "imp_heavyshocktrooper_player"
 	    npcTemplate	    = "imp_heavyshocktrooper_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 
-	imp_sniper
+	chrTemplateEntry imp_sniper
 	{
 	    nameKey	    = "STR_CHRNAME_SCOUTTROOPER"
 	    playerTemplate  = "imp_sniperscouttrooper_player"
 	    npcTemplate	    = "imp_sniperscouttrooper_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 
-	imp_pilotsupport
+	chrTemplateEntry imp_pilotsupport
 	{
 	    nameKey	    = "STR_CHRNAME_IMPPILOT"
 	    playerTemplate  = "imp_pilotsupport_player"
 	    npcTemplate	    = "imp_pilotsupport_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 
-	imp_royalguard
+	chrTemplateEntry imp_sup_snpc
 	{
-	    nameKey	    = "STR_CHRNAME_ROYALGUARD"
-	    playerTemplate  = "imp_royalguardmelee_player"
-	    npcTemplate	    = "imp_royalguardmelee_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    nameKey	    = "STR_CHRNAME_IMPPILOT"
+	    playerTemplate  = "imp_pilotsupport_player"
+	    npcTemplate	    = "imp_pilotsupport_npc"
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	}
+	
+	chrTemplateEntry imp_specheavy
+	{
+	    nameKey	    = "STR_CHRNAME_IMPSPEC"
+	    playerTemplate  = "imp_specheavy_player"
+	    npcTemplate	    = "imp_specheavy_npc"
+	    //icon	    = "misctex/gui/icons/imp/shocktrooper_icon"	    
+	}
+
+	chrTemplateEntry x2_clone_melee
+	{
+	    nameKey         = "STR_CHRNAME_STORY_X2_MELEE"
+	    playerTemplate  = "rep_x2melee_player"
+	    npcTemplate     = "rep_clonetrooper_npc"
+	    //icon          = "misctex/gui/icons/rep/trooper_icon"
 	}
 
 	// 
 	// SECONDARY HEROES
 	//
-	rep_darktrooper
+	chrTemplateEntry rep_darktrooper
 	{
 	    nameKey	    = "STR_CHRNAME_DARKTROOPER"
 	    playerTemplate  = "rep_darktrooper_player"
 	    npcTemplate	    = "rep_darktrooper_npc"
-	    icon	    = "misctex/icons/noimage" //TODO: Update
+	    //icon	    = "misctex/gui/icons/imp/darktrooper_icon"
 	}
 
-	rep_cloneskytrooper
+	chrTemplateEntry rep_cloneskytrooper
 	{
 	    nameKey	    = "STR_CHRNAME_CLONESKYTROOPER"
 	    playerTemplate  = "rep_cloneskytrooper_player"
 	    npcTemplate	    = "rep_cloneskytrooper_npc"
-	    icon	    = "misctex/gui/icons/rep/skytrooper_icon"
+	    //icon	    = "misctex/gui/icons/rep/skytrooper_icon"
 	}
 
-	zam_wessel
+	chrTemplateEntry zam_wessel
 	{
 	    nameKey	    = "STR_CHRNAME_ZAMWESSEL"
 	    playerTemplate  = "zam_wessel_player"
 	    npcTemplate	    = "zam_wessel_npc"
-	    icon	    = "misctex/gui/icons/cis/zwessel_icon"
+	    //icon	    = "misctex/gui/icons/cis/zwessel_icon"
 	}
 
-	cis_droideka
+	chrTemplateEntry cis_droideka
 	{
 	    nameKey	    = "STR_CHRNAME_DROIDEKA"
 	    playerTemplate  = "cis_droideka_player"
 	    npcTemplate	    = "cis_droideka_npc"
-	    icon	    = "misctex/icons/noimage" //TODO: Update
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
 	}
 
-	jango_fett
+	chrTemplateEntry jango_fett
 	{
 	    nameKey	    = "STR_CHRNAME_JANGOFETT"
 	    playerTemplate  = "jango_fett_player"
 	    npcTemplate	    = "jango_fett_npc"
-	    icon	    = "misctex/gui/icons/rep/sharpshooter_icon"
+	    //icon	    = "misctex/gui/icons/rep/sharpshooter_icon"
 	}
 	
-	boba_fett
+	chrTemplateEntry boba_fett
 	{
 	    nameKey	    = "STR_CHRNAME_BOBA_FETT"
 	    playerTemplate  = "boba_fett_player"
 	    npcTemplate	    = "boba_fett_npc"
-	    icon	    = "misctex/gui/icons/rep/sharpshooter_icon"
+	    //icon	    = "misctex/gui/icons/rep/sharpshooter_icon"
 	}
 
-	rep_tarfful
+	chrTemplateEntry rep_tarfful
 	{
 	    nameKey	    = "STR_CHRNAME_TARFFUL"
 	    playerTemplate  = "rep_tarfful_player"
 	    npcTemplate	    = "rep_tarfful_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 
-	rep_hansolo
+	chrTemplateEntry rep_hansolo
 	{
 	    nameKey	    = "STR_CHRNAME_HANSOLO"
 	    playerTemplate  = "rep_hansolo_player"
 	    npcTemplate	    = "rep_hansolo_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 
-	rep_hansolo_challenge
-	{
-	    nameKey	    = "STR_CHRNAME_HANSOLO_CHALLENGE"
-	    playerTemplate  = "han_solo_challenge"
-	    npcTemplate	    = "rep_hansolo_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
-	}
-
-	rep_leia
+	chrTemplateEntry rep_leia
 	{
 	    nameKey	    = "STR_CHRNAME_PRINCESSLEIA"
 	    playerTemplate  = "rep_leia_player"
 	    npcTemplate	    = "rep_leia_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 
-	rep_padme
+	chrTemplateEntry rep_padme
 	{
 	    nameKey	    = "STR_CHRNAME_PADME"
 	    playerTemplate  = "rep_padme_player"
 	    npcTemplate	    = "rep_padme_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	  
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	  
 	}
 
-	rep_leia_npc_challenge
-	{
-	    nameKey	    = "STR_CHRNAME_PRINCESSLEIA"
-	    playerTemplate  = "rep_leia_player"
-	    npcTemplate	    = "rep_leia_npc_challenge"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
-	}
-
-	rep_lando
+	chrTemplateEntry rep_lando
 	{
 	    nameKey	    = "STR_CHRNAME_LANDOCALRISSIAN"
 	    playerTemplate  = "rep_lando_player"
 	    npcTemplate	    = "rep_lando_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 
-	cis_durge
+	chrTemplateEntry cis_durge
 	{
 	    nameKey	    = "STR_CHRNAME_DURGE"
 	    playerTemplate  = "cis_durge_player"
 	    npcTemplate	    = "cis_durge_npc"	    
-	    icon	    = "misctex/icons/noimage" //TODO: Update
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
 	}
 
-	imp_ig88
+	chrTemplateEntry imp_ig88
 	{
 	    nameKey	    = "STR_CHRNAME_IG88"
 	    playerTemplate  = "imp_ig88_player"
 	    npcTemplate	    = "imp_ig88_npc"	    
-	    icon	    = "misctex/icons/noimage" //TODO: Update
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
 	}
 
 	//
 	// PRIMARY HERO CHARACTERS
 	//
-	darth_vader
+	chrTemplateEntry darth_vader
 	{
 	    nameKey	    = "STR_CHRNAME_DARTHVADER"
 	    playerTemplate  = "darth_vader_player"
 	    npcTemplate	    = "darth_vader_npc"
-	    icon	    = "misctex/gui/icons/imp/darthvader_icon"
+	    //icon	    = "misctex/gui/icons/imp/darthvader_icon"
 	}
 
-	count_dooku
+	chrTemplateEntry count_dooku
 	{
 	    nameKey	    = "STR_CHRNAME_COUNTDOOKU"
 	    playerTemplate  = "count_dooku_player"
 	    npcTemplate	    = "count_dooku_npc"
-	    icon	    = "misctex/gui/icons/cis/dooku_icon"
+	    //icon	    = "misctex/gui/icons/cis/dooku_icon"
 	}
 
-	asajj_ventress
+	chrTemplateEntry asajj_ventress
 	{
 	    nameKey	    = "STR_CHRNAME_ASAJJVENTRESS"
 	    playerTemplate  = "asajj_ventress_player"
 	    npcTemplate	    = "asajj_ventress_npc"
-	    icon	    = "misctex/gui/icons/cis/dooku_icon" //todo
+	    //icon	    = "misctex/gui/icons/cis/dooku_icon" //todo
 	}
 
-	general_grievous
+	chrTemplateEntry general_grievous
 	{
 	    nameKey	    = "STR_CHRNAME_GENERAL_GRIEVOUS"
 	    playerTemplate  = "general_grievous_player"
 	    npcTemplate	    = "general_grievous_npc"
-	    icon	    = "misctex/icons/noimage" //TODO: Update
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
 	}
 
-	mace_windu
+	chrTemplateEntry mace_windu
 	{
 	    nameKey	    = "STR_CHRNAME_MACEWINDU"
 	    playerTemplate  = "mace_windu_player"
 	    npcTemplate	    = "mace_windu_npc"
-	    icon	    = "misctex/gui/icons/rep/mwindu_icon"
+	    //icon	    = "misctex/gui/icons/rep/mwindu_icon"
 	}
 
-	master_ferroda
+	chrTemplateEntry master_ferroda
 	{
 	    nameKey	    = "STR_CHRNAME_FERRODA"
 	    playerTemplate  = "master_ferroda_player"
 	    npcTemplate	    = "master_ferroda_npc"
-	    icon	    = "misctex/gui/icons/rep/mwindu_icon"
+	    //icon	    = "misctex/gui/icons/rep/mwindu_icon"
 	}
 
-	tusken_raider //TODO: Update
+	chrTemplateEntry master_ferroda_story
+	{
+	    nameKey	    = "STR_CHRNAME_FERRODA_STORY"
+	    playerTemplate  = "master_ferroda_player_story"
+	    npcTemplate	    = "master_ferroda_npc_story"
+	    //icon	    = "misctex/gui/icons/rep/mwindu_icon"
+	}
+
+	chrTemplateEntry tusken_raider //TODO: Update
 	{
 	    nameKey	    = "STR_CHRNAME_REBSOLDIER"
 	    playerTemplate  = "master_ferroda_player"
 	    npcTemplate	    = "tusken_npc_story"
-	    icon	    = "misctex/gui/icons/rep/mwindu_icon"
+	    //icon	    = "misctex/gui/icons/rep/mwindu_icon"
 	}
     
-	sith_witch
+	chrTemplateEntry sith_witch
 	{
 	    nameKey	    = "STR_CHRNAME_SITHWITCH"
 	    playerTemplate  = "sith_witch_player"
 	    npcTemplate	    = "sith_witch_npc"
-	    icon	    = "misctex/gui/icons/rep/mwindu_icon"
+	    //icon	    = "misctex/gui/icons/rep/mwindu_icon"
 	}
     
-	yoda
+	chrTemplateEntry yoda
 	{
 	    nameKey	    = "STR_CHRNAME_YODA"
 	    playerTemplate  = "yoda_player"
 	    npcTemplate	    = "yoda_npc"
-	    icon	    = "misctex/icons/noimage" //TODO: Update
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
 	}
 
-	rep_chewbacca
+	chrTemplateEntry rep_chewbacca
 	{
 	    nameKey	    = "STR_CHRNAME_CHEWBACCA"
 	    playerTemplate  = "rep_chewbacca_player"
 	    npcTemplate	    = "rep_chewbacca_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 
-	rep_chewbacca_npc_challenge
-	{
-	    nameKey	    = "STR_CHRNAME_CHEWBACCA"
-	    playerTemplate  = "rep_chewbacca_player"
-	    npcTemplate	    = "rep_chewbacca_npc_challenge"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
-	}
-
-	kota_vahs
+	chrTemplateEntry kota_vahs
 	{
 	    nameKey	    = "STR_CHRNAME_MASTERKOTA"
 	    playerTemplate  = "kota_vahs_player"
 	    npcTemplate	    = "kota_vahs_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 
-	darth_maul
+	chrTemplateEntry darth_maul
 	{
 	    nameKey	    = "STR_CHRNAME_DARTHMAUL"
 	    playerTemplate  = "darth_maul_player"
 	    npcTemplate	    = "darth_maul_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 
-	the_emperor
+	chrTemplateEntry the_emperor
 	{
 	    nameKey	    = "STR_CHRNAME_THEEMPEROR"
 	    playerTemplate  = "the_emperor_player"
 	    npcTemplate	    = "the_emperor_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 
-	anakin_ep3
+	chrTemplateEntry anakin_ep3
 	{
 	    nameKey	    = "STR_CHRNAME_ANAKINEP3"
 	    playerTemplate  = "anakin_ep3_player"
 	    npcTemplate	    = "anakin_ep3_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 	
-	aayla_secura
+	chrTemplateEntry aayla_secura
 	{
 	    nameKey	    = "STR_CHRNAME_AAYLASECURA"
 	    playerTemplate  = "aayla_secura_player"
 	    npcTemplate	    = "aayla_secura_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon" //todo	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon" //todo	    
 	}
 	
-	luke_ep6
+	chrTemplateEntry luke_ep6
 	{
 	    nameKey	    = "STR_CHRNAME_LUKESKYWALKER"
 	    playerTemplate  = "luke_ep6_player"
 	    npcTemplate	    = "luke_ep6_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 
-	pilot_luke
+	chrTemplateEntry pilot_luke
 	{
 	    nameKey	    = "STR_CHRNAME_LUKE_PILOT"
 	    playerTemplate  = "luke_pilot_player"
 	    npcTemplate	    = "luke_pilot_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
 	}
 	
-	luke_ep6_npc_challenge
-	{
-	    nameKey	    = "STR_CHRNAME_LUKESKYWALKER"
-	    playerTemplate  = "luke_ep6_player"
-	    npcTemplate	    = "luke_ep6_npc_challenge"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
-	}
-		
-	young_obiwan
+	chrTemplateEntry young_obiwan
 	{
 	    nameKey	    = "STR_CHRNAME_YOUNGOBIWAN"
 	    playerTemplate  = "young_obiwan_player"
 	    npcTemplate	    = "young_obiwan_npc"
-	    icon	    = "misctex/gui/icons/rep/trooper_icon" // TO UPDATE
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon" // TO UPDATE
 	}
 	
-	old_obiwan
+	chrTemplateEntry old_obiwan
 	{
 	    nameKey	    = "STR_CHRNAME_OLDOBIWAN"
 	    playerTemplate  = "old_obiwan_player"
 	    npcTemplate	    = "old_obiwan_npc"
-	    icon	    = "misctex/gui/icons/rep/trooper_icon" // TO UPDATE
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon" // TO UPDATE
 	}
 
 	//
 	// STORY CHARACTERS
 	//
-	x1_clone_soldier
+	chrTemplateEntry x1_clone_soldier
 	{
 	    nameKey	    = "STR_CHRNAME_STORY_X1_SOLDIER"	
 	    playerTemplate  = "rep_x2soldier_player"
 	    npcTemplate	    = "rep_x1soldier_npc_story"
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
 	}
 	
-	x1_act3
+	chrTemplateEntry x1_act2
+	{
+	    nameKey	    = "STR_CHRNAME_X1_ACT2"	
+	    playerTemplate  = "x1_act2_npc_story"
+	    npcTemplate	    = "x1_act2_npc_story"
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon" // TO UPDATE
+	}
+	
+	chrTemplateEntry x1_act3
 	{
 	    nameKey	    = "STR_CHRNAME_X1_ACT2"	
 	    playerTemplate  = "x1_player"
 	    npcTemplate	    = "x1_npc"
-	    icon	    = "misctex/gui/icons/rep/trooper_icon" // TO UPDATE
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon" // TO UPDATE
 	}
 	
-	x2_clone_soldier
+	chrTemplateEntry x2_clone_soldier
 	{
 	    nameKey	    = "STR_CHRNAME_STORY_X2_SOLDIER"	
 	    playerTemplate  = "rep_x2soldier_player"
 	    npcTemplate	    = "rep_x2soldier_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
 	}
-	/*
-	x2_master_of_all_weapons
-	{
-	    nameKey	    = "STR_CHRNAME_STORY_X2_HEAVY"	
-	    playerTemplate  = "x2_moaw_player"
-	    npcTemplate	    = "x2_moaw_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
-	}*/
 	
-/*
-	x2_clone_heavy
-	{
-	    nameKey	    = "STR_CHRNAME_STORY_X2_HEAVY"	
-	    playerTemplate  = "rep_x2heavy_player"
-	    npcTemplate	    = "rep_x2heavy_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
-	}
-
-	x2_clone_rocket
-	{
-	    nameKey	    = "STR_CHRNAME_STORY_X2_ROCKET"	
-	    playerTemplate  = "rep_x2rocket_player"
-	    npcTemplate	    = "rep_x2heavy_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
-	}
-
-	x2_clone_sniper
-	{
-	    nameKey	    = "STR_CHRNAME_STORY_X2_SNIPER"	
-	    playerTemplate  = "rep_x2sniper_player"
-	    npcTemplate	    = "rep_x2sniper_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
-	}
-
-	x2_clone_support
-	{
-	    nameKey	    = "STR_CHRNAME_STORY_X2_SUPPORT"	
-	    playerTemplate  = "rep_x2support_player"
-	    npcTemplate	    = "rep_x2support_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
-	}
-
-	x2_clone_melee
-	{
-	    nameKey	    = "STR_CHRNAME_STORY_X2_MELEE"	
-	    playerTemplate  = "rep_x2melee_player"
-	    npcTemplate	    = "rep_x2melee_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
-	}
-*/
-	x2_act2_soldier
+	chrTemplateEntry x2_act2_soldier
 	{
 	    nameKey	    = "STR_CHRNAME_STORY_X2ACT2_SOLD"	
 	    playerTemplate  = "rep_x2act2sol_player"
 	    npcTemplate	    = "rep_x2act2sol_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
 	}
-/*
-	x2_act2_heavy
+	
+	chrTemplateEntry x2_hoth_soldier
 	{
-	    nameKey	    = "STR_CHRNAME_STORY_X2ACT2_HEAVY"	
-	    playerTemplate  = "rep_x2act2hvy_player"
-	    npcTemplate	    = "rep_x2act2hvy_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
+	    nameKey	    = "STR_CHRNAME_STORY_X2_HOTH"	
+	    playerTemplate  = "rep_x2hoth_player"
+	    npcTemplate	    = "rep_x2hoth_npc"	    
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
 	}
 
-	x2_act2_sniper
+	chrTemplateEntry x2_dantooine_soldier
 	{
-	    nameKey	    = "STR_CHRNAME_STORY_X2ACT2_SNIPE"	
-	    playerTemplate  = "rep_x2act2snip_player"
-	    npcTemplate	    = "rep_x2act2snip_npc"	    
+	    nameKey	    = "STR_CHRNAME_STORY_X2_DANTOOINE"	
+	    playerTemplate  = "rep_x2dantooine_player"
+	    npcTemplate	    = "rep_x2dantooine_npc"	    
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
+	}
+	chrTemplateEntry x2_coruscant_soldier
+	{
+	    nameKey	    = "STR_CHRNAME_STORY_X2_CORUSCANT"	
+	    playerTemplate  = "rep_x2coruscant_player"
+	    npcTemplate	    = "rep_x2dantooine_npc" // Do we need this for player only story chrs, asserts if left out..	
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
+	}
+	chrTemplateEntry x2_endor_soldier
+	{
+	    nameKey	    = "STR_CHRNAME_STORY_X2_ENDOR"	
+	    playerTemplate  = "rep_x2endor_player"
+	    npcTemplate	    = "rep_x2dantooine_npc"	
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
+	}
+	chrTemplateEntry x2_desol_soldier
+	{
+	    nameKey	    = "STR_CHRNAME_STORY_X2_DESOL"	
+	    playerTemplate  = "rep_x2desol_player"
+	    npcTemplate	    = "rep_x2dantooine_npc"	
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
+	}
+	chrTemplateEntry x2_training_soldier
+	{
+	    nameKey	    = "STR_TRAINING_GRENADE"	
+	    playerTemplate  = "rep_x2training_player"
+	    npcTemplate	    = "rep_x2dantooine_npc" // Do we need this for player only story chrs, asserts if left out..	
 	    icon	    = "misctex/gui/icons/rep/trooper_icon"
 	}
-
-	x2_act2_support
-	{
-	    nameKey	    = "STR_CHRNAME_STORY_X2ACT2_SUPP"	
-	    playerTemplate  = "rep_x2act2supp_player"
-	    npcTemplate	    = "rep_x2act2supp_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
-	}
-
-	x2_act2_melee
-	{
-	    nameKey	    = "STR_CHRNAME_STORY_X2ACT2_MELEE"	
-	    playerTemplate  = "rep_x2act2melee_player"
-	    npcTemplate	    = "rep_x2act2melee_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
-	}
-*/
 	// Bespin variant
-	x2_jedi_bespin
+	chrTemplateEntry x2_jedi_bespin
 	{
 	    nameKey	    = "STR_CHRNAME_STORY_X2_JEDISOL"	
-	    playerTemplate  = "x2_player"
-	    npcTemplate	    = "x2_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
+	    playerTemplate  = "x2_jedi_bespin_player"
+	    npcTemplate	    = "x2_jedi_bespin_npc"	    
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
 	}
 
 	// Dathomir variant
-	x2_jedi_dathomir
+	chrTemplateEntry x2_jedi_dathomir
 	{
 	    nameKey	    = "STR_CHRNAME_STORY_X2_JEDI_DA"	
 	    playerTemplate  = "x2_jedi_dathomir_player"
 	    npcTemplate	    = "x2_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
 	}
 
 	// Mustafar and Kashyyyk variant
-	x2_jedi_mus_kas
+	chrTemplateEntry x2_jedi_mus_kas
 	{
 	    nameKey	    = "STR_CHRNAME_STORY_X2_JEDI_MK"	
 	    playerTemplate  = "x2_jedi_mus_kas_player"
 	    npcTemplate	    = "x2_npc"	    
-	    icon	    = "misctex/gui/icons/rep/trooper_icon"
+	    //icon	    = "misctex/gui/icons/rep/trooper_icon"
 	}
 
-	spoiled_wookie
+	chrTemplateEntry spoiled_wookie
 	{
 	    nameKey	    = "STR_CHRNAME_SPOILED_WOOKIEE"
 	    playerTemplate  = "spoiled_clone_wookie_play"
 	    npcTemplate	    = "spoiled_clone_wookie"
-	    icon	    = "misctex/icons/noimage" //TODO: Update 
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
 	}
 
-        spoiled_trooper
+        chrTemplateEntry spoiled_trooper
 	{
 	    nameKey	    = "STR_CHRNAME_SPOILED_TROOPER"
 	    playerTemplate  = "spoiled_stormtrooper_play"
 	    npcTemplate	    = "spoiled_stormtrooper"
-	    icon	    = "misctex/icons/noimage" //TODO: Update
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
 	}
 	
-	reb_shara
+	// STORY MODE STUFF
+
+	chrTemplateEntry reb_shara
 	{
 	    nameKey	    = "STR_CHRNAME_SHARA"
-	    playerTemplate  = "rep_x2soldier_player"
+	    playerTemplate  = "shara_player"
 	    npcTemplate	    = "reb_shara_npc_story"	    
-	    icon	    = "misctex/icons/noimage" //TODO: Update 
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
 	}       
 	
-	dan_militiaA
+	chrTemplateEntry dan_militiaA
 	{
 	    nameKey	    = "STR_CHRNAME_MILITIA1"
-	    playerTemplate  = "rep_x2soldier_player"  //TODO: Update 
+	    playerTemplate  = "militia_1_player"  //TODO: Update 
 	    npcTemplate	    = "reb_militia1_npc_story"	    
-	    icon	    = "misctex/icons/noimage" //TODO: Update 
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
 	}
 	
-	dan_militiaB
+	chrTemplateEntry dan_militiaB
 	{
-	    nameKey	    = "STR_CHRNAME_MILITIA1"
-	    playerTemplate  = "rep_x2soldier_player"  //TODO: Update 
+	    nameKey	    = "STR_CHRNAME_MILITIA2"
+	    playerTemplate  = "militia_2_player"  //TODO: Update 
 	    npcTemplate	    = "reb_militia2_npc_story"	    
-	    icon	    = "misctex/icons/noimage" //TODO: Update 
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
 	}
 	
-	dan_militiaC
+	chrTemplateEntry dan_militiaC
 	{
-	    nameKey	    = "STR_CHRNAME_MILITIA1"
-	    playerTemplate  = "rep_x2soldier_player"  //TODO: Update 
+	    nameKey	    = "STR_CHRNAME_MILITIA3"
+	    playerTemplate  = "reb_militia3_player_story"  //TODO: Update 
 	    npcTemplate	    = "reb_militia3_npc_story"	    
-	    icon	    = "misctex/icons/noimage" //TODO: Update 
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+	
+        chrTemplateEntry dan_militiaD
+	{
+	    nameKey	    = "STR_CHRNAME_MILITIA4"
+	    playerTemplate  = "militia_4_player"  //TODO: Update 
+	    npcTemplate	    = "reb_militia4_npc_story"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+	
+        chrTemplateEntry dan_militiaE
+	{
+	    nameKey	    = "STR_CHRNAME_MILITIA5"
+	    playerTemplate  = "militia_5_player"  //TODO: Update 
+	    npcTemplate	    = "reb_militia5_npc_story"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+        
+	chrTemplateEntry newrepreb
+	{
+	    nameKey	    = "STR_CHRNAME_NEWREPREB"
+	    playerTemplate  = "newrepreb_player"  //TODO: Update 
+	    npcTemplate	    = "falon_grey_npc_story"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+        
+	chrTemplateEntry c3po
+	{
+	    nameKey	    = "STR_CHRNAME_C3PO"
+	    playerTemplate  = "c3p0_player"  //TODO: Update 
+	    npcTemplate	    = "falon_grey_npc_story"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+        
+	chrTemplateEntry wookslave_1
+	{
+	    nameKey	    = "STR_CHRNAME_WOOKIEE_SLAVE"
+	    playerTemplate  = "wook_slave_1_player"  //TODO: Update 
+	    npcTemplate	    = "reb_wookie_slave_npc_story"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+        
+	chrTemplateEntry wookslave_2
+	{
+	    nameKey	    = "STR_CHRNAME_WOOKIEE_SLAVE2"
+	    playerTemplate  = "wook_slave_2_player"  //TODO: Update 
+	    npcTemplate	    = "reb_wookie_slave2_npc_story"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+        
+	chrTemplateEntry wookslave_3
+	{
+	    nameKey	    = "STR_CHRNAME_WOOKIEE_SLAVE3"
+	    playerTemplate  = "wook_slave_3_player"  //TODO: Update 
+	    npcTemplate	    = "reb_wookie_slave3_npc_story"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+	
+	chrTemplateEntry imp_officer
+	{
+	    nameKey	    = "STR_CHRNAME_IMPOFFICER"
+	    playerTemplate  = "imp_officer_player"
+	    npcTemplate	    = "imp_officer_npc_story"
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	}
+	
+	chrTemplateEntry lobot
+	{
+	    nameKey	    = "STR_CHRNAME_LOBOT"
+	    playerTemplate  = "lobot_player"
+	    npcTemplate	    = "reb_lobot_npc_story"
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	}
+	
+	chrTemplateEntry ep3clonepilot
+	{
+	    nameKey	    = "STR_CHRNAME_EP3CLONEPILOT"
+	    playerTemplate  = "ep3clonepilot_player"
+	    npcTemplate	    = "rep_pil_snpc"
+	    //icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	}
+	
+	chrTemplateEntry lukeep4
+	{
+	    nameKey	    = "STR_CHRNAME_LUKE_EP4"
+	    playerTemplate  = "lukeep4_player"  //TODO: Update 
+	    npcTemplate	    = "falon_grey_npc_story"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
 	}
 
-	falon_grey
+	chrTemplateEntry luketrooper
+	{
+	    nameKey	    = "STR_CHRNAME_LUKE_STORMTROOPER"
+	    playerTemplate  = "luke_stormtrooper_player"  //TODO: Update 
+	    npcTemplate	    = "falon_grey_npc_story"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+
+	chrTemplateEntry hantrooper
+	{
+	    nameKey	    = "STR_CHRNAME_HAN_STORMTROOPER"
+	    playerTemplate  = "han_stormtrooper_player"  //TODO: Update 
+	    npcTemplate	    = "falon_grey_npc_story"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+
+	chrTemplateEntry hothsoldier
+	{
+	    nameKey	    = "STR_CHRNAME_HOTH_REBEL"
+	    playerTemplate  = "hoth_soldier_player"  //TODO: Update 
+	    npcTemplate	    = "falon_grey_npc_story"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+	
+	chrTemplateEntry kaminoan
+	{
+	    nameKey	    = "STR_CHRNAME_KAMINOAN"
+	    playerTemplate  = "kaminoan_player"  //TODO: Update 
+	    npcTemplate	    = "falon_grey_npc_story"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+	
+	chrTemplateEntry snowtrooper
+	{
+	    nameKey	    = "STR_CHRNAME_SNOWTROOPER"
+	    playerTemplate  = "snowtrooper_player"  //TODO: Update 
+	    npcTemplate	    = "falon_grey_npc_story"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+	
+	chrTemplateEntry botha
+	{
+	    nameKey	    = "STR_CHRNAME_CAPTAIN_BOTHA"
+	    playerTemplate  = "captain_botha_player"  //TODO: Update 
+	    npcTemplate	    = "falon_grey_npc_story"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+	
+	chrTemplateEntry X2_Act3
+	{
+	    nameKey	    = "STR_CHRNAME_X2"
+	    playerTemplate  = "X2_Act3_player"  //TODO: Update 
+	    npcTemplate	    = "falon_grey_npc_story"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+		
+	chrTemplateEntry falon_grey
 	{
 	    nameKey	    = "STR_CHRNAME_FALON_GREY"
-	    playerTemplate  = "rep_x2soldier_player"  //TODO: Update 
+	    playerTemplate  = "falon_grey_player"  //TODO: Update 
 	    npcTemplate	    = "falon_grey_npc_story"	    
-	    icon	    = "misctex/icons/noimage" //TODO: Update 
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
 	}
-
+								
 	//
 	// HUNT CHARACTERS
 	//
-	reb_ewok
+	chrTemplateEntry hunt_cis_spec
+	{
+	    nameKey	    = "STR_CHRNAME_HUNT_CIS_SPEC"
+	    playerTemplate  = "hunt_cis_spec_player"
+	    npcTemplate	    = "hunt_cis_spec_npc"
+	}
+
+	chrTemplateEntry hunt_cis_sniper
+	{    
+	    nameKey	    = "STR_CHRNAME_HUNT_CIS_SNIPER"
+	    playerTemplate  = "hunt_cis_sniper_player"
+	    npcTemplate	    = "hunt_cis_sniper_npc"
+	}
+	
+	chrTemplateEntry reb_ewok
 	{
 	    nameKey	    = "STR_CHRNAME_EWOK_WARRIOR"
 	    playerTemplate  = "reb_ewok_player"
 	    npcTemplate	    = "reb_ewok_npc"	    
-	    icon	    = "misctex/icons/noimage" //TODO: Update
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
+	}
+	
+	chrTemplateEntry reb_ewok_v2
+	{
+	    nameKey	    = "STR_CHRNAME_HUNT_EWOK3"
+	    playerTemplate  = "reb_ewok_v2_player"
+	    npcTemplate	    = "reb_ewok_v2_npc"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
 	}
 
-	reb_gungan
+	chrTemplateEntry reb_gungan
 	{
 	    nameKey	    = "STR_CHRNAME_GUNGAN"
 	    playerTemplate  = "reb_gungan_player"
 	    npcTemplate	    = "reb_gungan_npc"	    
-	    icon	    = "misctex/icons/noimage" //TODO: Update 
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+
+	chrTemplateEntry reb_gungan_hunt
+	{
+	    nameKey	    = "STR_CHRNAME_HUNT_GUNGAN"
+	    playerTemplate  = "reb_gungan_player"
+	    npcTemplate	    = "reb_gungan_npc"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
+	}
+
+	chrTemplateEntry reb_gungan_hunt2
+	{
+	    nameKey	    = "STR_CHRNAME_HUNT_GUNGAN2"
+	    playerTemplate  = "reb_gungan_v2_player"
+	    npcTemplate	    = "reb_gungan_v2_npc"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update 
 	}
 	
-	ugnaught
+	chrTemplateEntry ugnaught
 	{
 	    nameKey	    = "STR_CHRNAME_UGNAUGHT"
 	    playerTemplate  = "ugnaught_player"
 	    npcTemplate	    = "ugnaught_npc"	    
-	    icon	    = "misctex/icons/noimage" //TODO: Update
-	}
-
-	tusken_hunt
-	{
-	    nameKey	    = "STR_CHRNAME_TUSKEN_RAIDER"
-	    playerTemplate  = "tusken_hunt_player"
-	    npcTemplate	    = "tusken_hunt_npc"	    
-	    icon	    = "misctex/icons/noimage" //TODO: Update
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
 	}
 	
-	tusken_melee
+	chrTemplateEntry ugnaught_hunt
 	{
-	    nameKey	    = "STR_CHRNAME_TUSKEN_RAIDER"
+	    nameKey	    = "STR_CHRNAME_HUNT_UGNAUGHT"
+	    playerTemplate  = "ugnaught_player"
+	    npcTemplate	    = "ugnaught_npc"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
+	}
+
+	chrTemplateEntry ugnaught_hunt2
+	{
+	    nameKey	    = "STR_CHRNAME_HUNT_UGNAUGHT2"
+	    playerTemplate  = "ugnaught_v2_player"
+	    npcTemplate	    = "ugnaught_v2_npc"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
+	}
+
+	chrTemplateEntry tusken_hunt
+	{
+	    nameKey	    = "STR_CHRNAME_HUNT_TUSKEN"
+	    playerTemplate  = "tusken_hunt_player"
+	    npcTemplate	    = "tusken_hunt_npc"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
+	}
+	
+	/*
+	chrTemplateEntry tusken_hunt2
+	{
+	    nameKey	    = "STR_CHRNAME_HUNT_TUSKEN2"
 	    playerTemplate  = "tusken_melee_player"
 	    npcTemplate	    = "tusken_melee_npc"	    
-	    icon	    = "misctex/icons/noimage" //TODO: Update
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
 	}
+	*/
 
-	jawa_hunt
+	chrTemplateEntry jawa_hunt
 	{
-	    nameKey	    = "STR_CHRNAME_JAWA"
+	    nameKey	    = "STR_CHRNAME_HUNT_JAWA"
 	    playerTemplate  = "jawa_hunt_player"
 	    npcTemplate	    = "jawa_hunt_npc"	    
-	    icon	    = "misctex/icons/noimage" //TODO: Update
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
 	}
-
+	
+	chrTemplateEntry jawa_hunt2
+	{
+	    nameKey	    = "STR_CHRNAME_HUNT_JAWA2"
+	    playerTemplate  = "jawa_hunt_v2_player"
+	    npcTemplate	    = "jawa_hunt_v2_npc"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
+	}
+	
+	chrTemplateEntry remnant_hunt
+	{
+	    nameKey	    = "STR_CHRNAME_HUNT_REMNANT"
+	    playerTemplate  = "imp_remnant_player"
+	    npcTemplate	    = "imp_remnant_npc"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
+	}
+	
+	/*
+	chrTemplateEntry remnant_hunt2
+	{
+	    nameKey	    = "STR_CHRNAME_HUNT_REMNANT2"
+	    playerTemplate  = "imp_remnant_v2_player"
+	    npcTemplate	    = "imp_remnant_v2_npc"	    
+	    //icon	    = "misctex/icons/noimage" //TODO: Update
+	}
+	*/
+	
 	//
 	// TEMPORARY CHARACTERS
 	//
-	rep_heavytrooper_trail
+	chrTemplateEntry rep_heavytrooper_trail
 	{
 	    nameKey	    = "STR_CHRNAME_HEAVY_TRAIL"	
 	    playerTemplate  = "rep_cloneheavytrooper_trailer"
 	    npcTemplate	    = "rep_cloneheavytrooper_npc"	    
-	    icon	    = "misctex/gui/icons/rep/heavytrooper_icon"
+	    //icon	    = "misctex/gui/icons/rep/heavytrooper_icon"
 	}
 
-	rep_engineer_trail
+	chrTemplateEntry rep_engineer_trail
 	{
 	    nameKey	    = "STR_CHRNAME_ENG_TRAIL"
 	    playerTemplate  = "rep_engineer_trailer"
 	    npcTemplate	    = "rep_engineer_npc"
-	    icon	    = "misctex/gui/icons/rep/engineer_icon"	    
-	}
-	
-	rep_lancetrooper_trail
-	{
-	    nameKey	    = "STR_CHRNAME_LANCE_TRAIL"
-	    playerTemplate  = "rep_lance_trooper_trailer"
-	    npcTemplate	    = "rep_lance_trooper_npc"
-	    icon	    = "misctex/gui/icons/rep/lancetrooper_icon"	    
+	    //icon	    = "misctex/gui/icons/rep/engineer_icon"
 	}
 
-	rep_sharpshooter_trail
+	chrTemplateEntry rep_sharpshooter_trail
 	{
 	    nameKey	    = "STR_CHRNAME_SNIPE_TRAIL"
 	    playerTemplate  = "rep_sharpshooter_trailer"
 	    npcTemplate	    = "rep_sharpshooter_npc"
-	    icon	    = "misctex/gui/icons/rep/sharpshooter_icon"
+	    //icon	    = "misctex/gui/icons/rep/sharpshooter_icon"
 	}	
     }	
    
@@ -833,34 +1016,10 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"rep_clonetrooper"
-/*			"rep_cloneheavytrooper",    
-			"rep_sharpshooter",
-			"rep_engineer",
-			"rep_lancetrooper",
-			"cis_battledroid",
-			"cis_superdroid",
-			"cis_assassindroid",
-			"cis_engineerdroid",
-			"cis_magnadroid"
-/*
-			    ,
-			"rep_chewbacca",
-			"yoda",
-			"general_grievous",
-			"reb_ewok",
-			"reb_gungan",
-			"cis_droideka",
-			"cis_durge",
-			"imp_ig88",
-			"darth_maul",
-			"spoiled_trooper",
-			"spoiled_wookie",
-//			"ugnaught",
-			"tusken_hunt",
-			"tusken_melee",
-			"jawa_hunt"*/
-*/
+		"rep_clonetrooper",
+		"rep_engineer",
+		"x2_jedi_dathomir",
+		"cis_battledroid"
 	    }	
 	}
 
@@ -868,11 +1027,11 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"rep_clonetrooper",
-			"rep_cloneheavytrooper",    
-			"rep_sharpshooter",
-			"rep_engineer",
-			"rep_lancetrooper"
+		"rep_clonetrooper",
+		"rep_cloneheavytrooper", 
+		"rep_sharpshooter",
+		"rep_engineer",
+         	"rep_specialtrooper"
 	    }
 	    isCharacterClassList = "true"
 	}
@@ -881,11 +1040,11 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"cis_battledroid",
-			"cis_superdroid",
-			"cis_assassindroid",
-			"cis_engineerdroid",
-			"cis_magnadroid"
+		"cis_battledroid",
+		"cis_superdroid",
+		"cis_assassindroid",
+		"cis_engineerdroid",
+		"cis_specialdroid"		
 	    }
 	    isCharacterClassList = "true"
 	}
@@ -894,11 +1053,10 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"reb_soldier",
-			"reb_heavy_trooper",
-			"reb_sniper",
-			"reb_support",
-			"reb_wookiegeneral"
+		"reb_soldier",
+		"reb_heavy_trooper",
+		"reb_sniper",
+		"reb_support"
 	    }
 	    isCharacterClassList = "true"
 	}
@@ -907,24 +1065,37 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"reb_hot_sld",
-			"reb_heavy_trooper",
-			"reb_sniper",
-			"reb_support",
-			"reb_wookiegeneral"
+		"reb_hot_sld",
+		"reb_heavy_trooper",
+		"reb_sniper",
+		"reb_support",
+		"reb_wookiegeneral"			
 	    }
 	    isCharacterClassList = "true"
 	}
+	
+	wookiee_rebels
+	{
+	    string name_keys[]
+	    {
+		"reb_soldier",
+		"reb_heavy_trooper",
+		"reb_sniper",
+		"reb_support",
+		"reb_wookiegeneral"			
+	    }
+	    isCharacterClassList = "true"
+	}
+
 
 	imperials
 	{
 	    string name_keys[]
 	    {
-			"imp_stormtrooper",
-			"imp_heavytrooper",
-			"imp_sniper",
-			"imp_pilotsupport",
-			"imp_royalguard"
+		"imp_stormtrooper",
+		"imp_heavytrooper",
+		"imp_sniper",
+		"imp_pilotsupport"
 	    }
 	    isCharacterClassList = "true"
 	}
@@ -933,11 +1104,24 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"imp_snowtrooper",
-			"imp_heavytrooper",
-			"imp_sniper",
-			"imp_pilotsupport",
-			"imp_royalguard"
+		"imp_snowtrooper",
+		"imp_heavytrooper",
+		"imp_sniper",
+		"imp_pilotsupport",
+		"imp_specheavy"			
+	    }
+	    isCharacterClassList = "true"
+	}
+
+	officer_empire
+	{
+	    string name_keys[]
+	    {
+		"imp_stormtrooper",
+		"imp_heavytrooper",
+		"imp_sniper",
+		"imp_pilotsupport",
+		"imp_specheavy"			
 	    }
 	    isCharacterClassList = "true"
 	}
@@ -957,7 +1141,7 @@ chrtemplatemgrTemplate chr_template_mgr
 		"anakin_ep3",
 		"luke_ep6",
 		"rep_tarfful",
-		"yoda", // very hard to kill at the moment due to size
+		"yoda",
 		"young_obiwan",
 		"old_obiwan", 
 		"rep_padme"
@@ -973,15 +1157,16 @@ chrtemplatemgrTemplate chr_template_mgr
 		"count_dooku",
 		"darth_vader",
 		"zam_wessel",
+		"rep_darktrooper",		
 		"jango_fett",
 	        "darth_maul",
 	        "the_emperor",
+		"asajj_ventress",		
 		"cis_droideka",
 		"general_grievous",
 		"sith_witch",
 		"boba_fett",
 		"imp_ig88",
-		"cis_droideka",
 		"cis_durge"
 	    }
 	    isCharacterClassList = "false"
@@ -1001,7 +1186,8 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"reb_ewok"
+			"reb_ewok",
+			"reb_ewok_v2"
 	    }
 	    isCharacterClassList = "false"
 	}
@@ -1010,8 +1196,8 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"cis_superdroid",
-			"cis_assassindroid"
+			"hunt_cis_spec",
+			"hunt_cis_sniper"
 	    }
 	    isCharacterClassList = "false"
 	}
@@ -1020,7 +1206,8 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"reb_gungan"
+			"reb_gungan_hunt",
+			"reb_gungan_hunt2"
 	    }
 	    isCharacterClassList = "false"
 	}
@@ -1048,8 +1235,8 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"tusken_hunt",
-			"tusken_melee"
+			"tusken_hunt"
+//			"tusken_hunt2"
 	    }
 	    isCharacterClassList = "false"
 	}
@@ -1058,7 +1245,8 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"jawa_hunt"
+			"jawa_hunt",
+			"jawa_hunt2"
 	    }
 	    isCharacterClassList = "false"
 	}
@@ -1067,7 +1255,8 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"imp_stormtrooper"
+			"remnant_hunt"
+//			"remnant_hunt2",
 	    }
 	    isCharacterClassList = "false"
 	}
@@ -1076,7 +1265,8 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"ugnaught"
+			"ugnaught_hunt",
+			"ugnaught_hunt2"
 	    }
 	    isCharacterClassList = "false"
 	}
@@ -1090,8 +1280,7 @@ chrtemplatemgrTemplate chr_template_mgr
 			"rep_clonetrooper",
 			"rep_cloneheavytrooper",
 			"rep_engineer",
-			"rep_sharpshooter",
-			"rep_lancetrooper"
+			"rep_sharpshooter"
 	    }
 	}
 
@@ -1105,38 +1294,111 @@ chrtemplatemgrTemplate chr_template_mgr
 			"cis_battledroid",
 			"cis_superdroid",
 			"cis_assassindroid",
-			"cis_engineerdroid",
-			"cis_magnadroid"
+			"cis_engineerdroid"
 	    }
 	}
 
-
+	allchars
+	{
+		string name_keys[]
+	    {
+	    "falon_grey",
+	    "X2_Act3",
+	    "botha",
+	    "snowtrooper",
+	    "kaminoan",
+	    "hothsoldier",
+	    "hantrooper",
+	    "luketrooper",
+	    "lukeep4",
+            "imp_officer",            
+            "newrepreb",            
+            "reb_shara",            
+/*            "lobot",            
+            "ep3clonepilot",            
+            "dan_militiaA",            
+            "dan_militiaB",            
+            "dan_militiaC",            
+            "dan_militiaD",            
+            "dan_militiaE",            
+            "wookslave_1",            
+            "wookslave_2",            
+            "wookslave_3",                       
+            "count_dooku",
+            "darth_vader",
+            "darth_maul",
+            "the_emperor",
+            "sith_witch",
+            "yoda",
+            "general_grievous",
+            "aayla_secura",
+            "asajj_ventress",
+            "mace_windu",
+            "master_ferroda",
+            "kota_vahs",
+            "anakin_ep3",
+            "luke_ep6",
+            "young_obiwan",
+            "old_obiwan",
+            "jawa_hunt",
+            "tusken_hunt",
+            "reb_ewok",
+            "ugnaught_hunt",
+            "remnant_hunt",
+            "reb_gungan_hunt",
+            "jango_fett",
+            "zam_wessel",
+            "cis_droideka",
+            "cis_durge",
+            "rep_cloneskytrooper",
+            "rep_padme",
+            "rep_tarfful",
+            "boba_fett",
+            "imp_ig88",
+            "rep_chewbacca",
+            "rep_leia",
+            "rep_hansolo",
+            "rep_lando",
+            "x1_clone_soldier",
+            "cis_droideka",
+            "cis_battledroid",
+            "cis_superdroid",
+            "cis_assassindroid",
+            "cis_engineerdroid",
+            "rep_clonetrooper",
+            "rep_cloneheavytrooper",
+            "rep_engineer",
+            "rep_sharpshooter",
+            "imp_stormtrooper",
+            "imp_heavytrooper",
+            "imp_sniper",
+            "imp_pilotsupport",
+            "reb_soldier",
+            "reb_heavy_trooper",
+            "reb_sniper",
+            "reb_support",
+            "reb_wookiegeneral"*/
+		}
+	}
+	
 	jediarena
 	{
 	    string name_keys[]
 	    {
-			//"jango_fett",
-			//"zam_wessel",
+			"reb_gungan",
+			"zam_wessel",
 			"count_dooku",
 			"darth_vader",
 			"cis_droideka",
 			"cis_durge",
-			"rep_cloneskytrooper", 
-			"rep_padme",
-			//"rep_tarfful",
-			//"x2_master_of_all_weapons", 
-			//"boba_fett",
+			"yoda",
+			"general_grievous",
+			"rep_tarfful",
 			"imp_ig88",
 			"aayla_secura",
 			"asajj_ventress",
-			//"rep_chewbacca",
-			//"rep_leia",
 			"rep_hansolo",
-			"rep_lando",
-			"cis_superdroid",
-			"x1_clone_soldier",
-			"cis_magnadroid",
-			"boba_fett"
+			"cis_superdroid"
 	    }
 	}
 	
@@ -1145,9 +1407,17 @@ chrtemplatemgrTemplate chr_template_mgr
 	    string name_keys[]
 	    {
 			"mace_windu",
-            "master_ferroda",
+			"master_ferroda",
 			"count_dooku",
-			"darth_vader"
+			"darth_vader",
+			"rep_clonetrooper",
+			"rep_cloneheavytrooper",
+			"yoda",
+			"general_grievous",
+			"darth_maul",
+			"count_dooku",
+			"x2_jedi_bespin",
+			"asajj_ventress"	
 	    }
 	}
 	
@@ -1156,8 +1426,6 @@ chrtemplatemgrTemplate chr_template_mgr
 	    string name_keys[]
 	    {
 			"darth_vader",
-			"rep_lancetrooper",
-			"cis_magnadroid",
 			"count_dooku"
 	    }
 	}
@@ -1227,7 +1495,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	}
 
 //////////////////////////////////////////////////////////////////////////////
-// CONQUEST LEVEL SPECIFIC HEROES
+// CONQUEST LEVEL SPECIFIC HEROES 
 //////////////////////////////////////////////////////////////////////////////
 
 // DATHOMIR
@@ -1268,7 +1536,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"kota_vahs"
+			"yoda"
 	    }
 	}
 
@@ -1303,7 +1571,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"mace_windu"
+			"anakin_ep3"
 	    }
 	}
 
@@ -1410,7 +1678,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"imp_ig88" //Replace with Red Royal Guard when ready.
+			"rep_darktrooper" //Replace with Red Royal Guard when ready.
 	    }
 	}
 
@@ -1418,7 +1686,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"pilot_luke" 
+			"luke_ep6" 
 	    }
 	}
 
@@ -1437,7 +1705,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"count_dooku"
+			"darth_maul"
 	    }
 	}
 
@@ -1579,7 +1847,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"cis_droideka"
+			"cis_durge"
 	    }
 	}
 
@@ -1596,38 +1864,6 @@ chrtemplatemgrTemplate chr_template_mgr
 	    string name_keys[]
 	    {
 			"rep_cloneskytrooper"
-	    }
-	}
-
-	impCatHero1
-	{
-	    string name_keys[]
-	    {
-			"x1_act3"
-	    }
-	}
-
-	impCatHero2
-	{
-	    string name_keys[]
-	    {
-			"rep_darktrooper"  
-	    }
-	}
-
-	rebCatHero1
-	{
-	    string name_keys[]
-	    {
-			"luke_ep6" 
-	    }
-	}
-
-	rebCatHero2
-	{
-	    string name_keys[]
-	    {
-			"rep_leia" 
 	    }
 	}
 
@@ -1654,7 +1890,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"mace_windu" 
+			"young_obiwan" 
 	    }
 	}
 
@@ -1686,7 +1922,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"yoda" 
+			"kota_vahs" 
 	    }
 	}
 
@@ -1879,7 +2115,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"boba_fett" 
+			"rep_darktrooper" 
 	    }
 	}
 
@@ -1906,7 +2142,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"darth_maul"
+			"count_dooku"
 	    }
 	}
 
@@ -1914,7 +2150,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"cis_durge"
+			"cis_droideka"
 	    }
 	}
 
@@ -1946,7 +2182,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"rep_darktrooper"  //Replace with Red Royal Guard when ready.
+			"imp_ig88"
 	    }
 	}
 
@@ -1954,7 +2190,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"yoda" 
+			"old_obiwan" 
 	    }
 	}
 
@@ -1962,7 +2198,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"rep_hansolo" 
+			"rep_chewbacca" 
 	    }
 	}
 
@@ -1989,7 +2225,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"mace_windu"
+			"yoda"
 	    }
 	}
 
@@ -2021,7 +2257,7 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-			"old_obiwan" 
+			"luke_ep6" 
 	    }
 	}
 
@@ -2032,7 +2268,209 @@ chrtemplatemgrTemplate chr_template_mgr
 			"rep_chewbacca" 
 	    }
 	}
+	
+////////////////////////////////////////
+// Star Destroyer
 
+	cisStaHero1
+	{
+	    string name_keys[]
+	    {
+			"general_grievous"
+	    }
+	}
+
+	cisStaHero2
+	{
+	    string name_keys[]
+	    {
+			"jango_fett"
+	    }
+	}
+
+	repStaHero1
+	{
+	    string name_keys[]
+	    {
+			"master_ferroda"
+	    }
+	}
+
+	repStaHero2
+	{
+	    string name_keys[]
+	    {
+			"rep_tarfful"
+	    }
+	}
+
+	impStaHero1
+	{
+	    string name_keys[]
+	    {
+			"darth_vader"
+	    }
+	}
+
+	impStaHero2
+	{
+	    string name_keys[]
+	    {
+			"rep_darktrooper"
+	    }
+	}
+
+	rebStaHero1
+	{
+	    string name_keys[]
+	    {
+			"kota_vahs" 
+	    }
+	}
+
+	rebStaHero2
+	{
+	    string name_keys[]
+	    {
+			"rep_lando" 
+	    }
+	}
+	
+	
+////////////////////////////////////////
+// Death Star
+
+	cisDeaHero1
+	{
+	    string name_keys[]
+	    {
+			"darth_maul"
+	    }
+	}
+
+	cisDeaHero2
+	{
+	    string name_keys[]
+	    {
+			"zam_wessel"
+	    }
+	}
+
+	repDeaHero1
+	{
+	    string name_keys[]
+	    {
+			"anakin_ep3"
+	    }
+	}
+
+	repDeaHero2
+	{
+	    string name_keys[]
+	    {
+			"rep_padme"
+	    }
+	}
+
+	impDeaHero1
+	{
+	    string name_keys[]
+	    {
+			"darth_vader"
+	    }
+	}
+
+	impDeaHero2
+	{
+	    string name_keys[]
+	    {
+			"imp_ig88"
+	    }
+	}
+
+	rebDeaHero1
+	{
+	    string name_keys[]
+	    {
+			"old_obiwan" 
+	    }
+	}
+
+	rebDeaHero2
+	{
+	    string name_keys[]
+	    {
+			"rep_leia" 
+	    }
+	}
+
+////////////////////////////////////////
+// Invisible Hand (CIS Cruiser)
+
+	cisInvHero1
+	{
+	    string name_keys[]
+	    {
+			"count_dooku"
+	    }
+	}
+
+	cisInvHero2
+	{
+	    string name_keys[]
+	    {
+			"cis_droideka"
+	    }
+	}
+
+	repInvHero1
+	{
+	    string name_keys[]
+	    {
+			"young_obiwan"
+	    }
+	}
+
+	repInvHero2
+	{
+	    string name_keys[]
+	    {
+			"rep_cloneskytrooper"
+	    }
+	}
+
+	impInvHero1
+	{
+	    string name_keys[]
+	    {
+			"the_emperor"
+	    }
+	}
+
+	impInvHero2
+	{
+	    string name_keys[]
+	    {
+			"imp_ig88"
+	    }
+	}
+
+	rebInvHero1
+	{
+	    string name_keys[]
+	    {
+			"yoda" 
+	    }
+	}
+
+	rebInvHero2
+	{
+	    string name_keys[]
+	    {
+			"rep_chewbacca" 
+	    }
+	}
+	
 ////////////////////////////////////////
 
 	dthstr_challnge
@@ -2044,8 +2482,7 @@ chrtemplatemgrTemplate chr_template_mgr
 		"rep_clonetrooper",
 		"rep_cloneheavytrooper",
 		"rep_engineer",
-		"rep_sharpshooter",
-		"rep_lancetrooper"
+		"rep_sharpshooter"
 	    }
 	}
 
@@ -2058,7 +2495,6 @@ chrtemplatemgrTemplate chr_template_mgr
 		"imp_heavytrooper",
 		"imp_sniper",
 		"imp_pilotsupport",
-		"imp_royalguard",
 		"imp_ig88",
 		"rep_darktrooper",
 		"count_dooku",
@@ -2079,7 +2515,6 @@ chrtemplatemgrTemplate chr_template_mgr
 		"rep_cloneheavytrooper",    
 		"rep_sharpshooter",
 		"rep_engineer",
-		"rep_lancetrooper",
 		"mace_windu"
 	    }
 	}
@@ -2099,10 +2534,6 @@ chrtemplatemgrTemplate chr_template_mgr
 	    string name_keys[]
 	    {
 		"x2_clone_soldier",
-//		"x2_clone_heavy",
-//		"x2_clone_sniper",
-//		"x2_clone_support",
-//		"x2_clone_melee"
 	    }  	    
 	}
 
@@ -2112,10 +2543,6 @@ chrtemplatemgrTemplate chr_template_mgr
 	    string name_keys[]
 	    {
 		"x2_act2_soldier",
-//		"x2_act2_heavy",
-//		"x2_act2_sniper",
-//		"x2_act2_support",
-//		"x2_act2_melee"
 	    }  	    
 	}
 
@@ -2142,7 +2569,6 @@ chrtemplatemgrTemplate chr_template_mgr
 		"rep_cloneheavytrooper",    
 		"rep_sharpshooter",
 		"rep_engineer",
-		"rep_lancetrooper",
 		"cis_battledroid",
 		"cis_superdroid",
 		"cis_assassindroid",
@@ -2156,13 +2582,11 @@ chrtemplatemgrTemplate chr_template_mgr
 	    string name_keys[]
 	    {
 		"x2_clone_soldier",
-		"count_dooku",
-		"mace_windu",
+		"x1_clone_soldier",
 		"rep_clonetrooper",
 		"rep_cloneheavytrooper",    
 		"rep_sharpshooter",
 		"rep_engineer",
-		"rep_lancetrooper",
 		"cis_battledroid",
 		"cis_superdroid",
 		"cis_assassindroid",
@@ -2177,16 +2601,16 @@ chrtemplatemgrTemplate chr_template_mgr
 		"x2_jedi_bespin", 
 		"x2_clone_soldier",
 		"reb_soldier",
-		"reb_heavy_trooper",
 		"reb_sniper",
 		"reb_support",
-		"reb_wookiegeneral",
+		"rep_clonetrooper",
 		"imp_stormtrooper",
-		"imp_heavytrooper",
 		"imp_sniper",
 		"imp_pilotsupport",
+		"lobot",
 		"rep_lando",
-		"imp_royalguard"
+		"reb_shara",
+		"rep_darktrooper"
 	    }	
 	}
 
@@ -2205,7 +2629,6 @@ chrtemplatemgrTemplate chr_template_mgr
 		"cis_superdroid",
 		"cis_assassindroid",
 		"cis_engineerdroid",
-		"cis_magnadroid",
 		"cis_droideka"
 	    }	
 	}
@@ -2220,14 +2643,12 @@ chrtemplatemgrTemplate chr_template_mgr
 		"rep_sharpshooter",
 		"rep_engineer",
 		"rep_heavytrooper_trail",
-		"rep_lancetrooper_trail",
 		"rep_sharpshooter_trail",
 		"rep_engineer_trail",
 		"cis_battledroid",
 		"cis_superdroid",
 		"cis_assassindroid",
 		"cis_engineerdroid",
-		"cis_magnadroid",
 		"cis_droideka"
 	    }	
 	}
@@ -2236,15 +2657,14 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-		"x2_clone_soldier",
+		"x2_dantooine_soldier",
 		"rep_clonetrooper",
-		"rep_cloneheavytrooper",    
+		"rep_cloneheavytrooper",
 		"rep_sharpshooter",
 		"rep_engineer",
 		"dan_militiaA",
 		"dan_militiaB",
-		"dan_militiaC",
-		"falon_grey"
+		"dan_militiaC"
 	    }	
 	}
 	
@@ -2275,7 +2695,6 @@ chrtemplatemgrTemplate chr_template_mgr
 		"reb_heavy_trooper",
 		"reb_sniper",
 		"reb_support",
-		"reb_wookiegeneral",
 		"imp_stormtrooper",
 		"imp_heavytrooper",
 		"imp_sniper",
@@ -2300,7 +2719,6 @@ chrtemplatemgrTemplate chr_template_mgr
 		"imp_sniper",
 		"imp_pilotsupport",
 		"rep_lando",
-		"imp_royalguard",
 		"rep_tarfful",
 		"spoiled_wookie"
 	    }	
@@ -2311,14 +2729,13 @@ chrtemplatemgrTemplate chr_template_mgr
 	    string name_keys[]
 	    {
 		"x1_clone_soldier",
-		"x2_clone_soldier",
+		"x2_training_soldier",
 		"rep_clonetrooper",
 		"rep_cloneheavytrooper",    
 		"rep_sharpshooter",
 		"rep_engineer",
-        "rep_lancetrooper",
 		"tusken_raider",        
-        "master_ferroda"
+                "master_ferroda"
 	    }	
 	}
 
@@ -2326,17 +2743,20 @@ chrtemplatemgrTemplate chr_template_mgr
 	{
 	    string name_keys[]
 	    {
-		"x2_act2_soldier",
-		"reb_soldier",
+		"x2_hoth_soldier",
+		"reb_hot_sld",
 		"reb_heavy_trooper",
 		"reb_sniper",
-		"reb_sup_no_jet",
-		"reb_wookiegeneral",
+		"reb_sup_no_j",
+		"imp_snowtrooper",
 		"imp_stormtrooper",
 		"imp_heavytrooper",
 		"imp_sniper",
-		"imp_pilotsupport",
-		"count_dooku"
+		"imp_sup_snpc",
+		"x1_act2", 
+		"reb_shara", 
+		"rep_chewbacca", 
+		"darth_vader"
 	    }	
 	}
 	
@@ -2372,13 +2792,13 @@ chrtemplatemgrTemplate chr_template_mgr
 	    }	
 	}
     
-  end_story
+	end_story
 	{
 	    string name_keys[]
 	    {
-		"x2_clone_soldier",
+		"x2_act2_soldier",
 		"reb_soldier",
-		"reb_heavy_trooper",
+		"reb_heavy_trooper", // not needed?
 		"reb_sniper",
 		"reb_support",
 		"imp_stormtrooper",
@@ -2388,8 +2808,10 @@ chrtemplatemgrTemplate chr_template_mgr
 		"rep_hansolo",
 		"reb_ewok",
 		"reb_shara"
+		// TODO - add unmasked support guys.
 	    }	
 	}
+	
     weapons_test
 	{
 	    string name_keys[]
@@ -2398,12 +2820,12 @@ chrtemplatemgrTemplate chr_template_mgr
 			"rep_cloneheavytrooper",    
 			"rep_sharpshooter",
 			"rep_engineer",
-			"rep_lancetrooper",
+			"rep_specialtrooper",
 			"cis_battledroid",
 			"cis_superdroid",
 			"cis_assassindroid",
 			"cis_engineerdroid",
-			"cis_magnadroid",
+			"cis_specialdroid",
 			"reb_soldier",
 			"reb_heavy_trooper",
 			"reb_sniper",
@@ -2413,21 +2835,66 @@ chrtemplatemgrTemplate chr_template_mgr
 			"imp_heavytrooper",
 			"imp_sniper",
 			"imp_pilotsupport",
-			"imp_royalguard"
-			    
-	    }	
+			"imp_specheavy",
+			"reb_hot_sld"
+	    }
 	}
 
-  cfire_challnge
+	weapons_test2
 	{
 	    string name_keys[]
 	    {
-		"rep_hansolo_challenge",
-		"rep_leia_npc_challenge",
-		"luke_ep6_npc_challenge",
-		"rep_chewbacca_npc_challenge",
-		"reb_soldier",
-		"imp_stormtrooper"
+//			"reb_ewok",
+//			"reb_ewok_v2",
+//			"reb_gungan_hunt",
+//			"reb_gungan_hunt2",
+//			"hunt_cis_spec",
+//			"hunt_cis_sniper",	    
+//			"tusken_hunt",
+//			"jawa_hunt",
+//			"jawa_hunt2",
+//			"ugnaught_hunt",
+//			"ugnaught_hunt2",
+//			"remnant_hunt",
+			"rep_tarfful",
+			"rep_padme",
+			"rep_cloneskytrooper",
+			"cis_droideka",
+			"cis_durge",
+			"zam_wessel",
+			"jango_fett",
+			"rep_hansolo",
+			"rep_chewbacca",
+			"rep_leia",
+			"rep_lando",
+			"boba_fett",
+			"imp_ig88",
+			"rep_darktrooper"
+//			"young_obiwan",
+//			"anakin_ep3",
+//			"yoda",			    
+//			"count_dooku",
+//	                "mace_windu",
+//			"master_ferroda",
+//	                "darth_maul",
+//	                "general_grievous",
+//	                "asajj_ventress",			    
+//	                "darth_vader",
+//	                "the_emperor",
+//	                "sith_witch",
+//	                "aayla_secura",
+//			"old_obiwan",
+//	                "kota_vahs",
+//	                "luke_ep6",
+
+	    }
+	}
+
+  	cutscene_only
+	{
+	    string name_keys[]
+	    {
+		"x2_clone_soldier"
 	    }
 	}
     }

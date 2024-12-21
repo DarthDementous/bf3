@@ -1,128 +1,20 @@
 // vim: set syntax=c :
 
+// rancor settings
+
+/* --- auto commented out by commentOutTemplate
+template rancorSettingsDathomir
+{
+    roarDist = 15.f
+}
+*/ // --- auto commented out by commentOutTemplate
+
 // ==============================
 // BATTLEFRONT III DATHOMIR PROPS
 // ==============================
 
-// IMPERIAL REMNANT BASE
-
-template imp_remnant_base : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/dathomir/buildings/imp_remnant_base"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "imp_remnant"
-	editorPath         = "bf/props/dathomir/buildings"
-    }
-}
-
-// BIG TREE PROP
-
-template dath_bigtree : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/dathomir/misc/dath_tree_big"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "dath_bigtree"
-	editorPath         = "bf/props/dathomir/misc"
-    }
-}
-
-// VILLAGE PROP
-
-template dath_village : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/dathomir/misc/dath_village"
-    }
-
-    meta
-    {
-	canCreateInEditor  = 1
-	editorInstanceName = "dath_village"
-	editorPath         = "bf/props/dathomir/misc"
-    }
-}
-
-// BASE DOOR LEFT
-
-template base_door_l : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/dathomir/base_door_left"
-//  numLods = 2
-//	lodDist[] 
-//	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-
-    }
-
-    meta
-    {
-		canCreateInEditor  = 1
-		editorInstanceName = "b_dr_l"
-		editorPath         = "bf/props/dathomir"
-    }
-}
-
-// BASE DOOR RIGHT
-
-template base_door_r : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/dathomir/base_door_right"
-//  numLods = 2
-//	lodDist[] 
-//	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-
-    }
-
-    meta
-    {
-		canCreateInEditor  = 1
-		editorInstanceName = "b_dr_r"
-		editorPath         = "bf/props/dathomir"
-    }
-}
-
 //HANGAR DOORS OPEN
 
-template dat_hangar_o : staticprop
-{
-    obinstrenderer render
-    {
-	model = "props/dathomir/hanger_doors_open"
-//  numLods = 2
-//	lodDist[] 
-//	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-
-    }
-
-    meta
-    {
-		canCreateInEditor  = 1
-		editorInstanceName = "hangar_open"
-		editorPath         = "bf/props/dathomir"
-    }
-}
 
 //HANGAR DOORS CLOSED
 
@@ -147,13 +39,11 @@ template dat_hangar_c : staticprop
     }
 }
 
-//BASE DOOR UP
-
-template base_door_up : staticprop
+template dat_danger_fan : staticprop
 {
     obinstrenderer render
     {
-	model = "props/dathomir/interior_door"
+	model = "props/dathomir/shipyard/fan"
 //  numLods = 2
 //	lodDist[] 
 //	{ 100.0, 300.0 }
@@ -162,137 +52,149 @@ template base_door_up : staticprop
 
     }
 
+    transform_tick tick
+    {
+	degreesPerSec[]	{0.0f, 6.0f, 0.0f}
+    }
+    
     meta
     {
 		canCreateInEditor  = 1
-		editorInstanceName = "b_dr_up"
+		editorInstanceName = "danger_fan"
 		editorPath         = "bf/props/dathomir"
     }
 }
 
-// Control Panel
-template dath_control : bfexplodingstaticprop
+template dath_bone_01 : simplephysicsprop
 {
     obinstrenderer render
     {
-        model = "props/dathomir/control_panel"
-        castshadows = "true"
-	    receiveshadows = "true"    
-    }
-    
-    teamNum = 1
-    
-    dathDoorgendescript descript 
-    {
-
-    }
-    autoaimtarget
-    {
-        nameKey    = "STR_SPAWNSELECT_HOTH_GENERATOR"
-    } 
-    
-    healthcomponentbf health
-    {
-	    fullhealth	= 4.0f
-    }
-
-    vistableseercomp vtseer
-    {
-    }
-    
-    meta
-    {
-        canCreateInEditor  = 1
-        editorInstanceName = "control_panel"
-        editorPath         = "bf/props/dathomir"
-    }
-}
-
-
-
-// Shipyard Dest Core
-template shipyard_core: bfexplodingstaticprop //staticprop
-{
-   obinstrenderer render
-    {
-	model = "bg/ship_int_core"
-//   	numLods = 2
-//	lodDist[] 
-//	{ 100.0, 300.0 }
-	castshadows = "true"
+	model = "props/dathomir/physics/bone_01"
+   	castshadows = "true"
 	receiveshadows = "true"
-    }
 
-    autoAimTargetComponentBF autoaim
-    {
-        nameKey    = "STR_DESTPROP_SHIPYARD_CORE"
     }
+    odesimplephysics physics
+    {
+    	mayaphysics = "true"
+	moveable = "true"
 
-    healthcomponentbf health
-    {
-	fullhealth	= 5.0f
-    }
-    
-    teamNum = 1
-    
-    vistableseercomp vtseer
-    {
-	checkPosOffset[]    {0.0f, 5.0f, 0.0f}
+	bodyMass		= 2.0f
     }
 
     meta
     {
-    canCreateInEditor  = 1
-    editorInstanceName = "shipyard_core"
-    editorPath         = "bf/props/dathomir"
+	canCreateInEditor  = 1
+	editorInstanceName = "physics_bone01"
+	editorPath         = "bf/props/dathomir/physics"
     }
 }
 
-// Shipyard Dest Coms
-template shipyard_coms: bfexplodingstaticprop //staticprop
-{
-   obinstrenderer render
-    {
-	model = "bg/ship_int_com"
-//   	numLods = 2
-//	lodDist[] 
-//	{ 100.0, 300.0 }
-	castshadows = "true"
-	receiveshadows = "true"
-    }
-
-    autoAimTargetComponentBF autoaim
-    {
-        nameKey    = "STR_DESTPROP_SHIPYARD_COMS"
-    }
-
-    healthcomponentbf health
-    {
-	fullhealth	= 5.0f
-    }
-    
-    teamNum = 1
-    
-    vistableseercomp vtseer
-    {
-	checkPosOffset[]    {0.0f, 5.0f, 0.0f}
-    }
-    
-   meta
-   {
-   canCreateInEditor  = 1
-   editorInstanceName = "shipyard_com"
-   editorPath         = "bf/props/dathomir"
-   }
-}
-
-// Dathomir planet prop
-
-template dath_planet: staticprop
+template dath_bone_02 : simplephysicsprop
 {
     obinstrenderer render
     {
-        model = "props/dathomir/planet_dathomir"
+	model = "props/dathomir/physics/bone_02"
+   	castshadows = "true"
+	receiveshadows = "true"
+
+    }
+    odesimplephysics physics
+    {
+    	mayaphysics = "true"
+	moveable = "true"
+
+	bodyMass		= 2.0f
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "physics_bone02"
+	editorPath         = "bf/props/dathomir/physics"
+    }
+}
+
+template dath_box : simplephysicsprop
+{
+    obinstrenderer render
+    {
+	model = "props/dathomir/physics/box_01"
+   	castshadows = "true"
+	receiveshadows = "true"
+
+    }
+    odesimplephysics physics
+    {
+    	mayaphysics = "true"
+	moveable = "true"
+
+	bodyMass		= 2.0f
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "physics_box"
+	editorPath         = "bf/props/dathomir/physics"
+    }
+}
+
+template dath_rock_01 : simplephysicsprop
+{
+    obinstrenderer render
+    {
+	model = "props/dathomir/physics/rock_01"
+	castshadows = "true"
+	receiveshadows = "true"
+
+    }
+    odesimplephysics physics
+    {
+    	mayaphysics = "true"
+	moveable = "true"
+
+	bodyMass		= 2.0f
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "physics_rock01"
+	editorPath         = "bf/props/dathomir/physics"
+    }
+}
+
+template dath_rock_02 : simplephysicsprop
+{
+    obinstrenderer render
+    {
+	model = "props/dathomir/physics/rock_02"
+	castshadows = "true"
+	receiveshadows = "true"
+
+    }
+    odesimplephysics physics
+    {
+    	mayaphysics = "true"
+	moveable = "true"
+
+	bodyMass		= 2.0f
+    }
+
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "physics_rock02"
+	editorPath         = "bf/props/dathomir/physics"
+    }
+}
+
+template story_blocker1: staticprop
+{
+    obinstrenderer render
+    {
+        model = "props/dathomir/rockfall1"
 
         alwaysroom = "true"
     }
@@ -300,8 +202,41 @@ template dath_planet: staticprop
     meta
     {
     canCreateInEditor  = 1
-    editorInstanceName = "planet_dath"
+    editorInstanceName = "rockfall1"
     editorPath         = "bf/props/dathomir"
+    }
+}
+
+
+template story_blocker: staticprop
+{
+    obinstrenderer render
+    {
+        model = "props/dathomir/rockfall_story"
+
+        alwaysroom = "true"
+    }
+
+    meta
+    {
+    canCreateInEditor  = 1
+    editorInstanceName = "rockfall_story"
+    editorPath         = "bf/props/dathomir"
+    }
+}
+
+template dat_death_tower : staticprop
+{
+    obinstrenderer render
+    {
+	    model = "props/dathomir/shipyard/death_tower_small"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	editorInstanceName = "death_tower_small"
+    	editorPath         = "bf/props/dathomir"
     }
 }
 
@@ -313,12 +248,7 @@ template imp_shipyard : capitalshipprop //staticprop
 //    }
 
     teamNum = 1
-
-    autoaimtarget
-    {
-	nameKey	= "STR_CAPITALSHIP_CIS_MUNIFICENT"
-    }
-
+ 
 //    cruiserSentryGun testhack
 //    {
 //    }
@@ -363,8 +293,8 @@ template imp_shipyard : capitalshipprop //staticprop
 
     draw_as_background_component background_map
     {	
-	mapImage = "misctex/hud/cis_munificent_outline"
-	mapImageName = "cis_munificent_outline"
+	//mapImage = "misctex/hud/cis_munificent_outline"
+	//mapImageName = "cis_munificent_outline"
 	isOverlayImage = "true"	
 
 	float mapTextureAreaDimensions []
@@ -385,53 +315,350 @@ template imp_shipyard : capitalshipprop //staticprop
     }
 }
 
+// Shipyard Shield
+
+template shipyard_light1: staticprop
+{
+    obinstrenderer render
+    {
+        model = "props/dathomir/shipyard/exitshield"
+        alwaysroom = "true"
+    }
+
+    meta
+    {
+    canCreateInEditor  = 1
+    editorInstanceName = "shpyrd_light01"
+    editorPath         = "bf/props/dathomir"
+    }
+}
+
+template shipyard_shldBlk: staticprop
+{
+    obinstrenderer render
+    {
+        model = "props/dathomir/shipyard/shldblk"
+        alwaysroom = "true"
+    }
+
+    physics
+    {
+	collisionGroup = "vehicle_block"
+    }
+    
+    meta
+    {
+    canCreateInEditor  = 1
+    editorInstanceName = "shpyrd_shldBlk"
+    editorPath         = "bf/props/dathomir"
+    }
+}
+
+template shipyard_light2: staticprop
+{
+    obinstrenderer render
+    {
+        model = "props/dathomir/shipyard/core_lightning"
+        alwaysroom = "true"
+    }
+
+    meta
+    {
+    canCreateInEditor  = 1
+    editorInstanceName = "shpyrd_light02"
+    editorPath         = "bf/props/dathomir"
+    }
+}
+
+
+
+template shipyard_shield_1: staticprop
+{
+    obinstrenderer render
+    {
+        model = "props/dathomir/shipyard/core_beams"
+        alwaysroom = "true"
+    }
+  
+    transform_tick tick
+    {
+	degreesPerSec[]	{0.0f, 7.4f, 0.0f}
+    }
+  
+    meta
+    {
+    canCreateInEditor  = 1
+    editorInstanceName = "shpyrd_shield_1"
+    editorPath         = "bf/props/dathomir"
+    }
+}
+
+template shipyard_shield_2: staticprop
+{
+    obinstrenderer render
+    {
+        model = "props/dathomir/shipyard/core_beams_2"
+        alwaysroom = "true"
+    }
+
+    transform_tick tick
+    {
+	degreesPerSec[]	{0.0f, 7.4f, 0.0f}
+    }
+
+    meta
+    {
+    canCreateInEditor  = 1
+    editorInstanceName = "shpyrd_shield_2"
+    editorPath         = "bf/props/dathomir"
+    }
+}
 
 /*
-// MISC GUBBINS BELOW -- Ignore! :)
-
-// DAVE'S WORK IN PROGRESS BASE
-
-template wipbase5 : staticprop
+template shipyard_door1: SimpleSlideDoor1 
 {
     obinstrenderer render
     {
-	model = "props/dathomir/buildings/wipbase5"
+        model = "props/dathomir/shipyard/door_right"
     }
 
+    door
+    {
+    	soundmap = "sndmap_door_cisbalcony"          
+    }
+    
     meta
     {
-	canCreateInEditor  = 1
-	editorInstanceName = "wipbase5"
-	editorPath         = "bf/props/dathomir/buildings"
+    canCreateInEditor  = 1
+    editorInstanceName = "shpyrd_door1"
+    editorPath         = "bf/props/dathomir"
+    }
+}
+*/
+template shipyard_door2: SimpleSlideDoor1 
+{
+    obinstrenderer render
+    {
+        model = "props/dathomir/shipyard/door_left"	
+    }
+
+    door
+    {
+    	soundmap = "sndmap_door_cisbalcony"          
+    }
+    
+    meta
+    {
+    canCreateInEditor  = 1
+    editorInstanceName = "shpyrd_door2"
+    editorPath         = "bf/props/dathomir"
     }
 }
 
-template wipirb : staticprop
+// Shipyard Core
+template shipyard_core: bfexplodingstaticprop 
+{
+   obinstrenderer render
+    {
+	model = "props/dathomir/shipyard/core_core"
+//   	numLods = 2
+//	lodDist[] 
+//	{ 100.0, 300.0 }
+	castshadows = "true"
+	receiveshadows = "true"
+    }
+
+    autoAimTargetComponentBF autoaim
+    {
+        nameKey    = "STR_DESTPROP_SHIPYARD_CORE"
+    }
+
+    healthcomponentbf health
+    {
+	fullhealth	= 5.0f
+    }
+    
+    teamNum = 1
+    
+    vistableseercomp vtseer
+    {
+	checkPosOffset[]    {0.0f, 5.0f, 0.0f}
+    }
+    
+   meta
+   {
+   canCreateInEditor  = 1
+   editorInstanceName = "shpyrd_core"
+   editorPath         = "bf/props/dathomir"
+   }
+}
+
+template shipyard_escape1: SimpleSlideDoor1 
 {
     obinstrenderer render
     {
-	model = "props/dathomir/buildings/wipirb"
+        model = "props/dathomir/shipyard/exit_right"
     }
 
+    door
+    {
+    	soundmap = "sndmap_door_cisbalcony"          
+    }
+    
     meta
     {
-	canCreateInEditor  = 1
-	editorInstanceName = "wipirb"
-	editorPath         = "bf/props/dathomir/buildings"
+    canCreateInEditor  = 1
+    editorInstanceName = "shpyrd_escape1"
+    editorPath         = "bf/props/dathomir"
     }
 }
 
-template rancorbase : staticprop
+template shipyard_escape2: SimpleSlideDoor1 
 {
     obinstrenderer render
     {
-	model = "bg/rancorbase"
+        model = "props/dathomir/shipyard/exit_left"
+    }
+
+    door
+    {
+    	soundmap = "sndmap_door_cisbalcony"          
+    }
+    
+    meta
+    {
+    canCreateInEditor  = 1
+    editorInstanceName = "shpyrd_escape2"
+    editorPath         = "bf/props/dathomir"
+    }
+}
+
+// Shipyard Coms
+template shipyard_cable01: bfexplodingstaticprop 
+{
+   obinstrenderer render
+    {
+	model = "props/dathomir/shipyard/cables"
+//   	numLods = 2
+//	lodDist[] 
+//	{ 100.0, 300.0 }
+	castshadows = "true"
+	receiveshadows = "true"
+    }
+
+    autoAimTargetComponentBF autoaim
+    {
+        nameKey    = "STR_DESTPROP_SHIPYARD_COMS"
+    }
+
+    healthcomponentbf health
+    {
+	fullhealth	= 5.0f
+    }
+    
+    teamNum = 1
+    
+    vistableseercomp vtseer
+    {
+	checkPosOffset[]    {0.0f, 5.0f, 0.0f}
+    }
+    
+   meta
+   {
+   canCreateInEditor  = 1
+   editorInstanceName = "shpyrd_com1"
+   editorPath         = "bf/props/dathomir"
+   }
+}
+
+template shipyard_cap: bfexplodingstaticprop 
+{
+   obinstrenderer render
+    {
+	model = "props/dathomir/shipyard/core_capacitor"
+//   	numLods = 2
+//	lodDist[] 
+//	{ 100.0, 300.0 }
+	castshadows = "true"
+	receiveshadows = "true"
+    }
+    
+    static_obinst_physics physics
+    {
+		useRBs	    =	"true"
+    } 
+    
+    shipyardcapdes descript 
+    {
+    }
+
+    autoAimTargetComponentBF autoaim
+    {
+        nameKey    = "STR_FRIGATE_COMPONENT_POWER"
+    }
+
+    healthcomponentbf health
+    {
+	fullhealth	= 6.0f
+    }
+    
+    teamNum = 1
+    
+    vistableseercomp vtseer
+    {
+	checkPosOffset[]    {0.0f, 5.0f, 0.0f}
+    }
+    
+    meta
+    {
+	canCreateInEditor  = 1
+	editorInstanceName = "shpyrd_cap"
+	editorPath         = "bf/props/dathomir"
+    }
+}
+
+
+
+
+
+// COVER
+
+
+template dathomir_crate_crouch : staticprop
+{
+    obinstrenderer render
+    {
+	    model = "backgrounds/dathomir/props/dath_crate_crouch"
     }
 
     meta
     {
-	canCreateInEditor  = 1
-	editorInstanceName = "rancorbase"
-	editorPath         = "bf/props/dathomir/buildings"
+    	canCreateInEditor  = 1
+	    editorInstanceName = "crate_crouch"
+    	editorPath         = "bf/props/dathomir/cover"
     }
-}*/
+}
+
+template dathomir_crate_stand : staticprop
+{
+    obinstrenderer render
+    {
+	    model = "backgrounds/dathomir/props/dath_crate_stand"
+    }
+
+    meta
+    {
+    	canCreateInEditor  = 1
+	    editorInstanceName = "crate_stand"
+    	editorPath         = "bf/props/dathomir/cover"
+    }
+}
+
+template dath_cloud_layer : staticprop
+{
+    render
+    {
+	model	    =	"backgrounds/dathomir/props/dath_cloud_layer"
+    }
+}
+
