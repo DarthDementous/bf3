@@ -1,0 +1,14 @@
+      30052003 00001200     	EXEC ADDR(0x3) CNT(0x2) VC(0x3) BOOL_ADDR(0x80)
+03: 05f81000 00000688 00000000	      FETCH:	VERTEX	R1.xyzw = R0.x FMT_1_REVERSEUNSIGNED NORMALIZED STRIDE(0) CONST(31, 2) src_reg_am=0 dst_reg_am=0 num_format_all=0 signed_rf_mode_all=0 exp_adjust_all=0
+04: 05f80000 00000fc8 00000000	      FETCH:	VERTEX	R0.xy__ = R0.x FMT_1_REVERSEUNSIGNED NORMALIZED STRIDE(0) CONST(31, 2) src_reg_am=0 dst_reg_am=0 num_format_all=0 signed_rf_mode_all=0 exp_adjust_all=0
+      00000000 0000c200     	ALLOC POSITION SIZE(0x0)
+      00005005 00001200     	EXEC ADDR(0x5) CNT(0x5) BOOL_ADDR(0x80)
+05: 4c400000 0000001b e2000001	      ALU:	RECIP_IEEE	R0.__z_ = R1.wwww
+06: c8070002 00c6c000 e1000100	      ALU:	MULv	R2.xyz_ = R0.zzzz, R1.xyzz
+07: c80f0001 00c60000 8b020203	      ALU:	MULADDv	R1 = C3, R2.zzzz, C2
+08: c80f0001 00b13434 ab020101	      ALU:	MULADDv	R1 = R1.xzyw, R2.yyyy, C1.xzyw
+09: c80f803e 006c0034 ab020001	      ALU:	MULADDv	export62 = R1.xzyw, R2.xxxx, C0	; POSITION
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      0000100a 00002200     	EXEC_END ADDR(0xa) CNT(0x1) BOOL_ADDR(0x80)
+0a: c8038000 00b0b000 e2000000	      ALU:	MAXv	export0.xy__ = R0.xyyy, R0.xyyy
+      00000000 00000000     	NOP

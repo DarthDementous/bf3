@@ -1,0 +1,139 @@
+// vim: set syntax=c :
+
+boolean inited = false;
+callback int GalConquestIsMoveAllowed(int planet, int player, int team)
+{
+    //Script the movement rule set. return 1 if the movement is allowed, 0 otherwise.
+    //Below are rules setup based on the test scenario.
+    int planet_kash = getPlanetIndexByName("proxyplanet6_");
+//    int planet_cato = getPlanetIndexByName("proxyplanet1_");
+    int planet_dant = getPlanetIndexByName("proxyplanet5_");
+    int planet_yavin = getPlanetIndexByName("proxyplanet3_");
+    int planet_must = getPlanetIndexByName("proxyplanet4_");
+    int planet_tat = getPlanetIndexByName("tatplanet1_");
+//    int planet_cor = getplanetIndexByName("corplanet1_");
+    int planet_dath = getplanetIndexByName("proxyplanet2_");
+    int planet_endor = getplanetIndexByName("proxyplanet7_");
+    int planet_bespin = getplanetIndexByName("proxyplanet8_");
+    int planet_hoth = getplanetIndexByName("proxyplanet9_");
+    int planet_desolation = getplanetIndexByName("proxyplanet10_");
+    //cannot attack own planet.
+    if(isPlanetOwnedByPlayer(planet, player))
+	return 0;
+    
+    // teams can attack any planet on the map during their turn
+    if(team == 0)//REB
+    {	
+	return 1;
+    }
+    else if ( team == 1 )//IMP
+    {
+	return 1;
+    }
+
+    return 0; 
+}
+
+callback int GalConquestCheckVictoryConditions(int player, int team)
+{
+    //Script the victory conditions check in here.
+    //e.g. has the time/turn limit been reached, 
+    //has the player gained control of the required number of planets,
+    //has the player gained control of a specific planets, etc
+    //return 1 if the victory conditions have been reached, 0 otherwise.
+    int planet_kash = getPlanetIndexByName("proxyplanet6_");
+//   int planet_cato = getPlanetIndexByName("proxyplanet1_");
+    int planet_dant = getPlanetIndexByName("proxyplanet5_");
+    int planet_yavin = getPlanetIndexByName("proxyplanet3_");
+    int planet_must = getPlanetIndexByName("proxyplanet4_");
+    int planet_tat = getPlanetIndexByName("tatplanet1_");
+//    int planet_cor = getplanetIndexByName("corplanet1_");
+    int planet_dath = getplanetIndexByName("proxyplanet2_");
+    int planet_endor = getplanetIndexByName("proxyplanet7_");
+    int planet_bespin = getplanetIndexByName("proxyplanet8_");
+    int planet_hoth = getplanetIndexByName("proxyplanet9_");
+    int planet_desolation = getplanetIndexByName("proxyplanet10_");
+
+    //if IMP gains control of all planets
+    if((team == 1) && (isPlanetOwnedByPlayer(planet_dant, player)) && (isPlanetOwnedByPlayer(planet_yavin, player)) && (isPlanetOwnedByPlayer(planet_must, player))
+    && (isPlanetOwnedByPlayer(planet_tat, player)) && (isPlanetOwnedByPlayer(planet_dath, player))  && (isPlanetOwnedByPlayer(planet_kash, player)) && (isPlanetOwnedByPlayer(planet_endor, player))
+    && (isPlanetOwnedByPlayer(planet_bespin, player)) && (isPlanetOwnedByPlayer(planet_hoth, player))
+    && (isPlanetOwnedByPlayer(planet_desolation, player)))
+    {
+    	return 1;
+    }
+
+    //if REB gains control of all planets
+    if((team == 0) && (isPlanetOwnedByPlayer(planet_dant, player)) && (isPlanetOwnedByPlayer(planet_yavin, player)) && (isPlanetOwnedByPlayer(planet_must, player))
+    && (isPlanetOwnedByPlayer(planet_tat, player)) && (isPlanetOwnedByPlayer(planet_dath, player)) && (isPlanetOwnedByPlayer(planet_kash, player)) && (isPlanetOwnedByPlayer(planet_endor, player)) 
+    && (isPlanetOwnedByPlayer(planet_bespin, player)) && (isPlanetOwnedByPlayer(planet_hoth, player))
+    && (isPlanetOwnedByPlayer(planet_desolation, player)))
+    {
+    	return 1;
+    }
+
+    return 0;
+
+}
+
+function void InitialiseScenario()
+{
+    //Set up the initial state of a scenario.
+    //e.g. allocate planets to each team based on the game play overview.
+    //enable planets that are part of the scenario, others are disabled by default.
+    int planet_kash = getPlanetIndexByName("proxyplanet6_");
+//    int planet_cato = getPlanetIndexByName("proxyplanet1_");
+    int planet_dant = getPlanetIndexByName("proxyplanet5_");
+    int planet_yavin = getPlanetIndexByName("proxyplanet3_");
+    int planet_must = getPlanetIndexByName("proxyplanet4_");
+    int planet_tat = getPlanetIndexByName("tatplanet1_");
+//    int planet_cor = getplanetIndexByName("corplanet1_");
+    int planet_dath = getplanetIndexByName("proxyplanet2_");
+    int planet_endor = getplanetIndexByName("proxyplanet7_");
+    int planet_bespin = getplanetIndexByName("proxyplanet8_");
+    int planet_hoth = getplanetIndexByName("proxyplanet9_");
+    int planet_desolation = getplanetIndexByName("proxyplanet10_");
+    setPlanetToNeutral(planet_dant); // should be neutral
+    setPlanetOWningTeam(planet_yavin, 0);
+    setPlanetOwningTeam(planet_must, 1);
+    setPlanetToNeutral(planet_dath); // should be neutral
+    setPlanetToNeutral(planet_tat); // should be neutral
+//    setPlanetOwningTeam(planet_cato, 1);
+    setPlanetOwningTeam(planet_kash, 0);
+//    setPlanetToNeutral(planet_cor); // should be neutral
+    setPlanetToNeutral(planet_endor); // should be neutral
+    setPlanetOwningTeam(planet_bespin, 0);
+    setPlanetToNeutral(planet_hoth); // should be neutral
+    setPlanetOwningTeam(planet_desolation, 1);
+    inited = true;
+}
+
+function void UpdateCurrentScenarioState()
+{
+    resolveGalConquestState();
+}
+
+AllowCallback(CALLBACK_GalConquestIsMoveAllowed, GalConquestIsMoveAllowed);
+AllowCallback(CALLBACK_GalConquestCheckVictoryConditions, GalConquestCheckVictoryConditions);
+
+while(1)
+{
+    if(galConquestMapNeedsInit())
+    {
+	InitialiseScenario();
+	CheckSectorOwnerShip(0);//check for core world sector
+	CheckSectorOwnerShip(1);//check for core world sector
+	CheckSectorOwnerShip(2);//check for core world sector
+    }
+    else
+    {
+	if(!inited)
+	{
+	    UpdateCurrentScenarioState();
+            CheckSectorOwnerShip(0);//check for core world sector
+	    CheckSectorOwnerShip(1);//check for core world sector
+	    CheckSectorOwnerShip(2);//check for core world sector
+	    inited = true;
+	}
+    }
+}

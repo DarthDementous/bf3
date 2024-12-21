@@ -1,0 +1,24 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      00096002 00001200     	EXEC ADDR(0x2) CNT(0x6) BOOL_ADDR(0x80)
+02: 10001081 1f1ffff8 00004000	      FETCH:	SAMPLE	R1.x___ = R4.xyx CONST(0) ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+03: c8040500 00bebe00 f0000000	   (S)ALU:	DOT3v	R0.__z_ = R0.zxyy, R0.zxyy
+04: 58480000 00b1b1c6 2100ff80	      ALU:	MULv	R0.___w = C256.yyyy, C511.yyyy
+                          						    	RECIPSQ_IEEE	R0.__z_ = abs(R0).zzzz
+05: c8010501 016cb11b ab010000	      ALU:	MULADDv	R1.x___ = -R0.wwww, R1.xxxx, C256.yyyy
+06: a8870002 00c0c002 c0050500	      ALU:	ADDv	R2.xyz_ = R5.xyzz, R5.xyzz
+                          						    	MUL_CONST_0	R0.___w = C256.w, R0.z
+07: c8030500 00c7b000 e1000000	      ALU:	MULv	R0.xy__ = R0.wzzz, R0.xyyy
+      02546008 00001200     	EXEC ADDR(0x8) CNT(0x6) BOOL_ADDR(0x80)
+08: c8030500 00b06cb0 eb000104	      ALU:	MULADDv	R0.xy__ = R4.xyyy, R0.xyyy, R1.xxxx
+09: b8283081 1f1ffe88 00004000	      FETCH:	SAMPLE	R3.xyz_ = R4.zwz CONST(2) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+0a: 10381081 1f1ffe88 00004000	      FETCH:	SAMPLE	R1.xyz_ = R4.xyx CONST(3) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+0b: 10180001 1f1ff688 00004000	      FETCH:	SAMPLE	R0.xyzw = R0.xyx CONST(1) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+0c: c8020505 006c6cc6 0b02ffff	   (S)ALU:	MULADDv	R5._y__ = C511.zzzz, C258.xxxx, C511.xxxx
+0d: ac870102 00c0c045 c1020003	      ALU:	MULv	R2.xyz_ = R2.xyzz, R0.xyzz
+                          						    	MUL_CONST_1	R1.___w = C259.x, R5.y
+      0000400e 00002200     	EXEC_END ADDR(0xe) CNT(0x4) BOOL_ADDR(0x80)
+0e: c8070501 001bc000 e1010100	      ALU:	MULv	R1.xyz_ = R1.wwww, R1.xyzz
+0f: c8070501 00c06cc0 ab030101	      ALU:	MULADDv	R1.xyz_ = R1.xyzz, R3.xyzz, C257.xxxx
+10: 14070500 00c0c01b e1020100	      ALU:	MULv	R0.xyz_ = R2.xyzz, R1.xyzz
+11: 0c878000 00c06c1b a1000405	      ALU:	MULv	export0.xyz_ = R0.xyzz, C260.xxxx	; COLOR
+                          						    	MUL_PREVs	export0.___w = R5.wwww	; COLOR

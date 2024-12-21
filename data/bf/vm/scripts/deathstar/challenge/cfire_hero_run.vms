@@ -1,0 +1,102 @@
+// vim: set syntax=c :
+
+//////////////////////////////////////
+//
+// Script to move the hero characters along their paths in the deathstar cover fire challenge
+// based on chr_patrol.vms
+//
+// To use:
+// Add to a VMProp
+//
+// In the StringVars[]
+// 0: Spawnprop, SpawnGroup (will only work for first in group)
+// 1: patrol prop template (e.g dofWalk_, would work for dofWalk_0, dofWalk_1, etc )
+// 2: the score to award when the hero reaches the end of the path
+// 3: "final", to end the challenge when the hero reaches the end of the path
+//
+////////////////////////////////////////
+
+logStr("SCRIPT RUNNING");
+
+char16 sGroup  = getNthVMPropStringVar(me, 0);
+char16 sPadTmp = getNthVMPropStringVar(me, 1);
+char16 sScore  = getNthVMPropStringVar(me, 2);
+char16 sFinal  = getNthVMPropStringVar(me, 3);
+
+int iScore = Char16Toint(sScore);
+boolean bFinal = !char16cmp(sFinal, "final");
+
+propRef pGroup = propRefFromChar16(sGroup);
+
+propRef pPad;
+propRef pChr;
+propRef pSpawn;
+if (isGroupComponentProp(pGroup))
+{
+    pSpawn = GetNthPropFromGroup(pGroup, 0);
+}
+else
+{
+    pSpawn = pGroup;
+}
+
+if (isSpawnProp(pSpawn))   
+{
+    pChr = propSpawnerGetNthSpawnedProp(pSpawn, 0);
+}
+else
+{
+    pChr = pSpawn;
+}
+
+waitForGameTime(0.5f);
+setAIState(pChr, "AISTATE_BF_PATROL");
+beginInGameCutSceneWithFlags(k_vmFlag_ResumeScriptAfterHitReact, pChr);
+//addObjectiveIndicatorToProp(pChr, vector(0, 2, 0), vector(0.5, 0.5, 0.5));
+addNewObjectiveIndicatorToProp(pChr, k_objectiveIndicatorType_mainObjective);
+
+char16 sPad;
+int iCurrent = 0;
+while(true)
+{
+    sPad = Char16CatInt(sPadTmp, iCurrent);
+    pPad = propRefFromChar16(sPad);
+    if(propExists(pPad))
+    {
+	// starting a section on the path
+	chrRunToPadAndAlign(pChr, propGetPos(pPad), propGetDir(pPad), 4000.0f); //1700.0f
+	waitUntilVMsDone(pChr);
+
+	while(propExists(pChr) && propGetHealthFraction(pChr) > 0.0f && !chrHasReachedDest(pChr))
+	{
+	    waitForGameTime(0.01f);
+	}
+
+	if(!propExists(pChr) || propGetHealthFraction(pChr) <= 0.0f )
+	{
+	    // died on the way
+	    ChallengeFail();
+	    break;
+	}
+    }
+    else
+    {
+	// reached the end of the whole path
+	float fraction = propGetHealthFraction( pChr );
+	ChallengeAddScore( fraction * iScore );
+
+	removeObjectiveIndicatorFromProp(pChr);
+	DeleteSpawnerProp(pSpawn);
+
+	if(bFinal)
+	{
+	    ChallengeEnd();
+	}
+
+    	break;
+    }
+    iCurrent++;
+}
+
+endInGameCutScene();
+

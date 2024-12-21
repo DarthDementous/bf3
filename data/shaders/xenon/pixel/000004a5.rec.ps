@@ -1,0 +1,77 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      00946005 00001200     	EXEC ADDR(0x5) CNT(0x6) BOOL_ADDR(0x80)
+05: c8040605 006cb100 2107fe00	      ALU:	MULv	R5.__z_ = C263.xxxx, C510.yyyy
+06: 105080a1 1f1ff67f 00004000	      FETCH:	SAMPLE	R8.__yw = R5.xyx CONST(5) ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+07: 904080a1 1f1fffc7 00008000	      FETCH:	SAMPLE	R8._x__ = R5.xyz CONST(4) ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+08: 4c820709 006cc6c6 2101fe03	   (S)ALU:	MULv	R9._y__ = C257.xxxx, C510.zzzz
+                          						    	RECIP_IEEE	R7.___w = R3.zzzz
+09: 4c83070a 001bb01b e1070304	      ALU:	MULv	R10.xy__ = R7.wwww, R3.xyyy
+                          						    	RECIP_IEEE	R7.___w = R4.wwww
+0a: b8130803 011bb049 c10704ff	      ALU:	MULv	R3.xy__ = R7.wwww, R4.xyyy
+                          						    	SUB_CONST_0	R8.x___ = -C511.x, -R8.y
+      0500600b 00001200     	EXEC ADDR(0xb) CNT(0x6) BOOL_ADDR(0x80)
+0b: c80d0609 00040500 e0080800	      ALU:	ADDv	R9.x_zw = R8.xzzw, R8.yzzw
+0c: ac870704 0012bd08 8009ffff	      ALU:	ADDv	R4.xyz_ = R9.zyww, C511.yxyy
+                          						    	MUL_CONST_1	R7.___w = C511.w, R9.x
+0d: bc830308 001bc441 e10704ff	      ALU:	MULv	R8.xy__ = R7.wwww, R4.xzzz
+                          						    	SUB_CONST_1	R3.___w = C511.x, R3.y
+0e: c8030609 00b0c618 ab08ff03	      ALU:	MULADDv	R9.xy__ = R3.xwww, R8.xyyy, C511.zzzz
+0f: 101880a1 1f1ffe88 00004000	      FETCH:	SAMPLE	R8.xyz_ = R5.xyx CONST(1) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+10: 1038b121 1f1ff447 00004000	      FETCH:	SAMPLE	R11._xyz = R9.xyx CONST(3) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+      00956011 00001200     	EXEC ADDR(0x11) CNT(0x6) BOOL_ADDR(0x80)
+11: 100890a1 1f1ff447 00004000	      FETCH:	SAMPLE	R9._xyz = R5.xyx CONST(0) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+12: 1028a141 1f1fffd8 00004000	      FETCH:	SAMPLE	R10.xw__ = R10.xyx CONST(2) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+13: 106850a1 1f1ff688 00004000	      FETCH:	SAMPLE	R5.xyzw = R5.xyx CONST(6) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+14: c801060c 00b1b100 a1000300	   (S)ALU:	MULv	R12.x___ = R0.yyyy, C259.yyyy
+15: 1404060c 00b1b1b1 a1000500	      ALU:	MULv	R12.__z_ = R0.yyyy, C261.yyyy
+16: 0c280c03 00bebeb1 d0010104	      ALU:	DOT3v	R3.___w = R1.zxyy, R1.zxyy
+                          						    	MUL_PREVs	R12._y__ = C260.yyyy
+      00006017 00001200     	EXEC ADDR(0x17) CNT(0x6) BOOL_ADDR(0x80)
+17: 58880307 00bebe1b f0020283	      ALU:	DOT3v	R7.___w = R2.zxyy, R2.zxyy
+                          						    	RECIPSQ_IEEE	R3.___w = abs(R3).wwww
+18: 5884070a 006cb11b e10a0a87	      ALU:	MULv	R10.__z_ = R10.xxxx, R10.yyyy
+                          						    	RECIPSQ_IEEE	R7.___w = abs(R7).wwww
+19: 1501060a 001bc66c e1030100	      ALU:	MULv	R10.x___ = R3.wwww, R1.zzzz CLAMP
+1a: 0c270a0d 00c0c01b e0060601	      ALU:	ADDv	R13.xyz_ = R6.xyzz, R6.xyzz
+                          						    	MUL_PREVs	R10._y__ = R1.wwww
+1b: a8810a09 00c66c45 8503fe02	      ALU:	SETGTv	R9.x___ = R3.zzzz, C510.xxxx
+                          						    	MUL_CONST_0	R10.___w = C258.x, R4.y
+1c: 140f0609 001a001b e10a0907	      ALU:	MULv	R9 = R10.zwww, R9
+      0000601d 00001200     	EXEC ADDR(0x1d) CNT(0x6) BOOL_ADDR(0x80)
+1d: 0e430101 00b06cc6 e10a0902	      ALU:	MULv	R1.xy__ = R10.xyyy, R9.xxxx
+                          						    	MUL_PREVs	R1.__z_ = R2.zzzz CLAMP
+1e: ac1d0b0a 00f06c41 00090003	      ALU:	ADDv	R10.x_zw = C265.xyyz, C256.xxxx
+                          						    	MUL_CONST_1	R11.x___ = C259.x, R1.y
+1f: ac470b03 0015b141 810b0804	      ALU:	MULv	R3.xyz_ = R11.yzww, C264.yyyy
+                          						    	MUL_CONST_1	R11.__z_ = C260.x, R1.y
+20: ac270b04 00c0c041 c10d0505	      ALU:	MULv	R4.xyz_ = R13.xyzz, R5.xyzz
+                          						    	MUL_CONST_1	R11._y__ = C261.x, R1.y
+21: c90c0600 00ec6cb1 8b010606	      ALU:	MULADDv	R0.__zw = C262.yyyy, R1.xxxz, C262.xxxx CLAMP
+22: c8070605 00b41bc0 eb0c020b	      ALU:	MULADDv	R5.xyz_ = R11.xyzz, R12.xzyy, R2.wwww
+      00006023 00001200     	EXEC ADDR(0x23) CNT(0x6) BOOL_ADDR(0x80)
+23: c80c0600 00060600 e1000000	      ALU:	MULv	R0.__zw = R0.zzzw, R0.zzzw
+24: 288c0700 0006061b e1000001	      ALU:	MULv	R0.__zw = R0.zzzw, R0.zzzw
+                          						    	SETNEs	R7.___w = R1.wwww
+25: a8270a08 00c0c083 c1080604	      ALU:	MULv	R8.xyz_ = R8.xyzz, R6.xyzz
+                          						    	MUL_CONST_0	R10._y__ = C260.y, R0.w
+26: a8170a01 00141583 c00a0903	      ALU:	ADDv	R1.xyz_ = R10.xzww, R9.yzww
+                          						    	MUL_CONST_0	R10.x___ = C259.y, R0.w
+27: a8170701 00c0c042 c0010703	      ALU:	ADDv	R1.xyz_ = R1.xyzz, R7.xyzz
+                          						    	MUL_CONST_0	R7.x___ = C259.x, R0.z
+28: a8240707 00c66c42 81000504	      ALU:	MULv	R7.__z_ = R0.zzzz, C261.xxxx
+                          						    	MUL_CONST_0	R7._y__ = C260.x, R0.z
+      00006029 00001200     	EXEC ADDR(0x29) CNT(0x6) BOOL_ADDR(0x80)
+29: a8470a09 00c06c83 c1070005	      ALU:	MULv	R9.xyz_ = R7.xyzz, R0.xxxx
+                          						    	MUL_CONST_0	R10.__z_ = C261.y, R0.w
+2a: 28170700 00c0b11b e10a0002	      ALU:	MULv	R0.xyz_ = R10.xyzz, R0.yyyy
+                          						    	SETNEs	R7.x___ = R2.wwww
+2b: 14070607 00b46c1b e1000705	      ALU:	MULv	R7.xyz_ = R0.xzyy, R7.xxxx
+2c: c8070607 00c01bb4 eb090707	      ALU:	MULADDv	R7.xyz_ = R7.xzyy, R9.xyzz, R7.wwww
+2d: c8070607 01b4b4b4 eb080703	      ALU:	MULADDv	R7.xyz_ = -R3.xzyy, R8.xzyy, R7.xzyy
+2e: c8070607 00b4c0c0 eb040507	      ALU:	MULADDv	R7.xyz_ = R7.xyzz, R4.xzyy, R5.xyzz
+      0000302f 00002200     	EXEC_END ADDR(0x2f) CNT(0x3) BOOL_ADDR(0x80)
+2f: c8070607 00b4b4c0 eb040107	      ALU:	MULADDv	R7.xyz_ = R7.xyzz, R4.xzyy, R1.xzyy
+30: c8070607 00b46cc0 ab070703	      ALU:	MULADDv	R7.xyz_ = R3.xyzz, R7.xzyy, C263.xxxx
+31: 0c878000 00c06c1b a1070806	      ALU:	MULv	export0.xyz_ = R7.xyzz, C264.xxxx	; COLOR
+                          						    	MUL_PREVs	export0.___w = R6.wwww	; COLOR
+      00000000 00000000     	NOP

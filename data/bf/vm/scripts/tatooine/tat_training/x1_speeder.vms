@@ -1,0 +1,65 @@
+// vim: set syntax=c :
+
+logStr("SCRIPT RUNNING");
+
+char16 sGroup = getNthVMPropStringVar(me, 0);
+char16 sVehicle = getNthVMPropStringVar(me, 1);
+char16 sDofTmp = getNthVMPropStringVar(me, 2);
+char16 sHighlight = getNthVMPropStringVar(me, 3);
+char16 sOnArrival = getNthVMPropStringVar(me, 4);
+
+propRef pGroup = propRefFromChar16(sGroup);
+
+boolean bHighlight = false;
+boolean bOnArrival = false;
+
+if (!char16cmp(sHighlight, "highlight"))
+    bHighlight = true;
+
+if (!char16cmp(sOnArrival, "onarrival"))
+    bOnArrival = true;    
+    
+waitForGameTime(0.1f);
+
+int iDof = 0;
+char16 cGoal;
+cGoal = Char16CatInt(sDofTmp, iDof);
+
+propRef pChr = GetPropFromGroupSpawner(propRefFromChar16(sGroup), 0, 0);
+propRef pSpeeder;
+pSpeeder = propRefFromChar16(sVehicle);
+//BFRequestAIDriveVehicle(pChr, pSpeeder);
+
+DriveVehicleBF(pChr, pSpeeder);
+
+propRef pDriver;
+while (!propExists(pDriver))
+{
+    logStr("Waiting For Driver");
+    //WaitUntilDriver
+    pDriver = getVehicleDriver(pSpeeder);
+    waitForGameTime(0.1f);
+}
+
+setGunActive(pSpeeder, false);
+
+if (!bOnArrival)
+{
+    if (bHighlight)
+        addNewObjectiveIndicatorToProp(pSpeeder, 0);
+}
+
+while(propExists(propRefFromChar16(cGoal)))
+{    
+    DriveToDestinationBF(pDriver, propRefFromChar16(cGoal));    
+
+    waitUntilPropsAreClose(pSpeeder, propRefFromChar16(cGoal), 5.0f);
+
+    cGoal = Char16CatInt(sDofTmp, iDof++);
+}
+
+if (bOnArrival)
+{
+    if (bHighlight)
+        addNewObjectiveIndicatorToProp(pSpeeder, 0);
+}

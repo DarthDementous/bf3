@@ -1,0 +1,124 @@
+// vim: set syntax=c :
+
+//////////////////////////////////////
+//
+// Mark Kevern
+//
+// ambient_flying.vms
+//
+// For creating and keeping space/flying battles alive
+//
+// To use:
+// Add to a VMProp
+//
+// In the StringVars[]
+// 0: SpawnGroup to add spawned ships to
+// 1: Dof prop template (e.g xwngspwn_, would work for xwngspwn_0, xwngspwn_1, etc )
+// 2: Char tempalte e.g reb_sol_snpc
+// 3: vehicle tempalte e.g xwing_fighter
+// 4: SpawnGroup to add spawned ships to for 2nd lot of ships
+// 5: Dof prop template for 2nd lot of ships (e.g xwngspwn_, would work for xwngspwn_0, xwngspwn_1, etc )
+// 6: Char tempalte for 2nd lot of ships e.g reb_sol_snpc
+// 7: vehicle tempalte for 2nd lot of ships e.g xwing_fighter
+// 8: Number of Ships
+// 9: 2nd Number of ships
+////////////////////////////////////////
+
+logStr("SCRIPT RUNNING");
+
+int iCurrent = 0;
+char16 sGroup = getNthVMPropStringVar(me, 0);
+char16 sPadTmp = getNthVMPropStringVar(me, 1);
+char16 sChar = getNthVMPropStringVar(me, 2);
+string sVeh;
+char16 sGroup1 = getNthVMPropStringVar(me, 3);
+char16 sPadTmp1 = getNthVMPropStringVar(me, 4);
+char16 sChar1 = getNthVMPropStringVar(me, 5);
+string sVeh1;
+char16 sNum = getNthVMPropStringVar(me, 6);
+char16 sNum1 = getNthVMPropStringVar(me, 7);
+
+propRef pGroup = propRefFromChar16(sGroup);
+propRef pGroup1 = propRefFromChar16(sGroup1);
+
+int i = 0;
+int j = 0;
+    
+function propRef GetPad(char16 sPTmp, int iNum)
+{
+    propRef pTemp;
+    char16 sPad;
+
+    int iTemp = i;
+    
+    if (iNum == 1)
+        iTemp = j;
+
+// If your pad doesnt exist, this loop will get stuck.. make sure you set your level up correctly!
+    while (!propExists(pTemp))
+    {
+        sPad = Char16CatInt(sPTmp, iTemp);    
+        pTemp = propRefFromChar16(sPad);
+
+        if (!propExists(pTemp))
+            iTemp = 0;
+        else
+            iTemp++;
+    }    
+
+    if (iNum == 1)
+        j = iTemp;
+    else
+        i = iTemp;
+    
+    return pTemp;
+}
+
+int iNum = Char16ToInt(sNum);
+int iNum1 = Char16ToInt(sNum1);
+
+while ((iNum != -1)&&(iNum1 != -1))
+{
+    int r = rndInRange(1, 6);
+    if (r <=4)
+    {
+        sVeh = "xwing_fighter";
+    }
+    else if ((r <=5) && (r>4))
+    {
+        sVeh = "bwing_fighter";
+    }
+    else
+    {
+        sVeh = "reb_dropship";
+    }		 
+    
+    propRef pPad;
+    pPad = GetPad(sPadTmp, 0);
+    lib_SpawnActiveVehicleCG(pGroup, pPad, sChar, StringToChar16(sVeh), 20, iNum);
+
+    waitForGameTime(1.0f);
+    
+    pPad = GetPad(sPadTmp1, 1);
+    
+    int i = rndInRange(1, 3); 
+    if (i <=3)
+    {
+        sVeh1 = "tie_fighter";
+    }
+	    
+    else 
+    {
+        sVeh1 = "tie_interceptor";
+    }
+    lib_SpawnActiveVehicleCG(pGroup1, pPad, sChar1, StringToChar16(sVeh1), 20, iNum1);    
+    
+    waitForGameTime(1.0f);
+
+    sNum = getNthVMPropStringVar(me, 6);
+    sNum1 = getNthVMPropStringVar(me, 7);    
+    iNum = Char16ToInt(sNum);
+    iNum1 = Char16ToInt(sNum1);
+}
+
+logStr("SCRIPT ENDED");

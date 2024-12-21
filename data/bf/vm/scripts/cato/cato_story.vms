@@ -1,0 +1,917 @@
+// vim: set syntax=c :
+
+///////////////////////////////////
+/*
+   cato_story.vms
+ */
+///////////////////////////////////
+
+// vim: set syntax=c :
+
+///////////////////////////////////////////////
+/*
+    CATO NEIMOIDIA STORY CAMPAIGN (MISSION 3)
+*/
+///////////////////////////////////////////////
+
+/////////////MAKE SURE TO INCLUDE A BFStorylevelVarProp in your level
+propRef pPlayer = getPlayerPropRefFromID(GetPlayerId());
+boolean Skip = false;
+boolean tank_msg = true;
+propref AIGunship2;
+boolean endCutScene = false;
+boolean bEndLevel = false;
+
+char16 catBonus1;
+
+///////////// Include Defaults //////////////////////////////////////////////
+
+//////////////////////////CALLBACK INFO DO NOT CHANGE
+
+//PlayerKilled Callback Info
+boolean bCB_PK = false;
+int iCB_PK_KillerId = -1;
+int iCB_PK_Victim = -1;
+int iCB_PK_Result = -1;
+
+//triggeredProp Callback Info
+boolean bCB_TP = false;
+char16 cCB_TP_Prop = StringToChar16("");
+
+//ObjectiveTimeExpired Callback Info
+boolean bCB_OTE = false;
+char16 cCB_OTE_ObjName = StringToChar16("");
+
+//shipReachedScriptedSplineSegment  Callback Info
+boolean bCB_SRSS = false;
+propRef pCB_SRSS_Ship;
+propRef pCB_SRSS_Spline;
+int iCB_SRSS_Segment = -1;
+
+//////////////////////////END CALLBACK INFO
+
+function void ProcessCallbacks()
+{
+    //No else's as could be waiting to process two or more!
+
+    if (GetLevelVarInt("iCBLV") != -1)
+    {
+        if (bCB_PK) // playerKilled callback
+        {
+            playerKilled(iCB_PK_KillerId, iCB_PK_Result, iCB_PK_Victim);
+            bCB_PK = false;
+        }
+
+        if (bCB_TP) // triggeredProp callback
+        {
+            Trigger(cCB_TP_Prop);
+            bCB_TP = false;
+        }
+
+        // ObjectiveTimeExpired callback
+        if (bCB_OTE)
+        {
+            ObjectiveTimeExpired(cCB_OTE_ObjName);
+            bCB_OTE = false;
+        }
+
+        // shipReachedScriptedSplineSegment callback
+        if (bCB_SRSS)
+        {
+            ShipReachedScriptedSplineSegment(pCB_SRSS_Ship, pCB_SRSS_Spline, iCB_SRSS_Segment);
+            bCB_SRSS = false;
+        }
+
+        SetLevelVarInt("iCBLV", -1);    
+        waitForGameTime(0.1f);
+    }
+}
+
+callback void CB_PlayerKilled(int iKiller, int iResult, int iVictim)
+{
+    logStr("CB_PlayerKilled");
+   /* if (bCB_PK)
+        VMAssertMsg("CB_PlayerKilled - Already Waiting To Do Callback");
+
+    bCB_PK = true;
+    iCB_PK_KillerId = iKiller;
+    iCB_PK_Victim = iVictim;
+    iCB_PK_Result = iResult;
+
+    SetLevelVarInt("iCBLV", 1);    */
+    playerKilled(iKiller, iResult, iVictim);
+}
+
+callback int CB_TriggeredProp(int inType, char16 inTriggerProp, int pId)
+{    
+    logStr("CB_TriggeredProp");    
+    /*if (bCB_TP)
+        VMAssertMsg("CB_TriggeredProp - Already Waiting To Do Callback");
+
+    bCB_TP = true;
+    cCB_TP_Prop = inTriggerProp;
+
+    SetLevelVarInt("iCBLV", 1);    
+*/
+    Trigger(inTriggerProp);
+    return 0;
+}
+
+callback void CB_ObjectiveTimeExpired(char16 objName)
+{
+    logStr("CB_ObjectiveTimeExpired");        
+  /*  if (bCB_OTE)
+        VMAssertMsg("CB_ObjectiveTimeExpired - Already Waiting To Do Callback");
+
+    bCB_OTE = true;
+    cCB_OTE_ObjName = objName;
+
+    SetLevelVarInt("iCBLV", 1); */
+    ObjectiveTimeExpired(objName);
+}
+
+callback void CB_shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    logStr("CB_shipReachedScriptedSplineSegment");            
+  /*  if (bCB_SRSS)
+        VMAssertMsg("CB_shipReachedScriptedSplineSegment - Already Waiting To Do Callback");
+    
+    bCB_SRSS = true;
+    pCB_SRSS_Ship = ship;
+    pCB_SRSS_Spline = spline;
+    iCB_SRSS_Segment = segment;
+
+    SetLevelVarInt("iCBLV", 1);*/
+    ShipReachedScriptedSplineSegment(ship, spline, segment);
+
+}
+
+AllowCallback(CALLBACK_PlayerKilledBF, CB_playerKilled);
+AllowCallback(CALLBACK_TriggeredProp, CB_triggeredProp);
+AllowCallback(CALLBACK_ObjectiveTimeExpired, CB_ObjectiveTimeExpired);
+AllowCallback(CALLBACK_ShipReachedScriptedSplineSegment, CB_shipReachedScriptedSplineSegment);
+
+//////////////////////////END CALLBACKS
+
+function void playerKilled(int victimId, int killerId, int iOppTeam)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iActive = BFObjectiveGetNumForNthActive(i);
+	if (lib_playerKilled(victimId, killerId, iOppTeam, iActive)) 
+	{
+	    nextObjective(iActive);
+	}
+    }
+}
+
+function void Trigger(char16 inTriggerProp)
+{    
+    int iResult = 0;
+    
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iActive = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	iActive = BFObjectiveGetNumForNthActive(i);
+	iResult = lib_triggeredProp(inTriggerProp, iActive);
+
+	iResult = ObjectiveTriggerTests(iActive, inTriggerProp, iResult);
+
+	if (iResult >= 1) nextObjective(iActive);
+    }
+}
+
+function void ObjectiveSetupCheck()
+{
+    int iTempObj = GetLevelVarInt("iObjLV");
+    
+    if (iTempObj != -1)
+    {
+        char16 cName = BFObjectiveGetName(iTempObj);
+        if (ObjectiveSetup(cName, iTempObj, BFObjectiveGetSub(iTempObj)))
+            SetLevelVarInt("iObjLV", -1);
+
+        waitForGameTime(0.1f);        
+    }
+}
+
+function void SetObjectiveSetup(int iObj)
+{
+    logStr("SetObjectiveSetup Called");
+    logInt(iObj);
+    SetLevelVarInt("iObjLV", iObj);
+}
+
+function void nextObjective(int inObjNum) 
+{    
+    int result = lib_nextObjective(inObjNum);
+
+    if(result == 1)
+    {
+        //if next objective returns 1 it has updated a core objective and automatically moved us onto the next
+        //so do objective setup with current objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(BFObjectiveGetCurrent());
+        }
+    }
+
+    if(result == 2)
+    {
+        //if nextobjective returns 2 it has updated a bonus objective so we will want to 
+        //objective setup with the objective we passed to next objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(inObjNum);
+        }
+    }
+}
+
+function void JumpToObjective(int iStartObj, boolean bTeleport)
+{       
+	BFObjectiveSetJumpTo(iStartObj);	
+    nextObjective(BFObjectiveGetCurrent());
+    
+    if (bTeleport)
+    {
+        char16 tSpawn;
+        tSpawn = LevelVarToChar16("mCurrentSpawner");
+        if (propExists(propRefFromChar16(tSpawn)))
+            propTeleportToProp(pPlayer, propRefFromChar16(tSpawn));        
+    }
+    
+    logStr("Jumped To Objective");
+    logInt(BFObjectiveGetCurrent());
+}
+
+function void ObjectiveTimeExpired(char16 objName)
+{   
+    int objNum = 0;
+    objNum = BFObjectiveGetNumber(objName);   
+    if (lib_ObjTimeExpired(objNum))
+    {
+	nextObjective(objNum);
+    }
+}
+
+/* NOT NEEDED
+callback void playerSpawned(char16 teamName, int playerId)
+{
+    propRef p = getPlayerPropRefFromID(playerId);    
+}
+
+callback void finiteSpawnerComplete(char16 propId) 
+{
+
+}
+
+callback void gameHasStarted()
+{           
+}
+*/
+/////// Defaults END /////////////////////////////////////////////
+
+
+function void ScriptHasStarted()
+{
+    //SetLevelVarsBFStory("obj_Cat", "vmTrig");
+    SetBFStoryPrefixes("obj_Cat", "vmTrig");
+    BFObjectiveSetCopy(true);
+    ResetObjectives("mObjTmp", 12);
+    JumpToObjective(1, false);
+}
+
+function int ObjectiveTriggerTests(int iObjective, char16 inTriggerProp, int iResult) 
+{
+    return iResult;
+}
+
+function void ObjectiveTests(int iObjective) 
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+    int iNumTanks;
+    iNumTanks = propGroupSpCountAliveSpawnedProps(propRefFromName("obj1_tnks_G"));
+
+    if (iObjective == 12)   // Destroy the cis tanks  (bonus)
+    {
+	if (iNumTanks == 0) // There are four in total
+	{
+	   nextObjective(iObjective); 
+	}
+
+    }
+    if (endCutScene)
+    {
+    	playTimeline("data/bf/timelines/cs04.res");
+    	endCutScene = false;
+    	//waitForGameTime(1.0f);
+    	nextObjective(iObjective);
+    }
+
+}
+
+function void shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    if (spline ==  propRefFromName("AILAAT_spln"))
+    {
+/*
+
+	if (segment == 2)
+	    {
+		PassengerVehicleBF(propRefFromName("laat2_01"), ship, true, "PASSNGR1");
+		PassengerVehicleBF(propRefFromName("laat2_02"), ship, true, "PASSNGR2");
+		PassengerVehicleBF(propRefFromName("laat2_03"), ship, true, "PASSNGR3");
+		PassengerVehicleBF(propRefFromName("laat2_04"), ship, true, "PASSNGR4");
+	    }
+*/
+    if (segment == 5)
+	    {
+		propref spline2;
+		spline2 = propRefFromName("AILAAT_spln2");
+		BFShipFollowScriptedSplineNoAvoidance(ship , spline2 );
+	    }
+    }
+    if (spline ==  propRefFromName("AILAAT_spln2"))
+    {
+	if (segment == 1)
+	    {
+	    }
+	else if (segment == 3)
+	    {
+		propref spline3;
+		spline3 = propRefFromName("AILAAT_spln3");
+		BFShipFollowScriptedSplineNoAvoidance(ship , spline3 );
+	    }
+    }
+    if (spline == propRefFromName("AILAAT_spln3"))
+    {
+	if (segment == 1)
+	    {
+	    }
+	else if (segment == 7)
+	    {
+		propref spline4;
+		spline4 = propRefFromName("AILAAT_spln4");
+		BFShipFollowScriptedSplineNoAvoidance(ship , spline4 );
+	    }
+    }
+    if (spline == propRefFromName("AILAAT_spln4"))
+    {
+	
+	if (segment == 3)
+	    {
+		activateTalkingHeadNew("CatClone07", true);
+		BFRequestAILandShip(ship ,propRefFromName("LandPadProp1"));
+		spawnGroupSetActive(propRefFromName("LAAT2_G"), true);
+	    }
+/*	else if (segment == 4)
+	    {
+		BFRequestAILandShip(ship ,propRefFromName("LandPadProp1"));
+	    }
+
+	else if (segment == 5)
+	    {
+		
+		propDelete(ship);
+		SpawnPropFromTemplate("rep_gunship", propRefFromName("AI_land1_dof"), vector(0.0f, 0.0f, 0.0f));
+		spawnGroupSetActive(propRefFromName("LAAT2_G"), true);
+		
+	    }
+*/
+    }
+
+    if (spline == propRefFromName("shipspline1"))
+    {
+	if (segment == 5)
+	    {
+		propref spline7;
+		spline7 = propRefFromName("shipspline2");
+		BFShipFollowScriptedSplineNoAvoidance(ship , spline7 );
+
+	
+	    }
+    }
+    if (spline == propRefFromName("shipspline2"))
+    {
+	
+	if (segment == 11 && tank_msg) //Shoot the tanks
+	    {
+		activateTalkingHeadNew("CatClone10", true);
+		catBonus1 = StringToChar16("obj_Cat12"); //
+		BFObjectiveAddBonus(catBonus1, 12);	        // 
+		ObjectiveSetup(catBonus1, 12, 0);
+		tank_msg = false;   //only say it once
+	    }
+    }
+    if (spline == propRefFromName("shipspline2"))
+    {
+	
+	if (segment == 17) //go around for another pass
+	    {
+		    activateTalkingHeadNew("CatClone08", true);
+		   // activateTalkingHeadNew("CatClone10", true);
+		    propref spline5;
+		    spline5 = propRefFromName("shipspline3");
+		    BFShipFollowScriptedSplineNoAvoidance(ship , spline5 );
+
+	    }
+    }
+    if (spline == propRefFromName("shipspline3"))
+    {
+	
+	if (segment == 19)
+	    {
+		//activateTalkingHeadNew("CatClone02", true);
+		propref spline6;
+		spline6 = propRefFromName("shipspline2");
+		BFShipFollowScriptedSplineNoAvoidance(ship , spline6 );
+
+	
+	    }
+    }
+
+}
+
+
+///////////////////////////////////////// OBJECTIVES
+
+function boolean ObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{
+    if (iObjective == 1)	// Objective 1: (flying) Take out the turrets
+    {
+	//start the player in a LAAT gunship on the outskirts of the city
+	propRef player = getPlayerPropRefFromID(GetPlayerId());
+	
+	spawnGroupSetActive(propRefFromName("landPadRep_G"), true); //players laat passengers
+//	spawnGroupSetActive(propRefFromName("LAAT2_G"), true);	//laat2 passengers
+	//The Gunships that fly in at the beginning of the mission
+	//AIGunship2 is the one the player is a gunner in
+	propref AIGunship1, AIGunship3; 
+	propref spline1, spline2, spline3;
+	AIGunship1 = SpawnAIVehicleWithObjectives(propRefFromName("AI_LAAT1_DOF"), "rep_troop_snpc", "rep_gunship", 1, false, k_seatPos_driver, StringToChar16(""));
+	spline1 = propRefFromName("AILAAT_spln");
+	AIGunship2 = SpawnAIVehicleWithObjectives(propRefFromName("dofProp_1"), "rep_troop_snpc", "rep_gunship", 1, false, k_seatPos_driver, StringToChar16(""));
+	spline2 = propRefFromName("shipspline1");
+	
+//  Superbattledroids on a rooftop near the start of the mission - they don't seem to target the player
+//	spawnGroupSetActive(propRefFromName("rocket01_G"), true);
+//	BFNPCGroupObjectiveSetType(cObjectiveName, "rocket01_G",  k_objtype_attack_prop);
+///        BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "rocket01_G" ,AIGunship2, 1300, 1300);
+
+	lib_SetupTeamZone(cObjectiveName, 1, "LndPad_home", "LndPad_targ", k_objtype_clear_area);
+	lib_SetupGroupZone(cObjectiveName, "LAAT2_G", "forcourt_hom", "forcourt_tar", k_objtype_clear_area);
+    
+	//activateTalkingHead(0.0f, 1.75f, -1.3f, 0.0f, 1.75f, -2.0f, 7.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_lnd_tlk01", "Sir - We're going to do a flyby. Take out those turrets");
+	activateTalkingHeadNew("CatClone01", true);
+
+	addPropToGroup(propRefFromName("Spwn-1"), propRefFromName("tBesSntryGun1_"));
+	addPropToGroup(propRefFromName("Spwn-1"), propRefFromName("tBesSntryGun2_"));
+	addPropToGroup(propRefFromName("Spwn-1"), propRefFromName("tBesSntryGun3_"));
+	addPropToGroup(propRefFromName("Spwn-1"), propRefFromName("tBesSntryGun4_"));
+	addPropToGroup(propRefFromName("Spwn-1"), propRefFromName("tBesSntryGun5_"));
+	addPropToGroup(propRefFromName("Spwn-1"), propRefFromName("tBesSntryGun6_"));
+	addPropToGroup(propRefFromName("Spwn-1"), propRefFromName("tBesSntryGun7_"));
+	addPropToGroup(propRefFromName("Spwn-1"), propRefFromName("tBesSntryGun8_"));
+	addPropToGroup(propRefFromName("Spwn-1"), propRefFromName("tBesSntryGun9_"));
+	addPropToGroup(propRefFromName("Spwn-1"), propRefFromName("tSentryGunBF1"));
+	addPropToGroup(propRefFromName("Spwn-1"), propRefFromName("tSentryGunBF2"));
+	addPropToGroup(propRefFromName("Spwn-1"), propRefFromName("tSentryGunBF3"));
+	addPropToGroup(propRefFromName("Spwn-1"), propRefFromName("tSentryGunBF4"));
+	addPropToGroup(propRefFromName("Spwn-1"), propRefFromName("tSentryGunBF5"));
+				
+		     
+	//All the calls after this one (to make the ship follow the various splines) are 
+	//located in shipReachedScriptedSplineSegment above
+
+	//BW- quick hack fix for MS22 to stop ship getting shot down too quickly (remote brains now use the target lead pos to aim at)
+	SetPropRefInvincible(AIGunship2, true);
+	BFShipFollowScriptedSplineNoAvoidance(AIGunship1 , spline1 );
+	BFShipFollowScriptedSplineNoAvoidance(AIGunship2 , spline2 );
+	PassengerVehicleBF(player, AIGunship2, true, "PASSNGR1");
+	BFEnableSwitchSeats(AIGunship2, false);
+	//the remaining passengers are added to the ship in the bonus objective (obj_12)
+
+	lib_AddIndicatorsToGroup(propRefFromName("Spwn-1"), 0, true);
+	SetObjectiveKillSpawners(1, iObjective);
+
+	//Bonus Objective tanks (to be destroyed)
+	addPropToGroup(propRefFromName("obj1_tnks_G"), propRefFromName("aat1"));
+	addPropToGroup(propRefFromName("obj1_tnks_G"), propRefFromName("aat2"));
+	addPropToGroup(propRefFromName("obj1_tnks_G"), propRefFromName("cis_snailtank1"));
+	addPropToGroup(propRefFromName("obj1_tnks_G"), propRefFromName("cis_snailtank2"));
+
+/*
+	//tanks rolling around from each side
+	propref tank1, tank2;
+	propref gunner1, gunner2;
+	gunner1 = SpawnCharacterBF("cis_battledroid_npc_story",propRefFromName("tankGunr1DOF"), vector(0, 0, 0)); //right tank (from the view of the landing pad)
+	//gunner2 = SpawnCharacterBF("cis_battledroid_npc_story",propRefFromName("tankGunr2DOF"), vector(0, 0, 0)); //left tank (from the view of the landing pad)
+	tank1 = SpawnAIVehicleWithObjectives(propRefFromName("tankspwn1DOF"), "cis_battledroid_npc_story", "cis_snailtank", 1, false, k_seatPos_driver, StringToChar16(""));
+	//tank2 = SpawnAIVehicleWithObjectives(propRefFromName("tankspwn2DOF"), "cis_battledroid_npc_story", "cis_aat", 1, false, k_seatPos_driver,cObjectiveName,"");
+	DriveVehicleBF(gunner1, tank1, k_seatPos_passenger);
+	//DriveVehicleBF(gunner2, tank2, k_seatPos_passenger);
+*/
+
+    } 
+    else if (iObjective == 2)	// Objective 2: Secure the landing pad
+    { 
+	if (iSubObjective == 1)
+	{     
+	    //the player has landed so spawn the republic backup..
+	// they sould be in the laat!    spawnGroupSetActive(propRefFromName("landPadRep_G"), true);
+	    lib_SetupTeamZone(cObjectiveName, 0, "LndPad_home", "LndPad_targ", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "LAAT2_G", "forcourt_hom", "forcourt_tar", k_objtype_clear_area);
+	    //..and the landing pad enemy reinforcements
+	    spawnGroupSetActive(propRefFromName("Spwn1-2_1"), true);
+	    lib_SetupTeamZone(cObjectiveName, 1, "LndPad_home", "LndPad_targ", k_objtype_clear_area);
+
+	    activateTalkingHeadNew("CatClone02", true);
+	    //player squad setup
+	    chrAIJoinGroup( propRefFromName("plyrlaat01"), "player" );
+	    chrAIJoinGroup( propRefFromName("plyrlaat02"), "player" );
+	    chrAIJoinGroup( propRefFromName("plyrlaat03"), "player" ); //does the player really need three guys?
+
+	    removeObjectiveIndicatorFromProp(propRefFromName("aat1"));
+	    removeObjectiveIndicatorFromProp(propRefFromName("aat2"));
+	    removeObjectiveIndicatorFromProp(propRefFromName("cis_snailtank1"));
+	    removeObjectiveIndicatorFromProp(propRefFromName("cis_snailtank2"));
+	    //char16 catBonus1 = StringToChar16("obj_Cat12"); //
+	    catBonus1 = StringToChar16("obj_Cat12"); //
+	    BFObjectiveFailObjective(catBonus1, 12); 
+	    BFEnableSwitchSeats(AIGunship2, true);
+	
+	    SetObjectiveKillSpawners(2, iObjective);    
+	}
+	else
+	{	        
+	    activateTalkingHeadNew("CatClone11", true);
+	    
+	    lib_SetupGroupZone(cObjectiveName, "LAAT2_G", "forcourt_hom", "forcourt_tar", k_objtype_clear_area);
+	    //Tell the players ship to land
+	    BFRequestAILandShip(AIGunship2 ,propRefFromName("LandPadProp3_"));
+
+	    addNewObjectiveIndicatorToProp(propRefFromName("landPad_DOF"), k_objectiveIndicatorType_mainObjective);		
+	    
+	    SetObjectiveTriggered(true, iObjective); //the player has landed
+	    SetNumSubObjectives(1, iObjective);
+	}
+    }
+    else if (iObjective == 3)	// Objective 3: Clear the square
+    { 
+        //SetObjectiveTimer(cObjectiveName, 20);
+	SetObjectiveKillSpawners(1, iObjective);
+
+	//Republic team orders
+	lib_SetupTeamZone(cObjectiveName, 0, "forcourt_hom", "forcourt_tar", k_objtype_clear_area);
+
+	//spawn enemies coming from the gallery buildings to protect the forecourt square
+	spawnGroupSetActive(propRefFromName("Spwn-3"), true);
+	lib_SetupTeamZone(cObjectiveName, 1, "forcourt_hom", "forcourt_tar", k_objtype_clear_area);
+//  These tanks seem to be too powerful. Consider alternate vehicles
+	//tanks rolling around from each side
+/*
+	propref tank1, tank2;
+	propref gunner1, gunner2;
+	gunner1 = SpawnCharacterBF("cis_battledroid_npc_story",propRefFromName("tankGunr1DOF"), vector(0, 0, 0)); //right tank (from the view of the landing pad)
+//	gunner2 = SpawnCharacterBF("cis_battledroid_npc_story",propRefFromName("tankGunr2DOF"), vector(0, 0, 0)); //left tank (from the view of the landing pad)
+	tank1 = SpawnAIVehicleWithObjectives(propRefFromName("tankspwn1DOF"), "cis_btldrd_snpc", "cis_aat", 1, false, k_seatPos_driver, StringToChar16(""));
+//	tank2 = SpawnAIVehicleWithObjectives(propRefFromName("tankspwn2DOF"), "cis_btldrd_snpc", "cis_aat", 1, false, k_seatPos_driver,cObjectiveName,"");
+	PassengerVehicleBF(gunner1, tank1, false);
+//	PassengerVehicleBF(gunner2, tank2, false);
+	
+
+	addPropToGroup(propRefFromName("Spwn1-3"), tank1);
+*/	
+	activateTalkingHeadNew("CatClone03", true);
+	
+	removeObjectiveIndicatorFromProp(propRefFromName("landPad_DOF"));
+        addNewObjectiveIndicatorToProp(propRefFromName("forcourt_DOF"), k_objectiveIndicatorType_mainObjective);
+	    
+   } 
+    else if (iObjective == 4)	// Objective 4: Deactivate the AA guns
+    { 
+	
+	//spawn the first group in the gallery interior
+	spawnGroupSetActive(propRefFromName("gallInt1_G"), true);
+	lib_SetupTeamZone(cObjectiveName, 1, "gallInt1_hom", "gallInt1_tar", k_objtype_clear_area);
+	//spawn the second group in the gallery interior (nearer the AA gun controls)
+	spawnGroupSetActive(propRefFromName("gallInt2_G"), true);
+
+//  These two lines may be commented out if I find they break everything
+	BFNPCGroupObjectiveSetType(cObjectiveName,"gallInt2_G",  k_objtype_defend_prop);
+	BFNPCGroupObjectiveSetTargetProp(cObjectiveName,"gallInt2_G",propRefFromName("vmTrig4"), 20, 30);
+
+	//lib_SetupGroupZone(cObjectiveName, "gallInt2_G", "gallInt2_hom", "gallInt2_tar", k_objtype_clear_area);
+
+	//republic team orders
+	lib_SetupTeamZone(cObjectiveName, 0, "gallInt1_hom", "gallInt1_tar", k_objtype_clear_area);
+
+	removeObjectiveIndicatorFromProp(propRefFromName("forcourt_DOF"));
+//	addObjectiveIndicatorToProp(propRefFromName("vmTrig4"), vector(0.f, 0.f, 0.f), vector(1.0, 1.0, 0.0));
+        addNewObjectiveIndicatorToProp(propRefFromName("vmTrig4"), k_objectiveIndicatorType_mainObjective);	
+
+	activateTalkingHeadNew("CatClone04", true);
+	
+	SetObjectiveTriggered(true, iObjective); //the button that the player needs to press is a vm vmprop	
+    }
+    else if (iObjective == 5)	// Objective 5: Destroy long-range radio communications
+    { 
+	//in case one of the previous groups is still active
+	lib_SetupGroupZone(cObjectiveName, "gallInt1_G", "gallInt1_hom", "gallInt1_tar", k_objtype_clear_area);
+        //spawn the third group in the gallery upper balcony
+	spawnGroupSetActive(propRefFromName("gallInt3_G"), true);
+	lib_SetupTeamZone(cObjectiveName, 1, "gallInt3_hom", "gallInt3_tar", k_objtype_clear_area);
+	//spawn the fourth group in the gallery interior (by the radio tower)
+	spawnGroupSetActive(propRefFromName("gallInt4_G"), true);
+	lib_SetupGroupZone(cObjectiveName, "gallInt4_G", "gallInt4_hom", "gallInt4_tar", k_objtype_hold_area);
+
+	//the radio consoles 
+	addPropToGroup(propRefFromName("Spwn-5"), propRefFromName("radio_cont1"));
+	addPropToGroup(propRefFromName("Spwn-5"), propRefFromName("radio_cont2"));
+	addPropToGroup(propRefFromName("Spwn-5"), propRefFromName("radio_cont3"));
+	addPropToGroup(propRefFromName("Spwn-5"), propRefFromName("radio_cont4"));
+
+	lib_AddIndicatorsToGroup(propRefFromName("Spwn-5"), 0, true);
+	SetObjectiveKillSpawners(1, iObjective);
+
+	//republic team orders
+	lib_SetupTeamZone(cObjectiveName, 0, "gallInt4_hom", "gallInt4_tar", k_objtype_clear_area);
+	
+	//activateTalkingHead(0.0f, 1.75f, -1.3f, 0.0f, 1.75f, -2.0f, 7.0f,"characters/soldiers/rep/clonecommander/clonecommander_texboned", "AN_lnd_tlk01", "Starting our attack run now. Sir- we can't get through until that laser defense grid is down");
+	activateTalkingHeadNew("CatClone05", true);
+	
+	removeObjectiveIndicatorFromProp(propRefFromName("vmTrig4"));
+    }
+    else if (iObjective == 6)	// Objective 6: Use the turret to destroy the tanks
+    { 
+	if (iSubObjective == 1)
+	{   
+	    lib_SetupGroupZone(cObjectiveName, "tankorder_G", "repbatl2_hom", "repbatl2_hom", k_objtype_clear_area);
+	    
+	    propref obj6_tank1, obj6_tank2, obj6_gunner1, obj6_gunner2;
+	    obj6_tank1 = SpawnAIVehicleWithObjectives(propRefFromName("tankspn5DOF"), "cis_btldrd_snpc", "cis_aat", 1, false, k_seatPos_driver, StringToChar16("tankorder_G"));
+	    obj6_tank2 = SpawnAIVehicleWithObjectives(propRefFromName("tankspn8DOF"), "cis_btldrd_snpc", "cis_aat", 1, false, k_seatPos_driver, StringToChar16("tankorder_G"));
+	    obj6_gunner1 = SpawnCharacterBF("cis_battledroid_npc_story",propRefFromName("tankGnr5DOF"), vector(0, 0, 0));
+	    obj6_gunner2 = SpawnCharacterBF("cis_battledroid_npc_story",propRefFromName("tankGnr8DOF"), vector(0, 0, 0));
+	    
+	    PassengerVehicleBF(obj6_gunner1, obj6_tank1, false );
+	    PassengerVehicleBF(obj6_gunner2, obj6_tank2, false );
+
+	    addPropToGroup(propRefFromName("Spwn-6_1"), obj6_tank1);
+	    addPropToGroup(propRefFromName("Spwn-6_1"), obj6_tank2);
+	    
+	    lib_AddIndicatorsToGroup(propRefFromName("Spwn-6_1"), 0, true);
+
+	    SetObjectiveKillSpawners(1, iObjective);
+	}
+	else
+	{
+	    //spawn the fifth group in the gallery upper after the radio
+	    spawnGroupSetActive(propRefFromName("gallInt5_G"), true);
+	    lib_SetupTeamZone(cObjectiveName, 1, "gallInt5_hom", "gallInt5_tar", k_objtype_hold_area);
+
+	    //Repbulic team orders
+	    lib_SetupTeamZone(cObjectiveName, 0, "gallInt5_hom", "gallInt5_tar", k_objtype_clear_area);
+
+	    addNewObjectiveIndicatorToProp(propRefFromName("repTurret1"), k_objectiveIndicatorType_mainObjective);		
+	
+	    //activateTalkingHead(0.0f, 1.75f, -1.3f, 0.0f, 1.75f, -2.0f, 7.0f, "characters/soldiers/rep/clonecommander/clonecommander_texboned", "AN_lnd_tlk01", "Commencing attack. Get here as soon as you can. We're going to need you");
+	    activateTalkingHeadNew("CatClone06", true);
+
+	    // Lose the doors so the reinforcements can get through
+	    propDelete(propRefFromName("besdorLzrSml5_"));
+	    propDelete(propRefFromName("besdorLzrSml6_"));
+	    propDelete(propRefFromName("besdorLzrSml7_"));
+	    propDelete(propRefFromName("besdorLzrSml8_"));
+	    propDelete(propRefFromName("besdorLzrSml4_"));
+	    propDelete(propRefFromName("besdorLzrSml3_"));
+	    propDelete(propRefFromName("besdorLzrSml1_"));
+	
+	//Let the battle commence! (exterior battle that is visible to the player through the window)
+	    //the two LAAT's that look like they dropped off the troops
+	    propRef laat;
+	    laat = SpawnPropFromTemplate("rep_gunship", propRefFromName("bat_laat1_dof"), vector(0.0f, 0.0f, 0.0f));
+	    laat = SpawnPropFromTemplate("rep_gunship", propRefFromName("bat_laat2_dof"), vector(0.0f, 0.0f, 0.0f));
+		//the infantry
+	    spawnGroupSetActive(propRefFromName("repbattle_G"), true);
+	    lib_SetupGroupZone(cObjectiveName, "repbattle_G", "repbatle_hom", "battle_tar", k_objtype_clear_area);
+	    spawnGroupSetActive(propRefFromName("repbatl2_G"), true);
+	    lib_SetupGroupZone(cObjectiveName, "repbatl2_G", "repbatl2_hom", "battle2_tar", k_objtype_clear_area);
+	    spawnGroupSetActive(propRefFromName("cisbattle_G"), true);	
+	    lib_SetupGroupZone(cObjectiveName, "cisbattle_G", "cisbatle_hom", "battle_tar", k_objtype_clear_area);
+	    spawnGroupSetActive(propRefFromName("cisbatl2_G"), true);	
+	    lib_SetupGroupZone(cObjectiveName, "cisbatl2_G", "cisbatl2_hom", "battle2_tar", k_objtype_clear_area);
+		//tanks a lot
+	    propref battletank1, battletank2, battletank3, battletank4;
+	    propref atte1, atte1_gunner;
+	    propref bgunner1, bgunner2, bgunner3, bgunner4;
+	
+	    bgunner1 = SpawnCharacterBF("cis_battledroid_npc_story",propRefFromName("tankGnr3DOF"), vector(0, 0, 0));
+	    bgunner2 = SpawnCharacterBF("cis_battledroid_npc_story",propRefFromName("tankGnr4DOF"), vector(0, 0, 0));
+	    bgunner3 = SpawnCharacterBF("rep_clonetrooper_npc_story",propRefFromName("tankGnr6DOF"), vector(0, 0, 0));
+	    bgunner4 = SpawnCharacterBF("rep_clonetrooper_npc_story",propRefFromName("tankGnr7DOF"), vector(0, 0, 0));
+	
+	    atte1_gunner = SpawnCharacterBF("rep_clonetrooper_npc_story",propRefFromName("ATTE1gnrDOF"), vector(0, 0, 0));
+	
+	    battletank1 = SpawnAIVehicleWithObjectives(propRefFromName("tankspn3DOF"), "cis_btldrd_snpc", "cis_snailtank", 1, false, k_seatPos_driver, StringToChar16("cisbatl2_G"));
+	    battletank2 = SpawnAIVehicleWithObjectives(propRefFromName("tankspn4DOF"), "cis_btldrd_snpc", "cis_snailtank", 1, false, k_seatPos_driver, StringToChar16("cisbattle_G"));
+	    battletank3 = SpawnAIVehicleWithObjectives(propRefFromName("tankspn6DOF"), "rep_troop_snpc", "rep_clone_hover_tank", 1, false, k_seatPos_driver, StringToChar16("repbatl2_G"));
+	    battletank4 = SpawnAIVehicleWithObjectives(propRefFromName("tankspn7DOF"), "rep_troop_snpc", "rep_clone_hover_tank", 1, false, k_seatPos_driver, StringToChar16("repbattle_G"));
+	
+	    atte1 = SpawnAIVehicleWithObjectives(propRefFromName("ATTE1_DOF"), "rep_troop_snpc", "rep_atte", 1, false, k_seatPos_driver, StringToChar16("cisbatl2_G"));
+	
+	    PassengerVehicleBF(bgunner1, battletank1, false );
+	    PassengerVehicleBF(bgunner2, battletank2, false );
+	    PassengerVehicleBF(bgunner3, battletank3, false );
+	    PassengerVehicleBF(bgunner4, battletank4, false );
+	
+	    PassengerVehicleBF(atte1_gunner, atte1, false );
+
+		//End of battle setup
+
+
+	
+	//battle orders (so the battle continues)
+	//lib_SetupGroupZone(cObjectiveName, "repbattle_G", "repbatle_hom", "battle_tar", k_objtype_clear_area);
+	//lib_SetupGroupZone(cObjectiveName, "cisbattle_G", "cisbatle_hom", "battle_tar", k_objtype_clear_area);
+	//lib_SetupGroupZone(cObjectiveName, "repbatl2_G", "repbatl2_hom", "battle2_tar", k_objtype_clear_area);
+	//lib_SetupGroupZone(cObjectiveName, "cisbatl2_G", "cisbatl2_hom", "battle2_tar", k_objtype_clear_area);
+	
+	    SetObjectiveTriggered(true, iObjective);
+	    SetNumSubObjectives(1, iObjective);
+	}
+    }
+    else if (iObjective == 7)	// Objective 7: Shut down the droid controls
+    { 
+	if (iSubObjective == 1)
+	{     
+	
+	    lib_SetupTeamZone(cObjectiveName, 1, "cit_int2_tar", "cit_int2_tar", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "Spwn1-7_1", "cit_cont_ext", "cit_int2_tar", k_objtype_clear_area);
+	    spawnGroupSetActive(propRefFromName("Spwn1-7_1"), true);	//droidekas
+	    
+	    spawnGroupSetActive(propRefFromName("cit_cont_G"), true);	//droid control room
+	    lib_SetupGroupZone(cObjectiveName, "cit_cont_G", "cit_cont_hom", "cit_cont_tot", k_objtype_hold_area);
+	  
+	    spawnGroupSetActive(propRefFromName("cit_ent_G"), true);	//citadel corridors
+	    lib_SetupGroupZone(cObjectiveName, "cit_ent_G", "cit_corr_both", "cit_int2_tar", k_objtype_hold_area);
+	    
+	    //battle orders (so the battle participants have orders)
+	    lib_SetupGroupZone(cObjectiveName, "repbattle_G", "repbatle_hom", "battle_tar", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "cisbattle_G", "cisbatle_hom", "battle_tar", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "repbatl2_G", "repbatl2_hom", "battle2_tar", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "cisbatl2_G", "cisbatl2_hom", "battle2_tar", k_objtype_clear_area);
+
+
+	    //deactivate the battle spawners so the battle winds down
+	    DeactivateSpawner("repbattle_G");
+	    DeactivateSpawner("cisbattle_G");
+	    DeactivateSpawner("repbatl2_G");
+	    DeactivateSpawner("cisbatl2_G");
+    
+	    SetObjectiveKillSpawners(1, iObjective);
+	}
+	else
+	{
+	    //Republic team orders
+	    lib_SetupTeamZone(cObjectiveName, 0, "cit_cont_hom", "cit_int2_tar", k_objtype_clear_area);
+
+	    removeObjectiveIndicatorFromProp(propRefFromName("repTurret1"));
+
+	    addPropToGroup(propRefFromName("Spwn-7_1"), propRefFromName("drd_cont1"));
+	    addPropToGroup(propRefFromName("Spwn-7_1"), propRefFromName("drd_cont2"));
+	    lib_AddIndicatorsToGroup(propRefFromName("Spwn-7_1"), 0, true);
+
+	    //battle orders (so the battle continues)
+	    lib_SetupGroupZone(cObjectiveName, "repbattle_G", "repbatle_hom", "battle_tar", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "cisbattle_G", "cisbatle_hom", "battle_tar", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "repbatl2_G", "repbatl2_hom", "battle2_tar", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "cisbatl2_G", "cisbatl2_hom", "battle2_tar", k_objtype_clear_area);
+
+	    activateTalkingHeadNew("CatClone09", true);
+//	    spawnGroupSetActive(propRefFromName("Ferroda_G"), true);
+	    SetObjectiveTriggered(true, iObjective);
+	    SetNumSubObjectives(1, iObjective);
+	}
+    }
+    else if (iObjective == 8)	//Objective 8: Order 66 
+    { 
+//	BFKillAllNPCsFromTeam(1);
+
+	//None of these seem to work
+	BFKillAllNPCsFromSpawnGroup("cisbattle_G");
+	BFKillAllNPCsFromSpawnGroup("cisbatl2_G");
+	BFKillAllNPCsFromSpawnGroup("Spwn-7_1");
+	BFKillAllNPCsFromSpawnGroup("cit_cont_G");
+	BFKillAllNPCsFromSpawnGroup("cit_ent_G");
+	BFKillAllNPCsFromSpawnGroup("gallInt3_G");
+	BFKillAllNPCsFromSpawnGroup("gallInt4_G");
+	BFKillAllNPCsFromSpawnGroup("gallInt1_G");
+	BFKillAllNPCsFromSpawnGroup("gallInt2_G");
+
+	spawnGroupSetActive(propRefFromName("ext_throne_G"), true);
+	lib_SetupGroupZone(cObjectiveName, "ext_throne_G", "cit_thrn_rm_ent", "cit_thrn_rm_ent", k_objtype_hold_area);
+	
+        addNewObjectiveIndicatorToProp(propRefFromName("ext_thrn_DOF"), k_objectiveIndicatorType_mainObjective);
+	SetObjectiveTriggered(true, iObjective);	
+    }
+    else if (iObjective == 9)	//Order 66
+    {
+	endCutScene = true;
+	
+	//This is set in Objectivetests
+    }
+    else if (iObjective == 10)	//ferroda fight
+    {
+        BFNPCGroupObjectiveSetType(cObjectiveName, "Spwn-10",  k_objtype_attack_prop);
+        BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "Spwn-10" ,propRefFromName("player_0"), 5, 5);
+	propTeleportToProp(propRefFromName("player_0"), propRefFromName("fer_fight_DOF"));
+	spawnGroupSetActive(propRefFromName("Spwn-10"), true);
+	propDelete(propRefFromName("catThroneDoor1"));
+	removeObjectiveIndicatorFromProp(propRefFromName("ext_thrn_DOF"));
+//	re-enable this when the lance works
+//	playerForceClassSwitch(propRefFromName("player_0"), "STR_CHRNAME_STORY_X2_MELEE");
+
+	lib_AddIndicatorsToGroup(propRefFromName("Spwn-10"), 0, true);
+	SetObjectiveKillSpawners(1, iObjective);
+    }
+    else if (iObjective == 11)
+    {
+	    bEndLevel = true;
+    }
+    else if (iObjective == 12) // **BONUS** Destroy the CIS vehicles on the ground
+    {
+        addNewObjectiveIndicatorToProp(propRefFromName("aat1"), k_objectiveIndicatorType_bonusObjective);		
+        addNewObjectiveIndicatorToProp(propRefFromName("aat2"), k_objectiveIndicatorType_bonusObjective);		
+        addNewObjectiveIndicatorToProp(propRefFromName("cis_snailtank1"), k_objectiveIndicatorType_bonusObjective);		
+        addNewObjectiveIndicatorToProp(propRefFromName("cis_snailtank2"), k_objectiveIndicatorType_bonusObjective);		
+	//This bonus objective is completed in ObjectiveTests()
+
+	//populate the players LAAT
+	PassengerVehicleBF(propRefFromName("playersqd2"), AIGunship2, true, "PASSNGR2");
+	PassengerVehicleBF(propRefFromName("playersqd3"), AIGunship2, true, "PASSNGR3");
+	PassengerVehicleBF(propRefFromName("plyrlaat01"), AIGunship2, true, "PASSNGR4");
+	PassengerVehicleBF(propRefFromName("plyrlaat02"), AIGunship2, true, "PASSNGR5");
+	PassengerVehicleBF(propRefFromName("plyrlaat03"), AIGunship2, true, "PASSNGR6");
+
+	//spawn the enemies on the landing pad
+	spawnGroupSetActive(propRefFromName("Spwn-2_1"), true);
+
+    }
+    else
+    {
+	// The end
+//	CompleteLevel();
+    }
+    
+    return true;
+}
+
+///////////////This Script Actions
+
+//playTimelineOffset("data/bf/timelines/cs03.res", vector(-1000.f, -1000.f, 1000.f));
+
+wholeScreenFade(0.0f, 1.0f, false);
+waitForGameTime(0.1f);
+ScriptHasStarted(); //Do any setups
+waitForGameTime(0.5f);
+wholeScreenFade(1.0f, 0.0f, false);
+
+int dooku_dead = 0;
+int console1_destroyed = 0;
+int console2_destroyed = 0;
+int AAGunConsole_destroyed = 0;
+
+//Main game loop
+while(!bEndLevel)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    ProcessCallBacks();    
+    ObjectiveSetupCheck();
+
+    for (i=0; i<iNumActive; i++)
+    {
+        int iObjective = BFObjectiveGetNumForNthActive(i);
+        ObjectiveTests(iObjective);        
+        waitForGameTime(0.01f);
+    }
+
+    waitForGameTimeOrLVChange(0.5f, "iObjLV", "iCBLV");
+
+    logStr("tick");
+    logInt(iObjective);    
+}
+
+//playTimeline("data/bf/timelines/cs04.res");
+NextLevel("dantooine/dantooine_story.res");
+
+
+

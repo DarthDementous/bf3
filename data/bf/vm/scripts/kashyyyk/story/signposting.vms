@@ -1,0 +1,254 @@
+// vim: set syntax=c :
+logstr("started running signposting script");
+
+///////////////////////////////
+// INITIALISE
+///////////////////////////////
+waitForGameTime(1.3f);
+
+soundchannel sc1;
+int i;
+
+// TANNOY: Emergency Emergency
+playSound("l12a_010_announcer");
+
+waitForGameTime(2.0f);
+
+// Rebel: We’re under attack!
+playSound("l12a_030_rebelpilot");
+
+WaitUntilLevelVarFlagChangesTo("speech2a", 1);
+
+// SH: "X2, where are you?  We need you out here now! Find a ship and get out here!"
+activateTalkingHeadNew("KashShara_getToShip", true);
+playSound("l12b_010_shara");
+
+// TANNOY: All pilots report to the hangar bay!
+playSound("l12a_020_announcer");
+
+/////////////////////////////////
+// RANDOM CHATTER
+/////////////////////////////////
+
+
+
+// Rebel: Incoming Enemy fighters!
+//playSound("l12c_050_rebelpilot");
+
+//////////////////////////
+// SHOOT DOWN INTERDICTER
+//////////////////////////
+WaitUntilLevelVarFlagChangesTo("speech3a", 1);
+waitForGameTime(2.0f);
+
+// SH:"Welcome to the party X2. You’re missing all the fun."
+activateTalkingHeadNew("KashShara_inter1a", true);
+sc1 = playSound("l12c_010_shara");
+soundWaitUntilFinished(sc1);
+waitForGameTime(0.5f);
+
+// "Incoming enemy fighters"
+//activateTalkingHeadNew("KashReb_inter1c", true);
+sc1 = playSound("l12c_050_rebelpilot");
+soundWaitUntilFinished(sc1);
+
+waitForGameTime(5.0f);
+
+// "The Interdictor frigate is immobilizing our transport ships"
+activateTalkingHeadNew("KashShara_inter1b", true);
+playSound("l12c_020_shara");
+
+waitForGameTime(9.0f);
+
+if(GetLevelVarFlag("speech4a")==0)
+{
+    // Destroy the domes on the ships exterior. They're the gravity well projectors that are preventing our fleet's escape!
+    activateTalkingHeadNew("KashShara_inter2", true);
+}
+
+//if(GetLevelVarFlag("speech4a")==0)
+//{
+  //  waitForGameTime(7.0f);
+//}
+
+//if(GetLevelVarFlag("speech4a")==0)
+//{
+    // Our transport ships are getting torn apart by the tributary beam on the planet's surface. We got to get our guys out of here quickly! Take down that Interdictor!
+  //  activateTalkingHeadNew("KashReb_inter3", true);
+//}
+
+/////////////////////////////////////////////
+// PROTECT FLEET AS THEY JUMP INTO HYPERSPACE
+/////////////////////////////////////////////
+WaitUntilLevelVarFlagChangesTo("speech4a", 1);
+
+waitForGameTime(5.0f);
+
+// SH: "Great work Grey Squadron!"
+activateTalkingHeadNew("KashShara_protect1", true);
+sc1 = playSound("l12d_010_shara");
+soundWaitUntilFinished(sc1);
+waitForGameTime(1.0f);
+
+// SH: "Keep those fighters at bay long enough for our transports to escape!"
+sc1 = playSound("l12d_020_shara");
+soundWaitUntilFinished(sc1);
+waitForGameTime(1.0f);
+
+// Rebel: Incoming Fighters!
+playSound("l12a_040_rebelpilot");
+
+WaitUntilLevelVarFlagChangesTo("speech4b", 1);
+
+// REB: "Grey Squadron. Those Star Destroyers are causing problems. Somebody take out their turrets!"
+activateTalkingHeadNew("KashReb_turretBonus1", true);
+
+waitForGameTime(1.0f);
+
+// Rebel: Look Out!
+playSound("l12c_040_rebelpilot");
+
+///////////////////////////////
+// REGROUP WITH GREY SQUADRON
+///////////////////////////////
+WaitUntilLevelVarFlagChangesTo("speech9a", 1);
+
+// SH: "Great work! That's the last transport is away! Let's regroup Grey Squadron!"
+activateTalkingHeadNew("KashShara_regroup1", true);
+waitForGameTime(5.0f);
+
+// REB: "All pilots prepare for attack run! Watch out for that tributary beam. We're going down to the surface!"
+activateTalkingHeadNew("KashReb_regroup2", true);
+sc1 = playSound("l12e_010_rebelpilot");
+soundWaitUntilFinished(sc1);
+waitForGameTime(1.0f);
+
+// Rebel: Stay in formation Grey Squadron!
+playSound("l12c_030_rebelpilot");
+
+waitForGameTime(1.0f);
+
+//REB: "Sir- preliminary life-form scans aren’t showing anything useful. We get nothing, then a whole bunch of readings from all over the area."
+activateTalkingHeadNew("KashReb_land1", true);
+sc1 = playSound("l12f_010_rebelpilot");
+soundWaitUntilFinished(sc1);
+
+// SH: "Remember men, we’re looking for Master Luke. They have him down there somewhere"
+activateTalkingHeadNew("KashShara_regroup3", true);
+sc1 = playSound("l12e_020_shara");
+soundWaitUntilFinished(sc1);
+waitForGameTime(1.0f);
+
+//////////////////////////
+// CLEAR LANDING BAY
+//////////////////////////
+WaitUntilLevelVarFlagChangesTo("speech10a", 1);
+
+// SH: "Watch out! Their AA defences have shields. We need to land as soon as possible. We can't do much damage up here"
+activateTalkingHeadNew("KashShara_land2", true);
+waitForGameTime(7.f);
+
+// REB: "We can't land until we've cleared the landing pad. Grey Squadron; Take out those AT-STs."
+activateTalkingHeadNew("KashReb_land3", true);
+waitForGameTime(5.0f);
+
+WaitUntilLevelVarFlagChangesTo("speech10b", 1);
+
+// REB: "Damn! I can't get a clear attack run without those last TIE fighters causing  me problems. Grey Squadron; See if we can finish these guys off!"
+activateTalkingHeadNew("KashReb_tieBonus1", true);
+waitForGameTime(5.0f);
+
+WaitUntilLevelVarFlagChangesTo("speech11a", 1);
+
+waitForGameTime(3.0f);
+
+///////////////////////////////////////////
+// TRIBUTARY BEAM OBJECTVE
+///////////////////////////////////////////
+
+// REB: "Clear! Prepare to land for a ground attack!"
+activateTalkingHeadNew("KashReb_land4", true);
+waitForGameTime(5.0f);
+
+// SHARA: X2, I'm going to stay up here and keep control of the skies. We need you to deactivate the shields of that tributary beam. With that gone, I can guarantee a safe approach for reinforcements.
+activateTalkingHeadNew("KashShara_beam1", true);
+waitForGameTime(5.0f);
+
+WaitUntilLevelVarFlagChangesTo("speech11b", 1);
+
+// REB: We need turn off all the shield generators. Then our ships can finally destroy the tributary beam.
+activateTalkingHeadNew("KashReb_beam2", true);
+waitForGameTime(1.0f);
+
+/*while(GetLevelVarFlag("speech11c")==0)
+{
+    logStr("it's HERE");
+    waitForGameTime(0.2f);
+}*/
+
+WaitUntilLevelVarFlagChangesTo("speech11c", 1);
+
+// REB: Come in Shara. The beam's shields are down. She's all yours!
+activateTalkingHeadNew("KashReb_beam3", 1);
+
+WaitUntilLevelVarFlagChangesTo("speech13a", 1);
+
+///////////////////////////////
+// THE WOOKIE RESTORATION!
+///////////////////////////////
+
+activateTalkingHeadNew("KashShara_wookie1", true);
+sc1 = playSound("l12h_030_shara");
+soundWaitUntilFinished(sc1);
+waitForGameTime(1.0f);
+
+WaitUntilLevelVarFlagChangesTo("speech15a", 1);
+
+//////////////////////////////////////////////////
+// DESTROY THE TURRETS tO LET THE WOOKIES THROUGH
+//////////////////////////////////////////////////
+
+// Shara: The Wookies won't be able to help us until we destroy the ground turrets. This base is too well defended for them to get through.
+activateTalkingHeadNew("KashShara_turret1", true);
+
+waitForGameTime(4.0f);
+
+// X2: X2! We could really use your help. We're pinned back here. If we could just get past this AT-ST we could make a lot of ground and turn the battle to our favour.
+activateTalkingHeadNew("KashReb_atstBonus1", true);
+
+WaitUntilLevelVarFlagChangesTo("speech15b", 1);
+
+// REBEL: "We won't be able damage the turrets without deactivating their shields first. The controls must be somewhere nearby!"
+activateTalkingHeadNew("KashShara_turret2", true);
+
+WaitUntilLevelVarFlagChangesTo("speech16a", 1);
+
+/////////////////////////////
+// GET TO THE TEMPLE
+/////////////////////////////
+
+// Shara: X2. Make for the temple. I bet that's where Master Luke is held!
+activateTalkingHeadNew("KashShara_temple1", true);
+
+WaitUntilLevelVarFlagChangesTo("speech16b", 1);
+
+// Add Stormtrooper reaction! Intruder! etc!
+
+WaitUntilLevelVarFlagChangesTo("speech17a", 1);
+
+//////////////////////
+// RESCUE LUKE
+//////////////////////
+
+// Luke: I knew you’d find me X2.
+sc1 = playSound("l12j_010_luke");
+soundWaitUntilFinished(sc1);
+
+// Luke: X2. Make for the temple. I bet that's where Master Luke is held!
+activateTalkingHeadNew("KashShara_temple1", true);
+
+
+
+
+
+

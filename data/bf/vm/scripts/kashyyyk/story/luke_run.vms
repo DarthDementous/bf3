@@ -1,0 +1,63 @@
+// vim: set syntax=c :
+logstr("started running rebel script");
+
+///////////////////////////////
+// INITIALISE
+///////////////////////////////
+waitForGameTime(1.3f);
+
+vector actpnt1  = propGetPosFromName("actpnt1");
+vector actpnt2  = propGetPosFromName("actpnt2");
+vector actpnt3  = propGetPosFromName("actpnt3");
+
+propref luke    = propRefFromName("Luke");
+chrref  lukechr = chrRefFromName("Luke");
+
+propRef pChr;
+propRef pSpawn;
+
+/*if (isGroupComponentProp(luke))
+    pSpawn = GetNthPropFromGroup(luke, 0);
+else
+    pSpawn = luke;*/
+
+//if (isSpawnProp(pSpawn))   
+propref luke = propSpawnerGetNthSpawnedProp(propRefFromName("Luke"), 0);
+//else
+  //  pChr = pSpawn;
+
+    // Luke needs to be suspeneded with some animation...
+// For the moment he'll just stand there.
+    if(propValid(luke))
+	logStr("YES1");
+    else
+	logStr("NO1");
+setAIState(luke, "AISTATE_BF_PATROL");
+beginInGameCutSceneWithFlags(k_vmFlag_ResumeScriptAfterHitReact, luke);
+
+//while(1)
+//{
+    chrRunToPadAndAlign(luke, actpnt1, actpnt2, 800.0f);
+    waitUntilVMsDone(luke);
+
+//    waitForGameTime(3.0f);   
+   
+//    propKill();
+    chrRunToPadAndAlign(luke, actpnt2, actpnt3, 800.f);
+    waitUntilVMsDone(luke);
+
+  //  waitForGameTime(1.0f);
+
+    chrRunToPadAndAlign(luke, actpnt3, actpnt1, 800.f);
+    waitUntilVMsDone(luke);
+    logStr("blah");
+
+//    waitForGameTime(1.0f);
+
+
+//}
+
+endInGameCutScene();
+setAIState(luke, "AISTATE_BF_JEDICOMBAT");
+
+

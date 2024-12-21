@@ -1,0 +1,9 @@
+
+/********************************************
+** splinecameramgr.res
+********************************************/
+
+splineCameraManagerTemplate splineCameraMgr
+{
+}
+

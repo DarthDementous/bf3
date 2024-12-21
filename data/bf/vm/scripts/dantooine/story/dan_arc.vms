@@ -1,0 +1,39 @@
+// vim: set syntax=c :
+
+AddVMDebugHUDMsg("running arc script ", 1, "test_objective_message");
+forceTriggerTriggered(propRefFromName("danTrg9"));
+logStr("arc script");
+propRef player = getPlayerPropRefFromID(GetPlayerId());
+waitForGameTime(0.1f);
+int pclass;
+pclass = chrGetClass(player);
+if (pclass != 4)    
+{
+    AddVMDebugHUDMsg("player is non engineer ", 1, "test_objective_message");
+
+    char16 sAnim;
+    sAnim = StringToChar16("AN_sol_give_arc");   	    
+    chrPlayAnim(propRefFromName("engineer"), sAnim, 0.1f, false);
+    chrSpeak(player, "l04d_010_villager", 0, 0.0f, 45.0f, player, true, false);
+    waitForGameTime(5.0f);
+    char16 sAnimB;
+    sAnimB =   StringToChar16("AN_sol_collapse");
+    chrPlayAnim(propRefFromName("engineer"), sAnimB, 0.1f, false);
+    waitForGameTime(4.0f);
+    propKill(propRefFromName("engineer"));
+}
+else
+{
+    AddVMDebugHUDMsg("player is engineer ", 1, "test_objective_message");
+
+    char16 sAnimC;
+    sAnimC =   StringToChar16("AN_sol_collapse");
+    chrPlayAnim(propRefFromName("engineer"), sAnimC, 0.1f, false);
+    waitForGameTime(4.0f);
+    propKill(propRefFromName("engineer"));
+
+}
+
+AddVMDebugHUDMsg("finished script ", 1, "test_objective_message");
+
+

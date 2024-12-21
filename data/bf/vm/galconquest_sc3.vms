@@ -1,0 +1,130 @@
+// vim: set syntax=c :
+
+boolean inited = false;
+callback int GalConquestIsMoveAllowed(int planet, int player, int team)
+{
+    //Script the movement rule set. return 1 if the movement is allowed, 0 otherwise.
+    //Below are rules setup based on the test scenario.
+    int planet_kash = getPlanetIndexByName("proxyplanet6_");
+    int planet_cato = getPlanetIndexByName("proxyplanet1_");
+    int planet_dant = getPlanetIndexByName("proxyplanet5_");
+    int planet_yavin = getPlanetIndexByName("proxyplanet3_");
+    int planet_must = getPlanetIndexByName("proxyplanet4_");
+    int planet_tat = getPlanetIndexByName("tatplanet1_");
+    int planet_cor = getplanetIndexByName("corplanet1_");
+    int planet_dath = getplanetIndexByName("proxyplanet2_");
+    //cannot attack own planet.
+    if(isPlanetOwnedByPlayer(planet, player))
+	return 0;
+    
+    if(team == 0)//REP
+    {	
+	if(planet == planet_must) 
+	{   //if the Republic wants to attack Mustafar, it's only possible when Rep is in in control of all other planets
+	    if((isPlanetOwnedByPlayer(planet_tat, player)) && (isPlanetOwnedByPlayer(planet_cato, player)) && (isPlanetOwnedByPlayer(planet_kash, player)) && (isPlanetOwnedByPlayer(planet_dant, player))                    && (isPlanetOwnedByPlayer(planet_yavin, player)) && (isPlanetOwnedByPlayer(planet_cor, player)) && (isPlanetOwnedByPlayer(planet_dath, player)))
+		return 1;
+	    else
+		return 0;
+	}
+	else //if the target is another planet, go for it...
+	{
+	    return 1;
+	}//define movement rules for team 0;
+    }
+    else if ( team == 1 )//CIS
+    {
+	if(planet == planet_cor) 
+	{   //if the CIS wants to attack Coruscant, it's only possible when CIS is in in control of all other planets
+	    if((isPlanetOwnedByPlayer(planet_tat, player)) && (isPlanetOwnedByPlayer(planet_cato, player)) && (isPlanetOwnedByPlayer(planet_kash, player)) && (isPlanetOwnedByPlayer(planet_dant, player))                    && (isPlanetOwnedByPlayer(planet_yavin, player)) && (isPlanetOwnedByPlayer(planet_must, player)) && (isPlanetOwnedByPlayer(planet_dath, player)))
+		return 1;
+	    else
+		return 0;
+	}
+	else //if the target is another planet, go for it...
+	{
+	    return 1;
+	}//define movement rules for team 1;
+    }
+
+    return 0; 
+}
+
+callback int GalConquestCheckVictoryConditions(int player, int team)
+{
+    //Script the victory conditions check in here.
+    //e.g. has the time/turn limit been reached, 
+    //has the player gained control of the required number of planets,
+    //has the player gained control of a specific planets, etc
+    //return 1 if the victory conditions have been reached, 0 otherwise.
+    int planet_cor = getPlanetIndexByName("corplanet1_");
+    int planet_must = getPlanetIndexByName("proxyplanet4_");
+
+    //if CIS gains control of coruscant within the turn limit
+    if(team == 1 && isPlanetOwnedByPlayer(planet_cor, player))
+    {
+       	return 1;
+    }
+
+    //if REP gains control of Mustafar
+    if(team == 0 && isPlanetOwnedByPlayer(planet_must, player))
+    {
+       	return 1;
+    }
+
+    return 0;
+
+}
+
+function void InitialiseScenario()
+{
+    //Set up the initial state of a scenario.
+    //e.g. allocate planets to each team based on the game play overview.
+    //enable planets that are part of the scenario, others are disabled by default.
+    int planet_kash = getPlanetIndexByName("proxyplanet6_");
+    int planet_cato = getPlanetIndexByName("proxyplanet1_");
+    int planet_dant = getPlanetIndexByName("proxyplanet5_");
+    int planet_yavin = getPlanetIndexByName("proxyplanet3_");
+    int planet_must = getPlanetIndexByName("proxyplanet4_");
+    int planet_tat = getPlanetIndexByName("tatplanet1_");
+    int planet_cor = getplanetIndexByName("corplanet1_");
+    int planet_dath = getplanetIndexByName("proxyplanet2_");
+    setPlanetToNeutral(planet_kash);// should be neutral
+    setPlanetToNeutral(planet_cato);// should be neutral
+    setPlanetOwningTeam(planet_dant, 1);
+    setPlanetToNeutral(planet_yavin);// should be neutral
+    setPlanetOwningTeam(planet_must, 1);
+    setPlanetToNeutral(planet_tat);// should be neutral
+    setPlanetOwningTeam(planet_cor, 0);
+    setPlanetOwningTeam(planet_dath, 1);
+    inited = true;
+}
+
+function void UpdateCurrentScenarioState()
+{
+    resolveGalConquestState();
+}
+
+AllowCallback(CALLBACK_GalConquestIsMoveAllowed, GalConquestIsMoveAllowed);
+AllowCallback(CALLBACK_GalConquestCheckVictoryConditions, GalConquestCheckVictoryConditions);
+
+while(1)
+{
+    if(galConquestMapNeedsInit())
+    {
+	InitialiseScenario();
+	CheckSectorOwnerShip(0);//check for core world sector
+	CheckSectorOwnerShip(1);//check for core world sector
+	CheckSectorOwnerShip(2);//check for core world sector
+    }
+    else
+    {
+	if(!inited)
+	{
+	    UpdateCurrentScenarioState();
+            CheckSectorOwnerShip(0);//check for core world sector
+	    CheckSectorOwnerShip(1);//check for core world sector
+	    CheckSectorOwnerShip(2);//check for core world sector
+	    inited = true;
+	}
+    }
+}

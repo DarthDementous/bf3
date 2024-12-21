@@ -1,0 +1,148 @@
+// vim: set syntax=c :
+
+//////////////////////////////////////
+//
+// Mark Kevern
+//
+// group_move_to_point.vms
+//
+// For moving a group to a line of dofs
+// Each group member will walk to the appropriate dof point
+// e.g groupmember0 would go to dofWalk_0, groupmember1 would go to dofWalk_1, etc...
+//
+// To use:
+// Add to a VMProp
+//
+// In the StringVars[]
+// 0: SpawnGroup
+// 1: patrol prop template (e.g dofWalk_, would work for dofWalk_0, dofWalk_1, etc )
+// 2: run, to run
+// 3: freeze, to freeze on arrival
+// 4: highlight, to highlight (can combine with onarrival)
+// 5: onarrival, to do things on arrival
+// 6: Name of anim to do
+// 7: Name of anim loop to do
+//
+////////////////////////////////////////
+logStr("started");
+
+propRef pGroup;
+pGroup = propRefFromChar16(getNthVMPropStringVar(me, 0));
+
+char16 sPadTmp = getNthVMPropStringVar(me, 1);
+char16 sRun = getNthVMPropStringVar(me, 2);
+char16 sFreeze = getNthVMPropStringVar(me, 3);
+char16 sHighlight = getNthVMPropStringVar(me, 4);
+char16 sOnArrival = getNthVMPropStringVar(me, 5);
+char16 sAnim = getNthVMPropStringVar(me, 6);
+char16 sAnim2 = getNthVMPropStringVar(me, 7);
+
+boolean bRun = false;
+boolean bFreeze = false;
+boolean bHighlight = false;
+boolean bOnArrival = false;
+boolean bAnim = false;
+boolean bAnim2 = false;
+
+if (!char16cmp(sRun, "run"))
+    bRun = true;
+
+if (!char16cmp(sFreeze, "freeze"))
+    bFreeze = true;
+
+if (!char16cmp(sHighlight, "highlight"))
+    bHighlight = true;
+
+if (!char16cmp(sOnArrival, "onarrival"))
+    bOnArrival = true;    
+    
+if (char16cmp(sAnim, "null")) //not equals
+    bAnim = true;
+
+if (char16cmp(sAnim2, "null")) //not equals
+    bAnim2 = true;
+    
+int i = 0;
+waitForGameTime(0.1f);
+
+setAIState(pGroup, "AISTATE_BF_PATROL");
+
+if (!bOnArrival)
+{
+    if (bHighlight)
+        lib_AddIndicatorsToGroup(pGroup, k_objectiveIndicatorType_mainObjective, true);
+}
+
+for (i=0; i<propGroupGetNumOfProps(pGroup); i++)
+{
+    propRef pChr;
+    pChr = GetPropFromGroupSpawner(pGroup, i, 0);
+    
+    beginInGameCutSceneWithFlags(k_vmFlag_ResumeScriptAfterHitReact, pChr);
+    
+    char16 sPad;
+    sPad = Char16CatInt(sPadTmp, i);        
+    propRef pPad = propRefFromChar16(sPad);
+
+    if (bRun)
+        chrRunToPos(pChr, propGetPos(pPad));
+    else
+        chrWalkToPos(pChr, propGetPos(pPad));
+
+    waitForGameTime(0.1f);    
+}
+
+int iStopped = 0;
+
+while (iStopped < propGroupGetNumOfProps(pGroup)-1)
+{
+    iStopped = 0;
+
+    for (i=0; i<propGroupGetNumOfProps(pGroup); i++)
+    {
+        propRef pChr;
+        pChr = GetPropFromGroupSpawner(pGroup, i, 0);
+
+        if (chrHasReachedDest(pChr))
+            iStopped++;
+
+        waitForGameTime(0.1f);     
+    }
+
+    logStr("Num Stopped: ");    
+    logInt(iStopped);
+}
+
+for (i=0; i<propGroupGetNumOfProps(pGroup); i++)
+{
+    endInGameCutScene();
+}
+        
+
+if (bOnArrival)
+{
+    if (bAnim)
+        chrPlayAnim(pGroup, sAnim, 0.1f, false);
+    
+    waitForGameTime(0.1f);
+
+    if (bHighlight)
+        lib_AddIndicatorsToGroup(pGroup, k_objectiveIndicatorType_mainObjective, true);
+
+    waitForGameTime(0.1f);
+
+    //if (bFreeze)
+      //  propSetFrozen(pGroup, true);
+
+    if (bAnim2)
+    {
+        while (!AnimComplete(pGroup))
+        {
+            waitForGameTime(0.1f);
+        }
+        
+        chrPlayAnim(pGroup, sAnim2, 0.1f, true);
+    }     
+}
+
+logStr("ended");

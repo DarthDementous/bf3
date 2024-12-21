@@ -1,0 +1,34 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      05006003 00001200     	EXEC ADDR(0x3) CNT(0x6) BOOL_ADDR(0x80)
+03: 14440004 006c6cb1 a0010001	      ALU:	ADDv	R4.__z_ = R1.xxxx, C256.xxxx
+                          						    	MAXs	R0.__z_ = R1.yyyy
+04: 14140401 00b1b16c a0010001	      ALU:	ADDv	R1.__z_ = R1.yyyy, C256.yyyy
+                          						    	MAXs	R4.x___ = R1.xxxx
+05: 14820400 026c6cb1 a0010001	      ALU:	ADDv	R0._y__ = R1.xxxx, -C256.xxxx
+                          						    	MAXs	R4.___w = R1.yyyy
+06: 4c120004 02b1b11b a0010002	      ALU:	ADDv	R4._y__ = R1.yyyy, -C256.yyyy
+                          						    	RECIP_IEEE	R0.x___ = R2.wwww
+07: b8003081 1f1ffffb 00004000	      FETCH:	SAMPLE	R3.w___ = R4.zwz CONST(0) ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+08: 20003021 1f1fffdf 00004000	      FETCH:	SAMPLE	R3._w__ = R1.xzx CONST(0) ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+      00256009 00001200     	EXEC ADDR(0x9) CNT(0x6) BOOL_ADDR(0x80)
+09: 64000001 1f1ffeff 00004000	      FETCH:	SAMPLE	R0.__w_ = R0.yzy CONST(0) ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+0a: 10000081 1f1ff7ff 00004000	      FETCH:	SAMPLE	R0.___w = R4.xyx CONST(0) ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+0b: c8030200 006cb000 e1000200	   (S)ALU:	MULv	R0.xy__ = R0.xxxx, R2.xyyy
+0c: c8030202 02b01a00 e0030000	      ALU:	ADDv	R2.xy__ = R3.xyyy, -R0.zwww
+0d: c8040202 00b0b06c d10202fe	      ALU:	DOT2ADDv	R2.__z_ = C510.xxxx, R2.xyyy, R2.xyyy
+0e: 58840000 04b16cc6 a000fe82	      ALU:	ADDv	R0.__z_ = -R0.yyyy, C510.xxxx
+                          						    	RECIPSQ_IEEE	R0.___w = abs(R2).zzzz
+      0240600f 00001200     	EXEC ADDR(0xf) CNT(0x6) BOOL_ADDR(0x80)
+0f: c8030202 00b01b00 e1020000	      ALU:	MULv	R2.xy__ = R2.xyyy, R0.wwww
+10: c80f0202 00bc0a00 a102ff00	      ALU:	MULv	R2 = R2.xxyy, C511.zwzw
+11: c8030200 0419b0c4 ab020000	      ALU:	MULADDv	R0.xy__ = R0.xzzz, -R2.ywww, C256.xyyy
+12: 10180001 1f1ffe88 00004000	      FETCH:	SAMPLE	R0.xyz_ = R0.xyx CONST(1) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+13: c8020202 001bc6c6 ab00ff02	   (S)ALU:	MULADDv	R2._y__ = R2.zzzz, R0.wwww, C511.zzzz
+14: 00100202 000000cc e2020202	      ALU:	ADDs	R2.x___ = R2.xxzz
+      00004015 00002200     	EXEC_END ADDR(0x15) CNT(0x4) BOOL_ADDR(0x80)
+15: c8050202 00b0b100 a202fe00	      ALU:	MAXv	R2.x_z_ = R2.xyyy, C510.yyyy
+16: c88cc000 006c6cc6 ab02ff00	      ALU:	MULADDv	export0.__zw = R0.zzzz, R2.xxxx, C511.xxxx	; COLOR
+                          						    	RETAIN_PREV	export0.___w = R0.zzzz	; COLOR
+17: c8030202 006c6cb0 ab02ff00	      ALU:	MULADDv	R2.xy__ = R0.xyyy, R2.xxxx, C511.xxxx
+18: c8038000 00c6b0b0 ab02ff02	      ALU:	MULADDv	export0.xy__ = R2.xyyy, R2.zzzz, C511.xyyy	; COLOR
+      00000000 00000000     	NOP

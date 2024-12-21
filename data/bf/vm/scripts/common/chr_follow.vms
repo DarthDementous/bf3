@@ -1,0 +1,56 @@
+// vim: set syntax=c :
+
+//////////////////////////////////////
+//
+// Mark Kevern
+//
+// chr_follow.vms
+//
+// For having an NPC follow something
+//
+// To use:
+// Add to a VMProp
+//
+// In the StringVars[]
+// 0: Spawnprop, SpawnGroup (will only work for first in group)
+// 1: Prop To Follow, Spawnprop, SpawnGroup (will only work for first in group), Prop
+// 2: run, to run
+// 9: end, to end script
+//
+////////////////////////////////////////
+
+logStr("SCRIPT RUNNING");
+char16 sGroup = getNthVMPropStringVar(me, 0);
+char16 sProp = getNthVMPropStringVar(me, 1);
+char16 sEnd = getNthVMPropStringVar(me, 9);
+
+propRef pChr = GetPropFromGroupSpawner(propRefFromChar16(sGroup), 0, 0);
+propRef pFollow = GetPropFromGroupSpawner(propRefFromChar16(sProp), 0, 0);   
+
+boolean bEnd = false;
+
+int iCurrent = 0;
+sGroup = getNthVMPropStringVar(me, 0);
+sProp = getNthVMPropStringVar(me, 1);
+
+pChr = GetPropFromGroupSpawner(propRefFromChar16(sGroup), 0, 0);
+pFollow = GetPropFromGroupSpawner(propRefFromChar16(sProp), 0, 0);   
+
+waitForGameTime(0.1f);
+setAIState(pChr, "AISTATE_BF_PATROL");
+beginInGameCutSceneWithFlags(k_vmFlag_ResumeScriptAfterHitReact, pChr);
+
+//chrFollow(pChr, pFollow);
+
+while (!bEnd)
+{
+    chrKeepUp(pChr, pFollow, vector(-1.5f, 0, 0));
+    waitForGameTime(0.1f);
+
+    sEnd = getNthVMPropStringVar(me, 9);
+    if (!char16cmp(sEnd, "end"))
+        bEnd = true;    
+}
+
+endInGameCutScene();
+logStr("Script Has Ended");

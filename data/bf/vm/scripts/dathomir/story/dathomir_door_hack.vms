@@ -1,0 +1,20 @@
+propRef shara     = propRefFromName("sharaJoin");
+chrRef chr_shara    = chrRefFromName("sharaJoin");
+chrSetPatrolState(chr_shara);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_shara);
+chrRunToPadAndAlign(chr_shara, propGetPosFromName("sharaDoorHack"), propGetDirFromName("sharaDoorHack"), 800.f);
+waitUntilVMsDone(chr_shara);
+
+int i = 0;
+
+while(i<=2)
+{
+    chrPlayAnimSlot(chr_shara, "AN_hm_ter_lp", 1, false);
+    playerWaitUntilAnimDone(chr_shara);
+    i++;
+}
+endInGameCutScene();
+setAISpawnState(chr_shara, "AISTATE_BF_STORY", true);
+
+
+

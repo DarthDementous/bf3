@@ -1,0 +1,53 @@
+// vim: set syntax=c :
+
+//////////////////////////////////////
+//
+// Mark Kevern
+//
+// chr_face_animate.vms
+//
+// Will turn and animate when a player is close
+// Mainly used for training salutes
+//
+// To use:
+// Add to a VMProp
+//
+// In the StringVars[]
+// 0: Spawnprop
+// 1: TriggerProp, if dont want to trigger on distance check
+// 4, 5, 6, 7, 8, 9: Anims
+//
+////////////////////////////////////////
+
+propRef pPlayer = getPlayerPropRefFromID(GetPlayerId());
+propRef pProp = propRefFromChar16(getNthVMPropStringVar(me, 0));
+propRef pTrig = propRefFromChar16(getNthVMPropStringVar(me, 1));
+
+float fDist = 2.0f;
+
+waitForGameTime(5.0f);
+
+logStr("chr_face_animate BEGIN ****");
+
+setAIState(pProp, "AISTATE_BF_PATROL");
+
+lib_GroupBeginCutscene(pProp);
+
+while(propSpawnerGetNthSpawnedProp(pProp, 0))
+{
+    if (propExists(pTrig))
+    {        
+        vmFacePropAnimateTrig(pProp, pPlayer, 5.0f, pTrig, getNthVMPropStringVar(me, 4), /*getNthVMPropStringVar(me, 5), getNthVMPropStringVar(me, 6),*/ getNthVMPropStringVar(me, 7));
+        vmFaceOriginAnimateTrig(pProp, pPlayer, 5.0f, pTrig, getNthVMPropStringVar(me, 8),  getNthVMPropStringVar(me, 9));
+    }
+    else
+    {
+        vmFacePropAnimateDist(pProp, pPlayer, 5.0f, fDist, getNthVMPropStringVar(me, 4), /*getNthVMPropStringVar(me, 5), getNthVMPropStringVar(me, 6),*/ getNthVMPropStringVar(me, 7));                   
+        vmFaceOriginAnimateDist(pProp, pPlayer, 5.0f, -fDist, getNthVMPropStringVar(me, 8),  getNthVMPropStringVar(me, 9));
+    }
+
+    waitForGameTime(0.5f);    
+}
+
+logStr("SCRIPT ENDING");
+

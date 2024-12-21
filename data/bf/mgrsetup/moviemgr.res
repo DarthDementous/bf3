@@ -1,0 +1,4 @@
+MovieMgrTemplate MovieMgr
+{
+
+}

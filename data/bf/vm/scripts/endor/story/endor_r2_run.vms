@@ -1,0 +1,191 @@
+// vim: set syntax=c :
+
+
+int iObjective, iSubObjective, r2Objective, r2SubObjective;
+
+propRef ywing;
+
+iObjective = 1;
+iSubObjective = 1;
+r2Objective = -1;
+r2SubObjective = -1;
+
+chrRef chr_r4droid;
+propRef shara;
+//shara = getNthPropFromGroup(propRefFromName( "R2grp" ), 0);
+shara = propRefFromName("shara_dstar"); 
+chr_r4droid = chrRefFromName("plyrsqd1");
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_r4droid);	//ignores damage
+    
+//iObjective = BFObjectiveGetCurrent();
+//iSubObjective = BFObjectiveGetCurrent(IObjective);
+SetPropRefInvincible(propRefFromName("shara_dstar"), true);
+while(1) 
+{
+    iObjective = BFObjectiveGetCurrent();
+    iSubObjective = BFObjectiveGetSub(iObjective);
+//    iSubObjective = BFObjectiveGetCurrent(iObjective);
+    
+    if (iObjective==5 && (iObjective!=r2Objective))
+    {
+    AddVMDebugHUDMsg("Objective 5 - hiding and playing an anim", 0, "test_objective_message");	
+	r2Objective = iObjective;
+	chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt1"), propGetDirFromName("r4pnt1"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	waitUntilVMsDone(chr_r4droid);
+	//chrPlayAnimSlot(chr_r4droid, "AN_hm_ter_lp", 1, true);	//the animation performed, true = loop, false = play once
+//	propSetFrozen(chr_r4droid, true);
+    }
+    
+    else if (iObjective==6 && (iObjective!=r2Objective))
+    {
+	if (iSubObjective==0 && (iSubObjective!=r2subObjective))    //main objective loop
+	{
+        AddVMDebugHUDMsg("Objective 6 sub 0- run to r4pnt2, r4pnt3, r4pnt4", 0, "test_objective_message");
+	    chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt2"), propGetDirFromName("r4pnt2"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_r4droid);
+	    chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt3"), propGetDirFromName("r4pnt3"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_r4droid);
+	    chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt4"), propGetDirFromName("r4pnt4"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_r4droid);
+        setAIState(shara, "AISTATE_BF_STORY"); //Puts into normal story state
+//	    chrPlayAnimSlot(chr_r4droid, "AN_hm_ter_lp", 0, false);	//the animation performed, true = loop, false = play once
+//	    propSetFrozen(chr_r4droid, true);
+	    r2SubObjective = iSubObjective;
+	}
+	else if (iSubObjective==1 && (iSubObjective!=r2subObjective))
+	{
+        AddVMDebugHUDMsg("Obj 6 Sub 1", 0, "test_objective_message");
+	    //chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt5"), propGetDirFromName("r4pnt5"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    //waitUntilVMsDone(chr_r4droid);
+	    //chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt6"), propGetDirFromName("r4pnt6"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    //waitUntilVMsDone(chr_r4droid);
+	    //chrPlayAnimSlot(chr_r4droid, "AN_hm_ter_lp", 0, false);	//the animation performed, true = loop, false = play once
+//	    propSetFrozen(chr_r4droid, true);
+        
+	    r2SubObjective = iSubObjective;
+	}
+	else if (iSubObjective==2 && (iSubObjective!=r2SubObjective))
+	{   
+        AddVMDebugHUDMsg("Script working???? Obj 6 Sub 2", 0, "test_objective_message");
+        setAIState(shara, "AISTATE_BF_PATROL");        
+	    chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt7"), propGetDirFromName("r4pnt7"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_r4droid);
+	    chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt8"), propGetDirFromName("r4pnt8"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_r4droid);
+	    chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt9"), propGetDirFromName("r4pnt9"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_r4droid);
+	    chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt10"), propGetDirFromName("r4pnt10"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_r4droid);
+	    chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt10a"), propGetDirFromName("r4pnt10a"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_r4droid);
+//	    propSetFrozen(chr_r4droid, true);   
+	    r2SubObjective = iSubObjective;
+	}
+	else if (iSubObjective==3 && (iSubObjective!=r2SubObjective))
+	{
+        AddVMDebugHUDMsg("Script working???? Obj 6 Sub 3", 0, "test_objective_message");
+	    chrPlayAnimSlot(chr_r4droid, "AN_hm_ter_lp", 0, true); //HERE - Change to typing loop
+//	    propSetFrozen(chr_r4droid, true);
+	    r2SubObjective = iSubObjective;
+	}
+	else if (iSubObjective==4 && (iSubObjective!=r2SubObjective))
+	{
+        AddVMDebugHUDMsg("Script working???? Obj 6 Sub 4", 0, "test_objective_message");
+        setAIState(shara, "AISTATE_BF_STORY");   //Back into story state, set her home zone as the bit before the trench, she should run there and occupy it
+            
+	    //chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt10b"), propGetDirFromName("r4pnt10b"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    //waitUntilVMsDone(chr_r4droid);
+	    //chrWalkToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt11"), propGetDirFromName("r4pnt11"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    //waitUntilVMsDone(chr_r4droid);
+	    //chrWalkToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt12"), propGetDirFromName("r4pnt12"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    //waitUntilVMsDone(chr_r4droid);
+	    //chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt13"), propGetDirFromName("r4pnt13"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    //waitUntilVMsDone(chr_r4droid);
+	    //chrPlayAnimSlot(chr_r4droid, "AN_hm_ter_lp", 0, false);
+//	    propSetFrozen(chr_r4droid, true);
+        
+	    r2SubObjective = iSubObjective;
+	}
+	else if (iSubObjective==5 && (iSubObjective!=r2SubObjective))
+	{
+        AddVMDebugHUDMsg("Script working???? Obj 6 Sub 5", 0, "test_objective_message");
+        setAIState(shara, "AISTATE_BF_PATROL");
+	    chrWalkToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt14"), propGetDirFromName("r4pnt14"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_r4droid);
+	    chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt15"), propGetDirFromName("r4pnt15"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_r4droid);
+	    chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt16"), propGetDirFromName("r4pnt16"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_r4droid);
+	    chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt17"), propGetDirFromName("r4pnt17"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_r4droid);
+        chrPlayAnimSlot(chr_r4droid, "AN_hm_ter_lp", 0, true);
+//	    propSetFrozen(chr_r4droid, true);
+	    r2Objective = iObjective;
+	    r2SubObjective = iSubObjective;
+	}	
+    }
+    else if (iObjective==7 && (iObjective!=r2Objective))
+    {
+        if (iSubObjective==0 && (iSubObjective!=r2SubObjective))    //main objective loop
+        {
+            addNewObjectiveIndicatorToProp(propRefFromName("shara_dstar"), k_objectiveIndicatorType_mainObjective);
+            AddVMDebugHUDMsg("Script working???? Obj 7 Sub 0", 0, "test_objective_message");
+            //	chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt17"), propGetDirFromName("r4pnt17"), 800.f);  //Moves the char to the pad, get position and direction from action point
+            //	waitUntilVMsDone(chr_r4droid);
+//            chrPlayAnimSlot(chr_r4droid, "AN_ed_shr_t", 0, false);	//the animation performed, true = loop, false = play once
+            //	propSetFrozen(chr_r4droid, true);
+    	    r2SubObjective = iSubObjective;
+            //spawn the ship that you will escape in
+            ywing = SpawnPropFromTemplate("ywing_fighter", propRefFromName("ywing_sp_DOF"),vector(0.f, 0.0f, 0.f));
+        }
+        if (iSubObjective==1 && (iSubObjective!=r2SubObjective))    //main objective loop
+        {
+AddVMDebugHUDMsg("Script working???? Obj 7 Sub 1", 0, "test_objective_message");
+//            chrPlayAnimSlot(chr_r4droid, "AN_ed_shr_pr", 0, false);
+//	        waitUntilVMsDone(chr_r4droid);
+//            chrPlayAnimSlot(chr_r4droid, "AN_ed_shr_tl", 0, true);
+            r2SubObjective = iSubObjective;
+        }
+        if (iSubObjective==2 && (iSubObjective!=r2SubObjective))    //main objective loop
+        {
+AddVMDebugHUDMsg("Script working???? Obj 7 Sub 2", 0, "test_objective_message");
+//            chrPlayAnimSlot(chr_r4droid, "AN_ed_shr_pl", 0, false);
+//	        waitUntilVMsDone(chr_r4droid);
+//            chrPlayAnimSlot(chr_r4droid, "AN_ed_shr_tl", 0, true);
+            r2SubObjective = iSubObjective;
+        }
+        if (iSubObjective==3 && (iSubObjective!=r2SubObjective))    //main objective loop
+        {
+AddVMDebugHUDMsg("Script working???? Obj 7 Sub 3", 0, "test_objective_message");
+//            chrPlayAnimSlot(chr_r4droid, "AN_ed_shr_pr", 0, false);
+//	        waitUntilVMsDone(chr_r4droid);
+  //          chrPlayAnimSlot(chr_r4droid, "AN_ed_shr_tl", 0, true);
+            r2Objective = iObjective;
+            r2SubObjective = iSubObjective;
+        }
+              
+    }
+    else if (iObjective==8 && (iObjective!=r2Objective))
+    {
+	    removeObjectiveIndicatorFromProp(propRefFromName("shara_dstar"));
+    addNewObjectiveIndicatorToProp(ywing, k_objectiveIndicatorType_mainObjective);
+       AddVMDebugHUDMsg("Script working???? Obj 8 Sub 0", 0, "test_objective_message"); 
+	chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt18"), propGetDirFromName("r4pnt18"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	waitUntilVMsDone(chr_r4droid);
+	chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt19"), propGetDirFromName("r4pnt19"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	waitUntilVMsDone(chr_r4droid);
+	chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt20"), propGetDirFromName("r4pnt20"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	waitUntilVMsDone(chr_r4droid);
+	chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt21"), propGetDirFromName("r4pnt21"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	waitUntilVMsDone(chr_r4droid);
+    //propDelete(propRefFromName("shara_dstar"));
+    setAIState(shara, "AISTATE_BF_STORY");
+    PassengerVehicleBF(propRefFromName("shara_dstar"), ywing, false );
+    //  chrRunToPadAndAlign(chr_r4droid, propGetPosFromName("r4pnt22"), propGetDirFromName("r4pnt22"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	//  waitUntilVMsDone(chr_r4droid);
+	//  chrPlayAnimSlot(chr_r4droid, "AN_hm_ter_lp", 0, true);	//the animation performed, true = loop, false = play once
+//	propSetFrozen(chr_r4droid, true);
+	r2Objective = iObjective;
+    }
+
+}

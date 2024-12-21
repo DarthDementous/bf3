@@ -1,0 +1,1424 @@
+// vim: set syntax=c :
+/////////////MAKE SURE TO INCLUDE A BFStorylevelVarProp in your level
+
+//Declare the CPs, less expensive?
+
+boolean Skip = false;
+int iSpawnedTanks = 0;
+
+char16 yavBonusA = StringToChar16("obj_YavBonusA"); // Bonus Objective activated
+char16 yavBonusB = StringToChar16("obj_YavBonusB"); // Bonus Objective activated
+char16 yavBonusC = StringToChar16("obj_YavBonusC"); // Bonus Objective activated
+char16 yavBonusD = StringToChar16("obj_YavBonusD"); // Bonus Objective activated
+
+propRef tank1;                
+propRef tank2;     
+propRef atstDriver1;
+propRef atstDriver2;
+propRef atstDriver3;
+propRef atstDriver4;
+propRef tankdriver1;
+propRef tankdriver2;
+        
+propRef veha;
+propRef vehb;
+propRef vehc;
+propRef vehd;
+
+propRef xwing1;
+propRef xwing2;
+propRef xwing3;
+propRef luke;
+propRef wedge;
+propRef splineluke;
+propRef splinewedge;
+	
+boolean springsActivated = false;
+boolean lukehasenteredxwing = false;
+
+boolean bSharaInXwing = false;
+
+
+propRef playerZone = propRefFromName("player_0");
+
+propRef pPlayer = getPlayerPropRefFromID(GetPlayerId());
+boolean bEndLevel = false;
+        
+        
+///////////// Include Defaults //////////////////////////////////////////////
+
+//////////////////////////CALLBACK INFO DO NOT CHANGE
+
+//PlayerKilled Callback Info
+boolean bCB_PK = false;
+int iCB_PK_KillerId = -1;
+int iCB_PK_Victim = -1;
+int iCB_PK_Result = -1;
+
+//triggeredProp Callback Info
+boolean bCB_TP = false;
+char16 cCB_TP_Prop = StringToChar16("");
+
+//ObjectiveTimeExpired Callback Info
+boolean bCB_OTE = false;
+char16 cCB_OTE_ObjName = StringToChar16("");
+
+//shipReachedScriptedSplineSegment  Callback Info
+boolean bCB_SRSS = false;
+propRef pCB_SRSS_Ship;
+propRef pCB_SRSS_Spline;
+int iCB_SRSS_Segment = -1;
+
+//////////////////////////END CALLBACK INFO
+
+function void ProcessCallbacks()
+{
+    //No else's as could be waiting to process two or more!
+
+    if (GetLevelVarInt("iCBLV") != -1)
+    {
+        if (bCB_PK) // playerKilled callback
+        {
+            playerKilled(iCB_PK_KillerId, iCB_PK_Result, iCB_PK_Victim);
+            bCB_PK = false;
+        }
+
+        if (bCB_TP) // triggeredProp callback
+        {
+            Trigger(cCB_TP_Prop);
+            bCB_TP = false;
+        }
+
+        // ObjectiveTimeExpired callback
+        if (bCB_OTE)
+        {
+            ObjectiveTimeExpired(cCB_OTE_ObjName);
+            bCB_OTE = false;
+        }
+
+        // shipReachedScriptedSplineSegment callback
+        if (bCB_SRSS)
+        {
+            ShipReachedScriptedSplineSegment(pCB_SRSS_Ship, pCB_SRSS_Spline, iCB_SRSS_Segment);
+            bCB_SRSS = false;
+        }
+
+        SetLevelVarInt("iCBLV", -1);    
+        waitForGameTime(0.1f);
+    }
+}
+
+callback void CB_PlayerKilled(int iKiller, int iResult, int iVictim)
+{
+    logStr("CB_PlayerKilled");
+   /* if (bCB_PK)
+        VMAssertMsg("CB_PlayerKilled - Already Waiting To Do Callback");
+
+    bCB_PK = true;
+    iCB_PK_KillerId = iKiller;
+    iCB_PK_Victim = iVictim;
+    iCB_PK_Result = iResult;
+
+    SetLevelVarInt("iCBLV", 1);    */
+    playerKilled(iKiller, iResult, iVictim);
+}
+
+callback int CB_TriggeredProp(int inType, char16 inTriggerProp, int pId)
+{    
+    logStr("CB_TriggeredProp");    
+    /*if (bCB_TP)
+        VMAssertMsg("CB_TriggeredProp - Already Waiting To Do Callback");
+
+    bCB_TP = true;
+    cCB_TP_Prop = inTriggerProp;
+
+    SetLevelVarInt("iCBLV", 1);    
+*/
+    Trigger(inTriggerProp);
+    return 0;
+}
+
+callback void CB_ObjectiveTimeExpired(char16 objName)
+{
+    logStr("CB_ObjectiveTimeExpired");        
+  /*  if (bCB_OTE)
+        VMAssertMsg("CB_ObjectiveTimeExpired - Already Waiting To Do Callback");
+
+    bCB_OTE = true;
+    cCB_OTE_ObjName = objName;
+
+    SetLevelVarInt("iCBLV", 1); */
+    ObjectiveTimeExpired(objName);
+}
+
+callback void CB_shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    logStr("CB_shipReachedScriptedSplineSegment");            
+  /*  if (bCB_SRSS)
+        VMAssertMsg("CB_shipReachedScriptedSplineSegment - Already Waiting To Do Callback");
+    
+    bCB_SRSS = true;
+    pCB_SRSS_Ship = ship;
+    pCB_SRSS_Spline = spline;
+    iCB_SRSS_Segment = segment;
+
+    SetLevelVarInt("iCBLV", 1);*/
+    ShipReachedScriptedSplineSegment(ship, spline, segment);
+
+}
+
+AllowCallback(CALLBACK_PlayerKilledBF, CB_playerKilled);
+AllowCallback(CALLBACK_TriggeredProp, CB_triggeredProp);
+AllowCallback(CALLBACK_ObjectiveTimeExpired, CB_ObjectiveTimeExpired);
+AllowCallback(CALLBACK_ShipReachedScriptedSplineSegment, CB_shipReachedScriptedSplineSegment);
+
+//////////////////////////END CALLBACKS
+
+function void playerKilled(int victimId, int killerId, int iOppTeam)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iActive = BFObjectiveGetNumForNthActive(i);
+	if (lib_playerKilled(victimId, killerId, iOppTeam, iActive)) 
+	{
+	    nextObjective(iActive);
+	}
+    }
+}
+
+function void Trigger(char16 inTriggerProp)
+{    
+    int iResult = 0;
+    
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iActive = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	iActive = BFObjectiveGetNumForNthActive(i);
+	iResult = lib_triggeredProp(inTriggerProp, iActive);
+
+	iResult = ObjectiveTriggerTests(iActive, inTriggerProp, iResult);
+
+	if (iResult >= 1) nextObjective(iActive);
+    }
+}
+
+function void ObjectiveSetupCheck()
+{
+    int iTempObj = GetLevelVarInt("iObjLV");
+    
+    if (iTempObj != -1)
+    {
+        char16 cName = BFObjectiveGetName(iTempObj);
+        if (ObjectiveSetup(cName, iTempObj, BFObjectiveGetSub(iTempObj)))
+            SetLevelVarInt("iObjLV", -1);
+
+        waitForGameTime(0.1f);        
+    }
+}
+
+function void SetObjectiveSetup(int iObj)
+{
+    logStr("SetObjectiveSetup Called");
+    logInt(iObj);
+    SetLevelVarInt("iObjLV", iObj);
+}
+
+function void nextObjective(int inObjNum) 
+{    
+    int result = lib_nextObjective(inObjNum);
+
+    if(result == 1)
+    {
+        //if next objective returns 1 it has updated a core objective and automatically moved us onto the next
+        //so do objective setup with current objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(BFObjectiveGetCurrent());
+        }
+    }
+
+    if(result == 2)
+    {
+        //if nextobjective returns 2 it has updated a bonus objective so we will want to 
+        //objective setup with the objective we passed to next objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(inObjNum);
+        }
+    }
+    /*
+    if(result==3)
+    {
+	CheckPointSave();
+	AddVMDebugHUDMsg("checkSave ", result, "test_objective_message");
+    }   */ 
+}
+
+function void JumpToObjective(int iStartObj, boolean bTeleport)
+{       
+	BFObjectiveSetJumpTo(iStartObj);	
+    nextObjective(BFObjectiveGetCurrent());
+    
+    if (bTeleport)
+    {
+        char16 tSpawn;
+        tSpawn = LevelVarToChar16("mCurrentSpawner");
+        if (propExists(propRefFromChar16(tSpawn)))
+            propTeleportToProp(pPlayer, propRefFromChar16(tSpawn));        
+    }
+    
+    logStr("Jumped To Objective");
+    logInt(BFObjectiveGetCurrent());
+}
+
+
+function void ObjectiveTimeExpired(char16 objName)
+{  
+    int objNum = 0;
+    objNum = BFObjectiveGetNumber(objName);   
+    if (lib_ObjTimeExpired(objNum))
+    {
+	nextObjective(objNum);
+    } 
+    //if (lib_ObjTimeExpired()) nextObjective();
+}
+
+// *********************************************************************
+// *******************                    ******************************
+// *******************    SHIP SPLINES    ******************************
+// *******************                    ******************************
+// *********************************************************************
+
+
+function void shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    int iObjective = BFObjectiveGetCurrent();//GetLevelVarInt("mObjective");
+           
+    if(segment == 1)
+    {
+
+	if ((((spline == propRefFromName("spline_flyby1")) || (spline == propRefFromName("spline_flyby2"))) || (spline == propRefFromName("spline_flyby3"))) || (spline == propRefFromName("spline_flyby4")))
+	BFShipStartScriptedFiring(ship, 1, 6);  
+	
+	if (((spline == propRefFromName("spline_bombern1")) || (spline == propRefFromName("spline_bombern2"))) || (spline == propRefFromName("spline_bombern3"))) 
+	BFShipStartScriptedFiring(ship, 2, 1);
+    }
+    else if(segment == 2)
+    {
+      // if our landing ships have reached the upper atmosphere, remove quietly
+      if ((spline == propRefFromName("spline_landing1")) || (spline == propRefFromName("spline_landing2")))
+        propDelete(ship);
+ 
+      // bombers, start bombing !
+      else if (((spline == propRefFromName("spline_bomber1")) || (spline == propRefFromName("spline_bomber2"))) || (spline == propRefFromName("spline_bomber3")))
+        BFShipStartScriptedFiring(ship, 2, 8);  
+      else if (spline == propRefFromName("spline_bomber4"))
+        BFShipStartScriptedFiring(ship, 2, 8);
+    }
+    if(segment == 3)
+    {
+        if (((spline == propRefFromName("spline_bombern1")) || (spline == propRefFromName("spline_bombern2"))) || (spline == propRefFromName("spline_bombern3"))) 
+	BFShipStartScriptedFiring(ship, 2, 1);  
+      
+    }
+    if(segment == 4)
+    {
+        if (((spline == propRefFromName("spline_bombern1")) || (spline == propRefFromName("spline_bombern2"))) || (spline == propRefFromName("spline_bombern3"))) 
+	BFShipStartScriptedFiring(ship, 2, 1);  
+      
+    }
+    if(segment == 7)
+    {
+ 
+      // bombers, start bombing !
+      if(spline == propRefFromName("spline_bomber2"))
+        BFShipStartScriptedFiring(ship, 2, 7);  
+    }
+    /*
+    // mid-game bombers
+    if(segment == 4)
+    {
+      
+        
+      if ((spline == propRefFromName("spline_springs")) || (spline == propRefFromName("spline_walkway")))
+        BFShipStartScriptedFiring(ship, 2, 8);
+        
+      	logStr("::::::::::::: SHIP SPLINE POINT 2 :::");
+        
+    }
+    */
+}
+
+/*
+callback void playerSpawned(char16 teamName, int playerId)
+{
+    int iObjective = BFObjectiveGetCurrent();
+
+    logStr("teamName: ");
+    logchar16(teamName);
+
+}
+
+callback void finiteSpawnerComplete(char16 propId) 
+{
+	//int i = 0;
+    AddVMDebugHUDMsg("FINITE SPAWNER IS DEADED ", 0, "test_objective_message");
+}
+
+callback void gameHasStarted()
+{           
+}
+*/
+
+
+// *********************************************************************
+/// *******************                   ******************************
+/// *******************   SCRIPT STARTED  ******************************
+/// *******************                   ******************************
+// *********************************************************************
+
+// ScriptHasStarted() is run at the start of the level, jump to your first objective here
+
+function void ScriptHasStarted()
+{
+ // obj_YavGnd is the link into the bf/mgrsetup/objectivesmgr.res file.
+ // It will look for objectives in objectivesmgr: obj_YavGnd1, obj_YavGnd2 etc.
+ // vmTrig is the reference for trigger prop names in the editor, e.g. first trigger will be vmTrig1, then vmTrig2 etc
+    SetBFStoryPrefixes("obj_YavGnd", "vmTrig");
+    ResetObjectives("mObjTmp", 10);
+
+    // this handy piece of code copies all your group zone objectives between objectives!
+    BFObjectiveSetCopy(true);
+    
+     // Spawn some squaddies
+    ActivateSpawner("landingpad_g");
+            
+    //veha = SpawnAIVehicle(propRefFromName("dof_shuttle1"), "imp_eng_snpc", "imp_shuttle", 0, false, k_seatPos_driver);
+    //vehb = SpawnAIVehicle(propRefFromName("dof_shuttle2"), "imp_eng_snpc", "imp_shuttle", 0, false, k_seatPos_driver);
+    veha = SpawnAIVehicle(propRefFromName("dof_shuttle1"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+    vehb = SpawnAIVehicle(propRefFromName("dof_shuttle2"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+    vehc = SpawnAIVehicle(propRefFromName("dof_bombwalkway"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+    vehd = SpawnAIVehicle(propRefFromName("dof_bomber4"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+    
+    forceTriggerTriggered(propRefFromName("trigOpenDoor"));
+// make sure doors are closed before tweening them open
+    //forceTriggerTriggered(propRefFromName("trigCloseDoor"));
+    //forceTriggerTriggered(propRefFromName("trigCloseDoorD"));
+// open the doors
+    //propTweenToPos(propRefFromName("yhdoor_a1"), vector(76.05,310.4,-34.2815), 10.7593);
+    //propTweenToPos(propRefFromName("yhdoor_b1"), vector(76.05,310.6,-34.2815), 10.7593);
+    //propTweenToPos(propRefFromName("yhdoor_c1"), vector(76.05,316.18,-34.2815), 10.7593);
+    //propTweenToPos(propRefFromName("yhdoor_d1"), vector(76.05,320.05,-34.2815), 10.7593);
+    
+    JumpToObjective(1, true);
+}
+
+function int ObjectiveTriggerTests(int iObjective, char16 inTriggerProp, int iResult) 
+{
+    
+
+    return iResult;
+}
+
+// ************************************************************************
+/// *******************                      ******************************
+/// *******************   OBJECTIVE TESTS    ******************************
+/// *******************                      ******************************
+// ************************************************************************
+
+// We can test if certain objectives have been completed here, rather than trigger them immediately
+// This is because sometimes it is much easier on the CPU to test here rather than set up triggers
+function void ObjectiveTests(int iObjective) 
+{
+
+//Do some tests
+
+    int iSubObjective = BFObjectiveGetSub(iObjective);//GetLevelVarInt("mObjective");
+    
+    if (iObjective == 1)
+    {
+        if (iSubObjective == 1)
+        {
+            if (( propGroupSpCountAliveSpawnedProps( propRefFromName("Spwn1-2") ) < 4 ) && (springsActivated == false))
+            {
+                ActivateSpawner("reb_springs2_g");
+                ActivateSpawner("reb_springs3_g");
+                springsActivated = true;
+
+            }
+            if ( propGroupSpCountAliveSpawnedProps( propRefFromName("Spwn1-2") ) < 2 )
+            {
+                nextObjective(iObjective);
+            }
+            if    (  getVehicleDriver(propRefFromName("reb_xwing3_"))  )     //&& (bSharaInXwing == false))
+            {
+		//BFShipFollowScriptedSplineNoAvoidance(propRefFromName("reb_xwing3_"), propRefFromName("shipspline4"));
+		logStr("Shara got into X-wing 3 !!!!!!!!!!!!!!!!!!!!!!!-------___________________----------");
+		bSharaInXwing = true;
+	    }
+        }
+    }
+/*if (iObjective == 2)
+    {
+	if (!propExists(propRefFromName("aagun")))
+	{
+		nextObjective(iObjective);
+	}
+    }*/
+    if (iObjective == 4)
+    {
+        if (iSubObjective == 1)
+        {
+          // if all the atsts are dead, complete objective
+            if ( propGroupGetNumOfProps( propRefFromName("atsts_g") ) == 0 )
+            {
+                nextObjective(iObjective);
+            }
+        }
+    }
+    
+    if (iObjective == 7)
+    {
+        // if player has entered an xwing, complete objective
+        if (IsPlayerInVehicle("STR_VEHICLE_NAME_XWING_FIGHTER"))
+        {
+            AddVMDebugHUDMsg("X-Wing Obtained", 1, "test_objective_message");
+            nextObjective(iObjective);
+        }
+    }
+    
+    // when luke jumps in an X-wing, put him on a spline.
+    if ((iObjective == 7) || (iObjective == 8))
+    {
+	if (lukehasenteredxwing == false)
+	{
+		if (getDriverVehicle(xwing3))
+		{
+			if (getDriverVehicle(xwing3) == luke)
+			{
+				BFShipFollowScriptedSplineNoAvoidance(xwing3, splineluke);
+				lukehasenteredxwing = true;
+			}
+			/*
+			 if (iObjective == 7)
+			 {
+				activateTalkingHeadNew("YavLuke_Catchup", true);
+			 }
+			*/
+         	 
+      		}
+	}
+    }
+    if (iObjective == 8) 
+    {
+	// spawn a load of tie fighters
+	lib_SpawnActiveVehicleG(propRefFromName("ties_g"), propRefFromName("dof_tiespwns"),"imp_eng_snpc", "tie_fighter", 300, 2);
+    	lib_SpawnActiveVehicleG(propRefFromName("xwings_g"), propRefFromName("dof_tiespwns"),"reb_eng_snpc", "xwing_fighter", 300, 2);
+    }
+    if (iObjective == 20)
+    {
+        if ( propGroupSpCountAliveSpawnedProps ( propRefFromName("imp_roofsnipe_g") ) < 2 )
+        {
+            //removeObjectiveIndicatorFromProp(propRefFromName("steps_rpg_g"));
+            logStr("********************************************** OBJ 20 COMPLETE!!!!!!!!!!!!!!!!!!********************************");
+            BFObjectiveRemoveBonus(yavBonusA, 20);
+        }
+    }
+    
+  // if landing ships has reached end spline point, remove them quietly
+  
+}
+// *********************************************************************
+/// *******************                     ******************************
+/// *******************   OBJECTIVE SETUP    ******************************
+/// *******************                     ******************************
+// *********************************************************************
+
+// Set up what each objective actually is (the code for it anyway - the description strings are in objectivesmgr + strings localisation)
+
+function boolean ObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{
+            propRef veh2;            
+            
+    // as you spawn for the first time
+    if (iObjective == 1) 
+    { 
+        if (iSubObjective == 1)
+        {
+          // start objective tests for spawns
+
+            // Tell them to land
+            if (propExists(veha))
+            {
+                propRef spline1;
+                spline1 = propRefFromName("LandPadProp1"); 
+                BFRequestAILandShip(veha, spline1);
+            }
+            // Spawn troops from landing ship, move them into position : yavin_story_old_sub2.vms script!
+            //forceTriggerTriggered(propRefFromName("trig_trpspawn"));
+            
+            if (propExists(vehb))
+            {
+            // Tell them to land
+                propRef spline2;
+                spline2 = propRefFromName("LandPadProp2");
+                BFRequestAILandShip(vehb, spline2);
+            }
+            
+            if (propExists(vehc))
+            {
+            // Tell them to land
+                propRef spline3;
+                spline3 = propRefFromName("landing_river");
+                BFRequestAILandShip(vehc, spline3);
+            }
+            
+            if (propExists(vehd))
+            {
+            // Tell them to land
+                propRef spline4;
+                spline4 = propRefFromName("landing_temple");
+                BFRequestAILandShip(vehd, spline4);
+            }
+            
+        }
+        else 
+        {
+            //SetObjectiveKillSpawners(1, iObjective);
+            
+            // TIE fighters zoom overhead
+            // player spawns with squad
+            // storm troopers spawn inside ruins
+            // Sentry gun (AA gun) already triggered in the yavin.res
+            // Objective is to take the springs
+            // Land some shuttles overhead and further into the distance
+            // spawn landing ships on ground but dont let them do anything until next obj.
+
+         	 activateTalkingHeadNew("YavShara_Bombers", true);
+propSetCanBeActivated( propRefFromName("reb_xwing3_"), false );
+	
+/*
+ChrSpeak(chrRef of guy speaking, "l06a_010_2ic", flags, time,
+    range, chrRef of guy the character is speaking to);
+*/
+          
+          
+          // X1 speaks to the player
+            chrRef shara;
+	    shara = chrRefFromName("shara");
+	    // Play opening speech
+	    chrSpeak(shara, "l06a_030_shara", 0, 0.0f, 45.0f, shara, true, false);
+	    //chrSpeak(shara, "l01b_050_x1", 0, 0.0f, 45.0f, shara, true, false);
+	    /* uncomment 629 and 631 also when you uncomment this
+	    chrRef reb_pointing;
+	    reb_pointing = chrRefFromName("reb_pointing");
+	    chrSetPatrolState(reb_pointing);
+	    beginInGameCutSceneIgnorePerceptsAndDamage(reb_pointing);
+	    propSetFrozen(reb_pointing, true);	    
+	    chrPlayAnimSlot(reb_pointing, "AN_RebePoinLoop", 1.0f, false);
+          */
+          
+          /*
+            propRef veh;
+            veh = SpawnAIVehicle(propRefFromName("dof_bomber1"), "imp_eng_snpc", "tie_bomber", 0, false, 3);
+            propRef veh1;
+            veh1 = SpawnAIVehicle(propRefFromName("dof_bomber2"), "imp_eng_snpc", "tie_bomber", 0, false, 3);
+            propRef veh2;
+            veh2 = SpawnAIVehicle(propRefFromName("dof_bomber3"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+            propRef veh3;
+            veh3 = SpawnAIVehicle(propRefFromName("dof_bomber4"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+            */
+            propRef vehi;
+            vehi = SpawnAIVehicle(propRefFromName("dof_flyby1"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+            propRef vehi1;
+            vehi1 = SpawnAIVehicle(propRefFromName("dof_flyby2"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+            propRef vehi2;
+            vehi2 = SpawnAIVehicle(propRefFromName("dof_flyby3"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+            propRef vehi3;
+            vehi3 = SpawnAIVehicle(propRefFromName("dof_flyby4"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+            
+/* these are done in scripthasstarted now
+            propRef shut1;
+            shut1 = SpawnAIVehicle(propRefFromName("dof_shuttle1"), "imp_eng_snpc", "tie_fighter", 0, false, k_seatPos_driver);
+            propRef shut2;
+            shut2 = SpawnAIVehicle(propRefFromName("dof_shuttle2"), "imp_eng_snpc", "tie_fighter", 0, false, k_seatPos_driver);
+*/
+/*
+          propRef spline1;
+            spline1 = propRefFromName("spline_bomber1");   
+            BFShipFollowScriptedSplineNoAvoidance(veh, spline1);
+            propRef spline2;
+            spline2 = propRefFromName("spline_bomber2");   
+            BFShipFollowScriptedSplineNoAvoidance(veh1, spline2);
+            propRef spline3;
+            spline3 = propRefFromName("spline_bomber3");   
+            BFShipFollowScriptedSplineNoAvoidance(veh2, spline3);
+            propRef spline4;
+            spline4 = propRefFromName("spline_bomber4");   
+            BFShipFollowScriptedSplineNoAvoidance(veh3, spline4);
+*/
+
+            propRef splinei2;
+            propRef splinei1;
+            splinei1 = propRefFromName("spline_flyby1");   
+            BFShipFollowScriptedSplineNoAvoidance(vehi, splinei1);
+            splinei2 = propRefFromName("spline_flyby2");   
+            //BFShipFollowScriptedSplineNoAvoidance(vehi1, splinei2);
+            BFShipFollowScriptedSplineNoAvoidance(vehi1, splinei2);
+                      propRef splinei3;
+            splinei3 = propRefFromName("spline_flyby3");   
+            BFShipFollowScriptedSplineNoAvoidance(vehi2, splinei3);
+                      propRef splinei4;
+            splinei4 = propRefFromName("spline_flyby4");   
+            BFShipFollowScriptedSplineNoAvoidance(vehi3, splinei4);
+
+          
+            propRef veh;
+            veh = SpawnAIVehicle(propRefFromName("dof_bombernew1"), "imp_eng_snpc", "tie_bomber", 0, false, 3);
+            propRef veh1;
+            veh1 = SpawnAIVehicle(propRefFromName("dof_bombernew2"), "imp_eng_snpc", "tie_bomber", 0, false, 3);
+            propRef veh2;
+            veh2 = SpawnAIVehicle(propRefFromName("dof_bombernew3"), "imp_eng_snpc", "tie_bomber", 0, false, 3);
+
+            
+          propRef spline1;
+            spline1 = propRefFromName("spline_bombern1");   
+            BFShipFollowScriptedSplineNoAvoidance(veh, spline1);
+            propRef spline2;
+            spline2 = propRefFromName("spline_bombern2");   
+            BFShipFollowScriptedSplineNoAvoidance(veh1, spline2);
+            propRef spline3;
+            spline3 = propRefFromName("spline_bombern3");   
+            BFShipFollowScriptedSplineNoAvoidance(veh2, spline3);
+            
+/* these are done in scripthasstarted now
+            propRef shutspline1;
+            shutspline1 = propRefFromName("LandPadProp1"); 
+            BFRequestAILandShip(shut1, shutspline1);
+            propRef shutspline2;
+            shutspline2 = propRefFromName("LandPadProp2"); 
+            BFRequestAILandShip(shut2, shutspline2);     
+*/
+            
+            // spawnGroupSetActive(propRefFromName("playerSpawn1_"), true); 
+            
+            // Spawn troopers inside the ruins and give them a group objective
+
+            //lib_SetupGroupZone(cObjectiveName, "Spwn1-2", "springs_z", "boobspath_tz", k_objtype_hold_area);
+            //lib_SetupGroupZone(cObjectiveName, "reb_springs_g", "reb_springs_tz", "reb_springs_tz", k_objtype_clear_area);
+            //lib_SetupGroupZone(cObjectiveName, "ruinedstreet_g", "ruinedstreet_z", "boobspath_tz", k_objtype_hold_area);
+            //lib_SetupGroupZone(cObjectiveName, "btmwalkway_g", "btmwalkway_z", "btmwalkway_tz", k_objtype_hold_area);
+            lib_SetupGroupZone(cObjectiveName, "Spwn1-2", "springs_z", "springs_tz", k_objtype_hold_area);
+            lib_SetupGroupZone(cObjectiveName, "reb_springs_g", "reb_springs_tz", "", k_objtype_clear_area);
+            lib_SetupGroupZone(cObjectiveName, "ruinedstreet_g", "ruinedstreet_z", "", k_objtype_hold_area);
+            lib_SetupGroupZone(cObjectiveName, "btmwalkway_g", "btmwalkway_z", "", k_objtype_hold_area);
+            lib_SetupGroupZone(cObjectiveName, "reb_springs2_g", "springs_z", "", k_objtype_hold_area);
+            lib_SetupGroupZone(cObjectiveName, "reb_springs3_g", "springs_z", "", k_objtype_hold_area);
+            ActivateSpawner("Spwn1-2");
+            ActivateSpawner("reb_springs_g");
+            ActivateSpawner("btmwalkway_g");
+            ActivateSpawner("ruinedstreet_g");
+  
+            //chrAIJoinGroup( propRefFromName("player_squad_3"), "player" );
+            
+            // temp to test tie fighters
+            //BFAddFlyingAIPatrolZone(vector(-73.0f, 500.0f, -27.0f),400.0);
+            
+            //SetObjectiveTriggered(true, iObjective);
+            addNewObjectiveIndicatorToProp(propRefFromName("vmTrig1"), k_objectiveIndicatorType_mainObjective);
+            
+            BFRequestAIDriveVehicle(propRefFromName("shara"), propRefFromName("reb_xwing3_"));
+            //BFRequestAIDriveVehicle(propRefFromName("xwingpilot1"), propRefFromName("reb_xwing1_"));
+            //BFRequestAIDriveVehicle(propRefFromName("xwingpilot2"), propRefFromName("reb_xwing2_"));
+            //BFRequestAIDriveVehicle(propRefFromName("xwingpilot3"), propRefFromName("reb_xwing4_"));
+             
+		waitForGameTime(2.0f);
+	    //propSetFrozen(reb_pointing, false);	    	    
+	    // Set x1 back into the story state
+	    //SetAIState(reb_pointing, "AISTATE_BF_STORY");
+	    
+            SetNumSubObjectives(1, iObjective);
+            SetObjectiveTimer(5, iObjective);
+        }
+            
+    } 
+    // after you take the springs, you receive AA gun objective
+    else if (iObjective == 2)
+    {
+        //lib_SetupGroupZone(cObjectiveName, "reb_springs_g", "springs_z", "boobspath_tz", k_objtype_clear_area);
+        lib_SetupGroupZone(cObjectiveName, "reb_springs_g", "springs_z", "", k_objtype_clear_area);
+        lib_SetupGroupZone(cObjectiveName, "reb_springs2_g", "boobspath_z", "", k_objtype_hold_area);
+        lib_SetupGroupZone(cObjectiveName, "reb_springs3_g", "ruinedstreet_z", "", k_objtype_hold_area);
+        // boobs_z and statue_z next
+            
+        activateTalkingHeadNew("YavRebel_Springs", true);
+        
+        removeObjectiveIndicatorFromProp(propRefFromName("vmTrig1"));  // Remove previous HUD marker
+        if (propExists(propRefFromName("vmTrig2")))
+        {
+            addNewObjectiveIndicatorToProp(propRefFromName("vmTrig2"), k_objectiveIndicatorType_mainObjective);
+        }
+        
+        // troops start moving from right hand near side landing ship and take up sniping spots on walkway
+        // artillery starts moving into position from the right hand far side landing ship
+        
+        // As player joins battlefield, squaddies come join him (and usually die :( )
+        
+        //    chrAIJoinGroup( propRefFromName("friendly1"), "player" );
+        //    chrAIJoinGroup( propRefFromName("friendly2"), "player" );
+        //    chrAIJoinGroup( propRefFromName("friendly3"), "player" );
+
+        /* STOMPY AT-STs */
+           
+        propRef tank1;    
+        //tankdriver1 = SpawnCharacterBF("imp_eng_snpc", propRefFromName("dof_atst_stomp1"), vector(0, 0, 0)); 
+        tankdriver1 = SpawnPropFromTemplate("imp_eng_snpc", propRefFromName("dof_atst_stomp1"), vector(0.f, 0.f, 0.f)); 
+        tank1 = SpawnInVehicle(tankdriver1, propRefFromName("dof_atst_stomp1"), StringToChar16("imp_atst"), 0, k_seatPos_driver);
+        addPropToGroup(propRefFromName("atsts_g"), tank1);
+        addPropToGroup(propRefFromName("atstdrivers_g"), tankdriver1);
+
+        propRef tank2;
+        //tankdriver2 = SpawnCharacterBF("imp_eng_snpc", propRefFromName("dof_atst_stomp2"), vector(0, 0, 0)); 
+        tankdriver2 = SpawnPropFromTemplate("imp_eng_snpc", propRefFromName("dof_atst_stomp2"), vector(0.f, 0.f, 0.f)); 
+        tank2 = SpawnInVehicle(tankdriver2, propRefFromName("dof_atst_stomp2"), StringToChar16("imp_atst"), 0, k_seatPos_driver);
+        addPropToGroup(propRefFromName("atsts_g"), tank2);   
+        addPropToGroup(propRefFromName("atstdrivers_g"), tankdriver2);
+    
+        //lib_SetupGroupZone(cObjectiveName, "Spwn-2", "boobs_z", "boobspath_tz", k_objtype_hold_area);
+        lib_SetupGroupZone(cObjectiveName, "Spwn-2", "boobs_z", "", k_objtype_hold_area);
+        ActivateSpawner("Spwn-2");
+        
+        //activateTalkingHeadNew("YavShara_Aagun", true);
+        
+	SetObjectiveTriggered(true, iObjective);    
+    }
+    
+    // After you destroy the AA gun, take the walkway 
+    else if (iObjective == 3)
+    {
+        if (iSubObjective == 1)
+        {          
+          SetObjectiveKillSpawners(1, iObjective);
+          //lib_AddIndicatorsToGroup(propRefFromName("Spwn-3_1"), k_objectiveIndicatorType_mainObjective, true);
+           
+           int i = 0;
+            int tanks = propGroupGetNumOfProps(propRefFromName("Spwn-3_1"));
+            while (i < tanks)
+            {
+                propRef tank;
+                tank = getNthPropFromGroup( propRefFromName("Spwn-3_1"), i);
+                if (propExists(tank))
+                {
+                    addNewObjectiveIndicatorToProp(tank, k_objectiveIndicatorType_mainObjective);
+                }
+                i++;
+            }
+          
+          setAISpawnState(propRefFromName("Spwn-3_1"), "AISTATE_BF_SNIPE", true); 
+        }
+        else 
+        {
+            //activateTalkingHeadNew("YavShara_Aagundown", true);
+            activateTalkingHeadNew("YavRebel_Snipers", true);
+
+            /*   STOMPY AT-STs:   I CHOOSE YOU!    */
+            
+            DriveToDestinationBF( tankdriver1, propRefFromName("dof_atst_gohere") );
+            DriveToDestinationBF( tankdriver2, propRefFromName("dof_atst_gohere") );
+            
+            //addNewObjectiveIndicatorToProp(propRefFromName("Spwn-3_1"), k_objectiveIndicatorType_mainObjective);
+
+            // snipers on bridge should be firing down into forecourt
+            // xwing takes off out of hangar?
+
+           // have the imperials and rebels start fighting outside the hangar already. Spawn everything continuously so battle lasts until next obj.
+           // AT-STs should be walking past the walkway
+           
+            ActivateSpawner("Spwn-4");
+            ActivateSpawner("reb_hangar_g");
+            ActivateSpawner("reb_hangart_g");
+            ActivateSpawner("imp_roofsnipe_g");
+            
+            /*    //   NON-STOMPY AT-STs 
+            
+            atstDriver1 = SpawnAIVehicleWithObjectives(propRefFromName("dof_atst"), "imp_eng_snpc", "imp_atst", 1, true, k_seatPos_driver,StringToChar16(""));
+            atstDriver2 = SpawnAIVehicleWithObjectives(propRefFromName("dof_atst2"), "imp_eng_snpc", "imp_atst", 1, true, k_seatPos_driver,StringToChar16(""));
+            atstDriver3 = SpawnAIVehicleWithObjectives(propRefFromName("dof_atst3"), "imp_eng_snpc", "imp_atst", 1, true, k_seatPos_driver,StringToChar16(""));
+            atstDriver4 = SpawnAIVehicleWithObjectives(propRefFromName("dof_atst4"), "imp_eng_snpc", "imp_atst", 1, true, k_seatPos_driver,StringToChar16(""));
+
+            addPropToGroup(propRefFromName("atsts_g"), atstDriver1);
+            addPropToGroup(propRefFromName("atsts_g"), atstDriver2);
+            addPropToGroup(propRefFromName("atsts_g"), atstDriver3);
+            addPropToGroup(propRefFromName("atsts_g"), atstDriver4);
+            */
+            
+            // WALKWAY SNIPERS: STAY ON WALKWAY.  STEPS RPGs: Stay on top steps to be sniped. TURRET DUDES: man the turrets. 
+            //lib_SetupGroupZone(cObjectiveName, "Spwn-3_1", "walkwaymain_z", "walkway_z", k_objtype_hold_area);
+            //lib_SetupGroupZone(cObjectiveName, "steps_rpg_g", "steps_z", "steps_tz", k_objtype_clear_area);
+            //lib_SetupGroupZone(cObjectiveName, "turrets_g", "forecourt_z", "steps_tz", k_objtype_clear_area);
+            //lib_SetupGroupZone(cObjectiveName, "steps_perm_g", "steps_mid_z", "steps_tz", k_objtype_clear_area);
+            lib_SetupGroupZone(cObjectiveName, "Spwn-3_1", "walkwaymain_z", "", k_objtype_hold_area);
+            lib_SetupGroupZone(cObjectiveName, "steps_rpg_g", "steps_z", "", k_objtype_clear_area);
+            lib_SetupGroupZone(cObjectiveName, "turrets_g", "forecourt_z", "", k_objtype_clear_area);
+            lib_SetupGroupZone(cObjectiveName, "steps_perm_g", "steps_mid_z", "", k_objtype_clear_area);
+            
+            lib_SetupGroupZone(cObjectiveName, "reb_springs2_g", "walkwaymain_z", "", k_objtype_hold_area);
+            lib_SetupGroupZone(cObjectiveName, "reb_springs3_g", "walkwaymain_z", "", k_objtype_hold_area);
+            // EVERYONE ELSE: muck about on the steps
+            //lib_SetupTeamZone(cObjectiveName, 1, "steps_mid_z", "steps_tz", k_objtype_clear_area);
+            //lib_SetupTeamZone(cObjectiveName, 0, "steps_mid_z", "steps_tz", k_objtype_clear_area);
+            lib_SetupTeamZone(cObjectiveName, 1, "steps_mid_z", "", k_objtype_clear_area);
+            lib_SetupTeamZone(cObjectiveName, 0, "steps_mid_z", "", k_objtype_clear_area);
+            
+            lib_SetupGroupZone(cObjectiveName, "imp_roofsnipe_g", "templeroof_z", "", k_objtype_hold_area);
+            
+            ActivateSpawner("steps_rpg_g");
+            ActivateSpawner("Spwn-3_1");
+            
+            
+            // activate shuttle troop spawners: they go to reinforce the steps battle, to make sure there are lots of imperials to kill when you get there
+            
+            ActivateSpawner("shut1_g");
+            ActivateSpawner("shut2_g");
+            
+            // wait 5 seconds before testing against the sniper spawns as objective will tick before they get a chance to spawn
+            SetObjectiveTimer(6, iObjective);
+            SetNumSubObjectives(1, iObjective);
+            
+            RemoveObjectiveIndicatorFromProp(propRefFromName("vmTrig2"));
+
+        }
+
+    }
+    
+    // You've cleared the walkway, now kill some AT-STs
+    else if (iObjective == 4)
+    {
+    
+        if (iSubObjective == 1)
+        {      
+        // test for AT-STs being dead in obj tests after 5 sec has passed     
+        }
+        else 
+        {
+            // move these into obj 3 when number of VMs has been raised and game can cope with background battles
+            ActivateSpawner("turrets_g");    // this is just 3 dudes to jump into turrets
+            ActivateSpawner("steps_perm_g"); // this is like 7 dudes who dont respawn after they're dead
+            
+            activateTalkingHeadNew("YavRebel_Atsts", true);
+
+            propRef veh9;
+            veh9 = SpawnAIVehicle(propRefFromName("dof_bombsprings"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+
+            propRef spline9;
+            spline9 = propRefFromName("spline_springs");   
+            BFShipFollowScriptedSplineNoAvoidance(veh9, spline9);
+
+            //removeObjectiveIndicatorFromProp(propRefFromName("Spwn-3_1"));
+            
+            // add indicators to any remaining AT-STs
+            
+            int i = 0;
+            int tanks = propGroupGetNumOfProps(propRefFromName("atsts_g"));
+            while (i < tanks)
+            {
+                propRef tank;
+                tank = getNthPropFromGroup( propRefFromName("atsts_g"), i);
+                if (propExists(tank))
+                {
+                    addNewObjectiveIndicatorToProp(tank, k_objectiveIndicatorType_mainObjective);
+                }
+                i++;
+            }
+
+            SetNumSubObjectives(1, iObjective);
+            SetObjectiveTimer(5, iObjective);
+            BFObjectiveAddBonus(yavBonusA, 20);
+            BonusObjectiveSetup(yavBonusA, 20, 0);
+//            SetObjectiveTriggered(true, iObjective);
+
+DeleteSpawnerProp(propRefFromName("reb_springs_g"));
+ResetSpawner(propRefFromName("reb_springs_g"));
+ActivateSpawner("reb_springs_g");
+            //lib_SetupGroupZone(cObjectiveName, "reb_springs_g", "walkwaymain_z", "walkway_z", k_objtype_hold_area);
+            lib_SetupGroupZone(cObjectiveName, "reb_springs_g", "walkwaymain_z", "", k_objtype_hold_area);
+            
+            lib_SetupGroupZone(cObjectiveName, "reb_springs2_g", "steps_z", "", k_objtype_hold_area);
+            lib_SetupGroupZone(cObjectiveName, "reb_springs3_g", "steps_z", "", k_objtype_hold_area);
+        }
+    }
+    
+    // as you kill the last AT-ST, do this: (return to command room)
+    else if (iObjective == 5)
+    {
+          if (iSubObjective == 1) // hit the trigger at the top of the steps
+          {
+                //SpawnAIVehicle(propRefFromName("dof_atst_end1"), "imp_eng_snpc", "imp_atst", 0, true, k_seatPos_driver);
+		//SpawnAIVehicle(propRefFromName("dof_atst_end2"), "imp_eng_snpc", "imp_atst", 0, true, k_seatPos_driver);
+		//SpawnAIVehicle(propRefFromName("dof_atst_end3"), "imp_eng_snpc", "imp_atst", 0, true, k_seatPos_driver);
+		//SpawnAIVehicle(propRefFromName("dof_atst_end4"), "imp_eng_snpc", "imp_atst", 0, true, k_seatPos_driver);
+		//SpawnAIVehicle(propRefFromName("dof_atst_end5"), "imp_eng_snpc", "imp_atst", 0, true, k_seatPos_driver);
+		
+                
+                removeObjectiveIndicatorFromProp(propRefFromName("vmTrig5"));
+                addNewObjectiveIndicatorToProp(propRefFromName("vmTrig5_1"), k_objectiveIndicatorType_mainObjective);
+                // imperials stop spawning so any that die will be dead forever!
+                DeactivateSpawner("reb_hangart_g");
+                
+                // imperials push forwards into the hangar
+                // rebels spawn manning the turrets inside
+                SetObjectiveTriggered(true, iObjective);
+                logStr("===== objective 5 sub 1 =====");
+                
+                propRef veh8;
+                veh8 = SpawnAIVehicle(propRefFromName("dof_bombwalkway"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+
+                propRef spline8;
+                spline8 = propRefFromName("spline_walkway");   
+                BFShipFollowScriptedSplineNoAvoidance(veh8, spline8);
+                	    
+		forceTriggerTriggered(propRefFromName("trigCloseDoor"));
+		forceTriggerTriggered(propRefFromName("trigCloseDoorD"));
+		// start spawning LOADS of guys for the command room battle
+                logStr("5 sub 1 - close doors !");
+                
+                // change this to RPG troops firing at them
+                propKill(propRefFromName("H_Tur_Veh1_"));
+                propKill(propRefFromName("H_Tur_Veh2_"));
+                propKill(propRefFromName("H_Tur_Veh2"));
+                propKill(propRefFromName("H_Tur_Veh3"));
+                
+                //propTweenToPos(propRefFromName("yhdoor_d1"), vector(76.05,304.25,-34.2815), 0.7593);
+                setVMPropActive(propRefFromName("vmHalfCloseDoorD"), true); 
+		
+                
+          }
+          else if (iSubObjective == 2) // hit the trigger at bottom steps / entrance to hangar
+          {
+		removeObjectiveIndicatorFromProp(propRefFromName("vmTrig5_1"));
+                addNewObjectiveIndicatorToProp(propRefFromName("vmTrig5_2"), k_objectiveIndicatorType_mainObjective);
+                
+                chrRef reb_beckoning;
+		reb_beckoning = chrRefFromName("reb_beckoning");
+		chrSetPatrolState(reb_beckoning);
+		beginInGameCutSceneIgnorePerceptsAndDamage(reb_beckoning);
+		propSetFrozen(reb_beckoning, true);	    
+		chrPlayAnimSlot(reb_beckoning, "AN_RebeBeckLoop", 1.0f, false);
+		waitForGameTime(2.0f);
+		propSetFrozen(reb_beckoning, false);	    	    
+		SetAIState(reb_beckoning, "AISTATE_BF_STORY");
+		
+		DeactivateSpawner("shut1_g");
+                DeactivateSpawner("shut2_g"); 
+                SetObjectiveTriggered(true, iObjective);
+
+          }
+          else if (iSubObjective == 3) // hit the trigger halfway between hangar and command room
+          {	    
+                removeObjectiveIndicatorFromProp(propRefFromName("vmTrig5_2"));
+                addNewObjectiveIndicatorToProp(propRefFromName("vmTrig5_3"), k_objectiveIndicatorType_mainObjective);
+                
+                // stop rebels spawning behind the guns
+                // imperials push forward to the guns and die
+                //forceTriggerTriggered(propRefFromName("trigCloseDoorD"));
+                DeactivateSpawner("reb_hangart_g");
+                //lib_SetupTeamZone(cObjectiveName, 0, "hangarturrets_z", "hangarturrets_z", k_objtype_clear_area);
+                //lib_SetupTeamZone(cObjectiveName, 1, "command_tz", "command_tz", k_objtype_clear_area);
+                lib_SetupTeamZone(cObjectiveName, 0, "hangarturrets_z", "", k_objtype_clear_area);
+                lib_SetupTeamZone(cObjectiveName, 1, "command_tz", "", k_objtype_clear_area);
+                
+                logStr("===== objective 5 sub 2 =====");
+                
+                SetObjectiveTriggered(true, iObjective);
+                //ActivateSpawner("imp_infinite1_g");
+                
+                lib_SetupGroupZone(cObjectiveName, "luke_g", "commandmiddle_z", "commandmiddle_z", k_objtype_hold_area);
+		ActivateSpawner("luke_g");     
+// reb_wedge_npc_story
+		logStr("5 sub 2");
+		setVMPropActive(propRefFromName("vmResetDoorD"), true);  
+          }             
+          else
+          {
+                activateTalkingHeadNew("YavRebel_Commandroom", true);
+                
+                //removeObjectiveIndicatorFromProp(propRefFromName("vmTrig4"));
+
+                // at start of obj 5, just wait until player hits first trigger (he might already be inside but no matter)
+                
+                addNewObjectiveIndicatorToProp(propRefFromName("vmTrig5"), k_objectiveIndicatorType_mainObjective);
+                DeactivateSpawner("reb_infinite_g");
+                ActivateSpawner("reb_hangart_g");
+                
+                //lib_SetupGroupZone(cObjectiveName, "commandroom_g", "command_tz", "command_tz", k_objtype_hold_area);
+                //lib_SetupTeamZone(cObjectiveName, 0, "hangar_z", "steps_tz", k_objtype_clear_area);
+                //lib_SetupTeamZone(cObjectiveName, 1, "hangar_z", "steps_tz", k_objtype_clear_area);
+		lib_SetupGroupZone(cObjectiveName, "reb_hangart_g", "hangarturrets_z", "hangarturrets_z", k_objtype_clear_area);
+                lib_SetupGroupZone(cObjectiveName, "commandroom_g", "command_tz", "", k_objtype_hold_area);
+                lib_SetupTeamZone(cObjectiveName, 0, "hangar_z", "", k_objtype_clear_area);
+                lib_SetupTeamZone(cObjectiveName, 1, "hangar_z", "", k_objtype_clear_area);
+                lib_SetupGroupZone(cObjectiveName, "reb_springs_g", "steps_mid_z", "", k_objtype_clear_area);
+                ActivateSpawner("commandroom_g");
+        
+                SetNumSubObjectives(3, iObjective);
+                SetObjectiveTriggered(true, iObjective);
+                //activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 2.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "Kill the walkway snipers placeholder message!");    
+                logStr("===== objective 5 sub 0 =====");
+                
+                BFObjectiveRemoveBonus(yavBonusA,20);
+                
+                int i = 0;
+                int troops = propGroupGetNumOfProps(propRefFromName("imp_roofsnipe_g"));
+                
+                while (i < troops)
+                {
+                    propRef troop;
+                    troop = getNthPropFromGroup( propRefFromName("imp_roofsnipe_g"), i);
+                    if (propExists(troop))
+                    {
+                        removeObjectiveIndicatorFromProp(troop);
+                    }
+                    i++;
+                    //propSetFrozen(tank, true);
+                }
+                lib_SetupGroupZone(cObjectiveName, "steps_rpg_g", "hangar_z", "", k_objtype_clear_area);
+
+          }  
+    }
+    // as you enter the command room, do this (hold command room for 30 seconds, luke downloads the data / shuts down/self-destructs the rebel computers)
+    else if (iObjective == 6)
+    {        
+        
+		//SetObjectiveTriggered(true, iObjective);
+                logStr("5 sub 3 - close door D!");
+
+          //activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 2.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "Kill the walkway snipers placeholder message!");    
+                
+                // LUKE COMMENTED UNTIL ANIM STUFF IS FIXED 
+                lib_SetupGroupZone(cObjectiveName, "luke_g", "commandmiddle_z", "commandmiddle_z", k_objtype_hold_area);
+
+		propRef troop;
+		troop = getNthPropFromGroup( propRefFromName("luke_g"), 0);
+		if (propExists(troop))
+		{
+AddVMDebugHUDMsg("Luke definately exists!", 1, "test_objective_message");
+			addNewObjectiveIndicatorToProp(troop, k_objectiveIndicatorType_bonusObjective);
+		}
+		//
+		//propRef dofwalk0;
+		//dofwalk0 = propRefFromName("dofWalk_0");
+		//chrWalkToPadAndAlign(troop, propGetPos(dofwalk0), propGetDir(dofwalk0), 800.0f); 
+		
+		
+          SetObjectiveTimer(30, iObjective);
+          setVMPropActive(propRefFromName("vmPropLukeType"), true);
+          
+          activateTalkingHeadNew("YavLuke_Protectluke", true);
+
+          removeObjectiveIndicatorFromProp(propRefFromName("vmTrig5_3"));
+          ActivateSpawner("imp_commroom_g");
+          //DeactivateSpawner("imp_infinite1_g");
+    }
+    
+    // after 30 seconds when luke shuts down the computers, do this (get into an xwing)
+    else if (iObjective == 7)
+    {
+        if (iSubObjective == 1)     
+        {  
+        /*
+            	propRef luke;
+		luke = propRefFromName("luke");
+		//BFRequestAIDriveVehicle(luke, xwing3);
+		  BFRequestAIDriveVehicle(luke, propRefFromName("reb_xwing2"));
+	*/
+
+        //addPropToGroup(propRefFromName("atsts_g"), tank1);
+        ActivateSpawner("troopers_end_g");
+        lib_SetupGroupZone(cObjectiveName, "troopers_end_g", "steps_tz", "steps_tz", k_objtype_hold_area);
+        }
+        else 
+        {
+        
+        lib_SetupGroupZone(cObjectiveName, "luke_g", "hangar_z", "hangar_z", k_objtype_clear_area);
+
+              //setVMPropActive(propRefFromName("vmPropLukeType"), false);
+
+	luke = propRefFromName("luke");
+	splineluke = propRefFromName("spline_xwing3");
+	wedge = propRefFromName("wedge");
+	//splinewedge = propRefFromName("spline_xwing3");
+	activateTalkingHeadNew("YavLuke_Xwings", true);
+    
+          // spawn Xwings 
+          // set up objective to get into an xwing
+          //lib_SetupGroupZone(cObjectiveName, "commandroom_g", "hangar_z", "steps_tz", k_objtype_hold_area);
+          lib_SetupGroupZone(cObjectiveName, "commandroom_g", "hangar_z", "", k_objtype_hold_area);
+		
+          //xwing1 = SpawnVehicleBF("xwing_fighter",propRefFromName("dof_xwing1"),vector(0.f,0.f,0.f));
+          //xwing2 = SpawnVehicleBF("xwing_fighter",propRefFromName("dof_xwing2"),vector( 0.f , 0.f , 0.f ));
+          //xwing3 = SpawnVehicleBF("xwing_fighter",propRefFromName("dof_xwing3"),vector(0.f,0.f,0.f));
+
+          
+          xwing1 = propRefFromName("yav_xwing_luke1");
+          xwing2 = propRefFromName("reb_Xwing2");
+          xwing3 = propRefFromName("reb_xwing3");
+          //addNewObjectiveIndicatorToProp(xwing1, k_objectiveIndicatorType_mainObjective);
+          //addNewObjectiveIndicatorToProp(xwing2, k_objectiveIndicatorType_mainObjective);
+          addNewObjectiveIndicatorToProp(xwing3, k_objectiveIndicatorType_mainObjective);
+	
+	  propSetCanBeActivated( xwing1, false );
+	  BFFlyVehicleFollowPlayer( luke, xwing1, 0 );
+          //BFRequestAIDriveVehicle(luke, xwing1);
+          
+          propSetCanBeActivated( xwing2, false );
+          BFFlyVehicleFollowPlayer( wedge, xwing2, 0 );
+          
+          
+          //BFRequestAIDriveVehicle(luke, propRefFromName("reb_xwing2"));
+          //splinefalc = propRefFromName("spline_falc");
+          //BFShipFollowScriptedSplineNoAvoidance(falc, splinefalc)
+          
+		propRef troop;
+		troop = getNthPropFromGroup( propRefFromName("luke_g"), 0);
+		if (propExists(troop))
+		{
+			removeObjectiveIndicatorFromProp(troop);
+		}
+		
+		SetNumSubObjectives(1, iObjective);
+		SetObjectiveTimer(5, iObjective);
+        }
+    }
+    // as you enter the Xwing, do this: go into space
+    else if (iObjective == 8)
+    {
+    
+	forceTriggerTriggered(propRefFromName("trigOpenDoor"));
+          
+        BFStopFlyingAIFollowPlayer( luke );
+	BFStopFlyingAIFollowPlayer( wedge );
+	    
+    	propRef tank1;
+        propRef atst1;
+        /*
+        tankdriver1 = SpawnCharacterBF("imp_eng_snpc", propRefFromName("dof_atst_end1"), vector(0, 10.0f, 0)); 
+        tank1 = SpawnInVehicle(tankdriver1, propRefFromName("dof_atst_end1"),StringToChar16("imp_atst"), 0, k_seatPos_driver);
+        tankdriver1 = SpawnCharacterBF("imp_eng_snpc", propRefFromName("dof_atst_end2"), vector(0, 10.0f, 0)); 
+        tank1 = SpawnInVehicle(tankdriver1, propRefFromName("dof_atst_end2"),"imp_atst", 0, k_seatPos_driver);
+        tankdriver1 = SpawnCharacterBF("imp_eng_snpc", propRefFromName("dof_atst_end3"), vector(0, 10.0f, 0)); 
+        tank1 = SpawnInVehicle(tankdriver1, propRefFromName("dof_atst_end3"),"imp_atst", 0, k_seatPos_driver);
+        tankdriver1 = SpawnCharacterBF("imp_eng_snpc", propRefFromName("dof_atst_end4"), vector(0, 10.0f, 0)); 
+        tank1 = SpawnInVehicle(tankdriver1, propRefFromName("dof_atst_end4"),"imp_atst", 0, k_seatPos_driver);
+        tankdriver1 = SpawnCharacterBF("imp_eng_snpc", propRefFromName("dof_atst_end5"), vector(0, 10.0f, 0)); 
+        tank1 = SpawnInVehicle(tankdriver1, propRefFromName("dof_atst_end5"),"imp_atst", 0, k_seatPos_driver);
+        */
+        
+        SpawnAIVehicle(propRefFromName("dof_atst_end1"), "imp_eng_snpc", "imp_atst", 0, true, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_atst_end2"), "imp_eng_snpc", "imp_atst", 0, true, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_atst_end3"), "imp_eng_snpc", "imp_atst", 0, true, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_atst_end4"), "imp_eng_snpc", "imp_atst", 0, true, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_atst_end5"), "imp_eng_snpc", "imp_atst", 0, true, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_atst_side1"), "imp_eng_snpc", "imp_atst", 0, true, k_seatPos_driver);
+        
+        tank1 = SpawnAIVehicle(propRefFromName("dof_iftt_end1"), "imp_eng_snpc", "rep_ift_redwhite", 0, true, k_seatPos_driver);
+        tank2 = SpawnAIVehicle(propRefFromName("dof_iftt_end2"), "imp_eng_snpc", "rep_ift_redwhite", 0, true, k_seatPos_driver);
+        
+          activateTalkingHeadNew("YavLuke_Debris", true);
+          
+        if (iSubObjective == 1)
+        {
+            // TODO: take off other ships
+            // TODO: spawn tie fighters
+            // TODO: spawn loads of guys on the ground to storm the temple
+
+            // temp to test tie fighters
+            /*
+            SpawnAIVehicle(propRefFromName("dof_tiespawns"), "imp_eng_snpc", "tie_fighter", 300, false, 3);
+            SpawnAIVehicle(propRefFromName("dof_tiespawns"), "imp_eng_snpc", "tie_fighter", 300, false, 3);
+            SpawnAIVehicle(propRefFromName("dof_tiespawns"), "imp_eng_snpc", "tie_fighter", 300, false, 3);
+            SpawnAIVehicle(propRefFromName("dof_tiespawns"), "imp_eng_snpc", "tie_fighter", 300, false, 3);
+            SpawnAIVehicle(propRefFromName("dof_tiespawns"), "imp_eng_snpc", "tie_fighter", 300, false, 3);
+            SpawnAIVehicle(propRefFromName("dof_tiespawns"), "imp_eng_snpc", "tie_fighter", 300, false, 3);
+            SpawnAIVehicle(propRefFromName("dof_tiespawns"), "imp_eng_snpc", "tie_fighter", 300, false, 3);
+            SpawnAIVehicle(propRefFromName("dof_tiespawns"), "imp_eng_snpc", "tie_fighter", 300, false, 3);
+            SpawnAIVehicle(propRefFromName("dof_tiespawns"), "imp_eng_snpc", "tie_fighter", 300, false, 3);
+            SpawnAIVehicle(propRefFromName("dof_tiespawns"), "imp_eng_snpc", "tie_fighter", 300, false, 3);
+            */
+            SetObjectiveTriggered(true, iObjective);
+            addNewObjectiveIndicatorToProp(propRefFromName("vmTrig8_1"),  k_objectiveIndicatorType_mainObjective);
+
+            removeObjectiveIndicatorFromProp(propRefFromName("vmTrig8"));
+        }
+        else
+        {
+       
+	BFAddFlyingAIPropCentricPatrolZone(propRefFromName("dof_tiespwns"), 500.0f);
+       
+            if (propExists(xwing1))
+            {
+                removeObjectiveIndicatorFromProp(xwing1);
+            }
+            if (propExists(xwing2))
+            {
+                removeObjectiveIndicatorFromProp(xwing2);
+            }
+            if (propExists(xwing3)) 
+            {
+                removeObjectiveIndicatorFromProp(xwing3);
+            }
+
+           addNewObjectiveIndicatorToProp(propRefFromName("vmTrig8"),  k_objectiveIndicatorType_mainObjective);
+           
+        BFRemoveFlyingAIPatrolZone(vector(-73.0f, 500.0f, -27.0f));
+        //BFAddFlyingAIPatrolZoneAABB( vector( -3438.838135, 3788.322021, 1286.037964), vector( 2500, 300, 500) );
+        // spawn more dudes
+        // TODO: spawn these further out / on splines or set patrol zone / one at a time
+/*
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);  
+        
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);
+        SpawnAIVehicle(propRefFromName("dof_tiespwn2"), "imp_eng_snpc", "tie_fighter", 300, false, k_seatPos_driver);  
+*/
+             SetObjectiveTriggered(true, iObjective);
+             
+             // kill 5 tie fighters as bonus obj
+		BFObjectiveAddBonus(yavBonusB, 21);
+		BonusObjectiveSetup(yavBonusB, 21, 0);
+            
+             SetNumSubObjectives(1, iObjective);
+        }
+        
+    }
+    // once you have hit the first objective indicator, do this: go to the next objective indicator !
+    else if (iObjective == 9)
+	{
+		removeObjectiveIndicatorFromProp(propRefFromName("vmTrig8_1"));
+
+        // set up transponder collection objective
+        addNewObjectiveIndicatorToProp(propRefFromName("vmTrig9"),  k_objectiveIndicatorType_mainObjective);
+        SetObjectiveTriggered(true, iObjective);
+		//waitForGameTime(5.0f);
+		/*
+    		BFAddFlyingAIPropCentricPatrolZone(propRefFromName("dof_tie_debri_4"),  500.0f);
+		SpawnAIVehicle(propRefFromName("dof_tie_debri_1"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+		SpawnAIVehicle(propRefFromName("dof_tie_debri_2"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+		SpawnAIVehicle(propRefFromName("dof_tie_debri_3"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+		SpawnAIVehicle(propRefFromName("dof_tie_debri_4"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+		SpawnAIVehicle(propRefFromName("dof_tie_debri_5"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+		SpawnAIVehicle(propRefFromName("dof_tie_debri_6"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+		SpawnAIVehicle(propRefFromName("dof_tie_debri_7"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+		SpawnAIVehicle(propRefFromName("dof_tie_debri_8"), "imp_eng_snpc", "tie_fighter", 0, false, 3);
+            */
+    
+    }
+    else   
+    {
+	bEndLevel = true;
+    }
+    
+    return true;
+    
+}
+
+// *********************************************************************
+/// *******************                     ******************************
+/// *******************   BONUS OBJ SETUP    ******************************
+/// *******************                     ******************************
+// *********************************************************************
+
+function void BonusObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{
+    //Bonus Objective 4A: Snipe some dudes
+    if (iObjective == 20)
+    {
+        //tank1 = SpawnAIVehicle(propRefFromName("dof_tank1"), "imp_eng_snpc", "republic_ift_redwhite", 0, true, k_seatPos_driver);
+        //tank2 = SpawnAIVehicle(propRefFromName("dof_tank2"), "imp_eng_snpc", "republic_ift_redwhite", 0, true, k_seatPos_driver);
+        
+        //addObjectiveIndicatorToProp(tank1, vector(0.f, 0.f, 0.f), vector(0.5, 0.5, 0.5));
+        //addObjectiveIndicatorToProp(tank2, vector(0.f, 0.f, 0.f), vector(0.5, 0.5, 0.5));     
+        //addNewObjectiveIndicatorToProp(tank1, k_objectiveIndicatorType_bonusObjective);
+        //addNewObjectiveIndicatorToProp(tank2, k_objectiveIndicatorType_bonusObjective);
+                 
+        int i = 0;
+        int troops = propGroupGetNumOfProps(propRefFromName("imp_roofsnipe_g"));
+        
+        while (i < troops)
+        {
+            propRef troop;
+            troop = getNthPropFromGroup( propRefFromName("imp_roofsnipe_g"), i);
+            if (propExists(troop))
+            {
+                addNewObjectiveIndicatorToProp(troop, k_objectiveIndicatorType_bonusObjective);
+            }
+            i++;
+            //propSetFrozen(tank, true);
+        }
+        //addNewObjectiveIndicatorToProp(propRefFromName("steps_rpg_g"), k_objectiveIndicatorType_bonusObjective);
+        logStr("===== tanks spawned ! =====");
+    }
+    //Bonus Objective 8A: kill some tie fighters
+    else if (iObjective == 21)
+    {
+        	SetObjectiveKills(5, iObjective);
+        	//SetObjectiveKillType("FLYING", iObjective); 
+    }
+}
+
+playTimeline("data/bf/timelines/cs10.res");
+///////////////This Script Actions
+
+wholeScreenFade(0.0f, 1.0f, false);
+waitForGameTime(0.1f);
+ScriptHasStarted(); //Do any setups
+waitForGameTime(1.0f); //tweak here 
+wholeScreenFade(1.0f, 0.0f, false);
+
+//Main game loop
+while(!bEndLevel)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    ProcessCallBacks();    
+    ObjectiveSetupCheck();
+
+    for (i=0; i<iNumActive; i++)
+    {
+        int iObjective = BFObjectiveGetNumForNthActive(i);
+        ObjectiveTests(iObjective);        
+        waitForGameTime(0.01f);
+    }
+
+    waitForGameTimeOrLVChange(0.5f, "iObjLV", "iCBLV");
+    logStr("tick");
+    logInt(iObjective);    
+}
+
+// The End
+//Call this to complete the level
+NextLevel("hoth/hoth_story.res");
+
+// AddPropToGroup("grp prop id", propreffrom "vehicle id"

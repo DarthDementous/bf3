@@ -1,0 +1,105 @@
+// vim: set syntax=c :
+
+
+int iObjective, iSubObjective, r2Objective, r2SubObjective;
+
+
+iObjective = 1;
+iSubObjective = 1;
+r2Objective = -1;
+r2SubObjective = -1;
+
+
+//propRef ewok     = propRefFromName("Ewok");
+chrRef chr_ewok    = chrRefFromName("Ewok"); //Declares prop ref as lobot
+chrSetPatrolState(chr_ewok);	//sets lobot in patrol state
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_ewok);	//ignores damage
+
+//iObjective = BFObjectiveGetCurrent();
+//iSubObjective = BFObjectiveGetCurrent(IObjective);
+
+while(1) 
+{
+    iObjective = BFObjectiveGetCurrent();
+    iSubObjective = BFObjectiveGetSub(iObjective);
+//    iSubObjective = BFObjectiveGetCurrent(iObjective);
+    
+    if (iObjective==2 && (iObjective!=r2Objective))
+    {
+	if (iSubObjective==0 && (iSubObjective!=r2subObjective))    //main objective loop
+	{
+	    chrRunToPadAndAlign(chr_ewok, propGetPosFromName("ewokpnt1"), propGetDirFromName("ewokpnt1"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_ewok);
+	    chrPlayAnimSlot(chr_ewok, "AN_hm_ter_lp", 0, true);	//the animation performed, true = loop, false = play once
+//	    propSetFrozen(chr_ewok, true);
+	    r2SubObjective = iSubObjective;
+	}
+	else if (iSubObjective==1 && (iSubObjective!=r2subObjective))
+	{
+	    chrRunToPadAndAlign(chr_ewok, propGetPosFromName("ewokpnt2"), propGetDirFromName("ewokpnt2"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_ewok);
+	    chrRunToPadAndAlign(chr_ewok, propGetPosFromName("ewokpnt3"), propGetDirFromName("ewokpnt3"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_ewok);
+	    chrPlayAnimSlot(chr_ewok, "AN_hm_ter_lp", 0, true);	//the animation performed, true = loop, false = play once
+//	    propSetFrozen(chr_ewok, true);
+	    r2SubObjective = iSubObjective;
+	}
+	else if (iSubObjective==2 && (iSubObjective!=r2subObjective))
+	{
+	    chrRunToPadAndAlign(chr_ewok, propGetPosFromName("ewokpnt4"), propGetDirFromName("ewokpnt4"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_ewok);
+	    chrRunToPadAndAlign(chr_ewok, propGetPosFromName("ewokpnt5"), propGetDirFromName("ewokpnt5"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_ewok);
+	    chrRunToPadAndAlign(chr_ewok, propGetPosFromName("ewokpnt6"), propGetDirFromName("ewokpnt6"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_ewok);
+	    chrPlayAnimSlot(chr_ewok, "AN_hm_ter_lp", 0, false);
+//	    propSetFrozen(chr_ewok, true);   
+	    r2SubObjective = iSubObjective;
+	}
+	else if (iSubObjective==3 && (iSubObjective!=r2subObjective))
+	{
+	    chrRunToPadAndAlign(chr_ewok, propGetPosFromName("ewokpnt7"), propGetDirFromName("ewokpnt7"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_ewok);
+	    chrRunToPadAndAlign(chr_ewok, propGetPosFromName("ewokpnt8"), propGetDirFromName("ewokpnt8"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_ewok);
+	    chrPlayAnimSlot(chr_ewok, "AN_hm_ter_lp", 0, false);
+//	    propSetFrozen(chr_ewok, true);
+	    r2Objective = iObjective;
+	    r2SubObjective = iSubObjective;
+	    
+	}
+    }
+    else if (iObjective==3 && (iObjective!=r2Objective))
+    {
+	if (iSubObjective==0 && (iSubObjective!=r2subObjective))    //main objective loop
+	{
+	    logStr("ewok run: Obj 3, Sub ");
+	    logInt(iSubObjective);
+	    logInt(r2Objective);
+	    chrRunToPadAndAlign(chr_ewok, propGetPosFromName("ewokpnt9"), propGetDirFromName("ewokpnt9"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_ewok);
+	    chrRunToPadAndAlign(chr_ewok, propGetPosFromName("ewokpnt10"), propGetDirFromName("ewokpnt10"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_ewok);
+	    chrRunToPadAndAlign(chr_ewok, propGetPosFromName("ewokpnt11"), propGetDirFromName("ewokpnt11"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_ewok);
+	    chrPlayAnimSlot(chr_ewok, "AN_hm_ter_lp", 0, false);	//the animation performed, true = loop, false = play once
+//	    propSetFrozen(chr_ewok, true);
+	    r2SubObjective = iSubObjective;    
+	}
+	else if (iSubObjective==1 && (iSubObjective!=r2subObjective))
+	{
+	    chrRunToPadAndAlign(chr_ewok, propGetPosFromName("ewokpnt12"), propGetDirFromName("ewokpnt12"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_ewok);
+	    chrRunToPadAndAlign(chr_ewok, propGetPosFromName("ewokpnt13"), propGetDirFromName("ewokpnt13"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_ewok);
+	    chrRunToPadAndAlign(chr_ewok, propGetPosFromName("ewokpnt14"), propGetDirFromName("ewokpnt14"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	    waitUntilVMsDone(chr_ewok);
+	    chrPlayAnimSlot(chr_ewok, "AN_hm_ter_lp", 0, false);	//the animation performed, true = loop, false = play once
+//	    propSetFrozen(chr_ewok, true);
+	    r2Objective = iObjective;
+	    r2SubObjective = iSubObjective;    
+	}
+
+    }
+
+}

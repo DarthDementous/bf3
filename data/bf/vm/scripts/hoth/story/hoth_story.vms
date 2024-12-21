@@ -1,0 +1,1997 @@
+// vim: set syntax=c :
+
+///////////////////////////////////
+/*
+    hoth_story.vms
+
+    Created By Kieran Teasdale
+    Please do not modify without asking me!
+    or comment where you have modified
+
+*/
+///////////////////////////////////
+
+/////////////MAKE SURE TO INCLUDE A BFStorylevelVarProp in your level
+
+//NOTE TRY AND REMOVE AS MANY OF THESE AS POSSIBLE
+int final_turret_test = 0;
+int turrets_saved = 0;
+int turret1_down = 0;
+int turret2_down = 0;
+int turret3_down = 0;
+int turret4_down = 0;
+int turret_death = 0;
+
+int transport_death = 0;
+
+int stop_me = 0;
+
+int banks_done = 0;
+
+int riding = 0;
+
+int in_snwspdr = 0;
+
+int atats = 0;
+int all_counted = 0;
+
+int shield_down = 0;
+int kerpow = 0;
+
+int cell1_open = 0;
+int cell2_open = 0;
+int cell3_open = 0;
+int cell4_open = 0;
+int cell5_open = 0;
+int all_free = 0;
+
+int in_flight = 0;
+int final_flight = 0;
+
+propRef taunRider1;
+propRef taunRider2;
+propRef taunRider3;
+propRef atstDriver1;
+propRef atstDriver2;
+propRef atstDriver3;
+propRef atstDriver4;
+propRef atstDriver5;
+propRef atstDriver6;
+
+propRef lander1;
+propRef lander2;
+propRef lander3;
+propRef lander4;
+
+propRef pPlayer = getPlayerPropRefFromID(GetPlayerId());
+boolean Skip = false;
+boolean bEndLevel = false;
+
+// Declare any props so they can be used later
+
+// Declare Any Characters So They Can Be Used Later
+chrRef pilot;
+//chrRef han;
+chrRef player = chrRefFromName("player_0");
+
+boolean IsRunning = false;
+
+/////////////////////////////          INCLUDE DEFAULTS           /////////////////
+
+//////////////////////////CALLBACK INFO DO NOT CHANGE
+
+//PlayerKilled Callback Info
+boolean bCB_PK = false;
+int iCB_PK_KillerId = -1;
+int iCB_PK_Victim = -1;
+int iCB_PK_Result = -1;
+
+//triggeredProp Callback Info
+boolean bCB_TP = false;
+char16 cCB_TP_Prop = StringToChar16("");
+
+//ObjectiveTimeExpired Callback Info
+boolean bCB_OTE = false;
+char16 cCB_OTE_ObjName = StringToChar16("");
+
+//shipReachedScriptedSplineSegment  Callback Info
+boolean bCB_SRSS = false;
+propRef pCB_SRSS_Ship;
+propRef pCB_SRSS_Spline;
+int iCB_SRSS_Segment = -1;
+
+//////////////////////////END CALLBACK INFO
+
+function void ProcessCallbacks()
+{
+    //No else's as could be waiting to process two or more!
+
+    if (GetLevelVarInt("iCBLV") != -1)
+    {
+        if (bCB_PK) // playerKilled callback
+        {
+            playerKilled(iCB_PK_KillerId, iCB_PK_Result, iCB_PK_Victim);
+            bCB_PK = false;
+        }
+
+        if (bCB_TP) // triggeredProp callback
+        {
+            Trigger(cCB_TP_Prop);
+            bCB_TP = false;
+        }
+
+        // ObjectiveTimeExpired callback
+        if (bCB_OTE)
+        {
+            ObjectiveTimeExpired(cCB_OTE_ObjName);
+            bCB_OTE = false;
+        }
+
+        // shipReachedScriptedSplineSegment callback
+        if (bCB_SRSS)
+        {
+            ShipReachedScriptedSplineSegment(pCB_SRSS_Ship, pCB_SRSS_Spline, iCB_SRSS_Segment);
+            bCB_SRSS = false;
+        }
+
+        SetLevelVarInt("iCBLV", -1);    
+        waitForGameTime(0.1f);
+    }
+}
+
+callback void CB_PlayerKilled(int iKiller, int iResult, int iVictim)
+{
+    logStr("CB_PlayerKilled");
+   /* if (bCB_PK)
+        VMAssertMsg("CB_PlayerKilled - Already Waiting To Do Callback");
+
+    bCB_PK = true;
+    iCB_PK_KillerId = iKiller;
+    iCB_PK_Victim = iVictim;
+    iCB_PK_Result = iResult;
+
+    SetLevelVarInt("iCBLV", 1);    */
+    playerKilled(iKiller, iResult, iVictim);
+}
+
+callback int CB_TriggeredProp(int inType, char16 inTriggerProp, int pId)
+{    
+    logStr("CB_TriggeredProp");    
+    /*if (bCB_TP)
+        VMAssertMsg("CB_TriggeredProp - Already Waiting To Do Callback");
+
+    bCB_TP = true;
+    cCB_TP_Prop = inTriggerProp;
+
+    SetLevelVarInt("iCBLV", 1);    
+*/
+    Trigger(inTriggerProp);
+    return 0;
+}
+
+callback void CB_ObjectiveTimeExpired(char16 objName)
+{
+    logStr("CB_ObjectiveTimeExpired");        
+  /*  if (bCB_OTE)
+        VMAssertMsg("CB_ObjectiveTimeExpired - Already Waiting To Do Callback");
+
+    bCB_OTE = true;
+    cCB_OTE_ObjName = objName;
+
+    SetLevelVarInt("iCBLV", 1); */
+    ObjectiveTimeExpired(objName);
+}
+
+callback void CB_shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    logStr("CB_shipReachedScriptedSplineSegment");            
+  /*  if (bCB_SRSS)
+        VMAssertMsg("CB_shipReachedScriptedSplineSegment - Already Waiting To Do Callback");
+    
+    bCB_SRSS = true;
+    pCB_SRSS_Ship = ship;
+    pCB_SRSS_Spline = spline;
+    iCB_SRSS_Segment = segment;
+
+    SetLevelVarInt("iCBLV", 1);*/
+    ShipReachedScriptedSplineSegment(ship, spline, segment);
+
+}
+
+AllowCallback(CALLBACK_PlayerKilledBF, CB_playerKilled);
+AllowCallback(CALLBACK_TriggeredProp, CB_triggeredProp);
+AllowCallback(CALLBACK_ObjectiveTimeExpired, CB_ObjectiveTimeExpired);
+AllowCallback(CALLBACK_ShipReachedScriptedSplineSegment, CB_shipReachedScriptedSplineSegment);
+
+//////////////////////////END CALLBACKS
+
+function void playerKilled(int killerId, int result, int victimId)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iActive = BFObjectiveGetNumForNthActive(i);
+	if (lib_playerKilled(killerId, result, victimId, iActive)) 
+	{
+	    nextObjective(iActive);
+	}
+    }
+    //if (lib_playerKilled(victimId, killerId, iOppTeam)) nextObjective();    
+}
+
+function void shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+
+}
+
+function void Trigger(char16 inTriggerProp)
+{   
+    int iResult = 0;
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iActive = 0;
+    for (i=0; i<iNumActive; i++)
+    {
+        iActive = BFObjectiveGetNumForNthActive(i);
+        iResult = lib_triggeredProp(inTriggerProp, iActive);
+        iResult = ObjectiveTriggerTests(iActive, inTriggerProp, iResult);
+
+        if (iResult >= 1) nextObjective(iActive);
+    }
+}
+
+function void ObjectiveSetupCheck()
+{
+    int iTempObj = GetLevelVarInt("iObjLV");
+    
+    if (iTempObj != -1)
+    {
+        char16 cName = BFObjectiveGetName(iTempObj);
+        if (ObjectiveSetup(cName, iTempObj, BFObjectiveGetSub(iTempObj)))
+            SetLevelVarInt("iObjLV", -1);
+
+        waitForGameTime(0.1f);        
+    }
+}
+
+function void SetObjectiveSetup(int iObj)
+{
+    logStr("SetObjectiveSetup Called");
+    logInt(iObj);
+    SetLevelVarInt("iObjLV", iObj);
+}
+
+function void nextObjective(int inObjNum) 
+{    
+    int result = lib_nextObjective(inObjNum);
+
+    if(result == 1)
+    {
+        //if next objective returns 1 it has updated a core objective and automatically moved us onto the next
+        //so do objective setup with current objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(BFObjectiveGetCurrent());
+        }
+    }
+
+    if(result == 2)
+    {
+        //if nextobjective returns 2 it has updated a bonus objective so we will want to 
+        //objective setup with the objective we passed to next objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(inObjNum);
+        }
+    }
+}
+
+function void JumpToObjective(int iStartObj, boolean bTeleport)
+{       
+	BFObjectiveSetJumpTo(iStartObj);	
+    nextObjective(BFObjectiveGetCurrent());
+    
+    if (bTeleport)
+    {
+        char16 tSpawn;
+        tSpawn = LevelVarToChar16("mCurrentSpawner");
+        if (propExists(propRefFromChar16(tSpawn)))
+            propTeleportToProp(pPlayer, propRefFromChar16(tSpawn));        
+    }
+    
+    logStr("Jumped To Objective");
+    logInt(BFObjectiveGetCurrent());
+}
+
+function void ObjectiveTimeExpired(char16 objName)
+{   
+    //if (lib_ObjTimeExpired()) nextObjective();
+
+    int objNum = 0;
+    objNum = BFObjectiveGetNumber(objName);   
+    if (lib_ObjTimeExpired(objNum))
+    {
+	nextObjective(objNum);
+    }
+
+}
+
+/* NOT NEEEDED
+callback void playerSpawned(char16 teamName, int playerId)
+{
+    //int iObjective = GetLevelVarInt("mObjective");
+    logStr("teamName: ");
+    logchar16(teamName);
+}
+callback void finiteSpawnerComplete(char16 propId) 
+{
+    AddVMDebugHUDMsg("FINITE SPAWNER IS DEADED", 1, "test_objective_message");
+}
+
+callback void gameHasStarted()
+{           
+}
+*/
+/////////////////////////////          DEFAULTS END            /////////////////
+
+
+
+function void ResetProps()
+{
+// e.g    disableTrigger(propRefFromName("DeathTrigger"));       
+}
+
+function void ScriptHasStarted()
+{
+    //SetLevelVarsBFStory("obj_Mus", "vmTrig");
+    SetBFStoryPrefixes("obj_HotN", "vmTrig");
+ // obj_Mus is the link into the bf/mgrsetup/objectivesmgr.res file.
+ // It will look for objectives in objectivesmgr: obj_Mus1, obj_Mus2 etc. so rename it for your level
+ // vmTrig is the reference for trigger prop names in the editor, e.g. first trigger should be renamed to vmTrig1, then vmTrig2 etc
+ // Remember to paste into each trigger props action variable:
+ // propHasEnteredTriggerScript = "gamemodeTriggerSimple(triggerPropRef, thisPropRef);"
+
+    ResetObjectives("mObjTmp", 14);
+
+    //Reset CPs, Spawners, etc
+    ResetProps();
+
+    JumpToObjective(1, true); // Skip to an objective, MUST BE 1 for final version!!
+}
+
+function int ObjectiveTriggerTests(int iObjective, char16 inTriggerProp, int iResult) 
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+
+    //e.g for an alternate route
+    /*if (iObjective == 1)
+    {
+        if (iResult == 1) //For alternate route jump, else continue with no change
+            JumpToObjective(10, true);
+    }*/
+
+    //No Change
+        return iResult;
+}
+
+/////////////////////////////          OBJECTIVE TESTS            /////////////////
+
+// We can test if certain objectives have been completed here, rather than trigger them immediately
+// This is because sometimes it is much easier on the CPU to test here rather than set up triggers
+// Also we can do complex objective tests here which aren't otherwise possible (e.g. if prop is destroyed)
+function void ObjectiveTests(int iObjective) 
+{
+    //Tests for each game tick
+    logStr("Objective Tests");
+     
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+
+    // IMPERIAL SHIP SPAWNS IN SPACE
+		lib_SpawnActiveVehicleG(propRefFromName("imp_tf_spg"), propRefFromName("imp_tf_sp"), "imp_stpr_snpc", "tie_fighter", 10, 3);
+	    waitForGameTime(0.1f);
+	   
+	    lib_SpawnActiveVehicleG(propRefFromName("imp_ti_spg"), propRefFromName("imp_ti_sp"), "imp_stpr_snpc", "tie_interceptor", 10, 3);
+	    waitForGameTime(0.1f);
+		
+    // REBEL SHIP SPAWNS IN SPACE
+		lib_SpawnActiveVehicleG(propRefFromName("reb_xw_spg"), propRefFromName("reb_xw_sp"), "reb_sol_snpc", "xwing_fighter", 10, 3);
+		waitForGameTime(0.1f);
+	    	   
+	   	lib_SpawnActiveVehicleG(propRefFromName("reb_ss_spg"), propRefFromName("reb_ss_sp"), "reb_sol_snpc", "snowspeeder", 10, 3);
+    	waitForGameTime(0.1f);
+    	
+	///////////////////////////////////////////////////////////////////////////  
+    ///// For The Duration Of Objective 1 - Maintain The Forward Defences /////
+    ///////////////////////////////////////////////////////////////////////////
+    if (iObjective == 1)
+    {
+	    if ((propGetHealthFraction(propRefFromName("turret1"))) <= 0.0f && (propGetHealthFraction(propRefFromName("turret2"))) <= 0.0f 
+         && (propGetHealthFraction(propRefFromName("turret3"))) <= 0.0f && (propGetHealthFraction(propRefFromName("turret4"))) <= 0.0f
+         && turret_death == 0)
+        {
+            AddVMDebugHUDMsg("All Defenses Destroyed!", 1, "test_objective_message");
+
+            char16 emptyString = StringToChar16("");
+            BFObjectiveFailObjective(emptyString,1);
+            
+            turret_death = 1;
+        }
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////  
+    ///// For The Duration Of Objective 2 - Escort Reinforcements To The Shield Generator  /////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    else if (iObjective == 2)
+    {
+	    //Check the player is on a tauntaun before moving on
+	    if (iSubObjective == 1)
+        {
+        	if (IsPlayerInVehicle("STR_VEHICLE_NAME_REB_TAUNTAUN") && riding == 0)
+            {
+                AddVMDebugHUDMsg("Tauntaun Obtained", 1, "test_objective_message");
+                nextObjective(iObjective);
+                riding = 1;
+            }
+        }
+        
+        // Test For All Turrets Saved	
+        if ((propExists(propRefFromName("turret1"))) && (propExists(propRefFromName("turret2")))
+         && (propExists(propRefFromName("turret3"))) && (propExists(propRefFromName("turret4"))) 
+         && final_turret_test == 1)
+        {
+            AddVMDebugHUDMsg("All Turrets Intact!", 1, "test_objective_message");
+            final_turret_test = 0;
+            turrets_saved = 1;
+        } 
+/*        
+        // Test For All Turrets Saved	OLD HEALTH WAY
+        if ((propGetHealthFraction(propRefFromName("turret1"))) >= 0.1f && (propGetHealthFraction(propRefFromName("turret2"))) >= 0.1f 
+         && (propGetHealthFraction(propRefFromName("turret3"))) >= 0.1f && (propGetHealthFraction(propRefFromName("turret4"))) >= 0.1f
+         && final_turret_test == 1)
+        {
+            AddVMDebugHUDMsg("All Turrets Intact!", 1, "test_objective_message");
+            final_turret_test = 0;
+            turrets_saved = 1;
+        }  
+*/        
+    }
+    
+   	///////////////////////////////////////////////////////////////  
+    ///// For The Duration Of Objective 3 - Take Out An AT-AT /////
+    ///////////////////////////////////////////////////////////////
+    else if (iObjective == 3)
+    {
+	    if (iSubObjective == 2)
+        {
+        	if (IsPlayerInVehicle("STR_VEHICLE_NAME_SNOWSPEEDER") && in_snwspdr == 0)
+            {
+                AddVMDebugHUDMsg("Snowspeeder Obtained", 1, "test_objective_message");
+                nextObjective(iObjective);
+                in_snwspdr = 1;
+            }
+        }
+/*
+	    else if (iSubObjective == 4)
+        {
+			int alive; 
+			alive = propGroupSpCountAliveSpawnedProps(propRefFromName("BargeGroup"));
+			
+			if(((atats - alive) >= 1) && (all_counted == 0))
+			{
+				AddVMDebugHUDMsg("AT-AT Killed During Obj 3 - SubObj 4", 1, "test_objective_message");
+				nextObjective(iObjective);
+				all_counted = 1;
+			}
+		}
+*/
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////  
+    ///// For The Duration Of Objective 4 - Use The Ion Cannon To Disable Star Destroyers /////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    else if (iObjective == 4)
+    {	
+	    if (iSubObjective == 2)
+        {
+			if ((propGetHealthFraction(propRefFromName("impstrdstryr"))) <= 0.99f)
+	        {
+	            AddVMDebugHUDMsg("Star Destroyer Disabled", 1, "test_objective_message");
+	            nextObjective(iObjective);
+	        }
+    	}
+    }
+    
+    //////////////////////////////////////////////////////////////////////////////  
+    ///// For The Duration Of Objective 5 - Escort The Final Rebel Transport /////
+    //////////////////////////////////////////////////////////////////////////////
+    else if (iObjective == 5)
+    {	
+	    //change to prop exists
+		if ((propGetHealthFraction(propRefFromName("transport"))) <= 0.0f && transport_death == 0)
+        {
+            AddVMDebugHUDMsg("Transport Destroyed!", 1, "test_objective_message");
+
+            char16 emptyString = StringToChar16("");
+            BFObjectiveFailObjective(emptyString,5);
+            
+            transport_death = 1;
+        }
+        /*	
+        if (iSubObjective == 1)
+        {
+        	if (IsPlayerInVehicle("STR_VEHICLE_NAME_XWING_FIGHTER") && in_flight == 0)
+            {
+                AddVMDebugHUDMsg("X-Wing Obtained", 1, "test_objective_message");
+                nextObjective(iObjective);
+                in_flight = 1;
+            }
+        }
+        */
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////
+    ///// For The Duration Of Objective 6 - Board The Disabled Star Destroyer /////
+    ///////////////////////////////////////////////////////////////////////////////
+    else if (iObjective == 6)
+    {	
+
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////  
+    ///// For The Duration Of Objective 7 - Deactivate The Reactor Containment Shield /////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    else if (iObjective == 7)
+    {	
+       	if (iSubObjective == 4)
+        {
+	        if ((propGetHealthFraction(propRefFromName("console"))) <= 0.0f && (shield_down == 0))
+	        {
+	            AddVMDebugHUDMsg("Reactor Shield Destroyed", 1, "test_objective_message");
+				nextObjective(iObjective);
+				shield_down = 1;
+	        }	        	
+        } 
+    }
+    
+    //////////////////////////////////////////////////////////////////////////////////
+    ///// For The Duration Of Objective 8 - Destroy The Star Destroyer's Reactor /////
+    //////////////////////////////////////////////////////////////////////////////////
+    else if (iObjective == 8)
+    {	
+		if (iSubObjective == 3)
+        {
+	        if ((propGetHealthFraction(propRefFromName("react_prop1"))) <= 0.0f && (kerpow == 0))
+	        {
+	            AddVMDebugHUDMsg("Reactor Destroyed", 1, "test_objective_message");
+				nextObjective(iObjective);
+				kerpow = 1;
+	        }	        	
+        }
+    }
+    
+    ///////////////////////////////////////////////////////////////////////
+    ///// For The Duration Of Objective 9 - Escape The Exploding Ship /////
+    ///////////////////////////////////////////////////////////////////////
+    else if (iObjective == 9)
+    {	
+	    if (iSubObjective == 7)
+        {
+            if (!IsRunning)
+            {
+                AddVMDebugHUDMsg("DOING RUN", 1, "test_objective_message");
+                chrRef brother = chrRefFromName("Brother1");
+                chrSetPatrolState(brother);
+                beginInGameCutSceneIgnorePerceptsAndDamage(brother);                
+                chrRunToPadAndAlign(brother, propGetPosFromName("actpntBroRun"), propGetDirFromName("actpntBroRun"), 800.f); 
+                IsRunning = true;
+            }
+        }   
+        else if (iSubObjective == 15)
+        {
+            if (IsPlayerInVehicle("STR_VEHICLE_NAME_XWING_FIGHTER") && final_flight == 0)
+            {
+                AddVMDebugHUDMsg("X-Wing Obtained", 1, "test_objective_message");
+                nextObjective(iObjective);
+                final_flight = 1;
+            }
+        }       
+    }
+    
+    ////////////////////////////////////////////////////////////////
+    ///// For The Duration Of Objective 8 - Mission Complete!! /////
+    ////////////////////////////////////////////////////////////////
+    else if (iObjective == 10)
+    {	
+		
+    }
+    
+    ///// For The Duration Of BONUS Objective 1-1 - Maintain All Forward Turrets /////
+    else if (iObjective == 11)
+    {	
+        if (turrets_saved == 1 && stop_me == 0)
+        {
+	        // Turrets Saved, Woo
+	        nextObjective(11);
+	        stop_me = 1;
+        }
+    }
+    
+    ///// For The Duration Of BONUS Objective 5-1 - Destroy The Rebel Databanks /////
+    else if (iObjective == 12)
+    {	
+        if (propGetHealthFraction(propRefFromName("bank1")) <= 0.0 && propGetHealthFraction(propRefFromName("bank2")) <= 0.0f && banks_done == 0)
+        {
+            // Rebel Databanks Destroyed, Woo
+	        nextObjective(12);
+	        banks_done = 1;
+        }
+    }
+    ///// For The Duration Of BONUS Objective 6-1 - Take Out The Attacking Imperial Fighter Craft /////
+    else if (iObjective == 13)
+    {	
+		SetObjectiveKills(10, iObjective);
+		
+		SetObjectiveKillType("FLYING", iObjective);
+		
+    }
+    ///// For The Duration Of BONUS Objective 8-2 - Free The Rebel Prisoners /////
+    else if (iObjective == 14)
+    {	
+    	if ((propGetHealthFraction(propRefFromName("Cell1"))) <= 0.0f && (cell1_open == 0))
+        {
+            AddVMDebugHUDMsg("Rebel 1 Freed", 1, "test_objective_message");
+            propSetVisible(0, propRefFromName("cellshld1"));  						// Make Cell Door Invisible
+			cell1_open = 1;
+        }
+        if ((propGetHealthFraction(propRefFromName("Cell2"))) <= 0.0f && (cell2_open == 0))
+        {
+            AddVMDebugHUDMsg("Rebel 2 Freed", 1, "test_objective_message");
+            propSetVisible(0, propRefFromName("cellshld4"));  						// Make Cell Door Invisible
+			cell2_open = 1;
+        }
+        if ((propGetHealthFraction(propRefFromName("Cell3"))) <= 0.0f && (cell3_open == 0))
+        {
+            AddVMDebugHUDMsg("Rebel 3 Freed", 1, "test_objective_message");
+            propSetVisible(0, propRefFromName("cellshld5"));  						// Make Cell Door Invisible
+			cell3_open = 1;
+        }
+        if ((propGetHealthFraction(propRefFromName("Cell4"))) <= 0.0f && (cell4_open == 0))
+        {
+            AddVMDebugHUDMsg("Rebel 4 Freed", 1, "test_objective_message");
+            propSetVisible(0, propRefFromName("cellshld3"));  						// Make Cell Door Invisible
+			cell4_open = 1;
+        }
+        if ((propGetHealthFraction(propRefFromName("Cell5"))) <= 0.0f && (cell5_open == 0))
+        {
+            AddVMDebugHUDMsg("Rebel 5 Freed", 1, "test_objective_message");
+            propSetVisible(0, propRefFromName("cellshld2"));  						// Make Cell Door Invisible
+			cell5_open = 1;
+        }
+        
+        if ((cell1_open == 1) && (cell2_open == 1) && (cell3_open == 1) 
+         && (cell4_open == 1) && (cell5_open == 1) && (all_free == 0))
+        {
+            AddVMDebugHUDMsg("All Rebels Freed!!", 1, "test_objective_message");
+			nextObjective(14);
+			all_free = 1;
+        }
+    }
+
+    logStr("End Objective tests");
+}
+
+/////////////////////////////          OBJECTIVES            /////////////////
+
+// MAIN OBJECTIVE SETUP FUNCTION (most of your code will go here)
+// Set up what each objective actually is (the code for it anyway) and trigger events happening as player completes objectives
+// Objective description strings and numbers are in mgrsetup/objectivesmgr.res + strings localisation file
+
+function boolean ObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{
+	/////////////////////////////////////////////////////////////////
+	////////// OBJECTIVE 1 - Maintain The Forward Defences //////////
+	/////////////////////////////////////////////////////////////////    
+    if (iObjective == 1) 
+    { 
+	    if (iSubObjective == 1)
+        {    
+	        AddVMDebugHUDMsg("Objective 1 - SubObjective 1", 1, "test_objective_message");	         	        
+
+            // Give The Player A Squad
+            propRef pChr;
+            pChr = propSpawnerGetNthSpawnedProp(propRefFromName("SquadSP1"), 0);
+            chrAIJoinGroup( pChr, "player" );
+            pChr = propSpawnerGetNthSpawnedProp(propRefFromName("SquadSP1"), 1);
+            chrAIJoinGroup( pChr, "player" );
+            pChr = propSpawnerGetNthSpawnedProp(propRefFromName("SquadSP1"), 2);
+            chrAIJoinGroup( pChr, "player" );
+
+            // Blocking Function For Scipt Goodness
+	        //waitForGameTime(0.1f);
+
+          	lib_AddIndicatorsToGroup(propRefFromName("Spwn-T"), 0, true);	  // Add Indicator To Forward Turrets (0 = Main) 
+          	
+          	SetPropRefInvincible(propRefFromName("generator"), true); // Make Generator Invincible For Safety
+          	
+          	char16 hoth11 = StringToChar16("obj_HotN11"); 	// Convert Objective String to Char16
+            BFObjectiveAddBonus(hoth11, 11); 				// Activate Bonus Objective For Maintaining All Turrets
+            //SetNumSubObjectives(1, 10);					// Setup Number of Sub-Objectives For Bonus Objective
+            
+            SetObjectiveTimer(1.0f, iObjective); 			// Objective Timer
+        }
+        else if (iSubObjective == 2)
+        {    
+	        propSetVisible(0, propRefFromName("transport")); 		// Make Transport Invisible
+	                
+	        AddVMDebugHUDMsg("Objective 1 - SubObjective 2", 1, "test_objective_message");  
+	        
+	        activateTalkingHeadNew("HotShar1", true);	    // Activate Talking Head For Objective - Defend Forward Turrets
+	        
+	        chrSetMovementClamped(pPlayer, false); //Unlocking Player Movement
+	        
+			SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 3)
+        {      
+	        AddVMDebugHUDMsg("Objective 1 - SubObjective 3", 1, "test_objective_message");
+	        
+	        // Spawn AT-AT Landing Barge
+          	SpawnAtatBargeWithDriverObjectives("theta_barge1", propRefFromName("lander1"), vector(0,0,0), "");  
+          	
+	        camShakeAll(6, 0.00001, 0.007);  				// Shake the camera
+	        SetNumAltRoutes(1, iObjective);
+	        
+	        addSpeechMessage("Rebel: Come On! This Way!", 5.0f); // Adding Text Where Speech Will Go Later
+	        
+			SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 4)
+        {      
+	        AddVMDebugHUDMsg("Objective 1 - SubObjective 4", 1, "test_objective_message");
+	        
+	        addSpeechMessage("Rebel: We've got to get to the trenches!", 5.0f); // Adding Text Where Speech Will Go Later
+	        
+	        camShakeAll(6, 0.00001, 0.007); 				// Shake the camera
+	        SetNumAltRoutes(1, iObjective);
+	        
+			SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 5)
+        {   
+	        AddVMDebugHUDMsg("Objective 1 - SubObjective 5", 1, "test_objective_message"); 
+	          
+	        camShakeAll(6, 0.00001, 0.007);  				// Shake the camera
+	        SetNumAltRoutes(1, iObjective);
+	        
+			SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 6)
+        {      
+	        AddVMDebugHUDMsg("Objective 1 - SubObjective 6", 1, "test_objective_message");
+
+	        // Spawn AT-AT's and add to group
+            propRef p;
+            p = SpawnAIVehicleWithObjectives(propRefFromName("atat_dof1"), "imp_eng_snpc", "imp_atat", 1, true, k_seatPos_driver, StringToChar16(""));
+            addPropToGroup(propRefFromName("Spwn-3"), p);            
+            p = SpawnAIVehicleWithObjectives(propRefFromName("atat_dof2"), "imp_eng_snpc", "imp_atat", 1, true, k_seatPos_driver, StringToChar16(""));
+            addPropToGroup(propRefFromName("Spwn-3"), p); 
+
+            // Blocking Function For Scipt Goodness
+	        waitForGameTime(0.1f);
+	        
+            // Spawn AT-ST's
+            atstDriver1 = SpawnAIVehicleWithObjectives(propRefFromName("atst_dof1"), "imp_eng_snpc", "imp_atst", 1, true, k_seatPos_driver, StringToChar16(""));
+            atstDriver2 = SpawnAIVehicleWithObjectives(propRefFromName("atst_dof2"), "imp_eng_snpc", "imp_atst", 1, true, k_seatPos_driver, StringToChar16(""));
+
+            // Blocking Function For Scipt Goodness
+	        waitForGameTime(0.1f);
+	        
+            // Add Pre-Placed AT-AT's To Barge Group For Counting Later
+            addPropToGroup(propRefFromName("BargeGroup"), p); 
+            addPropToGroup(propRefFromName("BargeGroup"), p); 
+	            
+			SetObjectiveTimer(1.0f, iObjective);   			// Objective Timer
+        }
+        else if (iSubObjective == 7)
+        {      
+	        AddVMDebugHUDMsg("Objective 1 - SubObjective 7", 1, "test_objective_message");
+
+	        // Spawn Imperials
+	        ActivateSpawner("land1_spg");
+	        ActivateSpawner("land2_spg");
+	        ActivateSpawner("land3_spg");
+	        ActivateSpawner("land4_spg");
+	        ActivateSpawner("land5_spg");
+	        ActivateSpawner("land6_spg");
+	        ActivateSpawner("land10_spg");
+	        ActivateSpawner("land11_spg");	
+
+	        // Blocking Function For Scipt Goodness
+	        //waitForGameTime(0.1f);
+	        
+	        // Spawn Rebels In Trenches
+	        ActivateSpawner("tren1_spg");
+	        ActivateSpawner("tren2_spg");
+            
+			SetPropRefInvincible(propRefFromName("turret1"), false); // Make turret1 Not Invincible For Gameplay	        
+	        SetPropRefInvincible(propRefFromName("turret2"), false); // Make turret2 Not Invincible For Gameplay
+	        
+			SetObjectiveTimer(1.0f, iObjective);   			// Objective Timer
+        }
+        else if (iSubObjective == 8)
+        {      
+	        AddVMDebugHUDMsg("Objective 1 - SubObjective 8", 1, "test_objective_message");  	         	                  
+	        
+	        DeactivateSpawner("land4_spg");
+	        DeactivateSpawner("land1_spg");
+	        DeactivateSpawner("land2_spg");
+	        
+	        // Blocking Function For Scipt Goodness
+	        //waitForGameTime(0.1f);
+	        
+	        // Spawn More Imperials
+	        ActivateSpawner("land7_spg");
+	        ActivateSpawner("land8_spg");
+	        ActivateSpawner("land9_spg");
+
+	        SetPropRefInvincible(propRefFromName("turret3"), false); // Make turret3 Not Invincible For Gameplay
+	        
+            SetObjectiveTimer(1.0f, iObjective);   			// Objective Timer
+        }
+        else if (iSubObjective == 9)
+        {        
+	        AddVMDebugHUDMsg("Objective 1 - SubObjective 9", 1, "test_objective_message");
+	        
+	        // Tell AT-AT's To Walk To DOF's
+	        propRef p = getNthPropFromGroup(propRefFromName("Spwn-3"), 0);
+            DriveToDestinationBF( p, propRefFromName("go_here3") );
+            p = getNthPropFromGroup(propRefFromName("Spwn-3"), 1);            
+            DriveToDestinationBF( p, propRefFromName("go_here4") );
+
+            // Blocking Function For Scipt Goodness
+	        //waitForGameTime(0.1f);
+	        
+            // Tell AT-ST's To Walk To DOF's
+            DriveToDestinationBF( atstDriver1, propRefFromName("go_here1") );
+            DriveToDestinationBF( atstDriver2, propRefFromName("go_here2") );
+            
+	        // Spawn AT-AT Landing Barge
+            //propRef pVeh;
+        	//SpawnAtatBargeWithDriverObjectives("theta_barge2", propRefFromName("lander2"), vector(0,0,0), "");
+            //addPropToGroup(propRefFromName("BargeGroup"), pVeh);
+            
+            SetPropRefInvincible(propRefFromName("turret4"), false); // Make propRefFromName("turret4") Not Invincible For Gameplay
+            
+            SetObjectiveTimer(10.0f, iObjective);   		// Objective Timer
+        }
+        else if (iSubObjective == 10)
+        {       
+	        AddVMDebugHUDMsg("Objective 1 - SubObjective 10", 1, "test_objective_message");
+	         
+            //lib_AddIndicatorsToGroup(propRefFromName("BargeGroup"), 1, true); // Add Indicator To Landing Craft Group
+
+            addSpeechMessage("Rebel: Keep those turrets active!", 5.0f); // Adding Text Where Speech Will Go Later
+            
+            SetObjectiveTimer(30.0f, iObjective);   		// Objective Timer
+        }
+        else if (iSubObjective == 11)
+        {        
+	        AddVMDebugHUDMsg("Objective 1 - SubObjective 11", 1, "test_objective_message");
+	        
+	        // Spawn AT-AT Landing Barge
+            //propRef pVeh;
+            //SpawnAtatBargeWithDriverObjectives("theta_barge3", propRefFromName("lander3"), vector(0,0,0), "");
+            //addPropToGroup(propRefFromName("BargeGroup"), pVeh);
+            
+            SetObjectiveTimer(20.0f, iObjective);   		// Objective Timer
+        }
+        else if (iSubObjective == 12)
+        {      
+	        AddVMDebugHUDMsg("Objective 1 - SubObjective 12", 1, "test_objective_message"); 
+	         
+			//lib_AddIndicatorsToGroup(propRefFromName("BargeGroup"), 1, true); // Add Indicator To Landing Craft Group
+			
+            SetObjectiveTimer(20.0f, iObjective);   		// Objective Timer
+        }
+        else if (iSubObjective == 13)
+        {     
+	        AddVMDebugHUDMsg("Objective 1 - SubObjective 13", 1, "test_objective_message");
+	           
+	        // Spawn AT-AT Landing Barge
+            //propRef pVeh;
+            //SpawnAtatBargeWithDriverObjectives("theta_barge4", propRefFromName("lander4"), vector(0,0,0), "");
+            //addPropToGroup(propRefFromName("BargeGroup"), pVeh);
+            
+            SetObjectiveTimer(20.0f, iObjective);   		// Objective Timer
+        }
+        else if (iSubObjective == 14)
+        {        
+	        AddVMDebugHUDMsg("Objective 1 - SubObjective 14", 1, "test_objective_message");
+	        
+			//lib_AddIndicatorsToGroup(propRefFromName("BargeGroup"), 1, true); // Add Indicator To Landing Craft Group
+			
+            SetObjectiveTimer(20.0f, iObjective);   		// Objective Timer
+        }
+        else
+        { 
+	        AddVMDebugHUDMsg("Objective 1 - SubObjective 0", 1, "test_objective_message");
+	        
+	        // ZONE DECLARATION BATTLE SYSTEM   
+            // Enemy Group Prop Attack Stuff
+            BFNPCGroupObjectiveSetType(cObjectiveName, "land1_spg", k_objtype_attack_prop);
+        	BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "land1_spg", propRefFromName("turret1"), 75, 110);
+            BFNPCGroupObjectiveSetType(cObjectiveName, "land2_spg", k_objtype_attack_prop);
+        	BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "land2_spg", propRefFromName("turret2"), 75, 110);
+        	BFNPCGroupObjectiveSetType(cObjectiveName, "land3_spg", k_objtype_attack_prop);
+        	BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "land3_spg", propRefFromName("turret3"), 75, 110); 
+            BFNPCGroupObjectiveSetType(cObjectiveName, "land4_spg", k_objtype_attack_prop);
+        	BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "land4_spg", propRefFromName("turret4"), 75, 110); 
+
+        	// Blocking Function For Scipt Goodness
+	        waitForGameTime(0.1f);
+	        
+        	BFNPCGroupObjectiveSetType(cObjectiveName, "echo1_spg", k_objtype_defend_prop);
+        	BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "echo1_spg", propRefFromName("turret1"), 75, 110);
+        	BFNPCGroupObjectiveSetType(cObjectiveName, "echo2_spg", k_objtype_defend_prop);
+        	BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "echo2_spg", propRefFromName("turret2"), 75, 110);
+        	BFNPCGroupObjectiveSetType(cObjectiveName, "echo3_spg", k_objtype_defend_prop);
+        	BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "echo3_spg", propRefFromName("turret3"), 75, 110); 
+            BFNPCGroupObjectiveSetType(cObjectiveName, "echo4_spg", k_objtype_defend_prop);
+        	BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "echo4_spg", propRefFromName("turret4"), 75, 110); 
+        	
+        	// Blocking Function For Scipt Goodness
+	        waitForGameTime(0.1f);
+	        
+            // Team 0 (Player) Battle Commands        
+            lib_SetupTeamZone(cObjectiveName, 0, "Trench_Home", "Trench_Targ", k_objtype_hold_area); // Team Number, Home Zone, Target Zone, Objective Type
+            // Team 1 (Enemy) Battle Commands        
+            lib_SetupTeamZone(cObjectiveName, 1, "Trench_Home", "Trench_Targ", k_objtype_hold_area); // Team Number, Home Zone, Target Zone, Objective Type          
+
+	        // Spawn Rebels
+	        //ActivateSpawner("SquadSP1"); // Now being activated in it's own prop setup
+	        ActivateSpawner("echo1_spg");
+	        ActivateSpawner("echo2_spg");
+	        ActivateSpawner("echo3_spg");
+	        ActivateSpawner("echo4_spg");
+	        ActivateSpawner("echo5_spg");        	        
+
+	        // Blocking Function For Scipt Goodness
+	        //waitForGameTime(0.1f);
+	        
+	        //Door Close Stuff, Keep Player On Track
+	        doorClose(propRefFromName("hot_door_r1"), true );
+	        doorClose(propRefFromName("hot_door_l1"), true );
+	        doorClose(propRefFromName("hot_door_r2"), true );
+	        doorClose(propRefFromName("hot_door_l2"), true );
+	        doorClose(propRefFromName("hot_door_r4"), true );
+	        doorClose(propRefFromName("hot_door_l4"), true );
+	        doorClose(propRefFromName("hot_door_r6"), true );
+	        doorClose(propRefFromName("hot_door_l10"), true );
+	        
+	        // Blocking Function For Scipt Goodness
+	        //waitForGameTime(0.1f);
+	        
+	        SetPropRefInvincible(propRefFromName("turret1"), true); // Make turret1 Invincible For Safety
+	        SetPropRefInvincible(propRefFromName("turret2"), true); // Make turret2 Invincible For Safety
+	        SetPropRefInvincible(propRefFromName("turret3"), true); // Make turret3 Invincible For Safety
+	        SetPropRefInvincible(propRefFromName("turret4"), true); // Make turret4 Invincible For Safety
+	        
+	        propSetVisible(0, propRefFromName("EbaseDrOp1")); 		// Make Open Hangar Doors Invisible
+    		propSetVisible(1, propRefFromName("EbaseDrCl1")); 		// Make Closed Hangar Visible
+    		
+	        // Blocking Function For Scipt Goodness
+	        waitForGameTime(0.1f);
+	        
+            // Add Forward Turrets To Group For Use Later
+            addPropToGroup(propRefFromName("Spwn-T"), propRefFromName("turret1"));
+            addPropToGroup(propRefFromName("Spwn-T"), propRefFromName("turret2"));
+            addPropToGroup(propRefFromName("Spwn-T"), propRefFromName("turret3"));
+            addPropToGroup(propRefFromName("Spwn-T"), propRefFromName("turret4"));
+
+            SetPropRefInvincible(propRefFromName("impstrdstryr"), true); // Make Star Destroyer Invincible For Safety
+            SetPropRefInvincible(propRefFromName("impstrdstryr1"), true); // Make Star Destroyer Closer To Ground Invincible For Safety
+            
+            SetObjectiveTimer(1.0f, iObjective);   		// Objective Timer           
+            SetNumSubObjectives(14, iObjective); 		// Set Number Of Sub-Objectives 
+        }
+    } 
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////// OBJECTIVE 2 - Escort Reinforcments To The Shield Generator And Take Out AT-ST's //////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    else if (iObjective == 2) 
+    { 
+        if (iSubObjective == 1)
+        {      
+	        AddVMDebugHUDMsg("Objective 2 - SubObjective 1", 1, "test_objective_message");	
+	          
+	        // ZONE DECLARATION BATTLE SYSTEM - CLEARING PREVIOUS ZONE INFO SO PROP STUFF WORKS BELOW    
+        	// Team 0 (Player) Battle Commands        
+        	lib_SetupTeamZone(cObjectiveName, 0, "", "", k_objtype_hold_area); // Team Number, Home Zone, Target Zone, Objective Type
+        	// Team 1 (Enemy) Battle Commands        
+        	lib_SetupTeamZone(cObjectiveName, 1, "", "", k_objtype_hold_area); // Team Number, Home Zone, Target Zone, Objective Type
+        
+        	// ZONE DECLARATION BATTLE SYSTEM       
+        	// Team 0 (Player) Battle Commands 
+        	BFNPCTeamObjectiveSetType(cObjectiveName, 0, k_objtype_defend_prop);
+        	BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 0, propRefFromName("generator"), 75, 110); 
+        	// Team 1 (Enemy) Battle Commands  
+        	BFNPCTeamObjectiveSetType(cObjectiveName, 1, k_objtype_attack_prop);
+        	BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1, propRefFromName("generator"), 75, 110); 
+        	
+        	// Blocking Function For Scipt Goodness
+	        //waitForGameTime(0.1f);
+	        
+        	lib_AddIndicatorsToGroup(propRefFromName("Spwn-T"), 0, false);	  // Remove Indicator From Forward Turrets (0 = Main) 
+        	
+        	// ZONE DECLARATION BATTLE SYSTEM - Sending Some Rebels And Imperials To Forward Trenches Still
+        	lib_SetupGroupZone(cObjectiveName, "echo1_spg", "Trench_Home", "Trench_Targ", k_objtype_hold_area);
+        	lib_SetupGroupZone(cObjectiveName, "echo2_spg", "Trench_Home", "Trench_Targ", k_objtype_hold_area);
+        	lib_SetupGroupZone(cObjectiveName, "land1_spg", "Trench_Home", "Trench_Targ", k_objtype_hold_area);
+        	lib_SetupGroupZone(cObjectiveName, "land2_spg", "Trench_Home", "Trench_Targ", k_objtype_hold_area);       	
+        	lib_SetupGroupZone(cObjectiveName, "land3_spg", "Trench_Home", "Trench_Home", k_objtype_hold_area);
+        	
+        	lib_SetupGroupZone(cObjectiveName, "land4_spg", "Path_Home", "Path_Targ", k_objtype_hold_area);
+        	lib_SetupGroupZone(cObjectiveName, "path1_spg", "Path_Home", "Path_Targ", k_objtype_hold_area);
+        	
+        	// Blocking Function For Scipt Goodness
+	        //waitForGameTime(0.1f);
+	        
+        	BFNPCGroupObjectiveSetType(cObjectiveName, "echo3_spg", k_objtype_defend_prop);
+        	BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "echo3_spg", propRefFromName("Dish_Targ"), 75, 110);
+        	BFNPCGroupObjectiveSetType(cObjectiveName, "echo4_spg", k_objtype_defend_prop);
+        	BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "echo4_spg", propRefFromName("Dish_Targ"), 75, 110);
+        	//BFNPCGroupObjectiveSetType(cObjectiveName, "echo5_spg", k_objtype_defend_prop);
+        	//BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "echo5_spg", propRefFromName("Dish_Targ"), 75, 110); 
+            BFNPCGroupObjectiveSetType(cObjectiveName, "echo6_spg", k_objtype_defend_prop);
+        	BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "echo6_spg", propRefFromName("Dish_Targ"), 75, 110); 
+        	
+        	final_turret_test = 1; 	// Start Testing For All Turrets Intact
+
+	        //This objective tests for the player being on a tauntaun in the objective tests
+        }
+        else if (iSubObjective == 2)
+        {        
+        	AddVMDebugHUDMsg("Objective 2 - SubObjective 2", 1, "test_objective_message");	     	
+        	
+        	// Spawn AT-ST's
+            atstDriver3 = SpawnAIVehicleWithObjectives(propRefFromName("atst_dof3"), "imp_eng_snpc", "imp_atst", 1, true, k_seatPos_driver, StringToChar16(""));
+            atstDriver4 = SpawnAIVehicleWithObjectives(propRefFromName("atst_dof4"), "imp_eng_snpc", "imp_atst", 1, true, k_seatPos_driver, StringToChar16(""));
+                     
+        	// Spawn Fellow Tauntaun riders
+        	taunRider1 = SpawnAIVehicleWithObjectives(propRefFromName("Taun1"), "reb_hot_sld", "RebTauntaun", 1, true, k_seatPos_driver, StringToChar16(""));
+            taunRider2 = SpawnAIVehicleWithObjectives(propRefFromName("Taun2"), "reb_hot_sld", "RebTauntaun", 1, true, k_seatPos_driver, StringToChar16(""));
+            taunRider3 = SpawnAIVehicleWithObjectives(propRefFromName("Taun3"), "reb_hot_sld", "RebTauntaun", 1, true, k_seatPos_driver, StringToChar16(""));
+        	
+            // Blocking Function For Scipt Goodness
+	        //waitForGameTime(0.1f);
+	        
+	        lib_AddIndicatorsToGroup(propRefFromName("Spwn-T"), 0, false);	  // Remove Indicator From Forward Turrets (0 = Main) 
+	        
+            propRef tauntaun = propRefFromName("Tauntaun");
+        	removeObjectiveIndicatorFromProp(tauntaun);  		// Remove previous HUD marker
+        	
+        	addNewObjectiveIndicatorToProp(propRefFromName("generator"), k_objectiveIndicatorType_mainObjective);  // Add Indicator to Generator
+
+        	SetObjectiveTimer(1.0f, iObjective); 					// Objective Timer
+        }
+        else if (iSubObjective == 3)
+        {        
+        	AddVMDebugHUDMsg("Objective 2 - SubObjective 3", 1, "test_objective_message");	     	
+        	
+        	// Tell Tauntaun's To Walk To DOF's
+            DriveToDestinationBF( taunRider1, propRefFromName("TaunGo1") );
+            DriveToDestinationBF( taunRider2, propRefFromName("TaunGo2") );
+            DriveToDestinationBF( taunRider3, propRefFromName("TaunGo3") );
+
+            // Tell AT-ST's To Walk To DOF's
+            DriveToDestinationBF( atstDriver3, propRefFromName("go_here5") );
+            DriveToDestinationBF( atstDriver4, propRefFromName("go_here6") );
+            
+        	SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 4)
+        {        
+        	AddVMDebugHUDMsg("Objective 2 - SubObjective 4", 1, "test_objective_message");	     	
+        	
+        	activateTalkingHeadNew("HotShar3", true);	    	// Activate Talking Head For Objective - Just In Time...
+        	activateTalkingHeadNew("HotShar4", false);	    	// Activate Talking Head For Objective - Scout Walkers!
+        	
+        	// Spawn AT-ST's
+            atstDriver5 = SpawnAIVehicleWithObjectives(propRefFromName("atst_dof5"), "imp_eng_snpc", "imp_atst", 1, true, k_seatPos_driver, StringToChar16(""));
+            atstDriver6 = SpawnAIVehicleWithObjectives(propRefFromName("atst_dof6"), "imp_eng_snpc", "imp_atst", 1, true, k_seatPos_driver, StringToChar16(""));
+            
+        	SetObjectiveTimer(1.0f, iObjective); 					// Objective Timer
+        }
+        else if (iSubObjective == 5)
+        {        
+        	AddVMDebugHUDMsg("Objective 2 - SubObjective 5", 1, "test_objective_message");	     	
+        	
+        	activateTalkingHeadNew("HotShar5", true);	    	// Activate Talking Head For Objective - Take out an AT-ST!
+        	
+        	// Tell AT-ST's To Walk To DOF's
+            DriveToDestinationBF( atstDriver5, propRefFromName("go_here7") );
+            DriveToDestinationBF( atstDriver6, propRefFromName("go_here8") );
+            
+            SetObjectiveKills(2, iObjective);
+            SetObjectiveKillType("STR_VEHICLE_NAME_IMP_ATST", iObjective);  // Objective Completes When 2 AT-ST's are killed
+        }     
+        else 
+        {
+	        AddVMDebugHUDMsg("Objective 2 - SubObjective 0", 1, "test_objective_message");
+	        chrSetMovementClamped(pPlayer, false); //Unlocking Player Movement
+	        
+	        SetPropRefInvincible(propRefFromName("impstrdstryr"), true); // Make Star Destroyer Invincible For Safety
+
+            // Spawn Imperials
+            ActivateSpawner("path1_spg");
+
+            // Spawn Rebels
+	        ActivateSpawner("gen1_spg");
+	        ActivateSpawner("gen2_spg");
+	        
+	        // Blocking Function For Scipt Goodness
+	        //waitForGameTime(0.1f);
+	        
+	        lib_AddIndicatorsToGroup(propRefFromName("Spwn-T"), 0, false);	  // Remove Indicator From Forward Turrets (0 = Main) 
+	        
+	        addNewObjectiveIndicatorToProp(propRefFromName("Tauntaun"), k_objectiveIndicatorType_mainObjective);  // Add Indicator to Tauntaun
+	        
+	        activateTalkingHeadNew("HotShar2", true);	    	// Activate Talking Head For Objective - Escort Troops To Generator!
+	        
+	        BFObjectiveRemoveBonus(hoth11, 11); 				// Deactivate Bonus Objective For Maintaining All Turrets
+	        
+	        SetObjectiveTimer(2.0f, iObjective); 				// Objective Timer
+	        SetNumSubObjectives(5, iObjective); 				// Set Number Of Sub-Objectives
+	    }
+    } 
+    
+    /////////////////////////////////////////////////////
+    ////////// OBJECTIVE 3 - Take Out An AT-AT //////////
+    /////////////////////////////////////////////////////
+    else if (iObjective == 3) 
+    { 
+	    if (iSubObjective == 1)
+        { 
+		    AddVMDebugHUDMsg("Objective 3 - SubObjective 1", 1, "test_objective_message");	    
+
+		    SetObjectiveTimer(1.0f, iObjective); 					// Objective Timer	
+		}
+		else if (iSubObjective == 2)
+        { 
+	        AddVMDebugHUDMsg("Objective 3 - SubObjective 2", 1, "test_objective_message");	       	        
+	        	        	        
+	        //This bit tests for being in a snowspeeder to move on via objective tests
+        }
+        else if (iSubObjective == 3)
+        { 
+	        AddVMDebugHUDMsg("Objective 3 - SubObjective 3", 1, "test_objective_message");
+	        
+	        addSpeechMessage("Luke: Try to do a loop with your tow cable!", 5.0f); // Adding Text Where Speech Will Go Later
+	        
+	        //atats = propGroupSpCountAliveSpawnedProps(propRefFromName("BargeGroup"));
+	        
+	        SetObjectiveTimer(1.0f, iObjective); 					// Objective Timer	
+        }
+        else if (iSubObjective == 4)
+        { 
+	        AddVMDebugHUDMsg("Objective 3 - SubObjective 4", 1, "test_objective_message");
+	        
+	        SetObjectiveKills(1, iObjective);
+            SetObjectiveKillType("STR_VEHICLE_NAME_IMP_ATAT", iObjective);  // Objective Completes When 1 AT-AT is killed
+        }
+        else if (iSubObjective == 5)
+        { 
+	        AddVMDebugHUDMsg("Objective 3 - SubObjective 5", 1, "test_objective_message");
+	        
+	        SetPropRefInvincible(propRefFromName("generator"), false); // Make Generator Invincible For Safety
+	        
+	        SetObjectiveTimer(3.0f, iObjective); 					// Objective Timer	
+        }
+        else if (iSubObjective == 6)
+        { 
+	        AddVMDebugHUDMsg("Objective 3 - SubObjective 6", 1, "test_objective_message");
+	        
+	        // Blow Up Generator As Per Movie
+	        propKill(propRefFromName("generator"));
+	        	        
+	        //ActivateSpawner("hanspg"); 						// Spawn Falcon Pilot
+	     
+	        SetObjectiveTimer(1.0f, iObjective); 					// Objective Timer
+        }
+        else if (iSubObjective == 7)
+        { 
+	        AddVMDebugHUDMsg("Objective 3 - SubObjective 7", 1, "test_objective_message");
+	        
+	        //han = chrRefFromName("han");
+	        //DriveVehicleBF(han, propRefFromName("reb_falcon1"));
+	     
+	        SetObjectiveTimer(1.0f, iObjective); 					// Objective Timer
+        }
+        else if (iSubObjective == 8)
+        { 
+	        AddVMDebugHUDMsg("Objective 3 - SubObjective 8", 1, "test_objective_message");
+	        
+	        //propRef falfly;
+	        //falfly = propRefFromName("fal_out");
+	        //BFShipFollowScriptedSplineNoAvoidance(propRefFromName("reb_falcon1"), falfly);
+	     
+	        SetObjectiveTimer(1.0f, iObjective); 					// Objective Timer
+        }
+        else
+        {
+	        AddVMDebugHUDMsg("Objective 3 - SubObjective 0", 1, "test_objective_message");
+	        chrSetMovementClamped(pPlayer, false); //Unlocking Player Movement
+	        removeObjectiveIndicatorFromProp(propRefFromName("generator"));  		// Remove previous HUD marker
+
+	        SetObjectiveTimer(1.0f, iObjective); 					// Objective Timer
+	        SetNumSubObjectives(8, iObjective); 				// Set Number Of Sub-Objectives
+        }
+    } 
+    
+    /////////////////////////////////////////////////////////////////////////////////
+    ////////// OBJECTIVE 4 - Use The Ion Cannon To Disable Star Destroyers //////////
+    /////////////////////////////////////////////////////////////////////////////////
+    else if (iObjective == 4) 
+    { 
+	    if (iSubObjective == 1)
+        { 
+		    AddVMDebugHUDMsg("Objective 4 - SubObjective 1", 1, "test_objective_message");
+		    
+		    activateTalkingHeadNew("HotShar7", true);	    	// Activate Talking Head For Objective - Use The Ion Cannon!
+		    
+		    // Millenium Falcon Take Off
+		    
+		    //Test for player being on Ion Cannon? Use trigger Around Ion Cannon controls for now
+		    SetObjectiveTriggered(true, iObjective);			// Objective Triggered 
+		}
+		else if (iSubObjective == 2)
+        { 
+	        AddVMDebugHUDMsg("Objective 4 - SubObjective 2", 1, "test_objective_message");
+	        
+	        SetPropRefInvincible(propRefFromName("impstrdstryr"), false); // Make Star Destroyer Not Invincible For Shooting
+
+		    // Tests for Star Destroyer Health Loss In Objective Tests, should be stun status when working properly
+		}
+        else
+        {	
+	        AddVMDebugHUDMsg("Objective 4 - SubObjective 0", 1, "test_objective_message");	
+	        chrSetMovementClamped(pPlayer, false); //Unlocking Player Movement
+	        //Door Open Stuff Allow player Into Ion Cannon room from main hangar
+	        doorOpen(propRefFromName("hot_door_r1"), true );
+	        doorOpen(propRefFromName("hot_door_l1"), true );
+	        doorOpen(propRefFromName("hot_door_r2"), true );
+	        doorOpen(propRefFromName("hot_door_l2"), true );
+	        doorOpen(propRefFromName("hot_door_r4"), true );
+	        doorOpen(propRefFromName("hot_door_l4"), true );
+
+	        // Blocking Function For Scipt Goodness
+	        //waitForGameTime(0.1f);
+	        
+		    addNewObjectiveIndicatorToProp(propRefFromName("test_cannon1"), k_objectiveIndicatorType_mainObjective);  // Add Indicator to Ion Controls
+		    		    
+		    activateTalkingHeadNew("HotShar6", true);	    	// Activate Talking Head For Objective - ATAT Destroyed! Well Done!
+		    
+		    SetObjectiveTimer(2.0f, iObjective); 					// Objective Timer
+			SetNumSubObjectives(2, iObjective); 				// Set Number Of Sub-Objectives
+		}
+    } 
+    
+    ///////////////////////////////////////////////////////////////////
+    ////////// OBJECTIVE 5 - Escort The Final Rebel Transport /////////
+    ///////////////////////////////////////////////////////////////////
+    else if (iObjective == 5) 
+    { 
+	    if (iSubObjective == 1)
+        {       
+	        AddVMDebugHUDMsg("Objective 5 - SubObjective 1", 1, "test_objective_message");
+	         
+           	lib_AddIndicatorsToGroup(propRefFromName("BanksGrp"), 1, true); // Add Indicator To Rebel Databanks 
+	        activateTalkingHeadNew("HotShar9", true);	    	// Activate Talking Head For Objective - Escort The Final Transport!
+	        
+           	SetObjectiveTriggered(true, iObjective);			// Objective Triggered     
+        }
+	    else if (iSubObjective == 2)
+        {        
+	        AddVMDebugHUDMsg("Objective 5 - SubObjective 2", 1, "test_objective_message");
+	        
+	        propSetVisible(1, propRefFromName("transport")); 		// Make Transport Visible
+	        
+           	SetObjectiveTimer(2.0f, iObjective); 					// Objective Timer      
+        }
+        else if (iSubObjective == 3)
+        {     
+	        AddVMDebugHUDMsg("Objective 5 - SubObjective 3", 1, "test_objective_message");
+	           
+            ActivateSpawner("pilotSPG"); 						// Spawn Transport Pilot
+            
+	        SetObjectiveTimer(3.0f, iObjective); 					// Objective Timer 
+        }
+        else if (iSubObjective == 4)
+        { 
+	        AddVMDebugHUDMsg("Objective 5 - SubObjective 4", 1, "test_objective_message");
+	        
+	        pilot = chrRefFromName("pilot");
+	        DriveVehicleBF(pilot, propRefFromName("transport"));
+	        
+	        SetObjectiveTimer(3.0f, iObjective); 					// Objective Timer 
+        }
+        else if (iSubObjective == 5)
+        { 
+	        AddVMDebugHUDMsg("Objective 5 - SubObjective 5", 1, "test_objective_message");
+	        
+	        propRef spline5;
+	        spline5 = propRefFromName("ShipSpline5");
+	        BFShipFollowScriptedSplineNoAvoidance(propRefFromName("transport"), spline5);
+	        
+	        SetObjectiveTimer(3.0f, iObjective); 					// Objective Timer 
+        }
+        else if (iSubObjective == 6)
+        { 
+	        AddVMDebugHUDMsg("Objective 5 - SubObjective 6", 1, "test_objective_message");
+	        
+            //BFAddFlyingAIPatrolZone(vector(-658.38, 500.74, 445.83), 200.0); 	// Remember to add new one before removing old one!!
+            BFAddFlyingAIPropCentricPatrolZone( propRefFromName("transport"), 50.0f );
+            BFRemoveFlyingAIPatrolZone(vector(-254.45, 348.21, 361.74));
+            
+            SetObjectiveTimer(55.0f, iObjective); 					// Objective Timer 
+        }
+        else if (iSubObjective == 7)
+        { 
+	        AddVMDebugHUDMsg("Objective 5 - SubObjective 7", 1, "test_objective_message");
+	        
+	        addSpeechMessage("Pilot: Grey Two! They're on your tail!", 5.0f); // Adding Text Where Speech Will Go Later
+	        
+            //BFAddFlyingAIPatrolZone(vector(-1252.43, 807.18, 1050.33), 200.0);  // Remember to add new one before removing old one!!
+            //BFRemoveFlyingAIPatrolZone(vector(-658.38, 500.74, 445.83));
+            
+            SetObjectiveTimer(25.0f, iObjective); 					// Objective Timer 
+        }
+        else if (iSubObjective == 8)
+        { 
+	        AddVMDebugHUDMsg("Objective 5 - SubObjective 7", 1, "test_objective_message");
+	        
+	        addSpeechMessage("Pilot: Keep them away from the transport!", 5.0f); // Adding Text Where Speech Will Go Later
+	        
+            //BFAddFlyingAIPatrolZone(vector(-1252.43, 807.18, 1050.33), 200.0);  // Remember to add new one before removing old one!!
+            //BFRemoveFlyingAIPatrolZone(vector(-658.38, 500.74, 445.83));
+            
+            SetObjectiveTimer(25.0f, iObjective); 					// Objective Timer 
+        }
+        else if (iSubObjective == 9)
+        { 
+	        AddVMDebugHUDMsg("Objective 5 - SubObjective 8", 1, "test_objective_message");
+	        
+            //BFAddFlyingAIPatrolZone(vector(-2378.87, 1779.89, 1894.16), 200.0); // Remember to add new one before removing old one!!
+            //BFRemoveFlyingAIPatrolZone(vector(-1252.43, 807.18, 1050.33));
+            	
+            SetObjectiveTimer(70.0f, iObjective); 					// Objective Timer 
+        }                                                                                                                                                                                                                                                                                                                            
+        else
+        {
+	        AddVMDebugHUDMsg("Objective 5 - SubObjective 0", 1, "test_objective_message");
+	        
+	        chrSetMovementClamped(pPlayer, false); //Unlocking Player Movement HACK
+	        SetPropRefInvincible(propRefFromName("transport"), true); // Make transport For Safety HACK
+	        
+	        //ZONE DECLARATION BATTLE SYSTEM       
+            // Team 0 (Player) Battle Commands        
+            lib_SetupTeamZone(cObjectiveName, 0, "Trans_Home", "Trans_Targ", k_objtype_hold_area); // Team Number, Home Zone, Target Zone, Objective Type
+            // Team 1 (Enemy) Battle Commands        
+            lib_SetupTeamZone(cObjectiveName, 1, "Trans_Home", "Trans_Targ", k_objtype_hold_area); // Team Number, Home Zone, Target Zone, Objective Type
+        
+            BFAddFlyingAIPatrolZone(vector(-254.45, 348.21, 361.74),200.0); // Remember to add new one before removing old one!!
+            BFRemoveFlyingAIPatrolZone(vector(-89.51, 113.38, -10.64));
+            
+	        addNewObjectiveIndicatorToProp(propRefFromName("transport"), k_objectiveIndicatorType_mainObjective);  	// Add Indicator to Transport
+     		addNewObjectiveIndicatorToProp(propRefFromName("xwing_look"), k_objectiveIndicatorType_mainObjective);  // Add Indicator to X-Wing In Hangar    		
+       
+     		// Blocking Function For Scipt Goodness
+	        //waitForGameTime(0.1f);
+	        
+     		removeObjectiveIndicatorFromProp(propRefFromName("test_cannon1"));  		// Remove previous HUD marker
+     		
+			// Add Rebel Databanks To Group For Use Later
+            addPropToGroup(propRefFromName("BanksGrp"), propRefFromName("bank1"));
+            addPropToGroup(propRefFromName("BanksGrp"), propRefFromName("bank2"));
+                 
+            propSetVisible(1, propRefFromName("EbaseDrOp1")); 		// Make Open Hangar Doors Visible
+    		propSetVisible(0, propRefFromName("EbaseDrCl1")); 		// Make Closed Hangar Invisible
+    		
+            // Door Open Stuff To Let Player into Rear Hangar      
+            doorOpen(propRefFromName("hot_door_r6"), true );
+	        doorOpen(propRefFromName("hot_door_l10"), true );
+	             
+            SetPropRefInvincible(propRefFromName("impstrdstryr"), true); // Make Star Destroyer Invincible For Safety
+            
+            activateTalkingHeadNew("HotShar8", true);	    // Activate Talking Head For Objective - Star Destroyer Disabled!
+            
+            char16 hoth12 = StringToChar16("obj_HotN12"); 	// Convert Objective String to Char16
+            BFObjectiveAddBonus(hoth12, 12); 				// Activate Bonus Objective For Destroying Rebel Databanks
+            SetNumSubObjectives(1, 12);						// Setup Number of Sub-Objectives For Bonus Objective
+            
+            SetNumSubObjectives(9, iObjective); 			// Set Number Of Sub-Objectives
+            SetObjectiveTimer(2.0f, iObjective); 				// Wait for 2 seconds   
+        }  
+    } 
+    
+    ////////////////////////////////////////////////////////////////////
+    ////////// OBJECTIVE 6 - Board The Disabled Star Destroyer /////////
+    ////////////////////////////////////////////////////////////////////
+    else if (iObjective == 6) 
+    { 
+	    AddVMDebugHUDMsg("Objective 6 - SubObjective 1", 1, "test_objective_message");
+	    
+        if (iSubObjective == 1)
+        {       	         
+	        lib_SetupGroupZone(cObjectiveName, "med1_spg", "Hang_Ent", "Hang_Targ", k_objtype_hold_area);
+	        lib_SetupGroupZone(cObjectiveName, "med2_spg", "Hang_Ent", "Hang_Targ", k_objtype_hold_area);
+	        
+	        // Spawn Imperials
+	        ActivateSpawner("med1_spg");
+	        ActivateSpawner("med2_spg");
+	        
+	        // Blocking Function For Scipt Goodness
+	        //waitForGameTime(0.1f);
+	        
+	        activateTalkingHeadNew("HotShar12", true);	    	// Activate Talking Head For Objective - Get to bridge!
+	        
+	        propSetVisible(0, propRefFromName("destdebris1")); 		// Make Debris Invisible
+    		propSetVisible(1, propRefFromName("destconshld1")); 	// Make Shield Visible
+    		propSetVisible(0, propRefFromName("blast_dam1")); 		// Make Damaged Door Invisible
+    
+            SetObjectiveTriggered(true, iObjective);
+        }      
+        else
+        {
+	        AddVMDebugHUDMsg("Objective 6 - SubObjective 0", 1, "test_objective_message");
+	        chrSetMovementClamped(pPlayer, false); //Unlocking Player Movement
+	        BFFunnelSetEnabled(3, 0);							// Disable the ground funnel to keep the player in space
+	        removeObjectiveIndicatorFromProp(propRefFromName("transport"));  		// Remove previous HUD marker
+	        
+	        SetPropRefInvincible(propRefFromName("impstrdstryr"), true); 	// Make Star Destroyer Invincible For Safety
+	        
+	        // Kill all ground chaps for optimisation
+	        BFKillAllNPCsFromSpawner("echo1_spg");
+	        BFKillAllNPCsFromSpawner("echo2_spg");
+	        BFKillAllNPCsFromSpawner("echo3_spg");
+	        BFKillAllNPCsFromSpawner("echo4_spg");
+	        BFKillAllNPCsFromSpawner("echo5_spg");
+	        BFKillAllNPCsFromSpawner("land1_spg");
+	        BFKillAllNPCsFromSpawner("land2_spg");
+	        BFKillAllNPCsFromSpawner("land3_spg");
+	        BFKillAllNPCsFromSpawner("land4_spg");
+	        BFKillAllNPCsFromSpawner("land5_spg");
+	        BFKillAllNPCsFromSpawner("land6_spg");
+	        BFKillAllNPCsFromSpawner("land7_spg");
+	        BFKillAllNPCsFromSpawner("land8_spg");
+	        BFKillAllNPCsFromSpawner("land9_spg");
+	        BFKillAllNPCsFromSpawner("land10_spg");
+	        BFKillAllNPCsFromSpawner("land11_spg");
+	        
+	        // Blocking Funtion For Scipt Goodness
+	        //waitForGameTime(0.1f);
+	        
+	        // Add Cell Consoles To Group For Use Later
+            addPropToGroup(propRefFromName("Cells"), propRefFromName("Cell1"));
+            addPropToGroup(propRefFromName("Cells"), propRefFromName("Cell2"));
+            addPropToGroup(propRefFromName("Cells"), propRefFromName("Cell3"));
+            addPropToGroup(propRefFromName("Cells"), propRefFromName("Cell4"));
+            addPropToGroup(propRefFromName("Cells"), propRefFromName("Cell5"));
+            
+            // Door locking stuff for Safety
+            doorClose(propRefFromName("isd_door_a3"), true );
+	        doorClose(propRefFromName("isd_door_a4"), true );
+           	
+	        // Blocking Function For Scipt Goodness
+	        //waitForGameTime(0.1f);
+	        
+	        //BFAddFlyingAIPatrolZone(vector(-2378.87, 1779.89, 1894.16), 200.0); // Remember to add new one before removing old one!!
+	        BFRemoveFlyingAIPropCentricPatrolZone(propRefFromName("transport"));
+	        
+	        addNewObjectiveIndicatorToProp(propRefFromName("LookHang1"), k_objectiveIndicatorType_mainObjective);  // Add Indicator to Hangar
+
+           	activateTalkingHeadNew("HotShar10", true);	    	// Activate Talking Head For Objective - Final Transport Away!
+           	activateTalkingHeadNew("HotShar11", true);	    	// Activate Talking Head For Objective - Board Star Destroyer!
+           	
+	        lib_AddIndicatorsToGroup(propRefFromName("BanksGrp"), 1, false); 	// Remove Indicator From Rebel Databanks
+	        BFObjectiveRemoveBonus(hoth12, 12); 				// Deactivate Bonus Objective For Destroying Rebel Databanks
+	        
+	        char16 hoth13 = StringToChar16("obj_HotN13"); 		// Convert Objective String to Char16
+            BFObjectiveAddBonus(hoth13, 13); 					// Activate Bonus Objective For Taking Out TIE Fighters/Interceptors
+            //SetNumSubObjectives(1, 13);						// Setup Number of Sub-Objectives For Bonus Objective
+  
+            SetObjectiveTriggered(true, iObjective);
+            SetNumSubObjectives(1, iObjective); 				// Set Number Of Sub-Objectives
+        }
+    } 
+    
+    //////////////////////////////////////////////////////////////////////////
+    ////////// OBJECTIVE 7 - Deactive The Reactor Containment Shield /////////
+    //////////////////////////////////////////////////////////////////////////
+    else if (iObjective == 7) 
+    { 
+		if (iSubObjective == 1)
+        {       
+	        AddVMDebugHUDMsg("Objective 7 - SubObjective 1", 1, "test_objective_message");
+
+			lib_SetupGroupZone(cObjectiveName, "med1_spg", "Med_Home", "Med_Targ", k_objtype_hold_area);
+	        lib_SetupGroupZone(cObjectiveName, "med2_spg", "Med_Home", "Med_Targ", k_objtype_hold_area);
+	        lib_SetupGroupZone(cObjectiveName, "med3_spg", "Med_Home", "Med_Targ", k_objtype_hold_area);
+	        
+			lib_SetupGroupZone(cObjectiveName, "med4_spg", "Med_Home", "Med_Targ", k_objtype_hold_area);
+            	          
+	        DeactivateSpawner("med3_spg");
+	        
+	        addSpeechMessage("Stormtrooper: They're over there!", 5.0f); // Adding Text Where Speech Will Go Later
+	        
+			// Spawn Imperials
+			ActivateSpawner("med4_spg");
+			
+			SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 2)
+        {        
+	        AddVMDebugHUDMsg("Objective 7 - SubObjective 2", 1, "test_objective_message");
+	        
+			lib_SetupGroupZone(cObjectiveName, "med1_spg", "Laser_Home", "Laser_Targ", k_objtype_hold_area);
+	        lib_SetupGroupZone(cObjectiveName, "med2_spg", "Laser_Home", "Laser_Targ", k_objtype_hold_area);
+	        lib_SetupGroupZone(cObjectiveName, "med3_spg", "Laser_Home", "Laser_Targ", k_objtype_hold_area);
+			lib_SetupGroupZone(cObjectiveName, "med4_spg", "Laser_Home", "Laser_Targ", k_objtype_hold_area);
+			
+			lib_SetupGroupZone(cObjectiveName, "lase1_spg", "Laser_Home", "Laser_Targ", k_objtype_hold_area);
+			lib_SetupGroupZone(cObjectiveName, "lase2_spg", "Laser_Home", "Laser_Targ", k_objtype_hold_area);
+			
+			DeactivateSpawner("med4_spg");
+			
+			//Spawn Imperials
+			ActivateSpawner("lase1_spg");
+			ActivateSpawner("lase2_spg");
+			
+            SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 3)
+        {       
+	        AddVMDebugHUDMsg("Objective 7 - SubObjective 3", 1, "test_objective_message");
+
+			lib_SetupGroupZone(cObjectiveName, "med1_spg", "Brge_Home", "Brge_Targ", k_objtype_hold_area);
+	        lib_SetupGroupZone(cObjectiveName, "med2_spg", "Brge_Home", "Brge_Targ", k_objtype_hold_area);
+	        lib_SetupGroupZone(cObjectiveName, "med3_spg", "Brge_Home", "Brge_Targ", k_objtype_hold_area);
+			lib_SetupGroupZone(cObjectiveName, "med4_spg", "Brge_Home", "Brge_Targ", k_objtype_hold_area);
+			lib_SetupGroupZone(cObjectiveName, "lase1_spg", "Brge_Home", "Brge_Targ", k_objtype_hold_area);
+			lib_SetupGroupZone(cObjectiveName, "lase2_spg", "Brge_Home", "Brge_Targ", k_objtype_hold_area);
+			
+			lib_SetupGroupZone(cObjectiveName, "brge1_spg", "Brge_Home", "Brge_Targ", k_objtype_hold_area);
+			lib_SetupGroupZone(cObjectiveName, "brge2_spg", "Brge_Home", "Brge_Targ", k_objtype_hold_area);
+			
+			DeactivateSpawner("lase1_spg");
+			DeactivateSpawner("lase2_spg");
+			
+			//Spawn Imperials
+			ActivateSpawner("brge1_spg");
+			ActivateSpawner("brge2_spg");
+			
+			addNewObjectiveIndicatorToProp(propRefFromName("LookBridge1"), k_objectiveIndicatorType_mainObjective);  // Add Indicator to Hangar
+			removeObjectiveIndicatorFromProp(propRefFromName("LookLase1"));  		// Remove previous HUD marker
+			
+            SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 4)
+        {        
+	        AddVMDebugHUDMsg("Objective 7 - SubObjective 4", 1, "test_objective_message");	
+	        
+	        addNewObjectiveIndicatorToProp(propRefFromName("console"), k_objectiveIndicatorType_mainObjective);  // Add Indicator to Hangar
+	        removeObjectiveIndicatorFromProp(propRefFromName("LookBridge1"));  	// Remove previous HUD marker
+	        
+			// This Bit Checks For The Destruction of The Shield Console In The Objective Tests
+        }
+        else
+        {      
+	        AddVMDebugHUDMsg("Objective 7 - SubObjective 0", 1, "test_objective_message");
+			chrSetMovementClamped(pPlayer, false); //Unlocking Player Movement
+	        lib_SetupGroupZone(cObjectiveName, "med1_spg", "Med_Home", "Med_Targ", k_objtype_hold_area);
+	        lib_SetupGroupZone(cObjectiveName, "med2_spg", "Med_Home", "Med_Targ", k_objtype_hold_area);
+	        
+	        lib_SetupGroupZone(cObjectiveName, "med3_spg", "Med_Home", "Med_Targ", k_objtype_hold_area);
+	        
+	        DeactivateSpawner("med1_spg");
+	        DeactivateSpawner("med2_spg");
+	        
+	        addSpeechMessage("Stormtrooper: Call for reinforcements!", 5.0f); // Adding Text Where Speech Will Go Later
+	        
+	        // Spawn Imperials
+	        ActivateSpawner("med3_spg");
+	        
+	        BFObjectiveRemoveBonus(hoth13, 13); 			// Deactivate Bonus Objective For Taking Out Imp Fighters
+	        
+	        addNewObjectiveIndicatorToProp(propRefFromName("LookLase1"), k_objectiveIndicatorType_mainObjective);  // Add Indicator to Hangar
+	        removeObjectiveIndicatorFromProp(propRefFromName("LookHang1"));  	// Remove previous HUD marker	        
+	        
+            SetObjectiveTriggered(true, iObjective);
+            SetNumSubObjectives(4, iObjective); 			// Set Number Of Sub-Objectives
+        }	
+    } 
+  
+    ///////////////////////////////////////////////////////////////////////
+    ////////// OBJECTIVE 8 - Destroy The Star Destroyer's Reactor /////////
+    ///////////////////////////////////////////////////////////////////////
+    else if (iObjective == 8) 
+    { 
+	    if (iSubObjective == 1)
+        {       
+	        AddVMDebugHUDMsg("Objective 8 - SubObjective 1", 1, "test_objective_message");
+	        
+			lib_SetupGroupZone(cObjectiveName, "brge1_spg", "Cell_Home", "Cell_Targ", k_objtype_hold_area);
+			lib_SetupGroupZone(cObjectiveName, "brge2_spg", "Cell_Home", "Cell_Targ", k_objtype_hold_area);
+			
+			lib_SetupGroupZone(cObjectiveName, "cell1_spg", "Brge_Home", "Brge_Targ", k_objtype_hold_area);
+			lib_SetupGroupZone(cObjectiveName, "cell2_spg", "Brge_Home", "Brge_Targ", k_objtype_hold_area);
+			  
+			DeactivateSpawner("brge1_spg");
+			DeactivateSpawner("brge2_spg");
+			
+	        //Spawn Imperials
+			ActivateSpawner("cell1_spg");
+			ActivateSpawner("cell2_spg");
+
+			removeObjectiveIndicatorFromProp(propRefFromName("LookCell1"));  		// Remove previous HUD marker
+			addNewObjectiveIndicatorToProp(propRefFromName("LookCell2"), k_objectiveIndicatorType_mainObjective);  // Add Indicator to Reactor	
+			
+			SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 2)
+        {        
+	        AddVMDebugHUDMsg("Objective 8 - SubObjective 2", 1, "test_objective_message");
+	        
+			lib_SetupGroupZone(cObjectiveName, "cell3_spg", "Cell_Home", "Cell_Targ", k_objtype_hold_area);
+			lib_SetupGroupZone(cObjectiveName, "cell4_spg", "Cell_Home", "Cell_Targ", k_objtype_hold_area);
+
+			DeactivateSpawner("cell1_spg");
+			DeactivateSpawner("cell2_spg");
+
+	        //Spawn Imperials
+			ActivateSpawner("cell3_spg");
+			ActivateSpawner("cell4_spg");	
+			
+			SetPropRefInvincible(propRefFromName("impstrdstryr"), false); 	// Make Star Destroyer Not Invincible For To Damage Soon
+			
+			SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 3)
+        {     
+	        AddVMDebugHUDMsg("Objective 8 - SubObjective 3", 1, "test_objective_message");	
+	           
+	        lib_SetupGroupZone(cObjectiveName, "reac1_spg", "Reac_Home", "Reac_Targ", k_objtype_hold_area);
+	        
+			//Spawn Imperials
+			ActivateSpawner("reac1_spg");
+			
+			removeObjectiveIndicatorFromProp(propRefFromName("LookCell2"));  		// Remove previous HUD marker
+			addNewObjectiveIndicatorToProp(propRefFromName("reactor_look"), k_objectiveIndicatorType_mainObjective);  // Add Indicator to Reactor
+
+			// This bit checks in the objective tests for the Reactor's Destruction to go to the next objective
+        }
+	    else
+	    {
+		    AddVMDebugHUDMsg("Objective 8 - SubObjective 0", 1, "test_objective_message");
+		    chrSetMovementClamped(pPlayer, false); //Unlocking Player Movement
+		    DeactivateSpawner("brge1_spg");
+			DeactivateSpawner("brge2_spg");
+			
+			// Spawn Rebels In Cells
+			ActivateSpawner("pris1_spg");
+			ActivateSpawner("pris2_spg");
+			ActivateSpawner("pris3_spg");
+			ActivateSpawner("pris4_spg");
+			ActivateSpawner("pris5_spg");
+			
+			// Blocking Function For Scipt Goodness
+	        //waitForGameTime(0.1f);
+	        
+			activateTalkingHeadNew("HotShar13", true);	    			// Activate Talking Head For Objective - Destroy Reactor!
+
+			propSetVisible(0, propRefFromName("destconshld1"));  		// Make Shield Invisible
+        	propSetVisible(1, propRefFromName("destdebris1"));  		// Make Debris Visible
+        	propSetVisible(1, propRefFromName("blast_dam1")); 			// Make Damaged Door Visible
+        	propSetVisible(0, propRefFromName("blast_frm1")); 			// Make Regular Door Invisible
+        	
+            removeObjectiveIndicatorFromProp(propRefFromName("console"));  		// Remove previous HUD marker
+			addNewObjectiveIndicatorToProp(propRefFromName("LookCell1"), k_objectiveIndicatorType_mainObjective);  // Add Indicator to Reactor
+			
+            lib_AddIndicatorsToGroup(propRefFromName("Cells"), 1, true);	// Add Indicator To Prison Cells (1 = Bonus) 
+            
+            char16 hoth14 = StringToChar16("obj_HotN14"); 		// Convert Objective String to Char16
+            BFObjectiveAddBonus(hoth14, 14); 					// Activate Bonus Objective For Freeing Rebel Prisoners
+            SetNumSubObjectives(1, 14);							// Setup Number of Sub-Objectives For Bonus Objective
+            
+        	SetObjectiveTriggered(true, iObjective);
+        	SetNumSubObjectives(3, iObjective); 				// Set Number Of Sub-Objectives
+		}
+    } 
+
+    ////////////////////////////////////////////////////////////
+    ////////// OBJECTIVE 9 - Escape The Exploding Ship /////////
+    ////////////////////////////////////////////////////////////
+    else if (iObjective == 9) 
+    { 
+	   	if (iSubObjective == 1)
+        {      
+            AddVMDebugHUDMsg("Objective 9 - SubObjective 1", 1, "test_objective_message");	
+            
+	        SetPropRefInvincible(propRefFromName("impstrdstryr"), true); 		// Make Star Destroyer Invincible Again For Safety   
+			SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 2)
+        {        
+	        AddVMDebugHUDMsg("Objective 9 - SubObjective 2", 1, "test_objective_message");	
+	        
+			SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 3)
+        {    
+	        AddVMDebugHUDMsg("Objective 9 - SubObjective 3", 1, "test_objective_message");
+	            
+	        // Spawn Bro Here
+	        BFNPCGroupObjectiveSetType(cObjectiveName, "BroSpG", k_objtype_null);
+            ActivateSpawner("BroSpG"); //Spawn Brother (Dooku Placeholder)
+            AddVMDebugHUDMsg("Hello, Little Brother", iObjective, "test_objective_message");
+            chrRef brother = chrRefFromName("Brother1");	
+            
+            removeObjectiveIndicatorFromProp(propRefFromName("LookReac1"));  		// Remove previous HUD marker
+            
+            //ZONE DECLARATION BATTLE SYSTEM       
+            // Brother Spawn Battle Commands        
+            lib_SetupGroupZone(cObjectiveName, "BroSpG", "Reac_Cent", "Reac_Targ", k_objtype_hold_area); // Spawn Group, Home Zone, Target Zone, Objective Type
+            
+            //PlayerForceClassSwitch(player, "STR_CHRNAME_STORY_X2_MELEE"); // Force player to be Melee X2
+
+			SetObjectiveTimer(1.0f, iObjective); 				// Objective Timer
+        }
+        else if (iSubObjective == 4)
+        {     
+	        AddVMDebugHUDMsg("Objective 9 - SubObjective 4", 1, "test_objective_message");
+	           
+	        addSpeechMessage("X1: Not bad little brother, but you're staying here!", 5.0f); // Adding Text Where Speech Will Go Later
+	        
+	        chrRef brother = chrRefFromName("Brother1");
+            chrDoActionBF(brother, CHR_ACTION_FORCE_REPULSE_BF); //Make EX-101 do a Force Repulse on you
+            AddVMDebugHUDMsg("I Have Repulsed You!", iObjective, "test_objective_message");
+            	
+			SetObjectiveTimer(1.0f, iObjective); 				// Objective Timer
+        }
+        else if (iSubObjective == 5)
+        {        
+	        AddVMDebugHUDMsg("Objective 9 - SubObjective 5", 1, "test_objective_message");	
+	        
+			SetObjectiveTimer(60.0f, iObjective); 				// Objective Timer - Fight Duration
+        }
+        else if (iSubObjective == 6)
+        {        
+	        AddVMDebugHUDMsg("Objective 9 - SubObjective 6", 1, "test_objective_message");	
+	        
+	        chrRef brother = chrRefFromName("Brother1");
+            chrDoActionBF(brother, CHR_ACTION_FORCE_REPULSE_BF); //Make EX-101 do a Force Repulse on you
+            AddVMDebugHUDMsg("I Have Repulsed You!", iObjective, "test_objective_message");
+            
+			SetObjectiveTimer(1.0f, iObjective); 				// Objective Timer
+        }
+        else if (iSubObjective == 7)
+        {       
+	        AddVMDebugHUDMsg("Objective 9 - SubObjective 7", 1, "test_objective_message");	
+              
+	        // I'm telling my bro to leg it here in the objective tests
+	        
+			SetObjectiveTimer(10.0f, iObjective); 				// Objective Timer (Bro Run Time)
+        }
+        else if (iSubObjective == 8)
+        {       
+	        AddVMDebugHUDMsg("Objective 9 - SubObjective 8", 1, "test_objective_message");	
+
+	        // Lock Doors And Get Rid Of Bro Here
+	        doorClose(propRefFromName("isd_door_a12"), true );
+	        doorClose(propRefFromName("isd_door_a13"), true );
+	        
+	        // Door opening stuff for escape
+            doorOpen( propRefFromName("isd_door_a3"), true );
+	        doorOpen( propRefFromName("isd_door_a4"), true );
+           	doorOpen( propRefFromName("isd_door_a5"), true );
+	        doorOpen( propRefFromName("isd_door_a6"), true );
+	        
+	        //Shaky Explody Stuff
+	        camShakeAll(6, 0.00001, 0.007);  				// Shake the camera
+	        
+	        removeObjectiveIndicatorFromProp(propRefFromName("console"));  		// Remove previous HUD marker
+	        addNewObjectiveIndicatorToProp(propRefFromName("Escape1"), k_objectiveIndicatorType_mainObjective);  // Add Indicator to Reactor Doors
+	        
+	        SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 9)
+        {       
+	        AddVMDebugHUDMsg("Objective 9 - SubObjective 9", 1, "test_objective_message");	
+
+	        removeObjectiveIndicatorFromProp(propRefFromName("Escape1"));  		// Remove previous HUD marker
+	        addNewObjectiveIndicatorToProp(propRefFromName("Escape2"), k_objectiveIndicatorType_mainObjective);  // Add Indicator to Reactor Doors
+	        
+	        //Shaky Explody Stuff
+	        camShakeAll(6, 0.00001, 0.007); 				// Shake the camera
+	        
+			SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 10)
+        {       
+	        AddVMDebugHUDMsg("Objective 9 - SubObjective 10", 1, "test_objective_message");	
+
+	        //Shaky Explody Stuff
+	        camShakeAll(6, 0.00001, 0.007); 				// Shake the camera
+	        
+			SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 11)
+        {       
+	        AddVMDebugHUDMsg("Objective 9 - SubObjective 11", 1, "test_objective_message");	
+
+	        // Put Cool Hangar Stuff Here 
+	        
+	        //Shaky Explody Stuff
+	        camShakeAll(6, 0.00001, 0.007);  				// Shake the camera
+	        
+			SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 12)
+        {       
+	        AddVMDebugHUDMsg("Objective 9 - SubObjective 12", 1, "test_objective_message");	
+
+	        //Shaky Explody Stuff
+	        camShakeAll(6, 0.00001, 0.007); 				// Shake the camera
+	        
+	        // Talking head about x-wing?
+	        
+			SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 13)
+        {       
+	        AddVMDebugHUDMsg("Objective 9 - SubObjective 13", 1, "test_objective_message");	
+
+	        //Shaky Explody Stuff
+	        camShakeAll(6, 0.00001, 0.007); 				// Shake the camera
+	        
+	        removeObjectiveIndicatorFromProp(propRefFromName("Escape2"));  		// Remove previous HUD marker
+	        
+			SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 14)
+        {       
+	        AddVMDebugHUDMsg("Objective 9 - SubObjective 14", 1, "test_objective_message");	
+            
+	        //Shaky Explody Stuff
+	        camShakeAll(6, 0.00001, 0.007); 				// Shake the camera
+	        
+			SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 15)
+        {       
+	        AddVMDebugHUDMsg("Objective 9 - SubObjective 15", 1, "test_objective_message");	
+            
+	        // Test For Being In X-Wing In Objective Tests
+        }
+	    else
+	    {
+		    AddVMDebugHUDMsg("Objective 9 - SubObjective 0", 1, "test_objective_message");	
+		    chrSetMovementClamped(pPlayer, false); //Unlocking Player Movement
+		    propHealthReduceToFractionWithUniformDamage(propRefFromName("impstrdstryr"), 0.10);
+			removeObjectiveIndicatorFromProp(propRefFromName("reactor_look"));  	// Remove HUD marker from reactor
+			
+			addNewObjectiveIndicatorToProp(propRefFromName("LookReac1"), k_objectiveIndicatorType_mainObjective);  // Add Indicator to Reactor
+
+			// Blocking Function For Scipt Goodness
+	        //waitForGameTime(0.1f);
+	        
+			activateTalkingHeadNew("HotShar14", true);	    // Activate Talking Head For Objective - Get out of there!
+			
+			propSetVisible(0, propRefFromName("collision"));   				// Make Static Prop Reactor Core Invisible
+			
+			propPlayAnimSlot(propRefFromName("react_prop1"), "Reactor_Loop"); 		// Play reactor anim
+            propPlayAnimSlot(propRefFromName("react_prop1"), "Reactor_Boom"); 		// Play reactor anim
+            camShakeAll(6, 0.00001, 0.007);  				// Shake the camera
+            
+        	SetObjectiveTimer(1.0f, iObjective); 				// Objective Timer
+        	SetNumSubObjectives(15, iObjective); 			// Set Number Of Sub-Objectives
+		} 
+    } 
+    
+    //////////////////////////////////////////////////////
+    ////////// OBJECTIVE 10 - Mission Complete!! /////////
+    //////////////////////////////////////////////////////
+    else if (iObjective == 10) 
+    { 
+	    if (iSubObjective == 1)
+        {         
+			wholeScreenFade(3.0f, 1.0f, false); 		// Screen Fade Down To Black
+			SetObjectiveTimer(3.0f, iObjective); 			// Objective Timer
+        }
+        else if (iSubObjective == 2)
+        {        
+            bEndLevel = true;
+        }
+        else
+        {
+	        AddVMDebugHUDMsg("Mission Complete!", 1, "test_objective_message");
+        	endOfGameWinText("Mission Complete!");
+	        SetObjectiveTimer(3.0f, iObjective); 			// Objective Timer
+	        SetNumSubObjectives(3, iObjective); 		// Set Number Of Sub-Objectives
+        }
+    } 
+    
+    ///////////////////////////////////////
+    ////////// BONUS OBJECTIVES ///////////
+    ///////////////////////////////////////
+         
+    ////////// Bonus Objective 1-1 - Maintain All Forward Turrets //////////
+    else if (iObjective == 11) 
+    { 
+
+    } 
+    
+    ////////// Bonus Objective 5-1 - Destroy The Rebel Databanks //////////
+    else if (iObjective == 12) 
+    { 
+
+    } 
+    
+    ////////// Bonus Objective 6-1 - Take Out Imperial Fighters //////////
+    else if (iObjective == 13) 
+    { 
+
+    } 
+    
+    ////////// Bonus Objective 8-1 - Free The Rebel Prisoners //////////
+    else if (iObjective == 14) 
+    { 
+
+    } 
+
+    return true;
+}
+
+///////////////This Script Actions
+
+chrSetMovementClamped(pPlayer, true);  // Locking Player Movement For Safety
+
+// Play Cutscene
+playTimeline("data/bf/timelines/cs11.res");
+
+waitForGameTime(0.1f);
+
+ScriptHasStarted(); //Do any setups	 
+// ScriptHasStarted(); used to be here but it breaks the level so it's above the cutscene for now  
+
+//wholeScreenFade(0.0f, 1.0f, false); 		// Screen Set To Black For Fade At Level Start
+//waitForGameTime(0.5f);
+//wholeScreenFade(3.0f, 0.0f, false); 		// Screen Fade In From Black For Level Start
+
+//Main game loop
+while(!bEndLevel)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    ProcessCallbacks();
+    ObjectiveSetupCheck();
+
+    for (i=0; i<iNumActive; i++)
+    {
+	    logStr("NumerActive: ");
+	    logInt(iNumActive);
+        int iObjective = BFObjectiveGetNumForNthActive(i);
+        ObjectiveTests(iObjective);        
+        waitForGameTime(0.01f);
+    }
+
+    waitForGameTimeOrLVChange(0.5f, "iObjLV", "iCBLV");
+    logStr("tick");
+    logInt(iObjective);    
+}
+
+NextLevel("STR_LEVELNAME_ENDOR");

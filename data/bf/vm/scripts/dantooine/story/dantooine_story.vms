@@ -1,0 +1,1399 @@
+// vim: set syntax=c :
+
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Dantooine Story Script
+
+Currently in charge of Dantooine:
+
+Design: Tim Spencer
+Art: Iain Harrison
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+ Table of Contents:
+
+ 1 - Basic Setup (ints, proprefs, char16s)
+ 2 - Include Defaults (taken from story_template.vms)
+ 3 - Callbacks
+ 4 - Functions (functions set for this script only)
+ 5 - Objective tests (start and stop objectives)
+ 6 - Objectives (setup for each objective)
+ 7 - Initial events (cutscene at start of level)
+ 8 - Main game loop (ticks through objective tests)
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            BASIC SETUP  
+            ===========
+
+*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//NOTE TRY AND REMOVE AS MANY OF THESE AS POSSIBLE
+
+boolean Skip = false;
+//int SpawnedATXT = 0;
+int ActivatedBonusObjectiveSeven = 0;
+int ActivatedBonusObjectiveEight = 0;
+int ActivatedBonusObjectiveNine = 0;
+int ActivatedBonusObjectiveTen = 0;
+int SpawnedShip = 0;
+int playerIsInTank = 0;
+int ATTESpawned = 0;
+int ATXTSpawned = 0;
+int SoundA = 0;
+int SoundB = 0;
+int SoundC = 0;
+int SoundD = 0;
+
+boolean cutSceneB = false;
+boolean cutSceneC = false;
+boolean cutSceneD = false;
+boolean bEndLevel = false;
+
+//hacky vectors for doors
+vector openDoor2Pos;
+vector openDoor3Pos;
+vector closedDoor2Pos;
+vector closedDoor3Pos;
+
+vector closedDoor2Pos;
+closedDoor2Pos.x = -40.9432f;
+closedDoor2Pos.y = 14.8828f;
+closedDoor2Pos.z = -68.9725f;
+vector openDoor2Pos;
+openDoor2Pos.x = -40.9432f;
+openDoor2Pos.y = -50.0000f;
+openDoor2Pos.z = -68.9725f;
+vector closedDoor3Pos;
+closedDoor3Pos.x = -37.4181f;
+closedDoor3Pos.y = 15.0265f;
+closedDoor3Pos.z = -77.0420f;
+vector openDoor3Pos;
+openDoor3Pos.x = -37.4181f;
+openDoor3Pos.y = -50.0000f;
+openDoor3Pos.z = -77.0420f;
+
+//propRef important stuff
+propRef LAAT;
+propRef BrokenTank;
+propRef ATTE;
+propRef ATXT;
+
+propRef Generator = propRefFromName("dan_dbl_gen1");
+propRef player = getPlayerPropRefFromID(GetPlayerId());
+propRef Falon = propRefFromName("falon_grey");
+
+//beginInGameCutSceneWithFlags(k_vmFlag_ResumeScriptAfterHitReact, propRefFromName("engineer"));
+
+//Make Falon invincible
+SetPropRefInvincible(Falon, true);
+
+//Assign char16s to bonus objectives
+char16 dantooineba = StringToChar16("obj_Dan_Story7"); // Bonus A activated
+char16 dantooinebb = StringToChar16("obj_Dan_Story8"); // Bonus B activated
+char16 dantooinebc = StringToChar16("obj_Dan_Story9"); // Bonus C activated
+char16 dantooinebd = StringToChar16("obj_Dan_Story10"); // Bonus D activated
+
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            INCLUDE DEFAULTS  
+            ================
+
+*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////CALLBACK INFO DO NOT CHANGE
+
+//PlayerKilled Callback Info
+boolean bCB_PK = false;
+int iCB_PK_KillerId = -1;
+int iCB_PK_Victim = -1;
+int iCB_PK_Result = -1;
+
+//triggeredProp Callback Info
+boolean bCB_TP = false;
+char16 cCB_TP_Prop = StringToChar16("");
+
+//ObjectiveTimeExpired Callback Info
+boolean bCB_OTE = false;
+char16 cCB_OTE_ObjName = StringToChar16("");
+
+//shipReachedScriptedSplineSegment  Callback Info
+boolean bCB_SRSS = false;
+propRef pCB_SRSS_Ship;
+propRef pCB_SRSS_Spline;
+int iCB_SRSS_Segment = -1;
+
+//////////////////////////END CALLBACK INFO
+
+function void ProcessCallbacks()
+{
+    //No else's as could be waiting to process two or more!
+
+    if (GetLevelVarInt("iCBLV") != -1)
+    {
+        if (bCB_PK) // playerKilled callback
+        {
+            playerKilled(iCB_PK_KillerId, iCB_PK_Result, iCB_PK_Victim);
+            bCB_PK = false;
+        }
+
+        if (bCB_TP) // triggeredProp callback
+        {
+            Trigger(cCB_TP_Prop);
+            bCB_TP = false;
+        }
+
+        // ObjectiveTimeExpired callback
+        if (bCB_OTE)
+        {
+            ObjectiveTimeExpired(cCB_OTE_ObjName);
+            bCB_OTE = false;
+        }
+
+        // shipReachedScriptedSplineSegment callback
+        if (bCB_SRSS)
+        {
+            ShipReachedScriptedSplineSegment(pCB_SRSS_Ship, pCB_SRSS_Spline, iCB_SRSS_Segment);
+            bCB_SRSS = false;
+        }
+
+        SetLevelVarInt("iCBLV", -1);    
+        waitForGameTime(0.1f);
+    }
+}
+
+callback void CB_PlayerKilled(int iKiller, int iResult, int iVictim)
+{
+    logStr("CB_PlayerKilled");
+   /* if (bCB_PK)
+        VMAssertMsg("CB_PlayerKilled - Already Waiting To Do Callback");
+
+    bCB_PK = true;
+    iCB_PK_KillerId = iKiller;
+    iCB_PK_Victim = iVictim;
+    iCB_PK_Result = iResult;
+
+    SetLevelVarInt("iCBLV", 1);    */
+    playerKilled(iKiller, iResult, iVictim);
+}
+
+callback int CB_TriggeredProp(int inType, char16 inTriggerProp, int pId)
+{    
+    logStr("CB_TriggeredProp");    
+    /*if (bCB_TP)
+        VMAssertMsg("CB_TriggeredProp - Already Waiting To Do Callback");
+
+    bCB_TP = true;
+    cCB_TP_Prop = inTriggerProp;
+
+    SetLevelVarInt("iCBLV", 1);    
+*/
+    Trigger(inTriggerProp);
+    return 0;
+}
+
+callback void CB_ObjectiveTimeExpired(char16 objName)
+{
+    logStr("CB_ObjectiveTimeExpired");        
+  /*  if (bCB_OTE)
+        VMAssertMsg("CB_ObjectiveTimeExpired - Already Waiting To Do Callback");
+
+    bCB_OTE = true;
+    cCB_OTE_ObjName = objName;
+
+    SetLevelVarInt("iCBLV", 1); */
+    ObjectiveTimeExpired(objName);
+}
+
+callback void CB_shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    logStr("CB_shipReachedScriptedSplineSegment");            
+  /*  if (bCB_SRSS)
+        VMAssertMsg("CB_shipReachedScriptedSplineSegment - Already Waiting To Do Callback");
+    
+    bCB_SRSS = true;
+    pCB_SRSS_Ship = ship;
+    pCB_SRSS_Spline = spline;
+    iCB_SRSS_Segment = segment;
+
+    SetLevelVarInt("iCBLV", 1);*/
+    ShipReachedScriptedSplineSegment(ship, spline, segment);
+
+}
+
+
+AllowCallback(CALLBACK_PlayerKilledBF, CB_playerKilled);
+AllowCallback(CALLBACK_TriggeredProp, CB_triggeredProp);
+AllowCallback(CALLBACK_ObjectiveTimeExpired, CB_ObjectiveTimeExpired);
+AllowCallback(CALLBACK_ShipReachedScriptedSplineSegment, CB_shipReachedScriptedSplineSegment);
+
+//////////////////////////END CALLBACKS
+
+function void playerKilled(int victimId, int killerId, int iOppTeam)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iActive = BFObjectiveGetNumForNthActive(i);
+	if (lib_playerKilled(victimId, killerId, iOppTeam, iActive)) 
+	{
+	    nextObjective(iActive);
+	}
+    }
+    //if (lib_playerKilled(victimId, killerId, iOppTeam)) nextObjective();    
+}
+function void Trigger(char16 inTriggerProp)
+{    
+    int iResult = 0;
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iActive = 0;
+    for (i=0; i<iNumActive; i++)
+    {
+	iActive = BFObjectiveGetNumForNthActive(i);
+	iResult = lib_triggeredProp(inTriggerProp, iActive);
+	iResult = ObjectiveTriggerTests(iNumActive, inTriggerProp, iResult);
+
+	/* Old way to start the repair the tank objective, possibly redundant now.
+	   
+	if ((iActive == 3) && !ActivatedBonusObjectiveSeven)
+	{
+	    AddVMDebugHUDMsg("============= Objective 3 is on so turning on Bonus A (Objective 7) ===========", 1, "test_objective_message");
+	    ActivatedBonusObjectiveSeven = 1;
+	    BFObjectiveAddBonus(dantooineba, 7);
+	    addNewObjectiveIndicatorToProp(BrokenTank, k_objectiveIndicatorType_bonusObjective);
+	    //forceTriggerTriggered(propRefFromName("animTrig1_"));
+	}*/	
+	if (iResult >= 1)
+	{
+	    logStr("NextObjective called in triggeredProp");
+	    logInt(iActive);	    
+	    nextObjective(iActive);
+	}
+    }
+}
+
+function void ObjectiveSetupCheck()
+{
+    int iTempObj = GetLevelVarInt("iObjLV");
+    
+    if (iTempObj != -1)
+    {
+        char16 cName = BFObjectiveGetName(iTempObj);
+        if (ObjectiveSetup(cName, iTempObj, BFObjectiveGetSub(iTempObj)))
+            SetLevelVarInt("iObjLV", -1);
+
+        waitForGameTime(0.1f);        
+    }
+}
+
+function void SetObjectiveSetup(int iObj)
+{
+    logStr("SetObjectiveSetup Called");
+    logInt(iObj);
+    SetLevelVarInt("iObjLV", iObj);
+}
+
+function void nextObjective(int inObjNum) 
+{    
+    int result = lib_nextObjective(inObjNum);
+
+    if(result == 1)
+    {
+        //if next objective returns 1 it has updated a core objective and automatically moved us onto the next
+        //so do objective setup with current objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(BFObjectiveGetCurrent());
+        }
+    }
+
+    if(result == 2)
+    {
+        //if nextobjective returns 2 it has updated a bonus objective so we will want to 
+        //objective setup with the objective we passed to next objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(inObjNum);
+        }
+    }
+
+    if(result==3)
+    {
+	CheckPointSave();
+	AddVMDebugHUDMsg("checkSave ", result, "test_objective_message");
+    }
+
+}
+
+function void JumpToObjective(int iStartObj, boolean Skiping)
+{       
+    Skip = Skiping;
+    ResetProps();
+
+    if (Skip)
+    {
+	BFObjectiveSetJumpTo(iStartObj);
+    }
+
+    Skip = false;
+    nextObjective(BFObjectiveGetCurrent());
+
+    char16 tSpawn;
+    tSpawn = LevelVarToChar16("mCurrentSpawner");
+    if (propExists(propRefFromChar16(tSpawn)))
+        propTeleportToProp(getPlayerPropRefFromID(GetPlayerId()), propRefFromChar16(tSpawn));        
+
+    logStr("Jumped To Objective");
+    logInt(BFObjectiveGetCurrent());
+
+}
+
+function void ObjectiveTimeExpired(char16 objName)
+{   
+    //if (lib_ObjTimeExpired()) nextObjective();
+
+    int objNum = 0;
+    objNum = BFObjectiveGetNumber(objName);   
+    if (lib_ObjTimeExpired(objNum))
+    {
+	nextObjective(objNum);
+    }
+
+}
+
+function void shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    if((segment == 2) && (LAAT == ship))
+    {
+	BFRequestAILandShip(ship, propRefFromName("LAATLand"));
+	AddVMDebugHUDMsg("Ship has requested land", 1, "test_objective_message");
+    }
+    
+    if (segment == 1)
+    {
+	BFShipStartScriptedFiring(ship, 1, 12.0f);
+    }
+}
+
+/* Not needed
+callback void playerSpawned(char16 teamName, int playerId)
+{
+    //int iObjective = GetLevelVarInt("mObjective");
+    logStr("teamName: ");
+    logchar16(teamName);
+}
+callback void finiteSpawnerComplete(char16 propId) 
+{
+    AddVMDebugHUDMsg("FINITE SPAWNER IS DEADED", 1, "test_objective_message");
+}
+
+callback void gameHasStarted()
+{     
+
+}
+*/
+
+
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            DEFAULTS END  
+            ============
+
+*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+function void ResetProps()
+{
+// e.g    disableTrigger(propRefFromName("DeathTrigger"));       
+}
+
+function void ScriptHasStarted()
+{
+    SetBFStoryPrefixes("obj_Dan_Story", "danTrg");
+
+    ResetObjectives("mObjTmp", 15);
+
+    //Reset CPs, Spawners, etc
+    ResetProps();
+
+    JumpToObjective(1, true);
+}
+
+function int ObjectiveTriggerTests(int iObjective, char16 inTriggerProp, int iResult) 
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+
+    //e.g for an alternate route
+/*    if (iObjective == 1)
+    {
+        if (iResult == 1) //For alternate route jump, else continue with no change
+            JumpToObjective(10, true);
+    }
+*/
+    //No Change
+        return iResult;
+
+}
+
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            FUNCTIONS  
+            =========
+
+*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function void AddTank(int i, propRef pGroup)
+{
+//  propRef pGunner;
+    
+    char16 cName;
+//  cName = StringCatInt("gunDOF", i, "_");
+
+//  pGunner = SpawnCharacterBF("imp_stpr_snpc", propRefFromChar16(cName), vector(0, 0, 0));
+
+    cName = StringCatInt("tankDOF", i, "_");
+
+    propRef pTank;
+    pTank = SpawnAIVehicleWithObjectives(propRefFromChar16(cName), "imp_stpr_snpc", "rep_clone_hover_tank", 0, false, k_seatPos_driver, StringToChar16(""));
+
+//  PassengerVehicleBF(pGunner, pTank, false);
+    SetAICanDrive(pTank, true);
+
+    addPropToGroup(pGroup, pTank);
+}
+
+function void AddWalker(int i, propRef pGroup)
+{
+    char16 cName;
+    cName = StringCatInt("WalkerDOF", i, "_");
+
+    propRef pWalker;
+    pWalker = SpawnAIVehicleWithObjectives(propRefFromChar16(cName), "imp_stpr_snpc", "rep_atrt", 0, false, k_seatPos_driver, StringToChar16(""));
+    SetAICanDrive(pWalker, true);
+
+    addPropToGroup(pGroup, pWalker);
+}
+
+function void AddATXT(int i, propRef pGroup)
+{
+    char16 cName;
+    cName = StringCatInt("ATXTDOF", i, "_");
+
+    propRef pATXT;
+    pATXT = SpawnAIVehicleWithObjectives(propRefFromChar16(cName), "imp_stpr_snpc", "rep_atrt", 0, false, k_seatPos_driver, StringToChar16(""));
+    SetAICanDrive(pATXT, true);
+
+    addPropToGroup(pGroup, pATXT);
+}
+
+function void SplineShip(int i, string sShip, int j)
+{
+    char16 cName;
+    cName = StringCatInt("shipDOF", i, "_");
+    propRef pShip;
+    pShip = SpawnAIVehicle(propRefFromChar16(cName), "imp_stpr_snpc", sShip, 0, false, k_seatPos_driver);
+    waitForGameTime(0.1f);
+    char16 cSpline;
+    cSpline = StringCatInt("spline", j, "_");
+    propRef pSpline;
+    pSpline = propRefFromChar16(cSpline);
+    BFShipFollowScriptedSplineNoAvoidance(pShip, pSpline);
+}
+
+function void Sound(propRef pGroup, string sSpeech, propRef pSpeakTo )
+{
+    propRef npc;
+    int iAlive = 0;
+    int iCount = 0;
+    int iNumProps = propGroupGetNumOfProps(pGroup);
+    
+    while ((iAlive == 0)&&(iCount < iNumProps))
+    {
+	npc = GetNthPropFromGroup(pGroup, iCount);
+	npc = propSpawnerGetNthSpawnedProp(npc, 0);
+	iAlive = propGroupSpCountAliveSpawnedProps(npc);
+	iCount++;
+    }    
+    chrSpeak(npc, sSpeech, 0, 0.0f, 45.0f, pSpeakTo, true, false);	
+}
+
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            OBJECTIVE TESTS
+            ===============
+
+*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function void ObjectiveTests(int iObjective) 
+{
+    //Tests for each game tick
+
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+    
+    //If on Objective 2 (save the militia in the barn)
+    if (iObjective == 2)
+    {	
+	//if none of the villagers are alive...
+	if (propGroupSpCountAliveSpawnedProps(propRefFromName("Obj1_1Militia")) == 0)
+	{
+	    //...Epic Fail!
+	    char16 emptyString = StringToChar16("");
+	    BFObjectiveFailObjective(emptyString, iObjective); 
+	}
+
+	//Count the villagers and if theres only two alive...
+	int iBarn = propGroupSpCountAliveSpawnedProps(propRefFromName("Obj1_1Militia"));
+	if ((!SoundD) && (iBarn == 2))
+	{
+	    //...shout at the player!
+	    Sound(propRefFromName("Obj1_1Militia"), "l04c_040_villagers", player);
+	    SoundD = 1;
+	}
+    }
+    
+    //if on Objective 3 (rally the militia) 
+    else if (iObjective == 3)
+    {
+	if (iSubObjective == 1)
+	{
+	    if (propGroupSpCountAliveSpawnedProps(propRefFromName("Spwn-3_1")) <= 3)
+	    {
+		nextObjective(iObjective);
+	    }
+	}
+    }
+    
+    //Starting Bonus D (destroy LAAT gunships)
+    else if (iObjective == 4)
+    {
+	//is the player in a remote gun (AA gun) state but we don't have Bonus D (objective 10) active?
+	if ((IsPlayerState("stateRemote")) && (!ActivatedBonusObjectiveTen))
+	{
+	    BFObjectiveAddBonus(dantooinebd, 10);
+	    AddVMDebugHUDMsg("============= Player is in AA turret: turning on Bonus D (Objective10) ===========", 1, "test_objective_message");
+	    ActivatedBonusObjectiveTen = 1;
+	}
+    }
+    
+    //Bonus Objectives
+
+    //Bonus A: Repair the Clone Hover Tank
+    if ((iObjective == 7) && (ActivatedBonusObjectiveSeven))
+    {
+	disableTrigger(propRefFromName("animTrig1_"));
+
+	if (IsPlayerInVehicle("STR_VEHICLE_NAME_REPUBLIC_TANK"))	
+	{
+	    nextObjective(iObjective);
+	    AddVMDebugHUDMsg("============= Player is in tank: Bonus A (Objective 7) Done ===========", 1, "test_objective_message");
+	    //turn off republic engineer spawner too
+	    DeactivateSpawner("RepEngi");
+	    removeObjectiveIndicatorFromProp(BrokenTank);
+	}
+    }
+
+    //Bonus B: Destroy the AT-TE
+    if (iObjective == 8) 
+    {
+	if ((propValid(ATTE)) && (!ActivatedBonusObjectiveEight))
+	{
+	    AddVMDebugHUDMsg("============ ATTE spawned but Bonus isnt active: turning on Bonus B (Objective 8) =============", 1, "test_objective_message");
+	    ATTESpawned = 1;
+	    ActivatedBonusObjectiveEight = 1;
+	}
+    
+	else if ((ATTESpawned) && (!propValid (ATTE)))
+	{
+	    AddVMDebugHUDMsg("============ ATTE spawned but PropIsNotValid, Player must have killed it: Bonus B (Objective 8) Done =============", 1, "test_objective_message");
+	    nextObjective(iObjective);
+	}
+    }
+
+    //Bonus C: Defeat the AT-XT Walker
+    if (iObjective == 9)
+    {
+	if ((propValid(ATXT)) && (!ActivatedBonusObjectiveNine))
+	{
+	    AddVMDebugHUDMsg("============ ATXT spawned but Bonus isnt active: turning on Bonus C (Objective 9) =============", 1, "test_objective_message");
+	    ATXTSpawned = 1;
+	    ActivatedBonusObjectiveNine = 1;
+	}
+    
+	else if ((ATXTSpawned) && (!propValid (ATXT)))
+	{
+	    AddVMDebugHUDMsg("============ ATXT spawned but PropIsNotValid, Player must have killed it: Bonus C (Objective 9) Done =============", 1, "test_objective_message");
+	    nextObjective(iObjective);
+	}
+
+/* //Old ATXT check
+	if (!SpawnedATXT)
+	{
+	    AddVMDebugHUDMsg("============ Spawning ATXT for Bonus C (Objective 9) =============", 1, "test_objective_message");
+	    AddATXT(1, propRefFromName("Spwn-9"));
+
+	    lib_AddIndicatorsToGroup(propRefFromName("Spwn-9"), k_objectiveIndicatorType_bonusObjective, true);
+
+	    SpawnedATXT = 1;
+	}
+
+	else if (SpawnedATXT)
+	{
+	    propRef g = propRefFromName("Spwn-9");
+	    propRef p0 = GetNthPropFromGroup(g, 0);
+	    waitForGameTime(0.1f);
+	    
+	    //p0 (our spawned ATXT) doesn't exist? Player must have killed it.
+	    if (!propExists(p0)) 
+	    {
+		nextObjective(iObjective);
+	    }
+	}*/
+    }
+
+    //Bonus D: Destroy the LAAT Gunships
+    if (iObjective == 10) 
+    {
+	if (!SpawnedShip)
+	{
+	    LAAT = SpawnAIVehicle(propRefFromName("LAATDOF"), "imp_stpr_snpc", "rep_gunship", 0, false, k_seatPos_driver);
+
+	    propRef spline;
+	    spline = propRefFromName("LAATGunship");
+	    BFShipFollowScriptedSplineNoAvoidance(LAAT, spline);
+	    addNewObjectiveIndicatorToProp(LAAT, k_objectiveIndicatorType_bonusObjective);
+	    SpawnedShip = 1;
+	}
+	else if ((SpawnedShip) && (!propValid(LAAT)))
+	{
+	    nextObjective(10);
+	    AddVMDebugHUDMsg("PropIsNotValid", 1, "test_objective_message");
+	}
+    }
+    
+    //Cutscenes
+    
+    //2nd Cutscene: Falon introduces himself (after defending enclave, before escaping through caves)
+    if (cutSceneB)
+    {
+	playTimeline("data/bf/timelines/cs06.res");
+	cutSceneB = false;
+    }
+    
+    //3rd Cutscene: Ending cutscene 1
+    else if (cutSceneC)
+    {
+	playTimeline("data/bf/timelines/cs07.res");
+	cutSceneC = false;
+	nextObjective(iObjective);
+    }
+   
+    //4th Cutscene: Ending cutscene 2
+    else if (cutSceneD)
+    {
+	playTimeline("data/bf/timelines/cs08.res");
+	cutSceneD = false;
+	nextObjective(iObjective);
+    }
+}
+
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            OBJECTIVES 
+            ==========
+
+*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function boolean ObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{    
+    //Ahoy there! Initial actions and bridge stuff in here!
+    if (iObjective == 1)
+    {
+	//Bridge shinanigans, time to shout at (and beat up) the player
+	if (iSubObjective == 1)
+	{
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 1 SUBOBJECTIVE 1: GET TO VILLAGE =============", 1, "test_objective_message");
+	    
+	    //Set the Ambient fighters GroupZones (again, to stop them breaking between objectives)
+	    lib_SetupGroupZone(cObjectiveName, "ambientF", "AmbientBattle1", "", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "ambientE", "AmbientBattle1", "", k_objtype_clear_area);
+	    
+	    //TODO: Get OI speech in here!
+
+	    waitForGameTime(0.1f);
+	    
+	    //Set the state of the AI chars to hostile and aggro to the player
+	    setAIState(propRefFromName("Spwn-1"), "AISTATE_BF_STORY");
+	    BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "Spwn-1", player , 10.f, 20.f);
+	    BFNPCGroupObjectiveSetType(cObjectiveName, "Spwn-1", k_objtype_attack_prop); 
+	    
+	    //Objective done, head on to Objective 2: Save the people in the Barn
+	    SetObjectiveTriggered(true, iObjective);
+	}
+	else
+	{
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 1: GET TO VILLAGE =============", 1, "test_objective_message");
+
+	    //All spawn groups team set here
+	    //Friendlies?
+	    //Enemy:
+	    setSpawnGroupTeamOverride(propRefFromName("ambientE"), true, 1, true);
+	    setSpawnGroupTeamOverride(propRefFromName("HuntMe"), true, 1, true);
+	    setSpawnGroupTeamOverride(propRefFromName("Spwn-1"), true, 1, true);
+	    setSpawnGroupTeamOverride(propRefFromName("Spwn-2"), true, 1, true);
+	    setSpawnGroupTeamOverride(propRefFromName("Spwn-3_1"), true, 1, true);
+	    setSpawnGroupTeamOverride(propRefFromName("Spwn-4_4"), true, 1, true);
+	    setSpawnGroupTeamOverride(propRefFromName("Spwn-4_5"), true, 1, true);
+	    setSpawnGroupTeamOverride(propRefFromName("Spwn-4_6"), true, 1, true);
+	    setSpawnGroupTeamOverride(propRefFromName("Spwn-6"), true, 1, true);
+	    setSpawnGroupTeamOverride(propRefFromName("Spwn-6_1"), true, 1, true);
+	    setSpawnGroupTeamOverride(propRefFromName("RepEngi"), true, 1, true);
+
+	     
+	    waitForGameTime(0.1f);
+	    
+	    ActivateSpawner("ambientE");
+	    ActivateSpawner("ambientF");
+	    ActivateSpawner("Spwn-1");
+	    ActivateSpawner("Obj1_1Militia");
+	    //Set players squad to dynamic to pick up militia and limit it to 20 in squad
+	    /*AIMakeSquadDynamic("player");
+	    AISetSquadCapacity("player", 20);*/
+	    
+	    //Set the Ambient fighters GroupZones
+	    lib_SetupGroupZone(cObjectiveName, "ambientF", "AmbientBattle1", "", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "ambientE", "AmbientBattle1", "", k_objtype_clear_area);
+	    
+	    //Neeeeeowm fly ships fly!
+	    SplineShip(1, "rep_gunship", 1);
+	    SplineShip(2, "rep_gunship", 2);
+	    SplineShip(3, "rep_gunship", 3);
+	    
+	    //Innitial X1 talk of X2's betrayal
+	    activateTalkingHeadNew("TH_Dant_Obj1", False);
+	    
+	    //Set indicator to above the VILLAGE (no, not the barn, the village)
+	    addNewObjectiveIndicatorToProp(propRefFromName("Obj4DOF"), k_objectiveIndicatorType_mainObjective);	    
+	    	    
+	    //We have a sub objecitve, but were done with this objective so head into the subobjective above!
+	    SetNumSubObjectives (1, iObjective);
+	    SetObjectiveTriggered(true, iObjective);
+	}
+    }
+    
+    //Objective 2: Save the Villagers in the barn
+    else if (iObjective == 2)
+    {
+	AddVMDebugHUDMsg("============ IN OBJECTIVE 2: SAVE PEOPLE IN BARN =============", 1, "test_objective_message");
+
+	//Set the Ambient fighters GroupZones (again)
+	lib_SetupGroupZone(cObjectiveName, "ambientF", "AmbientBattle1", "", k_objtype_clear_area);
+	lib_SetupGroupZone(cObjectiveName, "ambientE", "AmbientBattle1", "", k_objtype_clear_area);
+	
+	//Turn on spawn 2, set them to fight the player
+	ActivateSpawner("Spwn-2");
+	DeactivateSpawner("Spwn-1");
+	
+	//Set people in team 0 to stay in the barn and in Team 1 (i.e. Spwn-2) to clear out the barn
+	lib_SetupTeamZone(cObjectiveName, 0, "Barn", "Barn", k_objtype_hold_area);
+	lib_SetupTeamZone(cObjectiveName, 1, "BarnTarget", "BarnTarget", k_objtype_clear_area);
+	
+	//remove indicator from village (ObjDOF4) and add one to the Barn (Obj2DOF)
+	removeObjectiveIndicatorFromProp(propRefFromName("Obj4DOF"));
+	addNewObjectiveIndicatorToProp(propRefFromName("Obj2DOF"), k_objectiveIndicatorType_mainObjective);	
+	
+	//Villagers shout for help in barn
+	chrSpeak(player, "l04b_010_x1", 0, 0.0f, 45.0f, player, true, false);
+	activateTalkingHeadNew("TH_Dant_Mil_Obj2", False);	
+
+	//SplineShip(4, "rep_arc170", 4);
+	SplineShip(5, "rep_arc170", 5);
+	//SplineShip(6, "rep_arc170", 6); TODO: fix ship splines as theyre too close
+	//SplineShip(6, "rep_arc170", 6);
+	
+	waitForGameTime(0.1f);
+	SetObjectiveKillSpawners(1, iObjective);
+    }
+    
+    //Objective 3: Rally the militia at the town hall
+    else if (iObjective == 3)
+    {
+	//Ok player got into Town hall area, lets give him the militia guys
+	if (iSubObjective == 1)
+	{
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 3 SUBOBJECTIVE 1: KILL TOWN HALL ENEMIES =============", 1, "test_objective_message");
+	    
+	    //Militia: Rally together men! Hes helping us!
+	    activateTalkingHeadNew("TH_Dant_Mil_Obj3", False);
+	    
+	    //Get Town Hall Militia guys to add to players group 
+	    chrAIJoinGroup( propRefFromName("Obj3Militia01"), "player" ); 
+	    chrAIJoinGroup( propRefFromName("Obj3Militia02"), "player" ); 
+	    chrAIJoinGroup( propRefFromName("Obj3Militia03"), "player" ); 
+	    chrAIJoinGroup( propRefFromName("Obj3Militia04"), "player" ); 
+	    chrAIJoinGroup( propRefFromName("Obj3Militia05"), "player" ); 
+    	    chrAIJoinGroup( propRefFromName("Obj3Militia06"), "player" );
+
+	    waitForGameTime(0.1f);
+	    //Objective done, head on to Objective 4: The Village Jazz.
+	    //SetObjectiveKills(10, iObjective);
+	    SetObjectiveKillSpawners(1, iObjective);
+	}
+	else
+	{
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 3: GET TO TOWN HALL =============", 1, "test_objective_message");
+	   
+	    //Set the Ambient fighters GroupZones (again again again)
+	    lib_SetupGroupZone(cObjectiveName, "ambientF", "AmbientBattle1", "", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "ambientE", "AmbientBattle1", "", k_objtype_clear_area);
+	    
+	    //Get Barn guys to add to players group 
+    	    chrAIJoinGroup( propRefFromName("squad01"), "player" );
+	    chrAIJoinGroup( propRefFromName("squad02"), "player" ); 
+    	    chrAIJoinGroup( propRefFromName("squad03"), "player" );
+	    chrAIJoinGroup( propRefFromName("squad04"), "player" ); 
+    	    chrAIJoinGroup( propRefFromName("squad05"), "player" );
+	    waitForGameTime(0.1f);
+	    
+	    //X1 getting more angry, telling ATTE to kill X2
+	    activateTalkingHeadNew("TH_Dant_Obj3", False);
+	    
+	    ////////////////////////////////////////////////////////////
+	    //Bonus A, B, C
+	    
+	    //Spawn Broken Tank for Bonus A
+	    BrokenTank = SpawnPropFromTemplate("rep_clone_hover_tank", propRefFromName("BrokenTankDOF"), vector(0, 0, 0));
+	    addNewObjectiveIndicatorToProp(BrokenTank, k_objectiveIndicatorType_bonusObjective);
+	    //This is the rebel engineer spawn, disabled!
+	    //ActivateSpawner("Militiaengi");
+	    ActivateSpawner("RepEngi");
+	    BFObjectiveAddBonus(dantooineba, 7);
+ 
+	    //Spawn ATTE for Bonus B
+	    ATTE = SpawnAIVehicle(propRefFromName("ATTEStartDOF"), "imp_stpr_snpc", "rep_atte", 0, false, k_seatPos_driver);
+	    propRef ATTEdriver = getVehicleDriver(ATTE);	    
+	    addNewObjectiveIndicatorToProp(ATTE, k_objectiveIndicatorType_bonusObjective);
+	    BFObjectiveAddBonus(dantooinebb, 8);
+	    //Tell ATTE driver to go to ATTE2NDDOF
+	    DriveToDestinationBF( ATTEdriver, propRefFromName("ATTE2NDDOF") );
+
+	    //Spawn ATXT for Bonus C
+
+	    /*AddATXT(1, propRefFromName("Spwn-9"));
+	    //Add inidcators to ATXT group
+	    lib_AddIndicatorsToGroup(propRefFromName("Spwn-9"), k_objectiveIndicatorType_bonusObjective, false);*/
+
+	    ATXT = SpawnAIVehicle(propRefFromName("ATTEStartDOF"), "imp_stpr_snpc", "rep_atrt", 0, false, k_seatPos_driver);
+	    propRef ATXTdriver = getVehicleDriver(ATXT);
+	    addNewObjectiveIndicatorToProp(ATXT, k_objectiveIndicatorType_bonusObjective);
+	    BFObjectiveAddBonus(dantooinebc, 9);
+	    
+	    /////////////////////////////////////////////////////////////
+	    
+	    SplineShip(10, "rep_arc170", 10);
+	    
+	    	    
+	    //Set the HuntMe group to enemy, turn them on and set them to hunt for the player
+	    ActivateSpawner("HuntMe");
+	    BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "HuntMe", player , 10.f, 20.f);
+	    BFNPCGroupObjectiveSetType(cObjectiveName, "HuntMe", k_objtype_attack_prop);
+	    
+	    //Set Enemies (1) to hold town hall area and friendlies (0) to clear the area
+	    lib_SetupTeamZone(cObjectiveName, 1, "TownHallHome", "", k_objtype_hold_area);
+	    lib_SetupTeamZone(cObjectiveName, 0, "TownHallHome", "", k_objtype_clear_area);
+	   
+	    waitForGameTime(0.1f);
+	    
+	    //Remove Barn indicator, add Town Hall indicator
+	    addNewObjectiveIndicatorToProp(propRefFromName("Obj3DOF"), k_objectiveIndicatorType_mainObjective);
+	    removeObjectiveIndicatorFromProp(propRefFromName("Obj2DOF"));
+
+	    //Turn on Spwn-3_1 (badguys) and HoldVillage+Obj3Militia groups
+	    ActivateSpawner("Spwn-3_1");
+	    ActivateSpawner("HoldVillage");
+	    ActivateSpawner("Obj3Militia");
+	    AddWalker(1, propRefFromName("Spwn-3_2"));
+	    //Turn off Barn enemy spawner
+	    DeactivateSpawner("Spwn-2");
+	    	    	    
+	    waitForGameTime(0.1f);
+	    
+	    //Weee on to Obj 3 SubObj 1 
+	    SetNumSubObjectives(1, iObjective);
+	    SetObjectiveTriggered(true, iObjective);
+	}
+    }
+
+    //Defend the Village
+    else if (iObjective == 4)
+    {
+	//Open Village doors
+	if (iSubObjective == 1)
+	{
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 4 SUBOBJECTIVE 1: GET PAST DOORS =============", 1, "test_objective_message");
+
+	    //Militia: Its ok hes with us, let him in.
+	    activateTalkingHeadNew("TH_Dant_Mil_Obj4_1", False);	    
+	    
+	    //Remove indicator from front door, put it on Village centre indicator
+	    removeObjectiveIndicatorFromProp(propRefFromName("Obj4DOF"));
+    	    addNewObjectiveIndicatorToProp(propRefFromName("Obj4_1DOF"), k_objectiveIndicatorType_mainObjective);
+	    
+	    //Open 2 Village Doors
+	    propSetPosUsingVector(propRefFromName("vDoor2"), openDoor2Pos);
+	    propSetPosUsingVector(propRefFromName("vDoor3"), openDoor3Pos);
+	    AddVMDebugHUDMsg("============ Opened Doors! =============", 1, "test_objective_message");
+	    
+	    //Spawn Village Militia
+	    ActivateSpawner("Obj4Militia");
+	    
+	    //Objective done
+	    SetObjectiveTriggered(true, iObjective); 
+	}
+	
+	//Close village doors
+	else if (iSubObjective == 2)
+	{
+	    
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 4 SUBOBJECTIVE 2: GET TO VILLAGE CENTRE =============", 1, "test_objective_message");
+	    
+	    //close 2 Village Doors
+	    propSetPosUsingVector(propRefFromName("vDoor2"), closedDoor2Pos);
+	    propSetPosUsingVector(propRefFromName("vDoor3"), closedDoor3Pos);
+	    AddVMDebugHUDMsg("============ Closed Doors! =============", 1, "test_objective_message");
+	    
+	    //Tidy up all the stuff outside the Village
+	    
+	    //Remove all NPCs left from these spawners
+	    BFKillAllNPCsFromSpawner("Spwn-1");
+	    BFKillAllNPCsFromSpawner("Spwn-2");
+	    BFKillAllNPCsFromSpawner("Spwn-3_1");
+	    BFKillAllNPCsFromSpawner("HuntMe");
+	    BFKillAllNPCsFromSpawner("RepEngi");
+	    BFKillAllNPCsFromSpawner("ambientE");
+	    BFKillAllNPCsFromSpawner("ambientF");
+	    
+	    //...and these zones
+	    KillNPCsInZone(zoneRefFromName("AmbientBattle1"));
+	    
+	    //Remove Bonuses A, B, C
+	    removeObjectiveIndicatorFromProp(BrokenTank);
+	    removeObjectiveIndicatorFromProp(ATTE);
+
+	    BFObjectiveRemoveBonus(dantooineba, 7);	
+	    BFObjectiveRemoveBonus(dantooinebb, 8);        
+	    BFObjectiveRemoveBonus(dantooinebc, 9);
+
+	    //set enemies to clear the centre and friendlies to hold it 
+	    lib_SetupTeamZone(cObjectiveName, 1, "Village", "", k_objtype_clear_area);
+	    lib_SetupTeamZone(cObjectiveName, 0, "Village", "", k_objtype_hold_area);
+
+	    waitForGameTime(0.1f);
+
+	    chrSpeak(player, "l04e_030_villagers", 0, 0.0f, 45.0f, player, true, false); //TODO: find out what this says
+    		
+ 	    SplineShip(7, "rep_arc170", 7);
+	    SplineShip(8, "rep_arc170", 8);
+	        	    
+	    SetObjectiveTriggered(true, iObjective); 
+	}
+	
+	//Battle Preparation
+	else if (iSubObjective == 3)
+	{
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 4 SUBOBJECTIVE 3: PREPARATION TIME =============", 1, "test_objective_message");
+	    AddVMDebugHUDMsg("============ PREPARATION TIME 1 =============", 1, "test_objective_message");
+
+	    waitForGameTime(10.0f);
+	    AddVMDebugHUDMsg("============ PREPARATION TIME 2 =============", 1, "test_objective_message");
+	    
+	    waitForGameTime(10.0f);
+	    AddVMDebugHUDMsg("============ PREPARATION TIME 3 =============", 1, "test_objective_message");
+	    
+	    //Militia: Get ready! They're coming!
+	    activateTalkingHeadNew("TH_Dant_Mil_Obj4_3", False);	    
+	    
+	    waitForGameTime(10.0f);
+	    nextObjective(iObjective);
+	    return false;
+	}
+	
+	//Start Invasion Section 1
+	else if (iSubObjective == 4)
+	{
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 4 SUBOBJECTIVE 4: INVASION PART 1! KILL STUFF =============", 1, "test_objective_message");
+	    
+	    //Militia: They've broken through the South Gate!
+	    activateTalkingHeadNew("TH_Dant_Mil_Obj4_4", False);	    
+	    
+	    //Remove indicator from Village, put it on door 1
+	    removeObjectiveIndicatorFromProp(propRefFromName("Obj4_1DOF"));
+    	    addNewObjectiveIndicatorToProp(propRefFromName("Obj4_4DOF"), k_objectiveIndicatorType_mainObjective);
+	    
+	    //TODO: add in ATTE
+	    
+	    //start Spwn-4_4
+	    ActivateSpawner("Spwn-4_4");
+	    	    
+	    //Set Hold Village group to hold village centre
+	    lib_SetupGroupZone(cObjectiveName, "HoldVillage", "Village", "", k_objtype_hold_area);
+	    
+	    //Remove Door 1 Doors Village Doors
+	    propDelete(propRefFromName("vDoor2"));
+	    propDelete(propRefFromName("vDoor3"));
+	    AddVMDebugHUDMsg("============ Deleted Invasion 1 Doors! =============", 1, "test_objective_message");
+	    
+	    //Set bud guys to Clear Invasion Zone 1 and good guys to hold it
+	    lib_SetupTeamZone(cObjectiveName, 1, "InvasionZone1", "", k_objtype_clear_area);
+	    lib_SetupTeamZone(cObjectiveName, 0, "InvasionZone1", "", k_objtype_hold_area);
+	    
+	    waitForGameTime(0.1f);
+	    
+	    //TODO: Sort out spline ships
+	    SplineShip(7, "rep_arc170", 7);
+	    SplineShip(8, "rep_arc170", 8);
+	    //SplineShip(9, "rep_arc170", 9); 
+	       
+	    SetObjectiveKills(10, iObjective);
+	}
+
+	//Invasion Section 2
+	else if (iSubObjective == 5)
+	{  
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 4 SUBOBJECTIVE 5: INVASION PART 2! KILL STUFF =============", 1, "test_objective_message");
+		
+	    //Militia: They're coming in the West Gate! Hold them off!
+	    activateTalkingHeadNew("TH_Dant_Mil_Obj4_5", False);	    
+	     
+	    //Remove indicator from door 1, put it on door 2
+	    removeObjectiveIndicatorFromProp(propRefFromName("Obj4_4DOF"));
+    	    addNewObjectiveIndicatorToProp(propRefFromName("Obj4_5DOF"), k_objectiveIndicatorType_mainObjective);
+	    
+	    //TODO: add jump troopers in
+	    //TODO: add walker in
+
+	    //Activate Spawner 4_5
+	    ActivateSpawner("Spwn-4_5");
+	    //Deactivate Previous Spawners
+	    DeactivateSpawner("Spwn-4_4");
+	    
+	    //Remove Door 2 Doors
+	    propDelete(propRefFromName("vDoor1"));
+	    propDelete(propRefFromName("vDoor6"));
+	    AddVMDebugHUDMsg("============ Deleted Invasion 2 Doors! =============", 1, "test_objective_message");
+	    
+	    //Set bud guys to Clear Invasion Zone 2 and good guys to hold it
+	    lib_SetupTeamZone(cObjectiveName, 1, "InvasionZone2", "", k_objtype_clear_area);
+	    lib_SetupTeamZone(cObjectiveName, 0, "InvasionZone2", "", k_objtype_hold_area);
+	    
+	    waitForGameTime(0.1f);
+
+	    //TODO: Add in spline ships
+
+	    SetObjectiveKills(10, iObjective);
+	}
+
+	//Invasion Section 3
+	else if (iSubObjective == 6)
+	{     
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 4 SUBOBJECTIVE 6: INVASION PART 3! KILL STUFF =============", 1, "test_objective_message");
+	    
+	    //Militia: They're breached the East Gate! We have to fight themback!
+	    activateTalkingHeadNew("TH_Dant_Mil_Obj4_6", False);	    
+	    
+	    //Remove indicator from door 2, put it on door 3
+	    removeObjectiveIndicatorFromProp(propRefFromName("Obj4_5DOF"));
+    	    addNewObjectiveIndicatorToProp(propRefFromName("Obj4_6DOF"), k_objectiveIndicatorType_mainObjective);
+	    
+	    //TODO: add jump troopers in
+	    //TODO: add strafing bombers/fighters
+
+	    //Activate Spawner 4_6 and set them to hostile
+	    ActivateSpawner("Spwn-4_6");
+	    //Deactivate Previous Spawners
+	    DeactivateSpawner("Spwn-4_5");
+	    
+	    //Remove Door 3 Doors
+	    propDelete(propRefFromName("vDoor4"));
+	    propDelete(propRefFromName("vDoor5"));
+	    AddVMDebugHUDMsg("============ Deleted Invasion 3 Doors! =============", 1, "test_objective_message");
+
+	    //Set bud guys to Clear Invasion Zone 3 and good guys to hold it
+	    lib_SetupTeamZone(cObjectiveName, 1, "InvasionZone3", "", k_objtype_clear_area);
+	    lib_SetupTeamZone(cObjectiveName, 0, "InvasionZone3", "", k_objtype_hold_area);
+	    
+	    waitForGameTime(0.1f);
+
+	    //TODO: Add in spline ships
+	    
+	    SetObjectiveKills(10, iObjective);
+	}
+
+	else
+	{   
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 4: GET TO DOORS =============", 1, "test_objective_message");
+	    
+	    //Time to tidy up the battlefield a bit before we do the assault on the Village
+	    
+	    //Turn off RepEngi Spwn-3_1 enemies, HuntMe, Ambient Friendly and Enemy and Kill off anyone in AmbientBattle1
+	    DeactivateSpawner("RepEngi");
+	    DeactivateSpawner("Spwn-3_1");
+	    DeactivateSpawner("HuntMe");    
+	    DeactivateSpawner("ambientE");
+	    DeactivateSpawner("ambientF");
+	    KillNPCsInZone(zoneRefFromName("AmbientBattle1"));
+
+	    //Set the Ambient fighters GroupZones (again again)
+	    lib_SetupGroupZone(cObjectiveName, "ambientF", "AmbientBattle1", "", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "ambientE", "AmbientBattle1", "", k_objtype_clear_area);
+
+	    waitForGameTime(0.1f);
+	    
+	    //Get ATTE Drive to drive to ATTEFinishDOF
+	    propRef ATTEdriver = getVehicleDriver(ATTE);
+	    DriveToDestinationBF( ATTEdriver, propRefFromName("ATTEFinishDOF") );
+	    
+	    //Remove Town Hall Indicator and Add indicator to Village door
+	    removeObjectiveIndicatorFromProp(propRefFromName("Obj3DOF"));
+    	    addNewObjectiveIndicatorToProp(propRefFromName("Obj4DOF"), k_objectiveIndicatorType_mainObjective);
+	    
+	    //X1 saying hes going to gank the village
+	    activateTalkingHeadNew("TH_Dant_Obj4", True);
+	    //Militia: Quickly, get inside the Village!
+	    activateTalkingHeadNew("TH_Dant_Mil_Obj4", True);
+	    
+
+	    waitForGameTime(0.1f);
+	    	    
+	    SplineShip(7, "rep_arc170", 7);
+	    SplineShip(8, "rep_arc170", 8);
+	    //SplineShip(9, "rep_arc170", 9); 
+	    
+	    chrSpeak(player, "l04d_020_x1", 0, 0.0f, 45.0f, player, true, false); //TODO: find out wtf this is
+
+	    SetNumSubObjectives(6, iObjective);
+	    SetObjectiveTriggered(true, iObjective); 
+	}
+    }
+
+    //Defend the enclave
+    else if (iObjective == 5)
+    {
+	AddVMDebugHUDMsg("============ IN OBJECTIVE 5: DEFEND THE ENCLAVE (KILL STUFF) =============", 1, "test_objective_message");
+
+	//Militia: There's too many of them! Fall back and defend the Enclave!
+	activateTalkingHeadNew("TH_Dant_Mil_Obj5", False);	
+	
+	//Remove door 3 indicator and add it to the enclave
+	removeObjectiveIndicatorFromProp(propRefFromName("Obj4_6DOF"));
+	addNewObjectiveIndicatorToProp(propRefFromName("Obj5DOF"), k_objectiveIndicatorType_mainObjective);
+	
+	waitForGameTime(0.1f);
+	
+	//Spawn Falon
+	ActivateSpawner("Falon");
+	//turn on ALL the Spawners
+	ActivateSpawner("Spwn-4_4");
+	ActivateSpawner("Spwn-4_5");
+
+	//TODO: add jump troopers in
+
+	//Badguys clear enclave, good guys defend it
+	lib_SetupTeamZone(cObjectiveName, 1, "EnclaveFront", "", k_objtype_clear_area);
+	lib_SetupTeamZone(cObjectiveName, 0, "EnclaveEntrance", "", k_objtype_hold_area);
+
+	//TODO: Add militia talkie head here shouting: fallback+defend!
+	chrSpeak(player, "l04e_010_villager", 0, 0.0f, 45.0f, player, true, false); //TODO: find out wtf this says.
+		
+	//This is the rebel engineer spawn, disabled!
+	//DeactivateSpawner("Militiaengi");
+	//Turn off Republic Engi spawner outside
+			
+	waitForGameTime(0.1f);
+		
+	//Kill 15 things to go to 6
+	SetObjectiveKills(20, iObjective);
+    }
+    
+    //Escape down the caves
+    else if (iObjective == 6)
+    {
+	//Get to middle cave
+	if (iSubObjective == 1)
+	{
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 6 SUBOBJECTIVE 1: GET TO MIDDLECAVE =============", 1, "test_objective_message");
+
+	    lib_SetupTeamZone(cObjectiveName, 0, "MiddleCave", "", k_objtype_clear_area);
+	    
+	    chrSpeak (propRefFromName("falon_grey"), "l04f_020_fallon", 0, 0.0f, 50.0f, player, true, false);	
+	    
+	    SetObjectiveTriggered(true, iObjective);
+	}
+	//Get to end cave, swap indicator off of Falon and onto Hangar
+	else if (iSubObjective == 2)
+	{
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 6 SUBOBJECTIVE 2: GET TO END CAVE =============", 1, "test_objective_message");
+	    
+	    ActivateSpawner("Spwn-6_1");
+	    
+	    lib_SetupTeamZone(cObjectiveName, 0, "MainCave", "", k_objtype_clear_area);
+	    lib_SetupTeamZone(cObjectiveName, 1, "HangerAndCave", "", k_objtype_hold_area);
+	     
+	    addNewObjectiveIndicatorToProp(propRefFromName("Obj6DOF"), k_objectiveIndicatorType_mainObjective);
+	    removeObjectiveIndicatorFromProp(propRefFromName("falon_grey"));
+	    
+	    SetObjectiveTriggered(true, iObjective);
+	}
+	//Get all friendlies to clear Hangar+Caves
+	else if (iSubObjective == 3)
+	{
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 6 SUBOBJECTIVE 3: GET TO HANGAR =============", 1, "test_objective_message");
+	    
+	    lib_SetupTeamZone(cObjectiveName, 0, "HangerAndCave", "", k_objtype_clear_area);
+
+	    SetObjectiveTriggered(true, iObjective);
+	}
+	//Cutscene End 1
+	else if (iSubObjective == 4)
+	{
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 6 SUBOBJECTIVE 4: END CUTSCENE 1 =============", 1, "test_objective_message");	    
+	    cutSceneC = true;
+	}
+	//Cutscene End 2
+	else if (iSubObjective == 5)
+	{
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 6 SUBOBJECTIVE 4: END CUTSCENE 2 =============", 1, "test_objective_message");	    
+	    cutSceneD = true;
+	}
+	//end Level
+	else if (iSubObjective == 6)
+	{
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 6 SUBOBJECTIVE 6: END LEVEL =============", 1, "test_objective_message");	    
+	    bEndLevel = true;       
+	}
+	else
+	{ 
+	    AddVMDebugHUDMsg("============ IN OBJECTIVE 6: HIT TRIGGER INSIDE CAVE DOOR =============", 1, "test_objective_message");
+	    
+	    //Do Falon introduction cutscene
+	    cutSceneB = true;
+
+	    //Delete Hangar Doors
+	    propDelete(propRefFromName("dan_door_left1"));
+	    propDelete(propRefFromName("dan_door_right1"));
+	    //Delete Cave to Hanger Door
+	    propDelete(propRefFromName("ds_vert_door2"));
+	    
+	    //Teleport the player and falon into the enclave entrance
+	    propTeleportToProp(getPlayerPropRefFromID(GetPlayerId()), propRefFromName("Obj6TPPlayer"));
+	    propTeleportToProp(propRefFromName("falon_grey"), propRefFromName("Obj6TPFalon"));
+
+	    //Remove indicator from Objective 5 and add Objective indicator to Falon
+	    removeObjectiveIndicatorFromProp(propRefFromName("Obj5DOF"));	
+	    addNewObjectiveIndicatorToProp(propRefFromName("falon_grey"), k_objectiveIndicatorType_mainObjective);
+	    
+	    lib_SetupTeamZone(cObjectiveName, 0, "EnclaveDown", "", k_objtype_clear_area);
+	    lib_SetupTeamZone(cObjectiveName, 1, "Cave", "", k_objtype_hold_area);
+	    
+	    //turn on Spwn-6 and make them hostile
+	    ActivateSpawner("Spwn-6");
+	    
+	    //turn off invasion spawns
+	    DeactivateSpawner("Spwn-4_4");
+	    DeactivateSpawner("Spwn-4_5");
+	    DeactivateSpawner("Spwn-4_6");
+	    
+	    //Kill NPCs in everything outside the Caves
+	    BFKillAllNPCsFromSpawner ("HoldVillage");
+	    BFKillAllNPCsFromSpawner ("Spwn-4_4");
+	    BFKillAllNPCsFromSpawner ("Spwn-4_5");
+	    BFKillAllNPCsFromSpawner ("Spwn-4_6");
+	       
+	    //X1 doing more slagging off of X2
+	    activateTalkingHeadNew("TH_Dant_Obj5", False);
+	    
+	    SetNumSubObjectives(6, iObjective);
+	    SetObjectiveTriggered(true, iObjective);
+	}	
+    }
+    
+    else if (iObjective == 7)
+    {
+	if (iSubObjective == 1)
+	{
+	}
+	else
+	{
+	}
+    }	
+
+    else if (iObjective == 8)
+    {
+    }
+
+    else if (iObjective == 9)
+    {
+
+    }
+
+    else if (iObjective == 10)
+    {
+    }
+    
+    else if (iObjective == 11)
+    {
+    }    
+    return true;
+}
+
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            INITIAL EVENTS  
+            ==============
+
+*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Intro Cutscene: Telling X1 to get knockered and jumping off of Dropship etc
+playTimelineOffset("data/bf/timelines/cs05.res", vector(0.f, -1000.f, 0.f));
+playTimeline("data/bf/timelines/cs05b.res");
+
+waitForGameTime(0.1f);
+
+ScriptHasStarted(); //Do any setups
+
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            MAIN GAME LOOP  
+            ==============
+
+*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+while(!bEndLevel)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    ProcessCallBacks();
+    ObjectiveSetupCheck();
+
+    for (i=0; i<iNumActive; i++)
+    {
+        int iObjective = BFObjectiveGetNumForNthActive(i);
+        ObjectiveTests(iObjective);        
+        waitForGameTime(0.01f);
+    }
+
+    waitForGameTimeOrLVChange(0.5f, "iObjLV", "iCBLV");
+ 
+    logStr("tick");
+    logInt(iObjective);    
+}
+
+NextLevel("desolation/des_story.res");

@@ -1,0 +1,462 @@
+// vim: set syntax=c :
+
+///////////////////////////////////
+/*
+ */
+///////////////////////////////////
+
+// vim: set syntax=c :
+
+///////////////////////////////////////////////
+/*
+*/
+///////////////////////////////////////////////
+
+/////////////MAKE SURE TO INCLUDE A BFStorylevelVarProp in your level
+
+
+boolean Skip = false;
+
+///////////// Include Defaults //////////////////////////////////////////////
+
+callback void playerKilled(int victimId, int killerId, int iOppTeam)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iActive = BFObjectiveGetNumForNthActive(i);
+	if (lib_playerKilled(victimId, killerId, iOppTeam, iActive)) 
+	{
+	    nextObjective(iActive);
+	}
+    }
+}
+
+callback int triggeredProp(int inType, char16 inTriggerProp, int pId)
+{    
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iActive = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	iActive = BFObjectiveGetNumForNthActive(i);
+	if (lib_triggeredProp(inTriggerProp, iActive))
+	{
+	    nextObjective(iActive);
+	}
+    }
+    
+    return 0;
+}
+
+function void nextObjective(int inObjNum) 
+{ 
+    int result =   lib_nextObjective(inObjNum);
+
+    if(result==1)
+    {
+	//if next objective returns 1 it has updated a core objective and automatically moved us onto the next
+	//so do objective setup with current objective
+	    int iObjective = BFObjectiveGetCurrent();//GetLevelVarInt("mObjective");
+	    char16 cName = BFObjectiveGetName(iObjective);
+	    ObjectiveSetup( cName, iObjective, BFObjectiveGetSub(iObjective));            
+    }
+
+    if(result==2)
+    {
+	//if nextobjective returns 2 it has updated a bonus objective so we will want to 
+	//objective setup with the objective we passed to next objective
+	    char16 cName = BFObjectiveGetName(inObjNum);
+	    ObjectiveSetup( cName, inObjNum, BFObjectiveGetSub(inObjNum));            
+    }    
+}
+
+function void JumpToObjective(int iStartObj, boolean Skiping)
+{  
+    BFObjectiveSetJumpTo(iStartObj);
+    nextObjective(BFObjectiveGetCurrent());
+    BFKillAllNPCsFromTeam(0);        
+    BFKillAllNPCsFromTeam(1);
+
+    logStr("Jumped To Objective");
+    logInt(BFObjectiveGetCurrent());  
+    Skip = false;
+}
+
+callback void ObjectiveTimeExpired(char16 objName)
+{   
+    int objNum = 0;
+    objNum = BFObjectiveGetNumber(objName);   
+    if (lib_ObjTimeExpired(objNum))
+    {
+	nextObjective(objNum);
+    }
+}
+
+callback void playerSpawned(char16 teamName, int playerId)
+{
+    propRef p = getPlayerPropRefFromID(playerId);    
+}
+
+callback void finiteSpawnerComplete(char16 propId) 
+{
+
+}
+
+
+/////// Defaults END /////////////////////////////////////////////
+
+
+
+
+callback void gameHasStarted()
+{           
+    // Reset all the spawners
+    setTeamOfSpawnPropGroup( "Spwn-1",  -1 );
+    setTeamOfSpawnPropGroup( "Spwn-2",  -1 );
+    setTeamOfSpawnPropGroup( "Spwn-3",  -1 );
+    setTeamOfSpawnPropGroup( "Spwn-4",  -1 );
+    setTeamOfSpawnPropGroup( "Spwn-5",  -1 );
+    setTeamOfSpawnPropGroup( "Spwn-6",  -1 );
+    setTeamOfSpawnPropGroup( "Spwn-7",  -1 );
+    setTeamOfSpawnPropGroup( "Spwn-8",  -1 );
+    setTeamOfSpawnPropGroup( "Spwn-9",  -1 );
+    setTeamOfSpawnPropGroup( "Spwn-10",  -1 );
+}
+
+function void ScriptHasStarted()
+{
+    //SetLevelVarsBFStory("obj_Cat", "vmTrig");
+    SetBFStoryPrefixes("obj_DesChlInf", "vmTrig");
+
+    ResetObjectives("mObjTmp", 10);
+/*
+    //Reset Space CPs, Spawners, etc
+    commandPostSetTeam(obj1REP_CP, -1); //Disabled
+    commandPostSetTeam(obj1CIS_CP, -1); //Disabled    
+    commandPostSetTeam(cit_ent_CP, -1); //Disabled
+    commandPostSetTeam(comproom_CP, -1); //Disabled
+    commandPostSetTeam(chamber_CP, -1); //Disabled
+//    commandPostSetTeam(, -1); //Disabled
+*/
+    JumpToObjective(1, false);
+}
+
+
+function void ObjectiveTests(int iObjective) 
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+//Do some tests
+}
+
+callback void shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+
+}
+
+
+///////////////////////////////////////// OBJECTIVES
+
+function void ObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{
+    if (iObjective == 1)	// 1st wave 
+    {
+        if (iSubObjective == 1)
+	{
+	    SetObjectiveTimer(5, iObjective);
+	    activateTalkingHeadNew("desinfchlg02", true); //"shoot out the cans"	
+	    //activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "here comes the 2nd wave");
+	 
+	    ChallengeEndWave();
+	}
+	else
+	{
+	   /*
+	    propRef plyr;
+	    plyr = getPlayerPropRefFromID(GetPlayerId());    
+	    playerForceClassSwitch(chrRefFromPropRef(plyr), "STR_CHRNAME_ROYALGUARD");
+	    */
+	    spawnGroupSetActive(propRefFromName("Spwn-1"), true);
+	    SetObjectiveKillSpawners(1, iObjective);
+	    
+	    BFNPCTeamObjectiveSetType(cObjectiveName, 1,  k_objtype_attack_prop);
+	    BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1 ,propRefFromName("player_0"), 20, 30);
+	    
+	    SetNumSubObjectives(1, iObjective);
+	    activateTalkingHeadNew("desinfchlg01", true); //"shoot out the cans"	
+	    //activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "1st wave");
+
+	    ChallengeBegin();
+	    ChallengeBeginWave(100, 2);
+
+
+	}
+    } 
+    else if (iObjective == 2)	// 2nd wave
+    {
+        if (iSubObjective == 1)
+	{
+	    SetObjectiveTimer(5, iObjective);
+	    activateTalkingHeadNew("desinfchlg03", true); //"shoot out the cans"	
+	    //activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "here comes the 3rd wave");
+	    
+	    ChallengeEndWave();
+	}
+	else
+	{
+	    spawnGroupSetActive(propRefFromName("Spwn-2"), true);
+	    SetObjectiveKillSpawners(1, iObjective);
+
+	    BFNPCTeamObjectiveSetType(cObjectiveName, 1,  k_objtype_attack_prop);
+	    BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1 ,propRefFromName("player_0"), 20, 30);
+	    
+	    SetNumSubObjectives(1, iObjective);
+//	    activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "2nd wave");
+
+	    ChallengeBeginWave(100, 2);
+	}
+    }
+    else if (iObjective == 3)	// 3rd wave 
+    { 
+        if (iSubObjective == 1)
+	{
+	    SetObjectiveTimer(5, iObjective);
+	    activateTalkingHeadNew("desinfchlg04", true); //"shoot out the cans"	
+	    //activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "here comes the 4th wave");
+	    
+	    ChallengeEndWave();
+	}
+	else
+	{
+	    spawnGroupSetActive(propRefFromName("Spwn-3"), true);
+	    SetObjectiveKillSpawners(1, iObjective);
+
+	    BFNPCTeamObjectiveSetType(cObjectiveName, 1,  k_objtype_attack_prop);
+	    BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1 ,propRefFromName("player_0"), 5, 5);
+	    
+	    SetNumSubObjectives(1, iObjective);
+//	    activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "3rd wave");
+
+	    ChallengeBeginWave(100, 2);
+	}
+    } 
+    else if (iObjective == 4)	// 4th wave 
+    { 
+        if (iSubObjective == 1)
+	{
+	    SetObjectiveTimer(5, iObjective);
+	    activateTalkingHeadNew("desinfchlg05", true); //"shoot out the cans"	
+	    //activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "here comes the 5th wave");
+	 
+	    ChallengeEndWave();
+	}
+	else
+	{
+	    spawnGroupSetActive(propRefFromName("Spwn-4"), true);
+	    SetObjectiveKillSpawners(1, iObjective);
+
+	    BFNPCTeamObjectiveSetType(cObjectiveName, 1,  k_objtype_attack_prop);
+	    BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1 ,propRefFromName("player_0"), 20, 30);
+	    
+	    SetNumSubObjectives(1, iObjective);
+//	    activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "4th wave");
+
+	    ChallengeBeginWave(100, 2);
+	}
+    } 
+    else if (iObjective == 5)	// 5th wave 
+    { 
+        if (iSubObjective == 1)
+	{
+	    SetObjectiveTimer(5, iObjective);
+	    activateTalkingHeadNew("desinfchlg06", true); //"shoot out the cans"	
+	    //activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "here comes the 6th wave");
+		 
+	    ChallengeEndWave();
+	}
+	else
+	{
+	    spawnGroupSetActive(propRefFromName("Spwn-5"), true);
+	    SetObjectiveKillSpawners(1, iObjective);
+
+	    BFNPCTeamObjectiveSetType(cObjectiveName, 1,  k_objtype_attack_prop);
+	    BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1 ,propRefFromName("player_0"), 20, 30);
+	    
+	    SetNumSubObjectives(1, iObjective);
+//	    activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "4th wave");
+
+	    ChallengeBeginWave(100, 2);
+	}
+    } 
+    else if (iObjective == 6)	// 6th wave 
+    { 
+        if (iSubObjective == 1)
+	{
+	    SetObjectiveTimer(5, iObjective);
+	    activateTalkingHeadNew("desinfchlg07", true); //"shoot out the cans"	
+	    //activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "here comes the 7th wave");
+	 
+	    ChallengeEndWave();
+	}
+	else
+	{
+	    spawnGroupSetActive(propRefFromName("Spwn-6"), true);
+	    SetObjectiveKillSpawners(1, iObjective);
+
+	    BFNPCTeamObjectiveSetType(cObjectiveName, 1,  k_objtype_attack_prop);
+	    BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1 ,propRefFromName("player_0"), 5, 5);
+	    
+	    SetNumSubObjectives(1, iObjective);
+//	    activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "4th wave");
+
+	    ChallengeBeginWave(100, 2);
+	}
+    } 
+    else if (iObjective == 7)	// 7th wave 
+    { 
+        if (iSubObjective == 1)
+	{
+	    SetObjectiveTimer(5, iObjective);
+	    activateTalkingHeadNew("desinfchlg08", true); //"shoot out the cans"	
+	    //activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "here comes the 8th wave");
+		 
+	    ChallengeEndWave();
+	}
+	else
+	{
+	    spawnGroupSetActive(propRefFromName("Spwn-7"), true);
+	    SetObjectiveKillSpawners(1, iObjective);
+
+	    BFNPCTeamObjectiveSetType(cObjectiveName, 1,  k_objtype_attack_prop);
+	    BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1 ,propRefFromName("player_0"), 20, 30);
+	    
+	    SetNumSubObjectives(1, iObjective);
+//	    activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "4th wave");
+
+	    ChallengeBeginWave(100, 2);
+	}
+    } 
+    else if (iObjective == 8)	// 8th wave 
+    { 
+        if (iSubObjective == 1)
+	{
+	    SetObjectiveTimer(5, iObjective);
+	 
+	    ChallengeEndWave();
+	}
+	else
+	{
+	    spawnGroupSetActive(propRefFromName("Spwn-8"), true);
+	    SetObjectiveKillSpawners(1, iObjective);
+
+	    BFNPCTeamObjectiveSetType(cObjectiveName, 1,  k_objtype_attack_prop);
+	    BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1 ,propRefFromName("player_0"), 20, 30);
+	    
+	    SetNumSubObjectives(1, iObjective);
+//	    activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "4th wave");
+
+	    ChallengeBeginWave(100, 2);
+	}
+    } 
+    else if (iObjective == 9)	// 9th wave 
+    { 
+        if (iSubObjective == 1)
+	{
+	    SetObjectiveTimer(5, iObjective);
+	 
+	    ChallengeEndWave();
+	}
+	else
+	{
+	    spawnGroupSetActive(propRefFromName("Spwn-9"), true);
+	    SetObjectiveKillSpawners(1, iObjective);
+
+	    BFNPCTeamObjectiveSetType(cObjectiveName, 1,  k_objtype_attack_prop);
+	    BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1 ,propRefFromName("player_0"), 20, 30);
+	    
+	    SetNumSubObjectives(1, iObjective);
+//	    activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "4th wave");
+
+	    ChallengeBeginWave(100, 2);
+	}
+    } 
+    else if (iObjective == 10)	// 10th wave 
+    { 
+        if (iSubObjective == 1)
+	{
+	    SetObjectiveTimer(5, iObjective);
+	 
+	    ChallengeEndWave();
+	    ChallengeEnd();
+	}
+	else
+	{
+	    spawnGroupSetActive(propRefFromName("Spwn-10"), true);
+	    SetObjectiveKillSpawners(1, iObjective);
+
+	    BFNPCTeamObjectiveSetType(cObjectiveName, 1,  k_objtype_attack_prop);
+	    BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1 ,propRefFromName("player_0"), 20, 30);
+	    
+	    SetNumSubObjectives(1, iObjective);
+//	    activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "4th wave");
+
+	    ChallengeBeginWave(100, 2);
+	}
+    } 
+    else
+    {
+	// The end
+	//CompleteLevel();
+    }
+    
+    //Call this to complete the level
+//    CompleteLevel();
+}
+
+AllowCallback(CALLBACK_PlayerSpawned, playerSpawned);
+AllowCallback(CALLBACK_PlayerKilledBF, playerKilled);
+AllowCallback(CALLBACK_TriggeredProp, triggeredProp);
+AllowCallback(CALLBACK_ObjectiveTimeExpired, ObjectiveTimeExpired);
+AllowCallback(CALLBACK_GameHasStarted, gameHasStarted);
+AllowCallback(CALLBACK_FSpawnerComplete, finiteSpawnerComplete);
+AllowCallback(CALLBACK_ShipReachedScriptedSplineSegment, shipReachedScriptedSplineSegment);
+
+///////////////This Script Actions
+
+
+
+ScriptHasStarted(); //Do any setups
+
+
+//Main game loop
+while(1)
+{
+
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iObjective = BFObjectiveGetNumForNthActive(i);
+	ObjectiveTests(iObjective);
+
+	logStr("tick");
+	logInt(iObjective);
+	int iSubObjective = BFObjectiveGetSub(i);
+	logInt(iSubObjective);
+    }
+    waitForGameTime(1.0f);
+    
+    //Check to see if the player has died
+    if (propGetHealthFraction(propRefFromName("player_0")) <= 0.0f)
+    {
+	activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "You failed. Game Over.");
+//	waitForGameTime(5.0f);
+	CompleteLevel();
+    }
+}
+
+

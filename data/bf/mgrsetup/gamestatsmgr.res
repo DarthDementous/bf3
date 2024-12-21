@@ -1,0 +1,3 @@
+gamestatsmgrTemplate gamestatsmgr
+{
+}

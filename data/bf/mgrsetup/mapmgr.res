@@ -1,0 +1,3 @@
+mapMgrTemplate mapmgr
+{
+}

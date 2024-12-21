@@ -1,0 +1,463 @@
+
+// vim: set syntax=c :
+
+///////////////////////////////
+// Dantooine Tanks Challenge //
+///////////////////////////////
+
+boolean Skip = false;
+propRef player = getPlayerPropRefFromID(GetPlayerId());
+
+int IsPlayerDead = 0;
+
+/////////////////////////////          INCLUDE DEFAULTS           /////////////////
+
+
+callback void playerKilled(int killerId, int iResult, int iSpare)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    
+    propRef pTank;
+    pTank = propRefFromInt(iSpare);
+    
+    propRef pKiller;
+    pKiller = propRefFromInt(killerId);    
+
+//dirty hack using chrs placed in different tanks to up score - multipliers in the form of pickups for this level?
+
+    if (isPlayerProp(pKiller) && iResult == 1)
+    {
+	int class = getVehicleClass(pTank);
+
+	if (class == 0)
+	{
+	    ChallengeAddScore(20);
+	}
+	else if (class == 1)
+	{
+	    ChallengeAddScore(50);
+	}
+	else if (class == 2)
+	{
+	    ChallengeAddScore(100);
+	}
+	else if (class == 3)
+	{
+	    ChallengeAddScore(250);
+	}
+
+	else if (class == 4)
+	{
+	    ChallengeAddScore(500 );
+	}
+
+	else
+	{
+	}
+    }
+    for (i=0; i<iNumActive; i++)
+    {
+	int iActive = BFObjectiveGetNumForNthActive(i);
+	if (lib_playerKilled(killerId, iResult, iSpare, iActive)) 
+	{
+	    nextObjective(iActive);
+	}
+    }
+}
+
+function void Trigger(char16 inTriggerProp)
+{   
+    int iResult = 0;
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iActive = 0;
+    for (i=0; i<iNumActive; i++)
+    {
+        iActive = BFObjectiveGetNumForNthActive(i);
+        iResult = lib_triggeredProp(inTriggerProp, iActive);
+        iResult = ObjectiveTriggerTests(iActive, inTriggerProp, iResult);
+
+        if (iResult >= 1) nextObjective(iActive);
+    }
+}
+
+callback int triggeredProp(int inType, char16 inTriggerProp, int pId)
+{   
+    Trigger(inTriggerProp);     
+    return 0;
+}
+function void nextObjective(int iObjNum) 
+{    
+    int result =   lib_nextObjective(iObjNum);
+
+    if(result==1)
+    {
+	//if next objective returns 1 it has updated a core objective and automatically moved us onto the next
+	//so do objective setup with current objective
+	if (!Skip)
+	{
+	    int iObjective = BFObjectiveGetCurrent();//GetLevelVarInt("mObjective");
+	    char16 cName = BFObjectiveGetName(iObjective);
+	    ObjectiveSetup( cName, iObjective, BFObjectiveGetSub(iObjective));            
+	}
+    }
+
+    if(result==2)
+    {
+	//if nextobjective returns 2 it has updated a bonus objective so we will want to 
+	//objective setup with the objective we passed to next objective
+	if (!Skip)
+	{
+	    char16 cName = BFObjectiveGetName(iObjNum);
+	    ObjectiveSetup( cName, iObjNum, BFObjectiveGetSub(iObjNum));            
+	}
+    }
+}
+
+function void JumpToObjective(int iStartObj, boolean Skiping)
+{       
+    Skip = Skiping;
+    ResetProps();
+
+    if (Skip)
+    {
+	BFObjectiveSetJumpTo(iStartObj);
+    }
+
+    Skip = false;
+    nextObjective(BFObjectiveGetCurrent());
+
+    char16 tSpawn;
+    tSpawn = LevelVarToChar16("mCurrentSpawner");
+    if (propExists(propRefFromChar16(tSpawn)))
+        propTeleportToProp(getPlayerPropRefFromID(GetPlayerId()), propRefFromChar16(tSpawn));        
+
+    logStr("Jumped To Objective");
+    logInt(BFObjectiveGetCurrent());
+}
+
+callback void ObjectiveTimeExpired(char16 objName)
+{   
+    //if (lib_ObjTimeExpired()) nextObjective();
+
+    int objNum = 0;
+    objNum = BFObjectiveGetNumber(objName);   
+    if (lib_ObjTimeExpired(objNum))
+    {
+		nextObjective(objNum);
+    }
+}
+
+callback void playerSpawned(char16 teamName, int playerId)
+{
+    //int iObjective = GetLevelVarInt("mObjective");
+    logStr("teamName: ");
+    logchar16(teamName);
+}
+
+callback void finiteSpawnerComplete(char16 propId) 
+{
+    AddVMDebugHUDMsg("FINITE SPAWNER IS DEADED", 1, "test_objective_message");
+}
+
+/////////////////////////////          DEFAULTS END            /////////////////
+
+callback void gameHasStarted()
+{    
+}
+
+function void ResetProps()
+{
+}
+
+function void ScriptHasStarted()
+{
+    SetBFStoryPrefixes("obj_Cru_Ch", "vmTrig");
+
+    ResetObjectives("mObjTmp", 8);
+
+    ResetProps();
+
+    JumpToObjective(1, true);
+}
+
+/*
+function int countDown(int, repeat, float delay)
+{
+    int i = 0;
+    while (i <repeat)
+    {
+    
+	int endedCountDown = 0;
+	countTime = (getGameTime() + delay);
+	
+	while (!endedCountDown)
+	{
+	    float currentTime;
+	    currentTime = getGameTime();
+
+	    if (getCurrentTime >= counTime)
+	    {
+		endedCountdown = 1;
+	    }
+
+	    else
+	    {
+		endedCountdown = 0;
+	    }
+	}
+
+	i++;
+    }
+}
+*/
+
+function void spawnEvilDude(int spawn, int numToSpawn, float delay)
+{      	
+
+}
+
+function int ObjectiveTriggerTests(int iObjective, char16 inTriggerProp, int iResult) 
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+
+    if (iObjective == 1)
+    {
+        if (iResult == 1) 
+            JumpToObjective(10, true);
+    }
+    return iResult;
+}
+
+/////////////////////////////          OBJECTIVE TESTS            /////////////////
+
+
+function void ObjectiveTests(int iObjective) 
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+
+    if (iSubObjective == 2)
+    {
+	int spawnsAlive = propGroupSpCountAliveSpawnedProps(propRefFromName("waveGrp"));
+
+	if (!spawnsAlive)
+	{
+	    nextObjective(iObjective);
+	}
+    }
+  
+    if (iObjective <= 10) 
+    {
+	if (!propValid(player) && !IsPlayerDead)
+	{
+	    IsPlayerDead = 1;
+	}
+
+	if (IsPlayerDead)
+	{
+	    ChallengeEnd();
+	}
+    }
+}
+
+/////////////////////////////          OBJECTIVES            /////////////////
+
+function void ObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{
+    if (iObjective == 1) 
+    {  
+	if (iSubObjective == 1)
+	{
+	    ActivateSpawner("wave1_1");
+	    ActivateSpawner("wave1_2");
+	    SetObjectiveKills(2, iObjective); 
+	}
+
+	else if (iSubObjective == 2)
+	{
+	    DeactivateSpawner("waveGrp");   
+	}
+
+	else
+	{
+	    BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1, player , 10.f, 20.f);
+	    BFNPCTeamObjectiveSetType(cObjectiveName, 1, k_objtype_attack_prop);
+	    SetNumSubObjectives(2, iObjective);
+	    SetObjectiveTimer(6, iObjective);	 
+	}
+    }
+
+    else if (iObjective == 2) 
+    {  
+	if (iSubObjective == 1)
+	{
+	    ActivateSpawner("wave1_1");
+	    ActivateSpawner("wave1_2");
+	    ActivateSpawner("wave2");
+	    SetObjectiveKills(3, iObjective); 
+	}
+
+	else if (iSubObjective == 2)
+	{
+	    DeactivateSpawner("waveGrp");   
+	}
+
+	else
+	{
+	    ChallengeAddScore((iObjective*75));
+	    BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1, player , 10.f, 20.f);
+	    BFNPCTeamObjectiveSetType(cObjectiveName, 1, k_objtype_attack_prop);
+	    SetNumSubObjectives(2, iObjective);
+	    SetObjectiveTimer(10, iObjective);	 
+	}
+    }
+
+    else if (iObjective == 3) 
+    {  
+	if (iSubObjective == 1)
+	{
+	    ActivateSpawner("wave1_1");
+	    ActivateSpawner("wave1_2");
+	    ActivateSpawner("wave2");
+	    ActivateSpawner("wave3");
+	    SetObjectiveKills(5, iObjective); 
+	}
+
+	else if (iSubObjective == 2)
+	{
+	    DeactivateSpawner("waveGrp");   
+	}
+
+	else
+	{
+	    ChallengeAddScore((iObjective*75));
+	    BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1, player , 10.f, 20.f);
+	    BFNPCTeamObjectiveSetType(cObjectiveName, 1, k_objtype_attack_prop);
+	    SetNumSubObjectives(2, iObjective);
+	    SetObjectiveTimer(10, iObjective);	 
+	}
+    }
+
+    else if (iObjective == 4) 
+    {  
+	if (iSubObjective == 1)
+	{
+	    ActivateSpawner("wave1_1");
+	    ActivateSpawner("wave1_2");
+	    ActivateSpawner("wave2");
+	    ActivateSpawner("wave3");
+	    ActivateSpawner("wave4");
+	    SetObjectiveKills(8, iObjective); 
+	}
+
+	else if (iSubObjective == 2)
+	{
+	    DeactivateSpawner("waveGrp");   
+	}
+
+	else
+	{
+	    ChallengeAddScore((iObjective*75));
+	    BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1, player , 10.f, 20.f);
+	    BFNPCTeamObjectiveSetType(cObjectiveName, 1, k_objtype_attack_prop);
+	    SetNumSubObjectives(2, iObjective);
+	    SetObjectiveTimer(10, iObjective);	 
+	}
+    }
+
+    else if (iObjective == 5) 
+    {  
+	if (iSubObjective == 1)
+	{
+	    ActivateSpawner("wave1_1");
+	    ActivateSpawner("wave1_2");
+	    ActivateSpawner("wave2");
+	    ActivateSpawner("wave3");
+	    ActivateSpawner("wave4");
+	    ActivateSpawner("wave5");
+	    ActivateSpawner("deka1");
+	    ActivateSpawner("deka2");
+	    SetObjectiveKills(12, iObjective); 
+	}
+
+	else if (iSubObjective == 2)
+	{
+	    DeactivateSpawner("waveGrp");   
+	}
+
+	else
+	{
+	    ChallengeAddScore((iObjective*75));
+	    BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1, player , 10.f, 20.f);
+	    BFNPCTeamObjectiveSetType(cObjectiveName, 1, k_objtype_attack_prop);
+	    SetNumSubObjectives(2, iObjective);
+	    SetObjectiveTimer(10, iObjective);	 
+	}
+    }
+
+    else if (iObjective == 6) 
+    {  
+	if (iSubObjective == 1)
+	{
+	    ActivateSpawner("wave1_1");
+	    ActivateSpawner("wave1_2");
+	    ActivateSpawner("wave2");
+	    ActivateSpawner("wave3");
+	    ActivateSpawner("wave4");
+	    ActivateSpawner("wave5");
+	    ActivateSpawner("wave6");
+	    SetObjectiveKills(16, iObjective); 
+	}
+
+	else if (iSubObjective == 2)
+	{
+	    DeactivateSpawner("waveGrp");   
+	}
+
+	else
+	{
+	    ChallengeAddScore((iObjective*75));
+	    BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1, player , 10.f, 20.f);
+	    BFNPCTeamObjectiveSetType(cObjectiveName, 1, k_objtype_attack_prop);
+	    SetNumSubObjectives(2, iObjective);
+	    SetObjectiveTimer(10, iObjective);	 
+	}
+    }
+
+    
+}
+
+AllowCallback(CALLBACK_PlayerSpawned, playerSpawned);
+AllowCallback(CALLBACK_PlayerKilledBF, playerKilled);
+AllowCallback(CALLBACK_TriggeredProp, triggeredProp);
+AllowCallback(CALLBACK_ObjectiveTimeExpired, ObjectiveTimeExpired);
+AllowCallback(CALLBACK_GameHasStarted, gameHasStarted);
+AllowCallback(CALLBACK_FSpawnerComplete, finiteSpawnerComplete);
+
+
+///////////////This Script Actions
+
+waitForGameTime(0.1f);
+ScriptHasStarted();
+ChallengeBegin();
+
+//Main game loop
+while(1)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iObjective = BFObjectiveGetNumForNthActive(i);
+	ObjectiveTests(iObjective);
+
+	logStr("tick");
+	logInt(iObjective);
+    }
+    waitForGameTime(1.0f);
+}
+
+
+

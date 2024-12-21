@@ -1,0 +1,21 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      00096002 00001200     	EXEC ADDR(0x2) CNT(0x6) BOOL_ADDR(0x80)
+02: 10000001 1f1ff23f 00004000	      FETCH:	SAMPLE	R0.__xy = R0.xyx CONST(0) ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+03: ac100000 00000041 c20000ff	   (S)ALU:	MUL_CONST_1	R0.x___ = C511.x, R1.y
+04: 4c220003 001b6c1b a102ff01	      ALU:	MULv	R3._y__ = R2.wwww, C511.xxxx
+                          						    	RECIP_IEEE	R0._y__ = R1.wwww
+05: a81c0300 0006b141 8000ffff	      ALU:	ADDv	R0.__zw = R0.zzzw, C511.yyyy
+                          						    	MUL_CONST_0	R3.x___ = C511.x, R0.y
+06: 140c0000 00b1066c e1030003	      ALU:	MULv	R0.__zw = R3.yyyy, R0.zzzw
+07: 0c1e0303 000c016c e1000001	      ALU:	MULv	R3._yzw = R0.xxzw, R0.yyzw
+                          						    	MUL_PREVs	R3.x___ = R1.xxxx
+      02406008 00002200     	EXEC_END ADDR(0x8) CNT(0x6) BOOL_ADDR(0x80)
+08: 00160101 00bc6ccb a003ff03	      ALU:	ADDv	R1._yz_ = R3.xxyy, C511.xxxx
+                          						    	ADDs	R1.x___ = R3.wwzz
+09: c8060001 00c116bc 8b010000	      ALU:	MULADDv	R1._yz_ = C256.xxyy, R1.yyzz, C256.zzww
+0a: a0160000 00c1166c e0010081	      ALU:	ADDv	R0._yz_ = R1.yyzz, R0.zzww
+                          						    	SQRT_IEEE	R0.x___ = abs(R1).xxxx
+0b: 64180001 1f1ff447 00004000	      FETCH:	SAMPLE	R0._xyz = R0.yzy CONST(1) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+0c: c8078000 0015c000 e1000200	   (S)ALU:	MULv	export0.xyz_ = R0.yzww, R2.xyzz	; COLOR
+0d: c8088000 006cc600 a600ff00	      ALU:	SETGTEv	export0.___w = R0.xxxx, C511.zzzz	; COLOR
+      00000000 00000000     	NOP

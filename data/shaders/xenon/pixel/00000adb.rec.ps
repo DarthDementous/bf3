@@ -1,0 +1,13 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      00096002 00001200     	EXEC ADDR(0x2) CNT(0x6) BOOL_ADDR(0x80)
+02: 10081001 1f1ff688 00004000	      FETCH:	SAMPLE	R1.xyzw = R0.xyx CONST(0) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+03: 14808000 0000001b e2010101	   (S)ALU:	MAXs	export0.___w = R1.wwww	; COLOR
+04: c8070100 00b4b4b4 8b010102	      ALU:	MULADDv	R0.xyz_ = C258.xzyy, R1.xzyy, C257.xzyy
+05: c8070100 00c0b4c0 ab000300	      ALU:	MULADDv	R0.xyz_ = R0.xyzz, R0.xyzz, C259.xzyy
+06: c8080100 00cd6c00 b000ff00	      ALU:	DOT3v	R0.___w = R0.yxzz, C511.xxxx
+07: c8070102 011bb1b4 ab00ff00	      ALU:	MULADDv	R2.xyz_ = -R0.xzyy, R0.wwww, C511.yyyy
+      00003008 00002200     	EXEC_END ADDR(0x8) CNT(0x3) BOOL_ADDR(0x80)
+08: c8070100 00c06cb4 ab020000	      ALU:	MULADDv	R0.xyz_ = R0.xzyy, R2.xyzz, C256.xxxx
+09: c8070100 02c0c000 e0000100	      ALU:	ADDv	R0.xyz_ = R0.xyzz, -R1.xyzz
+0a: c8078000 00c01bc0 eb000101	      ALU:	MULADDv	export0.xyz_ = R1.xyzz, R0.xyzz, R1.wwww	; COLOR
+      00000000 00000000     	NOP

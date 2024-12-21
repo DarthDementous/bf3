@@ -1,0 +1,18 @@
+// vim: set syntax=c :
+
+logStr("SCRIPT RUNNING");
+
+char16 sGroup = getNthVMPropStringVar(me, 0);
+char16 sString_A = getNthVMPropStringVar(me, 2);
+char16 sString_B = getNthVMPropStringVar(me, 3);
+
+propRef pGroup = propRefFromChar16(sGroup);
+
+propRef pChr_A = GetPropFromGroupSpawner(pGroup, 0, 0);
+propRef pChr_B = GetPropFromGroupSpawner(pGroup, 1, 0);
+
+chrSpeakChar16(pChr_A, sString_A, 0, 0.0f, 45.0f, pChr_B, true, true);
+chrSpeakChar16(pChr_B, sString_B, 0, 0.0f, 45.0f, pChr_A, true, true);
+
+
+logStr("Script Ended");

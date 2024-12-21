@@ -1,0 +1,285 @@
+// vim: set syntax=c :
+
+//////////////////////////////////////
+//
+// Mark Kevern
+//
+// chr_guide.vms
+//
+// For having an NPC guide a player
+//
+// To use:
+// Add to a VMProp
+//
+// In the StringVars[]
+// 0: Spawnprop, SpawnGroup (will only work for first in group)
+// 1: patrol prop template (e.g dofWalk_, would work for dofWalk_0, dofWalk_1, etc )
+// 2: run, to run
+// 3: destroy to deleteprop on arrival, waitatlast to wait only at last point
+// 4: TriggerName
+// 5: highlight, to highlight
+// 6: loop, to loop
+// 7: name of anim to do
+// 8: Distance from DOF to trigger Chr Movement
+//
+////////////////////////////////////////
+
+logStr("SCRIPT RUNNING");
+propRef pPlayer = propRefFromName("player_0");
+
+int iCurrent = -1;
+int iGoal = -1;
+float fDist = 5.0f;
+boolean bAtLastDof = false;
+int iLastPoint = GetLastPoint();
+char16 sGroup = getNthVMPropStringVar(me, 0);
+char16 sPadTmp = getNthVMPropStringVar(me, 1);
+char16 sRun = getNthVMPropStringVar(me, 2);
+char16 sOption = getNthVMPropStringVar(me, 3); //also destroy prop, etc..
+char16 sTrigger = getNthVMPropStringVar(me, 4);
+char16 sHighlight = getNthVMPropStringVar(me, 5);
+char16 sLoop = getNthVMPropStringVar(me, 6);
+char16 sAnim = getNthVMPropStringVar(me, 7);
+char16 sNum = getNthVMPropStringVar(me, 8);
+
+if (char16cmp(sNum, "null")) //Not Equal
+    fDist = Char16ToInt(sNum);
+
+boolean bRun = false;
+boolean bHighlight = false;
+boolean bLoop = false;
+boolean bDestroy = false;
+boolean bTrigger = false;
+boolean bWaitAtLast = false;
+propRef pTrigger;
+
+if (!char16cmp(sRun, "run"))
+    bRun = true;
+
+if (!char16cmp(sOption, "destroy"))
+    bDestroy = true;
+else if (!char16cmp(sOption, "waitatlast"))
+    bWaitAtLast = true;
+    
+if (char16cmp(sTrigger, "null")) //not equal
+{
+    bTrigger = true;
+    pTrigger = propRefFromChar16(sTrigger);
+}
+    
+if (!char16cmp(sHighlight, "highlight"))
+    bHighlight = true;
+
+if (!char16cmp(sLoop, "loop"))
+    bLoop = true;   
+    
+propRef pGroup = propRefFromChar16(sGroup);
+
+char16 sPad;
+sPad = Char16CatInt(sPadTmp, iCurrent);        
+propRef pPad = propRefFromChar16(sPad);
+
+propRef pChr;
+propRef pSpawn;
+if (isGroupComponentProp(pGroup))
+    pSpawn = GetNthPropFromGroup(pGroup, 0);
+else
+    pSpawn = pGroup;
+
+if (isSpawnProp(pSpawn))   
+    pChr = propSpawnerGetNthSpawnedProp(pSpawn, 0);
+else
+    pChr = pSpawn;
+    
+function int GetLastPoint()
+{
+    int iLast = 0;
+    sPad = Char16CatInt(sPadTmp, 0);        
+    pPad = propRefFromChar16(sPad);
+
+    while (propExists(pPad))
+    {
+        sPad = Char16CatInt(sPadTmp, iLast);        
+        pPad = propRefFromChar16(sPad);
+        if (propExists(pPad))
+            iLast++;                
+        waitForGameTime(0.01f);
+    }
+
+    return iLast-1;
+}
+
+iLastPoint = GetLastPoint();
+waitForGameTime(0.1f);
+setAIState(pChr, "AISTATE_BF_PATROL");
+beginInGameCutSceneWithFlags(k_vmFlag_ResumeScriptAfterHitReact, pChr);
+
+function int GetClosestPoint()
+{
+    int i = 0;
+    if (!bLoop)
+        i = iCurrent;
+
+    sPad = Char16CatInt(sPadTmp, i);
+    pPad = propRefFromChar16(sPad);
+
+    while (propExists(pPad))
+    {
+        if (propExists(pPad))
+        {
+            if (testIfPropsAreClose(pPlayer, pPad, fDist))
+                return i;
+        }     
+
+        i++;
+        sPad = Char16CatInt(sPadTmp, i);        
+        pPad = propRefFromChar16(sPad);        
+        waitForGameTime(0.01f);
+    }
+
+    return -1;
+}
+
+function boolean ChrMoveToDof(int iMoveTo)
+{
+    logStr("ChrMoveToDof");
+    iGoal = iMoveTo;
+    boolean bReturn = false;
+
+    while ((iCurrent != iGoal)&&(!bReturn))
+    {
+        logStr("iCurrent != iGoal");
+        logInt(iCurrent);
+        logInt(iGoal);                
+        if (chrHasReachedDest(pChr))
+        {    
+            iCurrent++;            
+            sPad = Char16CatInt(sPadTmp, iCurrent);
+            pPad = propRefFromChar16(sPad);            
+            if (propExists(pPad))
+            {
+                logStr("Walking To Next Destination");
+
+                if (bRun)
+                    chrRunToPos(pChr, propGetPos(pPad));
+                else
+                    chrWalkToPos(pChr, propGetPos(pPad));
+                waitUntilVMsDone(pChr);
+
+                if (iCurrent == iLastPoint)
+                    bReturn = true;
+            }
+            else
+            {
+                if (bLoop)
+                    iCurrent = -1;
+                else
+                {       
+                    iCurrent--;
+                    bReturn = true;
+                }
+            }            
+        }
+        else
+        {
+            if (!bWaitAtLast)
+            {
+                int iPoint = GetClosestPoint();
+                if (iPoint != -1)
+                {
+                    if ((bLoop)||(iPoint > iGoal))
+                        iGoal = iPoint;
+                }
+            }
+        }
+    }
+
+    return bReturn;
+}
+
+if (bHighlight)
+    addNewObjectiveIndicatorToProp(pChr, 0);
+
+//End initial Setup
+
+if (!bWaitAtLast)
+{
+    ChrMoveToDof(0);
+
+    //Main Loop
+    while (propExists(pChr)&&(!bAtLastDof))
+    {    
+        int iPoint = GetClosestPoint();
+
+        if (iPoint != -1)
+        {
+            bAtLastDof = ChrMoveToDof(iPoint+1);
+
+            if ((!bAtLastDof)&&(!bWaitAtLast))
+            {
+                if (char16cmp(sAnim, "null")) //Not equal
+                {                           
+                    logStr("Animating");            
+                    //Align            
+                    sPad = Char16CatInt(sPadTmp, iCurrent);
+                    pPad = propRefFromChar16(sPad);                     
+                    chrWalkToPadAndAlign(pChr, propGetPos(pPad), propGetDir(pPad), 800.0f);
+                    waitUntilVMsDone(pChr);            
+                    chrPlayAnim(pChr, sAnim, 0.1f, true);
+                }
+            }            
+        }
+
+        waitForGameTime(0.1f);
+    }
+}
+else
+{
+    ChrMoveToDof(GetLastPoint());
+}
+
+
+///////////////////////////////////
+//FINISHED MOVING THROUGH WAYPOINTS
+
+logStr("Finised Waypoints");
+
+if (bWaitAtLast)
+{
+    int iPoint = GetClosestPoint();
+
+    if (iPoint != iCurrent)
+    {
+        if (char16cmp(sAnim, "null")) //Not equal
+        {                
+            logStr("Animating");
+            //Align            
+            sPad = Char16CatInt(sPadTmp, iCurrent);
+            pPad = propRefFromChar16(sPad);                     
+            chrWalkToPadAndAlign(pChr, propGetPos(pPad), propGetDir(pPad), 800.0f);  
+            waitUntilVMsDone(pChr);            
+            chrPlayAnim(pChr, sAnim, 0.1f, true);
+        }
+    }
+
+    logStr("Waiting For Player At Last Point");
+    while (GetClosestPoint() != iCurrent)
+        waitForGameTime(0.1f);    
+
+    //End Loop
+    chrPlayAnim(pChr, sAnim, 0.1f, false);
+}
+
+waitForGameTime(0.1f);
+removeObjectiveIndicatorFromProp(pChr);
+endInGameCutScene();
+
+if (bDestroy)
+    DeleteSpawnerProp(pSpawn);
+else
+    setAIState(pChr, "AISTATE_BF_STORY");
+    
+if (bTrigger)
+    forceTriggerTriggered(pTrigger);
+
+logStr("Script Has Ended");

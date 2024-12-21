@@ -1,0 +1,75 @@
+// vim: set syntax=c :
+logStr("Script Begins");
+
+propRef pGroup;
+pGroup = propRefFromChar16(getNthVMPropStringVar(me, 0));
+char16 sAnim = getNthVMPropStringVar(me, 1);
+char16 sAnim1 = getNthVMPropStringVar(me, 2);
+char16 sAnim2 = getNthVMPropStringVar(me, 3);
+char16 sAnim3 = getNthVMPropStringVar(me, 4);
+propRef pDistTest;
+pDistTest = propRefFromChar16(getNthVMPropStringVar(me, 9));
+pDistTest = propSpawnerGetNthSpawnedProp(pDistTest, 0);
+
+
+int iNumAnims = 0;
+int iLoopAnim = -1;
+int iDistTestAnim = -1;
+int i = 0;
+
+if (char16cmp(sAnim, "null"))
+    iNumAnims++;
+    
+if (char16cmp(sAnim1, "null"))
+    iNumAnims++;
+
+if (char16cmp(sAnim2, "null"))
+    iNumAnims++;
+
+if (char16cmp(sAnim3, "null"))
+    iNumAnims++;
+
+for (i=5; i<9; i++)
+{
+    char16 sTemp;
+    sTemp = getNthVMPropStringVar(me, i);
+    if (!char16cmp(sTemp, "loop"))
+    {
+        iLoopAnim = i-4;
+        break;
+    }
+    else if (!char16cmp(sTemp, "disttest"))
+    {
+        iDistTestAnim = i-4;
+    }
+}
+
+int iAnim = 1;
+while (iAnim < iNumAnims+1)
+{
+    boolean bLoop = false;
+
+    if (iAnim == iLoopAnim)
+        bLoop = true;
+
+    char16 cAnim;
+    cAnim = getNthVMPropStringVar(me, iAnim);
+
+    if (iAnim == iDistTestAnim)
+    {
+        DistTestGroupAnim(pGroup, pDistTest, cAnim, bLoop, 5.0f);
+    }
+    else
+    {
+        chrPlayAnim(pGroup, cAnim, 0.1f, bLoop);
+
+        while (!AnimComplete(pGroup))
+        {
+            waitForGameTime(0.1f);
+        }
+
+        iAnim++;
+    }    
+}
+
+logStr("Script Has Ended");

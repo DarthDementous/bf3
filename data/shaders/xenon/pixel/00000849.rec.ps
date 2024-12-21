@@ -1,0 +1,24 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      00096002 00001200     	EXEC ADDR(0x2) CNT(0x6) BOOL_ADDR(0x80)
+02: 10004021 1f1ffff8 00004000	      FETCH:	SAMPLE	R4.x___ = R1.xyx CONST(0) ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+03: c8040200 00bebe00 f0000000	   (S)ALU:	DOT3v	R0.__z_ = R0.zxyy, R0.zxyy
+04: c8080200 00b16c00 2100ff00	      ALU:	MULv	R0.___w = C256.yyyy, C511.xxxx
+05: c8040204 016cb11b ab040000	      ALU:	MULADDv	R4.__z_ = -R0.wwww, R4.xxxx, C256.yyyy
+06: 58430004 00b0b0c6 a1830280	      ALU:	MULv	R4.xy__ = abs(R3).xyyy, C258.xyyy
+                          						    	RECIPSQ_IEEE	R0.__z_ = abs(R0).zzzz
+07: a8870003 00c0c002 c0020200	      ALU:	ADDv	R3.xyz_ = R2.xyzz, R2.xyzz
+                          						    	MUL_CONST_0	R0.___w = C256.w, R0.z
+      09506008 00001200     	EXEC ADDR(0x8) CNT(0x6) BOOL_ADDR(0x80)
+08: c8030200 00c7b000 e1000000	      ALU:	MULv	R0.xy__ = R0.wzzz, R0.xyyy
+09: c8030200 00b0c6b0 eb000401	      ALU:	MULADDv	R0.xy__ = R1.xyyy, R0.xyyy, R4.zzzz
+0a: b8281021 1f1ff447 00004000	      FETCH:	SAMPLE	R1._xyz = R1.zwz CONST(2) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+0b: 10381081 1f1ffffb 00004000	      FETCH:	SAMPLE	R1.w___ = R4.xyx CONST(3) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+0c: 10180001 1f1ff688 00004000	      FETCH:	SAMPLE	R0.xyzw = R0.xyx CONST(1) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+0d: c8010201 046c6cb1 8b01ffff	   (S)ALU:	MULADDv	R1.x___ = C511.yyyy, -R1.xxxx, C511.xxxx
+      0000500e 00002200     	EXEC_END ADDR(0xe) CNT(0x5) BOOL_ADDR(0x80)
+0e: c80e0201 00016c00 a1010100	      ALU:	MULv	R1._yzw = R1.yyzw, C257.xxxx
+0f: c80e0201 0001fc00 e1010000	      ALU:	MULv	R1._yzw = R1.yyzw, R0.xxyz
+10: c80e0201 0001fc00 e1010300	      ALU:	MULv	R1._yzw = R1.yyzw, R3.xxyz
+11: 14070200 00156c1b e1010100	      ALU:	MULv	R0.xyz_ = R1.yzww, R1.xxxx
+12: 0c878000 00c06c1b a1000302	      ALU:	MULv	export0.xyz_ = R0.xyzz, C259.xxxx	; COLOR
+                          						    	MUL_PREVs	export0.___w = R2.wwww	; COLOR

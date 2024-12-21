@@ -1,0 +1,14 @@
+
+callback void timerExpiredCallback(void)
+{
+    GamemodeComplete();
+}
+
+callback void gameOverCallback(void)
+{
+    AddHUDMessageForEveryone("Game over man! Game over!");
+}
+
+AllowCallback(CALLBACK_TimerExpired, timerExpiredCallback);
+AllowCallback(CALLBACK_GameHasEnded, gameOverCallback);
+

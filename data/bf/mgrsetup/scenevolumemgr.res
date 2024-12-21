@@ -1,0 +1,4 @@
+SceneVolumeMgrTemplate SceneVolumeMgr
+{
+
+}

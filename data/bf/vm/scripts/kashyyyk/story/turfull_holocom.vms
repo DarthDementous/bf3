@@ -1,0 +1,28 @@
+// vim: set syntax=c :
+logstr("started running Tarful Hologram script");
+
+////////////////////////////////////
+// Script deals with the hologram
+// appearance of Turfull the Wookie
+////////////////////////////////////
+
+propref tarfull    = propSpawn(propRefFromName("bfTarfHolo1"));
+chrref  tarfullChr = chrRefFromPropRef(tarfull);
+
+if(propValid(tarfull))
+    logStr("YES1");
+else
+    logStr("NO1");
+
+setAIState(tarfull, "AISTATE_BF_PATROL");
+beginInGameCutSceneWithFlags(k_vmFlag_ResumeScriptAfterHitReact, tarfull);
+
+//while(1)
+//{
+    waitForGameTime(5.0f);
+//}
+
+endInGameCutScene();
+
+propDelete(tarfull);
+

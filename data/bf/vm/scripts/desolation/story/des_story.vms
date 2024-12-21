@@ -1,0 +1,1380 @@
+// vim: set syntax=c :
+
+///////////////////////////////////
+/*
+    desolation_story.vms
+
+    Created By Leigh Griffiths
+    please do not modify without asking me!
+    or comment where you have modified
+
+*/
+///////////////////////////////////
+
+
+int iObjectiveNum = 0;
+propRef pPlayer = getPlayerPropRefFromID(GetPlayerId());
+boolean bEndLevel = false;
+
+/////////////MAKE SURE TO INCLUDE A BFStorylevelVarProp in your level
+
+//NOTE TRY TO REMOVE AS MANY OF THESE AS POSSIBLE
+propRef sentry1 = propRefFromName( "tSentryGun1_" );
+propRef sentry2 = propRefFromName( "tSentryGun3_" );
+propRef sentry3 = propRefFromName( "tSentryGun4_" );
+propRef sentry4 = propRefFromName( "tSentryGun5_" );
+propRef sentry5 = propRefFromName( "tSentryGun6_" );
+propRef sentry6 = propRefFromName( "tSentryGun7_" );
+
+propRef passenger1 = propRefFromName( "squadmember1" );
+propRef passenger2 = propRefFromName( "squadmember2" );
+propRef passenger3 = propRefFromName( "squadmember3" );
+propRef passenger4 = propRefFromName( "squadmember4" );
+propRef passenger5 = propRefFromName( "squadmember5" );
+propRef passenger6 = propRefFromName( "squadmember6" );
+
+propRef console_grp = propRefFromName( "Spwn-7" );
+
+propRef imp_shuttle = propRefFromName( "imp_shuttle1" );
+
+propRef trib_transp = propRefFromName( "trib_transp1_" );
+
+propRef hangar_group = propRefFromName( "obj1_gp1a_spgp_");
+
+propRef comms_1 = propRefFromName( "dest_console5");
+propRef comms_2 = propRefFromName( "dest_console9");
+propRef comms_3 = propRefFromName( "dest_console10");
+
+propRef TIE_ship_1;
+propRef TIE_ship_2;
+propRef TIE_ship_3;
+propRef TIE_ship_4;
+propRef TIE_ship_5;
+propRef TIE_ship_6;
+propRef TIE_ship_7;
+propRef TIE_ship_8;
+
+propRef flyby_shutt_1;
+propRef flyby_shutt_2;
+propRef flyby_theta_1;
+propRef flyby_theta_2;
+
+propRef xwing_land1;
+
+addPropToGroup(console_grp, propRefFromName( "dest_console1" ) ); 
+addPropToGroup(console_grp, propRefFromName( "dest_console3" ) ); 
+addPropToGroup(console_grp, propRefFromName( "dest_console4" ) ); 
+
+char16 BonusA = StringToChar16("obj_Des9");
+char16 BonusB = StringToChar16("obj_Des10");
+
+int obj9turret1_destroyed = 0;
+int obj9turret2_destroyed = 0;
+int obj9turret3_destroyed = 0;
+int obj9turret4_destroyed = 0;
+int obj9turret5_destroyed = 0;
+int obj9turret6_destroyed = 0;
+
+int comms_1_destroyed = 0;
+int comms_2_destroyed = 0;
+int comms_3_destroyed = 0;
+
+int ActivatedBonusObjectiveA = 0;
+int ActivatedBonusObjectiveB = 0;
+
+boolean HasActivatedStarFighter = false;
+boolean IsInATST = false;
+boolean Skip = false;
+boolean bIonFired = false;
+
+///////////// Include Defaults //////////////////////////////////////////////
+
+//////////////////////////CALLBACK INFO DO NOT CHANGE
+
+//PlayerKilled Callback Info
+boolean bCB_PK = false;
+int iCB_PK_KillerId = -1;
+int iCB_PK_Victim = -1;
+int iCB_PK_Result = -1;
+
+//triggeredProp Callback Info
+boolean bCB_TP = false;
+char16 cCB_TP_Prop = StringToChar16("");
+
+//ObjectiveTimeExpired Callback Info
+boolean bCB_OTE = false;
+char16 cCB_OTE_ObjName = StringToChar16("");
+
+//shipReachedScriptedSplineSegment  Callback Info
+boolean bCB_SRSS = false;
+propRef pCB_SRSS_Ship;
+propRef pCB_SRSS_Spline;
+int iCB_SRSS_Segment = -1;
+
+//////////////////////////END CALLBACK INFO
+
+function void ProcessCallbacks()
+{
+    //No else's as could be waiting to process two or more!
+
+    if (GetLevelVarInt("iCBLV") != -1)
+    {
+        if (bCB_PK) // playerKilled callback
+        {
+            playerKilled(iCB_PK_KillerId, iCB_PK_Result, iCB_PK_Victim);
+            bCB_PK = false;
+        }
+
+        if (bCB_TP) // triggeredProp callback
+        {
+            Trigger(cCB_TP_Prop);
+            bCB_TP = false;
+        }
+
+        // ObjectiveTimeExpired callback
+        if (bCB_OTE)
+        {
+            ObjectiveTimeExpired(cCB_OTE_ObjName);
+            bCB_OTE = false;
+        }
+
+        // shipReachedScriptedSplineSegment callback
+        if (bCB_SRSS)
+        {
+            ShipReachedScriptedSplineSegment(pCB_SRSS_Ship, pCB_SRSS_Spline, iCB_SRSS_Segment);
+            bCB_SRSS = false;
+        }
+
+        SetLevelVarInt("iCBLV", -1);    
+        waitForGameTime(0.1f);
+    }
+}
+
+callback void CB_PlayerKilled(int iKiller, int iResult, int iVictim)
+{
+    logStr("CB_PlayerKilled");
+   /* if (bCB_PK)
+        VMAssertMsg("CB_PlayerKilled - Already Waiting To Do Callback");
+
+    bCB_PK = true;
+    iCB_PK_KillerId = iKiller;
+    iCB_PK_Victim = iVictim;
+    iCB_PK_Result = iResult;
+
+    SetLevelVarInt("iCBLV", 1);    */
+    playerKilled(iKiller, iResult, iVictim);
+}
+
+callback int CB_TriggeredProp(int inType, char16 inTriggerProp, int pId)
+{    
+    logStr("CB_TriggeredProp");    
+    /*if (bCB_TP)
+        VMAssertMsg("CB_TriggeredProp - Already Waiting To Do Callback");
+
+    bCB_TP = true;
+    cCB_TP_Prop = inTriggerProp;
+
+    SetLevelVarInt("iCBLV", 1);    
+*/
+    Trigger(inTriggerProp);
+    return 0;
+}
+
+callback void CB_ObjectiveTimeExpired(char16 objName)
+{
+    logStr("CB_ObjectiveTimeExpired");        
+  /*  if (bCB_OTE)
+        VMAssertMsg("CB_ObjectiveTimeExpired - Already Waiting To Do Callback");
+
+    bCB_OTE = true;
+    cCB_OTE_ObjName = objName;
+
+    SetLevelVarInt("iCBLV", 1); */
+    ObjectiveTimeExpired(objName);
+}
+
+callback void CB_shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    logStr("CB_shipReachedScriptedSplineSegment");            
+  /*  if (bCB_SRSS)
+        VMAssertMsg("CB_shipReachedScriptedSplineSegment - Already Waiting To Do Callback");
+    
+    bCB_SRSS = true;
+    pCB_SRSS_Ship = ship;
+    pCB_SRSS_Spline = spline;
+    iCB_SRSS_Segment = segment;
+
+    SetLevelVarInt("iCBLV", 1);*/
+    ShipReachedScriptedSplineSegment(ship, spline, segment);
+
+}
+
+
+callback void ionCannonFired(char16 ionCannon)
+{
+    {
+	if(!bIonFired)
+	{
+	    propSetCanBeActivated(propRefFromName( "space2ground1" ), false);
+	    JumpToObjective(7, true);
+	}
+	bIonFired = true;
+
+    }
+}
+
+AllowCallback(CALLBACK_PlayerKilledBF, CB_playerKilled);
+AllowCallback(CALLBACK_TriggeredProp, CB_triggeredProp);
+AllowCallback(CALLBACK_ObjectiveTimeExpired, CB_ObjectiveTimeExpired);
+AllowCallback(CALLBACK_ShipReachedScriptedSplineSegment, CB_shipReachedScriptedSplineSegment);
+AllowCallback(CALLBACK_IonCannonFired, ionCannonFired); //TODO: Special case Add
+
+//////////////////////////END CALLBACKS
+
+
+function void Trigger(char16 inTriggerProp) //Used so can be called elsewhere in script (cant call a callback)
+{    
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iActive = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	iActive = BFObjectiveGetNumForNthActive(i);
+	int iResult = lib_triggeredProp(inTriggerProp, iActive);
+	iResult = ObjectiveTriggerTests(iActive, inTriggerProp, iResult);
+	if (iResult >= 1) nextObjective(iActive);
+    }
+}
+
+
+function void playerKilled(int victimId, int killerId, int iOppTeam)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iActive = BFObjectiveGetNumForNthActive(i);
+	if (lib_playerKilled(victimId, killerId, iOppTeam, iActive)) 
+	{
+	    nextObjective(iActive);
+	}
+    }
+}
+
+function void ObjectiveSetupCheck()
+{
+    int iTempObj = GetLevelVarInt("iObjLV");
+    
+    if (iTempObj != -1)
+    {
+        char16 cName = BFObjectiveGetName(iTempObj);
+        if (ObjectiveSetup(cName, iTempObj, BFObjectiveGetSub(iTempObj)))
+            SetLevelVarInt("iObjLV", -1);
+
+        waitForGameTime(0.1f);        
+    }
+}
+
+function void SetObjectiveSetup(int iObj)
+{
+    logStr("SetObjectiveSetup Called");
+    logInt(iObj);
+    SetLevelVarInt("iObjLV", iObj);
+}
+
+function void nextObjective(int inObjNum) 
+{    
+    int result = lib_nextObjective(inObjNum);
+
+    if(result == 1)
+    {
+        //if next objective returns 1 it has updated a core objective and automatically moved us onto the next
+        //so do objective setup with current objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(BFObjectiveGetCurrent());
+        }
+    }
+
+    if(result == 2)
+    {
+        //if nextobjective returns 2 it has updated a bonus objective so we will want to 
+        //objective setup with the objective we passed to next objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(inObjNum);
+        }
+    }
+}
+
+
+function void JumpToObjective(int iStartObj, boolean bTeleport)
+{       
+	BFObjectiveSetJumpTo(iStartObj);	
+    nextObjective(BFObjectiveGetCurrent());
+    
+    if (bTeleport)
+    {
+        char16 tSpawn;
+        tSpawn = LevelVarToChar16("mCurrentSpawner");
+        if (propExists(propRefFromChar16(tSpawn)))
+            propTeleportToProp(pPlayer, propRefFromChar16(tSpawn));        
+    }
+    
+    logStr("Jumped To Objective");
+    logInt(BFObjectiveGetCurrent());
+}
+
+// stuff to test for wookiees released from cells (button presses)
+
+function int ObjectiveTriggerTests(int iObjective, char16 inTriggerProp, int iResult) 
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);       
+
+    if (iObjective == 3)
+    {
+        if (iSubObjective == 2)
+        {
+            if (!char16cmp(inTriggerProp, "vmTrig3_2"))
+            {
+		ActivateSpawner("cell_1_grp_"); // spawn cell 1 NME wave
+	        setAIState(propRefFromName("wook_slave_24"), "AISTATE_BF_STORY");
+	        setAIState(propRefFromName("wookiee_1a"), "AISTATE_BF_STORY");
+		SetPropRefAttackable( chrRefFromName("c_slave_8"), true);
+		SetPropRefAttackable( chrRefFromName("c_slave_9"), true);
+		removeObjectiveIndicatorFromProp(propRefFromName("vmTrig3_2"));
+            } 
+
+            if (!char16cmp(inTriggerProp, "vmTrig3_2-c1"))
+            {
+                ActivateSpawner("cell_2_grp_"); // spawn cell 2 NME wave
+	        setAIState(propRefFromName("wook_slave_36"), "AISTATE_BF_STORY");
+		SetPropRefAttackable( chrRefFromName("c_slave_7"), true);
+                removeObjectiveIndicatorFromProp(propRefFromName("vmTrig3_2-c1"));
+            } 
+
+            if (!char16cmp(inTriggerProp, "vmTrig3_2-c2"))
+            {
+		ActivateSpawner("cell_infspwn_g"); // start infinite spawners here
+                ActivateSpawner("cell_3_grp_"); // spawn cell 3 NME wave
+	        setAIState(propRefFromName("wook_slave_35"), "AISTATE_BF_STORY");
+	        setAIState(propRefFromName("wookiee_3a"), "AISTATE_BF_STORY");
+		SetPropRefAttackable( chrRefFromName("c_slave_5"), true);
+		SetPropRefAttackable(  chrRefFromName("c_slave_6"), true);
+                removeObjectiveIndicatorFromProp(propRefFromName("vmTrig3_2-c2"));
+            } 
+
+            if (!char16cmp(inTriggerProp, "vmTrig3_2-c3"))
+            {
+                ActivateSpawner("cell_4_grp_"); // spawn cell 4 NME wave
+	        setAIState(propRefFromName("wook_slave_32"), "AISTATE_BF_STORY");
+		SetPropRefAttackable( chrRefFromName("c_slave_4"), true);
+                removeObjectiveIndicatorFromProp(propRefFromName("vmTrig3_2-c3"));                
+            } 
+
+            if (!char16cmp(inTriggerProp, "vmTrig3_2-c4"))
+            {
+                ActivateSpawner("cell_5_grp_"); // spawn cell 5 NME wave
+	        setAIState(propRefFromName("wookiee_5"), "AISTATE_BF_STORY");
+		SetPropRefAttackable( chrRefFromName("c_slave_3"), true);
+                removeObjectiveIndicatorFromProp(propRefFromName("vmTrig3_2-c4"));                
+            } 
+
+            if (!char16cmp(inTriggerProp, "vmTrig3_2-c5"))
+            {
+		setAIState(propRefFromName("wookiee_6"), "AISTATE_BF_STORY");
+	        setAIState(propRefFromName("wookiee_6a"), "AISTATE_BF_STORY");
+		SetPropRefAttackable( chrRefFromName("c_slave_1"), true);
+		SetPropRefAttackable( chrRefFromName("c_slave_2"), true);
+	        removeObjectiveIndicatorFromProp(propRefFromName("vmTrig3_2-c5"));
+                ActivateSpawner("cell_6_grp_"); // spawn cell 6 NME wave
+            } 
+        }
+    }
+    return iResult;
+}
+
+function void ObjectiveTimeExpired(char16 objName)
+{   
+    int objNum = 0;
+    objNum = BFObjectiveGetNumber(objName);   
+    if (lib_ObjTimeExpired(objNum))
+    {
+	nextObjective(objNum);
+    }
+}
+
+///// Ship following scripted spline callbacks (mainly for deleting them) /////
+
+function void shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    // Delete TIE fighters at the end(ish) of the spline
+    if (spline ==  propRefFromName("TIE_spline_1"))
+    {
+	if (segment == 5)
+	{
+	    propDelete(TIE_ship_1);
+	}
+    }
+    
+    if (spline ==  propRefFromName("TIE_spline_2"))
+    {
+	if (segment == 5)
+	{
+	    propDelete(TIE_ship_2);
+	}
+    }
+    
+    if (spline ==  propRefFromName("TIE_spline_3"))
+    {
+	if (segment == 3)
+	{
+	    propDelete(TIE_ship_3);
+	}
+    }
+    
+    if (spline ==  propRefFromName("TIE_spline_4"))
+    {
+	if (segment == 3)
+	{
+	    propDelete(TIE_ship_4);
+	}
+    }
+
+    if (spline ==  propRefFromName("TIE_spline_5"))
+    {
+	if (segment == 4)
+	{
+	    propDelete(TIE_ship_5);
+	}
+    }
+    
+    if (spline ==  propRefFromName("TIE_spline_6"))
+    {
+	if (segment == 3)
+	{
+	    propDelete(TIE_ship_6);
+	}
+    }
+    
+    if (spline ==  propRefFromName("TIE_spline_7"))
+    {
+	if (segment == 3)
+	{
+	    propDelete(TIE_ship_7);
+	}
+    }
+
+    if (spline ==  propRefFromName("TIE_spline_8"))
+    {
+	if (segment == 3)
+	{
+	    propDelete(TIE_ship_8);
+	}
+    }
+
+      
+    if (spline ==  propRefFromName("flyby_spline_1"))
+    {
+	if (segment == 3)
+	{
+	    propDelete(flyby_shutt_1);
+	}
+    }
+
+    if (spline ==  propRefFromName("flyby_spline_2"))
+    {
+	if (segment == 3)
+	{
+	    propDelete(flyby_theta_1);
+	}
+    }
+    
+    if (spline ==  propRefFromName("flyby_spline_3"))
+    {
+	if (segment == 3)
+	{
+	    propDelete(flyby_theta_2);
+	}
+    }
+
+
+}
+
+
+function void ObjectiveTests(int iObjective) 
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+    if (!HasActivatedStarFighter)
+    {
+	if (IsPlayerInVehicle("STR_VEHICLE_NAME_TIE_FIGHTER")) //player in TIE fighter, goto next objective
+	{
+	    HasActivatedStarFighter = true;
+	    nextObjective(iObjective);
+	}
+    }
+
+    if (!IsInATST)
+    {
+	if (IsPlayerInVehicle("STR_VEHICLE_NAME_IMP_ATST")) //player in ATST so spawn heavy weapons dudes
+	{
+	    IsInATST = true;
+	    spawnGroupSetActive(propRefFromName("shock_trp_grp"), true);
+
+	}
+    }
+
+
+// bonus objective setup
+
+    if ((iObjective == 6) && (!ActivatedBonusObjectiveA))
+    {	    
+	ActivatedBonusObjectiveA = 1;
+	ObjectiveSetup(BonusA, 9, 0);
+    }
+    else if (iObjective == 9)
+    {
+	if (!obj9turret1_destroyed && !propValid(sentry1))
+	{
+	    obj9turret1_destroyed = 1;
+	}
+	else if (!obj9turret2_destroyed && !propValid(sentry2))
+	{
+	    obj9turret2_destroyed = 1;
+	}
+	else if (!obj9turret3_destroyed && !propValid(sentry3))
+	{
+	    obj9turret3_destroyed = 1;
+	}
+	else if (!obj9turret4_destroyed && !propValid(sentry4))
+	{
+	    obj9turret4_destroyed = 1;
+	}
+	else if (!obj9turret5_destroyed && !propValid(sentry5))
+	{
+	    obj9turret5_destroyed = 1;
+	}
+	else if (!obj9turret6_destroyed && !propValid(sentry6))
+	{
+	    obj9turret6_destroyed = 1;
+	}
+	else if (obj9turret1_destroyed && obj9turret2_destroyed && obj9turret3_destroyed && obj9turret4_destroyed 
+		&& obj9turret5_destroyed && obj9turret6_destroyed)
+	{ 
+	    nextObjective(iObjective);
+	}
+    }
+    
+        if ((iObjective == 1) && (!ActivatedBonusObjectiveB))
+	{
+	ActivatedBonusObjectiveB = 1;
+	ObjectiveSetup(BonusB, 10, 0);
+	}
+	else if (iObjective == 10)
+	{
+	    if (!comms_1_destroyed && !propValid(comms_1))
+	    {
+	    comms_1_destroyed = 1;
+	    }
+	    else if (!comms_2_destroyed && !propValid(comms_2))
+	    {
+	    comms_2_destroyed = 1;
+	    }
+	    else if (!comms_3_destroyed && !propValid(comms_3))
+	    {
+	    comms_3_destroyed = 1;
+	    }
+	    else if (comms_1_destroyed && comms_2_destroyed && comms_3_destroyed)
+	    { 
+	    nextObjective(iObjective);
+	    }
+	}
+}
+
+/* NOT NEEDED
+callback void playerSpawned(char16 teamName, int playerId)
+{
+    propRef p = getPlayerPropRefFromID(playerId);    
+}
+
+callback void finiteSpawnerComplete(char16 propId) 
+{
+
+}
+
+
+callback void gameHasStarted()
+{           
+    
+}
+*/
+
+/////// Defaults END /////////////////////////////////////////////
+
+
+function void ScriptHasStarted()
+{
+
+    ionCannonSetRandomFiringEnabled( propRefFromName( "space2ground1" ), false);
+
+    //SetLevelVarsBFStory("obj_Des", "vmTrig");
+    SetBFStoryPrefixes("obj_Des", "vmTrig");
+
+    ResetObjectives("mObjTmp", 10);
+
+
+	  
+    //Reset Space CPs, Spawners, etc
+
+
+BFPropSetTeamNum(sentry1, -1);
+BFPropSetTeamNum(sentry2, -1);
+BFPropSetTeamNum(sentry3, -1);
+BFPropSetTeamNum(sentry4, -1);
+BFPropSetTeamNum(sentry5, -1);
+BFPropSetTeamNum(sentry6, -1);
+
+
+SetPropRefInvincible(propRefFromName("tSentryGun1_"), true);
+SetPropRefInvincible(propRefFromName("tSentryGun3_"), true);
+SetPropRefInvincible(propRefFromName("tSentryGun4_"), true);
+SetPropRefInvincible(propRefFromName("tSentryGun5_"), true);
+SetPropRefInvincible(propRefFromName("tSentryGun6_"), true);
+SetPropRefInvincible(propRefFromName("tSentryGun7_"), true);
+
+SetPropRefInvincible(propRefFromName("dest_console1"), true);
+SetPropRefInvincible(propRefFromName("dest_console3"), true);
+SetPropRefInvincible(propRefFromName("dest_console4"), true);
+
+SetPropRefInvincible(propRefFromName("trib_transp1_"), true);
+
+SetPropRefInvincible(propRefFromName("imp_shuttle1"), true);
+
+
+JumpToObjective(1, true);
+}
+
+
+//function void ObjectiveTests() 
+//{
+//Do some tests
+//}
+
+/* 
+
+placeholder talking head chars I am using:
+
+characters/soldiers/reb/rebelsoldierbasic
+
+characters/heroes/kotavahs/kotavahs
+
+characters/villains/imperial_officer
+
+characters/villains/captain_botha/captain_botha
+
+*/
+
+
+
+/////////////////////////////////////////OBJECTIVES
+
+function boolean ObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{
+    if (iObjective == 1) // objective 1: secure hangar & area
+    {
+
+	if (iSubObjective == 1)
+	{
+  	  propRef player = getPlayerPropRefFromID(GetPlayerId());
+	  BFEnableSwitchSeats(imp_shuttle, false); // when shuttle is fixed, use this to stop player jumping seats
+
+	  BFShipFollowScriptedSplineNoAvoidance(TIE_ship_1 ,  propRefFromName("TIE_spline_1") );
+	  BFShipFollowScriptedSplineNoAvoidance(TIE_ship_2 ,  propRefFromName("TIE_spline_2") );
+	  BFShipFollowScriptedSplineNoAvoidance(TIE_ship_5 ,  propRefFromName("TIE_spline_5") );
+	  BFShipFollowScriptedSplineNoAvoidance(TIE_ship_6 ,  propRefFromName("TIE_spline_6") );
+	  BFShipFollowScriptedSplineNoAvoidance(TIE_ship_7 ,  propRefFromName("TIE_spline_7") );
+	  BFShipFollowScriptedSplineNoAvoidance(TIE_ship_8 ,  propRefFromName("TIE_spline_8") );
+
+	  BFShipFollowScriptedSplineNoAvoidance(flyby_shutt_1 , propRefFromName("flyby_spline_1") );
+	  BFShipFollowScriptedSplineNoAvoidance(flyby_theta_1 , propRefFromName("flyby_spline_1") );
+	  BFShipFollowScriptedSplineNoAvoidance(flyby_theta_2 , propRefFromName("flyby_spline_1") );
+  
+//	  activatespawner("wook_slave_11"); // wookiee slave/worker idler 1
+//	  activatespawner("wook_slave_31"); // wookiee slave/worker idler 2
+//	  activatespawner("wook_slave_33"); // wookiee slave/worker idler 3
+//	  activatespawner("wook_slave_21"); // wookiee slave/worker idler 4
+//	  activatespawner("wook_slave_13"); // wookiee slave/worker idler 5
+//	  activatespawner("wook_slave_22"); // wookiee slave/worker idler 6
+//	  activatespawner("wook_slave_15"); // wookiee slave/worker idler 7	  
+//	  activatespawner("wook_slave_34"); // wookiee slave/worker idler 8
+//	  activatespawner("wook_slave_12"); // wookiee slave/worker idler 9
+//	  activatespawner("wook_slave_23"); // wookiee slave/worker idler 10
+
+	  ActivateSpawner("slaves_grp");
+	  
+	  ActivateSpawner("wook_slave_32"); // Wookiee slave in cell 
+          ActivateSpawner("wookiee_5"); // Wookiee slave in cell
+	  ActivateSpawner("wookiee_6"); // Wookiee slave in cell
+          ActivateSpawner("wookiee_6a"); // Wookiee slave in cell
+	  ActivateSpawner("wook_slave_35"); // Wookiee slave in cell
+	  ActivateSpawner("wookiee_3a"); // Wookiee slave in cell
+	  ActivateSpawner("wook_slave_36"); // Wookiee slave in cell
+	  ActivateSpawner("wook_slave_24"); // Wookiee slave in cell
+	  ActivateSpawner("wookiee_1a"); // Wookiee slave in cell
+	  
+	  ActivateSpawner("obj1_gp1a_spgp_"); // activate trooper parade group
+	  
+	  DriveVehicleBF(player, imp_shuttle, true);
+
+	  PassengerVehicleBF(passenger1, imp_shuttle, true);
+	  PassengerVehicleBF(passenger2, imp_shuttle, true);
+	  PassengerVehicleBF(passenger3, imp_shuttle, true);
+	  PassengerVehicleBF(passenger4, imp_shuttle, true);
+	  PassengerVehicleBF(passenger5, imp_shuttle, true);
+	  PassengerVehicleBF(passenger6, imp_shuttle, true);
+	  addNewObjectiveIndicatorToProp(propRefFromName("vmTrig1_1"), k_objectiveIndicatorType_mainObjective);
+	  
+	  activateTalkingHeadNew("DesKota03", true); // Ever since the Death Star's main...
+	  activateTalkingHeadNew("DesKota04", true); // Desolation Station is where...
+//	  activateTalkingHeadNew("DesKota05", true); // This is hardly a final solution...
+	  activateTalkingHeadNew("DesKota06", true); // Our timing appears a little off...
+//	  activateTalkingHeadNew("DesKota07", true); // This will complicate things...
+	  activateTalkingHeadNew("DesKota08", true); // You will need to locate the controls...
+	  activateTalkingHeadNew("DesImpOff01", true); //Shuttle Talyn, standby for verification...
+//	  chrSpeak(player, "l05b_010_impcomms", 0, 0.0f, 45.0f, player, true, false);
+	  activateTalkingHeadNew("DesImpOff02", true); // Your codes check out. You are cleared to land...
+//	  chrSpeak(player, "l05b_020_impcomms", 0, 0.0f, 45.0f, player, true, false);
+  	  
+	  SetObjectiveTriggered(true, iObjective); // landed in hangar and exited shuttle
+	}
+
+	else if (iSubObjective == 2)
+        {
+	  lib_SetupTeamZone(cObjectiveName, 0, "e_hang_reb_h", "e_hang_t", k_objtype_clear_area);
+	  lib_SetupTeamZone(cObjectiveName, 1, "e_hang_h", "e_hang_t", k_objtype_hold_area);
+
+	  SetPropRefInvincible( passenger1, true);
+	  SetPropRefInvincible( passenger2, true);
+	  SetPropRefInvincible( passenger3, true);
+
+	  activateTalkingHeadNew("DesImpOff03", true); // What the... its a rebel incursion!
+	  
+	  setAIState(hangar_group, "AISTATE_BF_STORY");
+
+	  activateTalkingHeadNew("DesReb02", true); // Our cover is blown! Stormtroopers...
+	  activateTalkingHeadNew("DesReb03", true); // If you can destroy those three...
+
+	  propSetCanBeActivated(imp_shuttle, false);
+	  
+	  SetObjectiveTimer(15, iObjective);
+        }
+	
+	else if (iSubObjective == 3)
+	{
+	      	   
+	  SetPropRefAttackable( propRefFromName( "wook_slave_11" ), false);  // should prevent NMEs attacking the Wookiee idlers
+	  SetPropRefAttackable( propRefFromName( "wook_slave_31" ), false);
+	  SetPropRefAttackable( propRefFromName( "wook_slave_33" ), false);
+	  SetPropRefAttackable( propRefFromName( "wook_slave_21" ), false);
+	  SetPropRefAttackable( propRefFromName( "wook_slave_13" ), false);
+	  SetPropRefAttackable( propRefFromName( "wook_slave_22" ), false);
+	  SetPropRefAttackable( propRefFromName( "wook_slave_15" ), false);
+	  SetPropRefAttackable( propRefFromName( "wook_slave_34" ), false);
+	  SetPropRefAttackable( propRefFromName( "wook_slave_12" ), false);
+	  SetPropRefAttackable( propRefFromName( "wook_slave_23" ), false);
+
+	  TIE_ship_3 = SpawnAIVehicle(propRefFromName("dofProp_7"), "imp_eng_snpc", "tie_fighter", 5, false, k_seatPos_driver);
+	  TIE_ship_4 = SpawnAIVehicle(propRefFromName("dofProp_8"), "imp_eng_snpc", "tie_fighter", 5, false, k_seatPos_driver);
+	
+	  BFShipFollowScriptedSplineNoAvoidance(TIE_ship_3 , propRefFromName("TIE_spline_3") );
+	  BFShipFollowScriptedSplineNoAvoidance(TIE_ship_4 , propRefFromName("TIE_spline_4") );
+	  	    
+//	  BFNPCGroupObjectiveSetType(cObjectiveName, "shock_trp_grp",  k_objtype_attack_prop);
+//	  BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "shock_trp_grp",propRefFromName("imp_atst2"), 40, 10);
+	  
+	  setVMPropActive(propRefFromName("vmProp1") ,true);
+	  removeObjectiveIndicatorFromProp(propRefFromName("vmTrig1_1"));
+	  addNewObjectiveIndicatorToProp(propRefFromName("ObIndicator_1"), k_objectiveIndicatorType_mainObjective);
+	  
+	  BFObjectiveAddBonus(BonusB, 10);
+
+	  addNewObjectiveIndicatorToProp(propRefFromName("dest_console5"), k_objectiveIndicatorType_bonusObjective);
+	  addNewObjectiveIndicatorToProp(propRefFromName("dest_console9"), k_objectiveIndicatorType_bonusObjective);
+	  addNewObjectiveIndicatorToProp(propRefFromName("dest_console10"), k_objectiveIndicatorType_bonusObjective);
+
+	  SetObjectiveTriggered(true, iObjective); // in vmtrig box approaching interesting corridor
+	}
+	
+	else if (iSubObjective == 4)
+	{
+	  ActivateSpawner("Spwn-1_4"); // spawn interesting corridor NMEs
+//	  lib_SetupTeamZone(cObjectiveName, 0, "int_crrdr_h", "int_crrdr_t", k_objtype_clear_area);
+//	  lib_SetupTeamZone(cObjectiveName, 1, "int_crrdr_h", "int_crrdr_t", k_objtype_hold_area);
+	  lib_SetupTeamZone(cObjectiveName, 0, "int_crrdr_h", "", k_objtype_clear_area);
+	  lib_SetupTeamZone(cObjectiveName, 1, "int_crrdr_h", "", k_objtype_hold_area);
+	  chrAIJoinGroup( passenger1, "player" );
+	  chrAIJoinGroup( passenger2, "player" );
+	  chrAIJoinGroup( passenger3, "player" );
+
+	  SetObjectiveKillSpawners(1, iObjective); // should trigger complete when spawn group Spwn-1_4 are all dead
+	}
+
+	else // this is done before any of the sub-objectives
+	{
+	  SetNumSubObjectives(4, iObjective);
+
+	  BFAddFlyingAIPatrolZone(vector(-302.129f, 1178.449f, 272.3429f),400.0f);
+
+	  TIE_ship_1 = SpawnAIVehicle(propRefFromName("dofProp_2"), "imp_eng_snpc", "tie_fighter", 5, false, k_seatPos_driver);
+	  TIE_ship_2 = SpawnAIVehicle(propRefFromName("dofProp_4"), "imp_eng_snpc", "tie_fighter", 5, false, k_seatPos_driver);
+	  TIE_ship_5 = SpawnAIVehicle(propRefFromName("dofProp_6"), "imp_eng_snpc", "tie_fighter", 5, false, k_seatPos_driver);
+	  TIE_ship_6 = SpawnAIVehicle(propRefFromName("dofProp_10"), "imp_eng_snpc", "tie_fighter", 5, false, k_seatPos_driver);
+	  TIE_ship_7 = SpawnAIVehicle(propRefFromName("dofProp_12"), "imp_eng_snpc", "tie_fighter", 5, false, k_seatPos_driver);
+	  TIE_ship_8 = SpawnAIVehicle(propRefFromName("dofProp_13"), "imp_eng_snpc", "tie_fighter", 5, false, k_seatPos_driver);
+	  
+// These lines below commented out TEMPORARILY until bug fix for embedded drivers comes through	  
+	  
+//	  flyby_theta_1 = SpawnAIVehicle(propRefFromName("dofProp_5"), "imp_eng_snpc", "thetabarge_dummy", 5, false, k_seatPos_driver);
+//	  flyby_theta_2 = SpawnAIVehicle(propRefFromName("dofProp_9"), "imp_eng_snpc", "thetabarge_dummy", 5, false, k_seatPos_driver);
+//	  flyby_shutt_1 = SpawnAIVehicle(propRefFromName("dofProp_3"), "imp_eng_snpc", "imp_shuttle", 5, false, k_seatPos_driver);
+	  	  
+	  setAISpawnState(hangar_group, "AISTATE_BF_PATROL", true);
+	      
+ 	  BFPropSetTeamNum(imp_shuttle, 0);
+
+	  passenger1 = SpawnPropFromTemplate("reb_sol_snpc", propRefFromName("rebsol_DOF1"), vector(0, 0, 0));
+	  passenger2 = SpawnPropFromTemplate("reb_sol_snpc", propRefFromName("rebsol_DOF2"), vector(0, 0, 0));
+	  passenger3 = SpawnPropFromTemplate("reb_sol_snpc", propRefFromName("rebsol_DOF3"), vector(0, 0, 0));
+	  passenger4 = SpawnPropFromTemplate("reb_sol_snpc", propRefFromName("rebsol_DOF4"), vector(0, 0, 0));
+	  passenger5 = SpawnPropFromTemplate("reb_sol_snpc", propRefFromName("rebsol_DOF5"), vector(0, 0, 0));
+	  passenger6 = SpawnPropFromTemplate("reb_sol_snpc", propRefFromName("rebsol_DOF6"), vector(0, 0, 0));
+	  
+	  propSetVisible(0, propRefFromName("reb_xwing1"));
+	  propSetVisible(0, propRefFromName("reb_xwing3"));
+	  propSetVisible(0, propRefFromName("reb_xwing4"));
+	  
+	  SetObjectiveTimer(1, iObjective);
+	}
+    } 
+
+    else if (iObjective == 2) // objective 2: gain control of security centre
+    { 
+
+        if (iSubObjective == 1) // objective 2.1 from this point (clear the factory)
+        {
+//	  lib_SetupTeamZone(cObjectiveName, 0, "factory_h_1", "factory_t_1", k_objtype_clear_area);
+//	  lib_SetupTeamZone(cObjectiveName, 1, "factory_h_1", "factory_t_1", k_objtype_hold_area);
+	  lib_SetupTeamZone(cObjectiveName, 0, "factory_h_1", "", k_objtype_clear_area);
+	  lib_SetupTeamZone(cObjectiveName, 1, "factory_h_1", "", k_objtype_hold_area);
+	  ActivateSpawner("obj2_1_g_spgp_"); // spawn NMEs in factory
+	  ActivateSpawner("obj2_1_g2_spgp_"); // ditto above
+	  SetObjectiveTriggered(true, iObjective); // vmtrig halfway through factory
+        }
+
+	else if (iSubObjective == 2)
+        {
+	  removeObjectiveIndicatorFromProp(propRefFromName("vmTrig2_1"));
+	  addNewObjectiveIndicatorToProp(propRefFromName("obIndicator_2"), k_objectiveIndicatorType_mainObjective);
+          ActivateSpawner("obj2_1_g3_spgp_"); // spawn NMEs in east hamster tube
+//	  lib_SetupTeamZone(cObjectiveName, 0, "e_hamtube_h", "e_hamtube_t", k_objtype_clear_area);
+//	  lib_SetupTeamZone(cObjectiveName, 1, "e_hamtube_h", "e_hamtube_t", k_objtype_hold_area);
+	  lib_SetupTeamZone(cObjectiveName, 0, "e_hamtube_h", "", k_objtype_clear_area);
+	  lib_SetupTeamZone(cObjectiveName, 1, "e_hamtube_h", "", k_objtype_clear_area);
+	  SetObjectiveTriggered(true, iObjective); // vmtrig at factory entrance to east hamster tube
+        }
+
+	else if (iSubObjective == 3) // objective 2.2 from this point (get through drill chamber)
+        {
+	  SetObjectiveTriggered(true, iObjective); // vmtrig a third of the way into east hamster tube from factory
+	}
+
+	else if (iSubObjective == 4)
+        {
+	  ActivateSpawner("obj2_2_g1_spgp_"); // spawn NMEs to run into hamster tube from drill
+	  SetObjectiveTriggered(true, iObjective); // vmtrig two thirds of the way into east hamster tube from factory
+        }
+
+	else if (iSubObjective == 5)
+        {
+	  ActivateSpawner("obj2_2_g2_spgp_"); // spawn 2nd wave of NMEs to run into hamster tube from drill
+	  SetObjectiveTriggered(true, iObjective); // vmtrig approaching end of east hamster tube
+	  activateTalkingHeadNew("DesKota02", false); // Intel from out Bothan spies...
+	}
+
+	else if (iSubObjective == 6)
+        {
+//	  lib_SetupTeamZone(cObjectiveName, 0, "drill_gnd_h", "drill_gnd_t", k_objtype_clear_area);
+//	  lib_SetupTeamZone(cObjectiveName, 1, "drill_gnd_h", "drill_gnd_t", k_objtype_hold_area);
+	  lib_SetupTeamZone(cObjectiveName, 0, "drill_gnd_h", "", k_objtype_clear_area);
+	  lib_SetupTeamZone(cObjectiveName, 1, "drill_gnd_h", "", k_objtype_hold_area);
+	  SetObjectiveTriggered(true, iObjective);
+	}
+
+	else if (iSubObjective == 7)
+        {
+	  ActivateSpawner("obj2_2_g3_spgp_"); // spawn entry level drill chamber NMEs
+	  removeObjectiveIndicatorFromProp(propRefFromName("obIndicator_2"));
+	  addNewObjectiveIndicatorToProp(propRefFromName("vmTrig2_11"), k_objectiveIndicatorType_mainObjective);
+	  SetObjectiveTriggered(true, iObjective);
+	}
+
+	else if (iSubObjective == 8)
+        {
+	  SetObjectiveTriggered(true, iObjective); // player on mid level so move onto next waves
+	}
+
+	else if (iSubObjective == 9)
+        {
+	  ActivateSpawner("obj2_2_g4_spgp_"); // wake up basement level drill chamber NMEs
+	  lib_SetupTeamZone(cObjectiveName, 0, "drill_gnd_t", "drill_gnd_h", k_objtype_clear_area);
+	  lib_SetupTeamZone(cObjectiveName, 1, "drill_basement_h", "drill_basement_t", k_objtype_hold_area);
+	  SetObjectiveTriggered(true, iObjective);
+	}
+
+	else if (iSubObjective == 10)
+        {
+	  ActivateSpawner("obj2_2_g5_spgp_"); // spawn top level drill chamber & lower hamster tube NMEs
+	  SetObjectiveTriggered(true, iObjective); // player on top level so move onto next waves 
+	}
+
+	else if (iSubObjective == 11)
+        {
+//	  lib_SetupTeamZone(cObjectiveName, 0, "drill_2ndflr_h", "drill_2ndflr_t", k_objtype_clear_area);
+//	  lib_SetupTeamZone(cObjectiveName, 1, "drill_2ndflr_h", "drill_2ndflr_t", k_objtype_hold_area);
+	  lib_SetupTeamZone(cObjectiveName, 0, "drill_2ndflr_h", "", k_objtype_clear_area);
+	  lib_SetupTeamZone(cObjectiveName, 1, "drill_2ndflr_h", "", k_objtype_hold_area);
+	  ActivateSpawner("obj2_2_g6_spgp_"); // spawn more drill chamber & upper hamster tube NMEs
+	  SetObjectiveTriggered(true, iObjective); // player pressed button to unlock doors to underground cells
+	}
+
+    	else 
+	{
+	  BFObjectiveRemoveBonus(BonusB, 10);
+	  removeObjectiveIndicatorFromProp(propRefFromName("dest_console5"));
+	  removeObjectiveIndicatorFromProp(propRefFromName("dest_console9"));
+	  removeObjectiveIndicatorFromProp(propRefFromName("dest_console10"));
+          SetNumSubObjectives(11, iObjective);
+	  forceTriggerTriggered( propRefFromName( "door_trigger" ) );
+	  removeObjectiveIndicatorFromProp(propRefFromName("ObIndicator_1"));
+	  addNewObjectiveIndicatorToProp(propRefFromName("vmTrig2_1"), k_objectiveIndicatorType_mainObjective);
+//	  lib_SetupTeamZone(cObjectiveName, 0, "factory_h_1", "factory_t_1", k_objtype_clear_area);
+//	  lib_SetupTeamZone(cObjectiveName, 1, "factory_h_1", "factory_t_1", k_objtype_hold_area);
+	  lib_SetupTeamZone(cObjectiveName, 0, "factory_h_1", "", k_objtype_clear_area);
+	  lib_SetupTeamZone(cObjectiveName, 1, "factory_h_1", "", k_objtype_hold_area);
+	  SetObjectiveTriggered(true, iObjective);
+	  activateTalkingHeadNew("DesKota01", true); // Security is as tight as expected...
+	  
+	}
+    }   
+
+    else if (iObjective == 3) // Free captive Wookiees in underground cells
+    { 
+        
+	if (iSubObjective == 1)
+	{
+//	  lib_SetupTeamZone(cObjectiveName, 0, "cells_h", "cells_t", k_objtype_clear_area);
+//	  lib_SetupTeamZone(cObjectiveName, 1, "cells_h", "cells_t", k_objtype_hold_area);
+	  lib_SetupTeamZone(cObjectiveName, 0, "cells_h", "", k_objtype_clear_area);
+	  lib_SetupTeamZone(cObjectiveName, 1, "cells_h", "", k_objtype_hold_area);
+	  ActivateSpawner("obj3_g1_spgp_"); // spawn underground cells NME guards
+	  SetObjectiveTriggered(true, iObjective); // entered cells so move onto first cell to be "opened"
+        }
+
+	else if (iSubObjective == 2)
+	{  
+//	  lib_SetupTeamZone(cObjectiveName, 0, "cells_h", "cells_t", k_objtype_clear_area);
+//	  lib_SetupTeamZone(cObjectiveName, 1, "cells_h", "cells_t", k_objtype_hold_area);
+	  lib_SetupTeamZone(cObjectiveName, 0, "cells_h", "", k_objtype_clear_area);
+	  lib_SetupTeamZone(cObjectiveName, 1, "cells_h", "", k_objtype_hold_area);
+	  removeObjectiveIndicatorFromProp(propRefFromName("obIndicator_3"));
+	  addNewObjectiveIndicatorToProp(propRefFromName("vmTrig3_2"), k_objectiveIndicatorType_mainObjective);
+	  addNewObjectiveIndicatorToProp(propRefFromName("vmTrig3_2-c1"), k_objectiveIndicatorType_mainObjective);
+	  addNewObjectiveIndicatorToProp(propRefFromName("vmTrig3_2-c2"), k_objectiveIndicatorType_mainObjective);
+	  addNewObjectiveIndicatorToProp(propRefFromName("vmTrig3_2-c3"), k_objectiveIndicatorType_mainObjective);
+	  addNewObjectiveIndicatorToProp(propRefFromName("vmTrig3_2-c4"), k_objectiveIndicatorType_mainObjective);
+	  addNewObjectiveIndicatorToProp(propRefFromName("vmTrig3_2-c5"), k_objectiveIndicatorType_mainObjective);
+          setAISpawnState(propRefFromName("wook_slave_24"), "AISTATE_BF_PATROL", true);
+          setAISpawnState(propRefFromName("wookiee_1a"), "AISTATE_BF_PATROL", true);
+          setAISpawnState(propRefFromName("wook_slave_36"), "AISTATE_BF_PATROL", true);
+//          setAISpawnState(propRefFromName("wook_slave_35"), "AISTATE_BF_PATROL", true);
+//          setAISpawnState(propRefFromName("wookiee_3a"), "AISTATE_BF_PATROL", true);
+//          setAISpawnState(propRefFromName("wook_slave_32"), "AISTATE_BF_PATROL", true);
+//          setAISpawnState(propRefFromName("wookiee_5"), "AISTATE_BF_PATROL", true);
+//          setAISpawnState(propRefFromName("wookiee_6"), "AISTATE_BF_PATROL", true);
+//          setAISpawnState(propRefFromName("wookiee_6a"), "AISTATE_BF_PATROL", true);
+          SetPropRefInvincible(propRefFromName("wook_slave_24"), true); // make some wookiees invincible (wook_slave_24 = Tarfful)
+	  SetPropRefInvincible(propRefFromName("wook_slave_36"), true);
+	  SetPropRefInvincible(propRefFromName("wookiee_3a"), true);
+	  SetPropRefInvincible(propRefFromName("wookiee_5"), true);
+	  SetPropRefInvincible(propRefFromName("wookiee_6a"), true);
+	  SetObjectiveTriggered(true, iObjective); // Cell 1 button - unlock door & free Wookiee
+	  SetObjectiveTriggered(true, iObjective); // Cell 2 button - unlock door & free Wookiee
+	  SetObjectiveTriggered(true, iObjective); // Cell 3 button - unlock door & free Wookiee
+	  SetObjectiveTriggered(true, iObjective); // Cell 4 button - unlock door & free Wookiee
+	  SetObjectiveTriggered(true, iObjective); // Cell 5 button - unlock door & free Wookiee
+	  SetObjectiveTriggered(true, iObjective); // Cell 6 button - unlock door & free Wookiee
+ 	  activateTalkingHeadNew("DesKota10", true); // The Empire doesn't know who they have...
+	}
+
+	else
+	{ 
+	  SetNumSubObjectives(2, iObjective);
+	  lib_SetupTeamZone(cObjectiveName, 1, "drill_basement_h", "drill_basement_t", k_objtype_hold_area);
+	  ActivateSpawner("cell_tunnel_gp"); // spawn backup from tunnel to cells
+	  removeObjectiveIndicatorFromProp(propRefFromName("vmTrig2_11"));
+	  addNewObjectiveIndicatorToProp(propRefFromName("obIndicator_3"), k_objectiveIndicatorType_mainObjective);
+	  SetObjectiveTriggered(true, iObjective); // player approaching underground cells, kick off the action
+ 	  activateTalkingHeadNew("DesKota09", true); // The underground cells where the slaves...
+	}
+    } 
+
+    else if (iObjective == 4) // get to security room & shutdown trib transport shield
+    {
+
+	if (iSubObjective == 1)
+        {
+//	  lib_SetupTeamZone(cObjectiveName, 0, "security_h", "security_t", k_objtype_clear_area);
+//	  ib_SetupTeamZone(cObjectiveName, 1, "security_h", "security_t", k_objtype_hold_area);
+	  lib_SetupTeamZone(cObjectiveName, 0, "security_h", "", k_objtype_clear_area);
+	  lib_SetupTeamZone(cObjectiveName, 1, "security_h", "", k_objtype_hold_area);
+	  ActivateSpawner("security_grp"); // spawn security room NMEs
+	  ActivateSpawner("security_infsp"); // trickle spawner to keep a bit of action going
+   	  SetObjectiveTriggered(true, iObjective); // button pressed to deactivate tributary transport shield
+	}
+
+  	else 
+        {
+	  SetNumSubObjectives(1, iObjective);
+	  lib_SetupTeamZone(cObjectiveName, 0, "leave_cells_h", "", k_objtype_hold_area);
+	  lib_SetupTeamZone(cObjectiveName, 1, "leave_cells_h", "", k_objtype_clear_area);
+	  addNewObjectiveIndicatorToProp(propRefFromName("vmTrig4_1"), k_objectiveIndicatorType_mainObjective);
+	  DeactivateSpawner("cell_infspwn_g"); // kill cells infinite spawners
+	  
+	  activateTalkingHeadNew("DesBotha01", true); // the slaves are free!! All troops...
+	  activateTalkingHeadNew("DesBotha02", true); // Please! Someone? Get me the hell...
+	  activateTalkingHeadNew("DesKota11", false); // The controls for the shield protecting...
+	  SetObjectiveTriggered(true, iObjective); // approaching security room from cells
+	}
+    }
+
+    else if (iObjective == 5) // acquire some transport & land in the tributary transport hangar
+    { 
+	  lib_SetupTeamZone(cobjectivename, 0, "w_hangar_h", "", k_objtype_clear_area);
+	  lib_SetupTeamZone(cobjectivename, 1, "w_hangar_h", "", k_objtype_hold_area);
+	  propDelete( propRefFromName( "trib_shield1" ) );
+	  forceTriggerTriggered( propRefFromName( "unlock_doors" ) );
+	  ActivateSpawner("spwnprpgrp1"); // spawn imperial pilots in the hangar
+	  removeObjectiveIndicatorFromProp(propRefFromName("vmTrig4_1"));
+	  addNewObjectiveIndicatorToProp(propRefFromName("imp_tiefight1"), k_objectiveIndicatorType_mainObjective);
+	  addNewObjectiveIndicatorToProp(propRefFromName("imp_tiefight3"), k_objectiveIndicatorType_mainObjective);
+//	  SetObjectiveTriggered(true); // objective completed from "IsPlayerInVehicle" func when player gets into a TIE fighter
+	  activateTalkingHeadNew("DesKota12", false); // Wookiees aren't known for their subtlety...
+    } 
+
+    else if (iObjective == 6) // board the transport
+    {
+	  if (iSubObjective == 1)
+        {
+	  activateTalkingHeadNew("DesReb05", true); // We didn't get briefed on anti-aircraft turrets...
+
+	  SpawnAIVehicle(propRefFromName("TIEspawnDOF_1"), "imp_eng_snpc", "tie_fighter", 40, false, k_seatPos_driver);
+	  SpawnAIVehicle(propRefFromName("TIEspawnDOF_1"), "imp_eng_snpc", "tie_fighter", 40, false, k_seatPos_driver);
+	  SpawnAIVehicle(propRefFromName("TIEspawnDOF_1"), "imp_eng_snpc", "tie_fighter", 40, false, k_seatPos_driver);
+	  SpawnAIVehicle(propRefFromName("TIEspawnDOF_2"), "imp_eng_snpc", "tie_fighter", 40, false, k_seatPos_driver);
+	  SpawnAIVehicle(propRefFromName("TIEspawnDOF_2"), "imp_eng_snpc", "tie_fighter", 40, false, k_seatPos_driver);
+	  SpawnAIVehicle(propRefFromName("TIEspawnDOF_2"), "imp_eng_snpc", "tie_fighter", 40, false, k_seatPos_driver);
+	  SpawnAIVehicle(propRefFromName("TIEspawnDOF_3"), "imp_eng_snpc", "tie_fighter", 40, false, k_seatPos_driver);
+	  SpawnAIVehicle(propRefFromName("TIEspawnDOF_3"), "imp_eng_snpc", "tie_fighter", 40, false, k_seatPos_driver);
+	  SpawnAIVehicle(propRefFromName("TIEspawnDOF_3"), "imp_eng_snpc", "tie_fighter", 40, false, k_seatPos_driver);
+	  SpawnAIVehicle(propRefFromName("xwing_dof_1"), "reb_sol_snpc", "xwing_fighter", 40, false, k_seatPos_driver);
+	  SpawnAIVehicle(propRefFromName("xwing_dof_1"), "reb_sol_snpc", "xwing_fighter", 40, false, k_seatPos_driver);
+	  SpawnAIVehicle(propRefFromName("xwing_dof_1"), "reb_sol_snpc", "xwing_fighter", 40, false, k_seatPos_driver);
+	  SpawnAIVehicle(propRefFromName("xwing_dof_1"), "reb_sol_snpc", "xwing_fighter", 40, false, k_seatPos_driver);
+	  SpawnAIVehicle(propRefFromName("xwing_dof_2"), "reb_sol_snpc", "xwing_fighter", 40, false, k_seatPos_driver);
+	  SpawnAIVehicle(propRefFromName("xwing_dof_2"), "reb_sol_snpc", "xwing_fighter", 40, false, k_seatPos_driver);
+	  SpawnAIVehicle(propRefFromName("xwing_dof_2"), "reb_sol_snpc", "xwing_fighter", 40, false, k_seatPos_driver);
+	  SpawnAIVehicle(propRefFromName("xwing_dof_2"), "reb_sol_snpc", "xwing_fighter", 40, false, k_seatPos_driver);
+	  
+//	  xwing_land1 = SpawnAIVehicle(propRefFromName("dofProp_14"), "reb_soldier_npc_story", "xwing_fighter", 5, false, k_seatPos_driver);
+//	  SetPropRefInvincible(xwing_land1, true);
+	  
+	  propSetVisible(1, propRefFromName("reb_xwing1"));
+	  propSetVisible(1, propRefFromName("reb_xwing3"));
+	  propSetVisible(1, propRefFromName("reb_xwing4"));
+
+	  ActivateSpawner("transp_reb_grp");
+
+	  SetObjectiveTriggered(true, iObjective); // in vmtrig box encompassing Trib Transport hangar (i.e. landed safely)
+	  BFObjectiveAddBonus(BonusA, 9);
+	}
+	  else 
+        {
+	  SetNumSubObjectives(1, iObjective);
+	  DeactivateSpawner("security_infsp"); // kill trickle spawner for security room
+//	  removeObjectiveIndicatorFromProp(propRefFromName("vehicleSpawn1_"));
+//	  removeObjectiveIndicatorFromProp(propRefFromName("vehicleSpawn2"));
+	  removeObjectiveIndicatorFromProp(propRefFromName("imp_tiefight1"));
+	  removeObjectiveIndicatorFromProp(propRefFromName("imp_tiefight3"));
+	  addNewObjectiveIndicatorToProp(propRefFromName("obIndicator_4"), k_objectiveIndicatorType_mainObjective);
+ 
+	  BFPropSetTeamNum(sentry1, 1);
+	  BFPropSetTeamNum(sentry2, 1);
+	  BFPropSetTeamNum(sentry3, 1);
+	  BFPropSetTeamNum(sentry4, 1);
+	  BFPropSetTeamNum(sentry5, 1);
+	  BFPropSetTeamNum(sentry6, 1);
+	  addNewObjectiveIndicatorToProp(propRefFromName("tSentryGun1_"), k_objectiveIndicatorType_bonusObjective);
+	  addNewObjectiveIndicatorToProp(propRefFromName("tSentryGun3_"), k_objectiveIndicatorType_bonusObjective);
+	  addNewObjectiveIndicatorToProp(propRefFromName("tSentryGun4_"), k_objectiveIndicatorType_bonusObjective);
+	  addNewObjectiveIndicatorToProp(propRefFromName("tSentryGun5_"), k_objectiveIndicatorType_bonusObjective);
+	  addNewObjectiveIndicatorToProp(propRefFromName("tSentryGun6_"), k_objectiveIndicatorType_bonusObjective);
+	  addNewObjectiveIndicatorToProp(propRefFromName("tSentryGun7_"), k_objectiveIndicatorType_bonusObjective);
+	  SetPropRefInvincible(propRefFromName("tSentryGun1_"), false);
+	  SetPropRefInvincible(propRefFromName("tSentryGun3_"), false);
+	  SetPropRefInvincible(propRefFromName("tSentryGun4_"), false);
+	  SetPropRefInvincible(propRefFromName("tSentryGun5_"), false);
+	  SetPropRefInvincible(propRefFromName("tSentryGun6_"), false);
+	  SetPropRefInvincible(propRefFromName("tSentryGun7_"), false);
+	  
+	  activateTalkingHeadNew("DesReb04", true); // Blue leader reporting in. We are moving...
+	  
+	  SetObjectiveTimer(3, iObjective);
+	}
+    }
+    
+    else if (iObjective == 7) // fire the laser and destroy Desolation Station
+    { 
+
+	if (iSubobjective == 1)
+	{
+	  lib_SetupTeamZone(cobjectivename, 1, "trib_hang_h", "", k_objtype_hold_area);
+	  lib_SetupTeamZone(cobjectivename, 0, "trib_hang_h", "", k_objtype_clear_area);
+
+	  activatespawner("obj6_grp2_"); // spawn cargo area nmes and backup
+	  removeobjectiveindicatorfromprop(propreffromname("obIndicator_5"));
+	  addNewObjectiveIndicatorToProp(propRefFromName("vmTrig7_4"), k_objectiveIndicatorType_mainObjective);
+	  setobjectivetriggered(true, iObjective); // in vmtrig approaching hologram room
+   	} 
+
+	else if (iSubobjective == 2)
+	{
+	  lib_SetupTeamZone(cobjectivename, 0, "trib_core_h", "", k_objtype_clear_area);
+	  lib_SetupTeamZone(cobjectivename, 1, "trib_core_h", "", k_objtype_hold_area);
+	  activatespawner("obj6_grp3_"); // spawn holo-room nmes
+	  setobjectivetriggered(true, iObjective);
+	}
+
+	else if (iSubobjective == 3)
+	{
+	  activatespawner("obj6_grp4_"); // spawn power core backup wave
+	  setobjectivetriggered(true, iObjective); // in vmtrig approaching capacitor room
+	}
+
+	else if (iSubobjective == 4) // radio msg here to switch class to sniper
+	{
+	  lib_SetupTeamZone(cobjectivename, 0, "cap_lobby_h", "", k_objtype_clear_area);
+	  lib_SetupTeamZone(cobjectivename, 1, "cap_lobby_h", "", k_objtype_hold_area);
+	  activatespawner("obj6_grp5_"); // spawn capacitor lobby defenders
+	  setobjectivetriggered(true, iObjective); // press button to open door to capacitor chamber
+	  
+	  activateTalkingHeadNew("DesReb06", true); // Sir according to the transport mission logs...
+	}
+
+	else if (iSubobjective == 5) // into the capacitor sniper area
+	{
+	  removeobjectiveindicatorfromprop(propreffromname("vmTrig7_4"));
+	  addNewObjectiveIndicatorToProp(propRefFromName("space2ground1"), k_objectiveIndicatorType_mainObjective);
+	  lib_SetupTeamZone(cobjectivename, 0, "trib_hang_h", "", k_objtype_hold_area);
+	  lib_SetupTeamZone(cobjectivename, 1, "trib_cap_h", "", k_objtype_clear_area);
+	  activatespawner("cap_sniper_grp"); // spawn capacitor snipers
+	  activatespawner("cap_trooper_grp"); // spawn capacitor troopers
+	  
+	  activateTalkingHeadNew("DesReb07", true); // This is as far as we can go sir...
+	  
+	  propDelete(propRefFromName("reb_xwing1"));
+	  propDelete(propRefFromName("reb_xwing3"));
+	  propDelete(propRefFromName("reb_xwing4"));
+	  
+	  setobjectivetriggered(true, iObjective); // vmtrig approaching laser controls
+	}
+
+	else if (iSubobjective == 6) // this objective completed when ion cannon is fired
+	{
+	  lib_SetupTeamZone(cobjectivename, 1, "laser_h", "", k_objtype_hold_area);
+	  SetPropRefInvincible(propRefFromName("trib_transp1_"), false);
+	  activatespawner("laser_grp"); // spawn laser control defenders
+	  
+	  propDelete(propRefFromName("bfRebSoldrSp1")); // delete the rebels who have "evacuated"
+	  propDelete(propRefFromName("bfRebSoldrSp3"));
+	  propDelete(propRefFromName("bfRebSoldrSp4"));
+	  
+	  activateTalkingHeadNew("DesReb09", true); // Target is lined up, you may fire when ready...
+	}
+	
+	else 
+        {
+	  SetNumSubObjectives(6, iObjective);
+	  
+	  SetPropRefInvincible(propRefFromName("bfRebSoldrSp1"), true);
+	  SetPropRefInvincible(propRefFromName("bfRebSoldrSp2"), true);
+	  SetPropRefInvincible(propRefFromName("bfRebSoldrSp4"), true);
+
+	  chrAIJoinGroup(propRefFromName("bfRebSoldrSp1"), "player" );
+	  chrAIJoinGroup(propRefFromName("bfRebSoldrSp2"), "player" );
+	  chrAIJoinGroup(propRefFromName("bfRebSoldrSp4"), "player" );
+	  
+  	  propKill(sentry1);
+	  propKill(sentry2);
+	  propKill(sentry3);
+	  propKill(sentry4);
+	  propKill(sentry5);
+	  propKill(sentry6);
+
+	  propSetCanBeActivated(propRefFromName( "imp_tiefight1" ), false);
+	  propSetCanBeActivated(propRefFromName( "imp_tiefight3" ), false);
+
+	  SetAICanDrive(propRefFromName( "imp_tiefight1" ), false);
+	  SetAICanDrive(propRefFromName( "imp_tiefight3" ), false);
+	    
+	  BFObjectiveRemoveBonus(BonusA, 9); 
+	  lib_SetupTeamZone(cobjectivename, 0, "trib_hang_H3", "", k_objtype_hold_area);
+	  lib_SetupTeamZone(cobjectivename, 1, "trib_hang_H2", "", k_objtype_hold_area);
+	  addNewObjectiveIndicatorToProp(propRefFromName("obIndicator_5"), k_objectiveIndicatorType_mainObjective);
+	  removeobjectiveindicatorfromprop(propreffromname("obIndicator_4"));
+	  activatespawner("obj6_grp1_"); // spawn backup wave from cargo area
+	  setobjectivetriggered(true, iObjective); // in vmtrig approaching cargo area
+	  
+	  activateTalkingHeadNew("DesKota13", true); // The beam laser is fully operational...
+	  
+//	  BFRequestAILandShip(xwing_land1, propRefFromName("port_land"));
+	}
+    }
+
+//// OLD objective 7 to destroy consoles is REMOVED ////
+/*    
+    else if (iObjective == 7) 
+    { 
+
+	if (iSubObjective == 1)
+	{
+//	  propHealthReduceToFractionWithUniformDamage(trib_transp, 0.15f);
+	  propSetHealthFraction(trib_transp, 0.15f);
+	  SetObjectiveTimer(1, iObjective);
+	}
+
+	else
+	{
+//	  propHealthReduceToFractionWithUniformDamage(trib_transp, 0.24f);
+          propSetHealthFraction(trib_transp, 0.24f);
+	  setNumSubObjectives(1, iObjective);
+	  lib_SetupTeamZone(cobjectivename, 1, "trib_cap_h3", "", k_objtype_hold_area);
+	  activatespawner("cap_reinf_gp"); // more snipers & troopers to hassle you while you destroy consoles
+	  SetPropRefInvincible(propRefFromName("dest_console1"), false);
+	  SetPropRefInvincible(propRefFromName("dest_console3"), false);
+	  SetPropRefInvincible(propRefFromName("dest_console4"), false);
+	  addNewObjectiveIndicatorToProp(propRefFromName("dest_console1"), k_objectiveIndicatorType_mainObjective);
+	  addNewObjectiveIndicatorToProp(propRefFromName("dest_console3"), k_objectiveIndicatorType_mainObjective);
+	  addNewObjectiveIndicatorToProp(propRefFromName("dest_console4"), k_objectiveIndicatorType_mainObjective);
+	  SetObjectiveKillSpawners(1, iObjective);
+	  activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 8.0f, "characters/heroes/kotavahs/kotavahs", "AN_lnd_tlk01", "We need to destroy this laser before it is installed in the Death Star. Destroy the three main power regulator consoles to overload the charging capacitors");
+	}
+    } 
+*/
+    else if (iObjective == 8) // use escape pod to evacuate transport
+    { 
+
+        if (iSubObjective == 1)
+	{
+	  propSetHealthFraction(trib_transp, 0.01f);
+//	  propKill(trib_transp);
+  	  propRef player = getPlayerPropRefFromID(GetPlayerId());
+	  BFSetVehicleViewMode(player, 3); 
+	  BFLockCamera(true);
+	  removeObjectiveIndicatorFromProp(propRefFromName("IMPScEscPdBt1"));
+	  SetObjectiveTimer(7, iObjective);
+
+	  activateTalkingHeadNew("DesKota15", true); // This is a mighty blow we have struck today...
+	  activateTalkingHeadNew("DesKota16", true); // History may well recognise this as a key...
+	}
+
+	else if (iSubObjective == 2)
+	{
+	    propKill(trib_transp);
+//	    camShakeAll(0.5, 0.00005, 0.005);
+	    SetObjectiveTimer(15, iObjective);
+	}
+	
+	else if (iSubObjective == 3)
+	{
+	    bEndLevel = true;
+	}
+
+	else
+	{
+	  SetNumSubObjectives(3, iObjective);
+  	  propSetHealthFraction(trib_transp, 0.05f);
+	  lib_SetupTeamZone(cobjectivename, 1, "trib_cap_h3", "", k_objtype_hold_area);
+	  activatespawner("cap_reinf_gp"); // more snipers & troopers to hassle you while you destroy consoles
+	  propSetCanBeActivated(propRefFromName( "space2ground1" ), false);
+	  bgDisEnableAll("lvbg", k_bgover_forceHide, true, true);
+	  bgDisEnableAll("des_story_ground", k_bgover_forceHide, true, false);
+
+	  forceTriggerTriggered( propRefFromName( "lazer_trigger" ) ); // open lazer door allowing access to escape pod
+	  removeObjectiveIndicatorFromProp(propRefFromName("space2ground1"));
+	  addNewObjectiveIndicatorToProp(propRefFromName("IMPScEscPdBt1"), k_objectiveIndicatorType_mainObjective);
+	  SetObjectiveTriggered(true, iObjective); // escape pod left trigger box at rear of transport
+
+	  activateTalkingHeadNew("DesKota14", true); // Desolation Station has been utterly destroyed...
+	}
+    } 
+
+    else if (iObjective == 9) // bonus objective A - destroy AA turrets
+    {
+    }
+
+    else if (iObjective == 10) // bonus objective B - destroy comms consoles in east hangar
+    {
+    }
+    
+    return true;
+}
+
+///////////////This Script Actions
+
+waitForGameTime(0.1f);
+playTimelineOffset("data/bf/timelines/cs09.res", vector(0.f, -1000.f, 0.f));
+
+wholeScreenFade(0.f, 1, false);
+
+ScriptHasStarted(); //Do any setups
+
+waitForGameTime(0.5f);
+
+wholeScreenFade(12.f, 0, false);
+
+//Main game loop
+while(!bEndLevel)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    ProcessCallbacks();
+    ObjectiveSetupCheck();
+
+    for (i=0; i<iNumActive; i++)
+    {
+        int iObjective = BFObjectiveGetNumForNthActive(i);
+        ObjectiveTests(iObjective);        
+        waitForGameTime(0.01f);
+    }
+
+    waitForGameTimeOrLVChange(0.5f, "iObjLV", "iCBLV");
+    logStr("tick");
+    logInt(iObjective);    
+}
+
+BFLockCamera(false);
+NextLevel("yavin/yavin_story.res");//hoth/hoth_story.res");
+

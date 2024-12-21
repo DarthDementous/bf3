@@ -1,0 +1,26 @@
+      00001004 00001200     	EXEC ADDR(0x4) CNT(0x1) BOOL_ADDR(0x80)
+04: 20800000 0100006c e2000080	      ALU:	SETGTs	R0.___w = -abs(R0).xxxx
+      001f0006 00007000     	LOOP_START ADDR(0x6) LOOP_ID(31)
+      05006005 00001200     	EXEC ADDR(0x5) CNT(0x6) BOOL_ADDR(0x80)
+05: c80c0001 80acb100 2001fd00	      ALU:	ADDv	R1.__zw = C257.xxxy, C509.yyyy
+06: c8030001 80b0b000 a0000100	      ALU:	ADDv	R1.xy__ = R0.xyyy, C257.xyyy
+07: c80c0001 0006ac00 e0010000	      ALU:	ADDv	R1.__zw = R1.zzzw, R0.xxxy
+08: c8030002 001ab11b 8b0100fe	      ALU:	MULADDv	R2.xy__ = C510.wwww, R1.zwww, C256.yyyy
+09: 10081021 1f1ffe88 00004000	      FETCH:	SAMPLE	R1.xyz_ = R1.xyx CONST(0) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+0a: 10180041 1f1ffe3f 00004000	      FETCH:	SAMPLE	R0.__x_ = R2.xyx CONST(1) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+      0002600b 00001200     	EXEC ADDR(0xb) CNT(0x6) BOOL_ADDR(0x80)
+0b: c8070001 00c0c000 a101fe00	   (S)ALU:	MULv	R1.xyz_ = R1.xyzz, C510.xyzz
+0c: a8410001 00beb142 90011100	      ALU:	DOT3v	R1.x___ = R1.zxyy, C273.yyyy
+                          						    	MUL_CONST_0	R0.__z_ = C256.x, R0.z
+0d: c8040000 00c66c1b cb0081fd	      ALU:	MULADDv	R0.__z_ = C509.wwww, R0.zzzz, abs(R1).xxxx
+0e: 40400000 000000c6 e2000080	      ALU:	LOG_IEEE	R0.__z_ = abs(R0).zzzz
+0f: a8100100 00000042 c20000ff	      ALU:	MUL_CONST_0	R1.x___ = C511.x, R0.z
+10: c8040000 006c6c00 e4010100	      ALU:	SETEv	R0.__z_ = R1.xxxx, R1.xxxx
+      00002011 00001200     	EXEC ADDR(0x11) CNT(0x2) BOOL_ADDR(0x80)
+11: c8040000 00c66c6c ac00fd01	      ALU:	CNDEv	R0.__z_ = R1.xxxx, R0.zzzz, C509.xxxx
+12: c8080000 001bc600 e0000000	      ALU:	ADDv	R0.___w = R0.wwww, R0.zzzz
+      001f0002 00008400     	LOOP_END ADDR(0x2) LOOP_ID(31)
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      00001013 00002200     	EXEC_END ADDR(0x13) CNT(0x1) BOOL_ADDR(0x80)
+13: c88fc000 001bc600 a100fd00	      ALU:	MULv	export0 = R0.wwww, C509.zzzz	; COLOR
+                          						    	RETAIN_PREV	export0.___w = R0	; COLOR

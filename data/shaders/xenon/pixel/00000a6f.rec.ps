@@ -1,0 +1,8 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      00095001 00002200     	EXEC_END ADDR(0x1) CNT(0x5) BOOL_ADDR(0x80)
+01: 10080001 1f1ff688 00004000	      FETCH:	SAMPLE	R0.xyzw = R0.xyx CONST(0) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+02: c8010002 006c6cb1 0b00ffff	   (S)ALU:	MULADDv	R2.x___ = C511.yyyy, C256.xxxx, C511.xxxx
+03: c80e0002 00fcfc00 e1000100	      ALU:	MULv	R2._yzw = R0.xxyz, R1.xxyz
+04: 14070000 00156c1b e1020200	      ALU:	MULv	R0.xyz_ = R2.yzww, R2.xxxx
+05: 0c878000 00c06c1b a1000101	      ALU:	MULv	export0.xyz_ = R0.xyzz, C257.xxxx	; COLOR
+                          						    	MUL_PREVs	export0.___w = R1.wwww	; COLOR

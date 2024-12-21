@@ -1,0 +1,1620 @@
+// vim: set syntax=c :
+
+///////////////////////////////////////////////////
+//
+//    TATOOINE STORY CAMPAIGN MISSION (MISSION 1)
+//
+///////////////////////////////////////////////////
+
+/////////////MAKE SURE TO INCLUDE A BFStorylevelVarProp in your level
+
+// Get a propRef to the player
+propRef pPlayer = getPlayerPropRefFromID(GetPlayerId());
+
+boolean Skip = false;
+boolean bEndLevel = false;
+
+//NOTE try and remove as many of the below as possible
+
+// Republic Gunship (objective 6)
+propRef rep_gunship;
+propRef laat_pilot;
+propRef laat_trooper;
+// Objective 6 Ferroda
+propRef ferroda;
+chrRef x1;
+
+//TODO Move to new Ships on Spline script
+// CIS Landing Ships
+propRef takeoffship;
+propRef landingship;
+propRef landingship2;
+propRef landingship3;
+propRef startfighter1;
+propRef startfighter2;
+propRef street_strafe1;
+propRef dcs_landingship;
+
+// TODO MOVE TO SPLINES
+// Gunship leaving Tatooine at start
+propRef cis_gunship_dist;
+
+///////////// Include Defaults //////////////////////////////////////////////
+
+//////////////////////////CALLBACK INFO DO NOT CHANGE
+
+//PlayerKilled Callback Info
+boolean bCB_PK = false;
+int iCB_PK_KillerId = -1;
+int iCB_PK_Victim = -1;
+int iCB_PK_Result = -1;
+
+//triggeredProp Callback Info
+boolean bCB_TP = false;
+char16 cCB_TP_Prop = StringToChar16("");
+
+//ObjectiveTimeExpired Callback Info
+boolean bCB_OTE = false;
+char16 cCB_OTE_ObjName = StringToChar16("");
+
+//shipReachedScriptedSplineSegment  Callback Info
+boolean bCB_SRSS = false;
+propRef pCB_SRSS_Ship;
+propRef pCB_SRSS_Spline;
+int iCB_SRSS_Segment = -1;
+
+//////////////////////////END CALLBACK INFO
+
+function void ProcessCallbacks()
+{
+    //No else's as could be waiting to process two or more!
+
+    if (GetLevelVarInt("iCBLV") != -1)
+    {
+        if (bCB_PK) // playerKilled callback
+        {
+            playerKilled(iCB_PK_KillerId, iCB_PK_Result, iCB_PK_Victim);
+            bCB_PK = false;
+        }
+
+        if (bCB_TP) // triggeredProp callback
+        {
+            Trigger(cCB_TP_Prop);
+            bCB_TP = false;
+        }
+
+        // ObjectiveTimeExpired callback
+        if (bCB_OTE)
+        {
+            ObjectiveTimeExpired(cCB_OTE_ObjName);
+            bCB_OTE = false;
+        }
+
+        // shipReachedScriptedSplineSegment callback
+        if (bCB_SRSS)
+        {
+            ShipReachedScriptedSplineSegment(pCB_SRSS_Ship, pCB_SRSS_Spline, iCB_SRSS_Segment);
+            bCB_SRSS = false;
+        }
+
+        SetLevelVarInt("iCBLV", -1);    
+        waitForGameTime(0.1f);
+    }
+}
+
+callback void CB_PlayerKilled(int iKiller, int iResult, int iVictim)
+{
+    logStr("CB_PlayerKilled");
+   /* if (bCB_PK)
+        VMAssertMsg("CB_PlayerKilled - Already Waiting To Do Callback");
+
+    bCB_PK = true;
+    iCB_PK_KillerId = iKiller;
+    iCB_PK_Victim = iVictim;
+    iCB_PK_Result = iResult;
+
+    SetLevelVarInt("iCBLV", 1);    */
+    playerKilled(iKiller, iResult, iVictim);
+}
+
+callback int CB_TriggeredProp(int inType, char16 inTriggerProp, int pId)
+{    
+    logStr("CB_TriggeredProp");    
+    /*if (bCB_TP)
+        VMAssertMsg("CB_TriggeredProp - Already Waiting To Do Callback");
+
+    bCB_TP = true;
+    cCB_TP_Prop = inTriggerProp;
+
+    SetLevelVarInt("iCBLV", 1);    
+*/
+    Trigger(inTriggerProp);
+    return 0;
+}
+
+callback void CB_ObjectiveTimeExpired(char16 objName)
+{
+    logStr("CB_ObjectiveTimeExpired");        
+  /*  if (bCB_OTE)
+        VMAssertMsg("CB_ObjectiveTimeExpired - Already Waiting To Do Callback");
+
+    bCB_OTE = true;
+    cCB_OTE_ObjName = objName;
+
+    SetLevelVarInt("iCBLV", 1); */
+    ObjectiveTimeExpired(objName);
+}
+
+callback void CB_shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    logStr("CB_shipReachedScriptedSplineSegment");            
+  /*  if (bCB_SRSS)
+        VMAssertMsg("CB_shipReachedScriptedSplineSegment - Already Waiting To Do Callback");
+    
+    bCB_SRSS = true;
+    pCB_SRSS_Ship = ship;
+    pCB_SRSS_Spline = spline;
+    iCB_SRSS_Segment = segment;
+
+    SetLevelVarInt("iCBLV", 1);*/
+    ShipReachedScriptedSplineSegment(ship, spline, segment);
+
+}
+
+AllowCallback(CALLBACK_PlayerKilledBF, CB_playerKilled);
+AllowCallback(CALLBACK_TriggeredProp, CB_triggeredProp);
+AllowCallback(CALLBACK_ObjectiveTimeExpired, CB_ObjectiveTimeExpired);
+AllowCallback(CALLBACK_ShipReachedScriptedSplineSegment, CB_shipReachedScriptedSplineSegment);
+
+//////////////////////////END CALLBACKS
+
+function void playerKilled(int victimId, int killerId, int iOppTeam)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iActive = BFObjectiveGetNumForNthActive(i);
+	if (lib_playerKilled(victimId, killerId, iOppTeam, iActive)) 
+	{
+	    nextObjective(iActive);
+	}
+    }
+}
+
+function void Trigger(char16 inTriggerProp)
+{    
+    int iResult = 0;
+    
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iActive = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+        iActive = BFObjectiveGetNumForNthActive(i);
+        iResult = lib_triggeredProp(inTriggerProp, iActive);
+
+        iResult = ObjectiveTriggerTests(iActive, inTriggerProp, iResult);
+
+        if (iResult >= 1) nextObjective(iActive);
+    }
+}
+
+function void ObjectiveSetupCheck()
+{
+    int iTempObj = GetLevelVarInt("iObjLV");
+    
+    if (iTempObj > 0)
+    {
+        char16 cName = BFObjectiveGetName(iTempObj);
+        if (ObjectiveSetup(cName, iTempObj, BFObjectiveGetSub(iTempObj)))
+            SetLevelVarInt("iObjLV", -1);
+
+        waitForGameTime(0.1f);        
+    }
+}
+
+function void SetObjectiveSetup(int iObj)
+{
+    logStr("SetObjectiveSetup Called");
+    logInt(iObj);
+    SetLevelVarInt("iObjLV", iObj);
+}
+
+function void nextObjective(int inObjNum) 
+{    
+    int result = lib_nextObjective(inObjNum);
+
+    if(result == 1)
+    {
+        //if next objective returns 1 it has updated a core objective and automatically moved us onto the next
+        //so do objective setup with current objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(BFObjectiveGetCurrent());
+        }
+    }
+
+    if(result == 2)
+    {
+        //if nextobjective returns 2 it has updated a bonus objective so we will want to 
+        //objective setup with the objective we passed to next objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(inObjNum);
+        }
+    }
+}
+
+function void JumpToObjective(int iStartObj, boolean bTeleport)
+{       
+	BFObjectiveSetJumpTo(iStartObj);	
+    nextObjective(BFObjectiveGetCurrent());
+    
+    if (bTeleport)
+    {
+        char16 tSpawn;
+        tSpawn = LevelVarToChar16("mCurrentSpawner");
+        if (propExists(propRefFromChar16(tSpawn)))
+            propTeleportToProp(pPlayer, propRefFromChar16(tSpawn));        
+    }
+    
+    logStr("Jumped To Objective");
+    logInt(BFObjectiveGetCurrent());
+}
+
+function void ObjectiveTimeExpired(char16 objName)
+{
+    int objNum = 0;
+    objNum = BFObjectiveGetNumber(objName);   
+    if (lib_ObjTimeExpired(objNum))
+    {
+	nextObjective(objNum);
+    }
+}
+
+/////// Defaults END /////////////////////////////////////////////
+
+function void ScriptHasStarted()
+{
+    SetBFStoryPrefixes("obj_Tat", "vmTrig"); 
+    BFObjectiveSetCopy(true);    
+ 
+    ResetObjectives("mObjTmp", 14);
+
+    // Make the Droid Control Ship invincible to attack from the outside
+    SetPropRefInvincible(propRefFromName("cruisership2S"), true);
+
+    // Make the Acclamator invincible until after the player has boarded it
+    SetPropRefInvincible(propRefFromName("cisfrig"), true);
+
+    // Make the Antenna button invisible
+    //propSetVisible(0, propRefFromName("vmTrig1_2")); //THERE IS NO PROP CALLED vmTrig1_2, COME ON!
+
+    JumpToObjective(1, true); //start objective
+}
+
+
+function int ObjectiveTriggerTests(int iObjective, char16 inTriggerProp, int iResult) 
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+
+	// Might be a better place for this (might not)
+	if (iObjective <= 3)
+	{
+	    if ((Char16Cmp(inTriggerProp, "sec_obj1") == 0))
+	    {
+//		BFObjectiveAddBonus(secondary1, 11);
+//		ObjectiveSetup(secondary1, 11, 0);
+	    }
+	    else
+	    {
+		if ((Char16Cmp(inTriggerProp, "sec_obj2_1") == 0))
+		{
+		    BFObjectiveAddBonus(StringToChar16("obj_Tat12"), 12);
+		    addNewObjectiveIndicatorToProp(propRefFromName("cantina_obj"), k_objectiveIndicatorType_bonusObjective);
+		    ObjectiveSetup(StringToChar16("obj_Tat12"), 12, 0);
+		}
+	    }
+	}
+
+	// Check for the player flying out of the Acclamator in objective 8
+	if (iObjective == 8)
+	{
+	    if ((Char16Cmp(inTriggerProp, "RepFrig_Near") == 0) || (Char16Cmp(inTriggerprop, "RepFrig_Far") == 0))
+	    {
+		BFAddFlyingAIPropCentricPatrolZone(pPlayer, 200.0f);
+	    }
+	}
+		
+	// Trigger final landing ship
+	if (iObjective == 10)
+	{
+	    if ((Char16Cmp(inTriggerProp, "blastdoor1") == 0))
+	    {
+		dcs_landingship = SpawnAIVehicle(propRefFromName("dcs_landsp"), "cis_battledroid_npc_story", "cis_landing_ship", 0, false, 0);
+	    }
+	}
+
+    return iResult;
+}
+
+function void ObjectiveTests(int iObjective) 
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+
+    if (iObjective == 8)
+    {
+	if (propGroupGetNumOfProps(propRefFromName("ARCSpwns")) < 4) 	
+	{
+	    propRef starfighter;
+	    starfighter = SpawnAIVehicle(propRefFromName("obj7_rep_DOF"), "rep_clonetrooper_npc_story", "rep_starfighter", 0, false, k_seatPos_driver);
+	    addPropToGroup(propRefFromName("ARCSpwns"), starfighter);
+	}
+    
+	if (propGroupGetNumOfProps(propRefFromName("VSpwns")) < 2) 	
+	{
+	    propRef vwing;
+	    vwing = SpawnAIVehicle(propRefFromName("obj7_rep_DOF"), "rep_clonetrooper_npc_story", "rep_vwing", 0, false, k_seatPos_driver);
+	    addPropToGroup(propRefFromName("VSpwns"), vwing);
+	}
+	
+	if (propGroupGetNumOfProps(propRefFromName("DroidSpwns")) < 3)
+	{
+	    propRef droid;
+	    droid = SpawnAIVehicle(propRefFromName("obj7_cis_DOF"), "cis_battledroid_npc_story", "cis_droidfighter", 0, false, k_seatPos_driver);
+	    addPropToGroup(propRefFromName("DroidSpwns"), droid);
+	}
+
+	if (propGroupGetNumOfProps(propRefFromName("TriSpwns")) < 5)
+	{
+	    propRef tri;
+	    tri = SpawnAIVehicle(propRefFromName("obj7_cis_DOF"), "cis_battledroid_npc_story", "cis_tri_fighter", 0, false, k_seatPos_driver);
+	    addPropToGroup(propRefFromName("TriSpwns"), tri);
+	}
+    }
+
+    // Droid Gunship objective
+    if (iObjective == 11)
+    {
+	
+	// Force the remotes and controls to be linked
+	if(propExists(propRefFromName("remote_cp1")) && propExists(propRefFromName("lb_remote1")))
+	{
+	    SetRemoteGunControlPropOverride(propRefFromName("remote_cp1"), propRefFromName("lb_remote1"));
+	}
+	if(propExists(propRefFromName("remote_cp2")) && propExists(propRefFromName("lb_remote2")))
+	{
+	    SetRemoteGunControlPropOverride(propRefFromName("remote_cp2"), propRefFromName("lb_remote2"));
+	}
+	if(propExists(propRefFromName("remote_cp3")) && propExists(propRefFromName("lb_remote3")))
+	{
+	    SetRemoteGunControlPropOverride(propRefFromName("remote_cp3"), propRefFromName("lb_remote3"));
+	}
+
+	// Arrow directed at the Droid Dropships
+    	//addNewObjectiveIndicatorToProp(cis_gunship, k_objectiveIndicatorType_bonusObjective);
+    }
+   
+    // Help take out fighters objective
+    if (iObjective == 12)
+    {
+	// WHO DIES FIRST? TROOPS OR DROIDS?
+	if (propGroupSpCountAliveSpawnedProps(propRefFromName("Spwn-12_1")) == 0)
+	{
+	    nextObjective(iObjective);
+	    logStr("droids dead");
+	}else
+	{
+	    if(propGroupSpCountAliveSpawnedProps(propRefFromName("cantina_clone_SG")) == 0)
+	    {
+		// Troops are dead. Objective Fail.
+		logStr("troops dead");
+		BFObjectiveFailObjective(StringToChar16("obj_Tat12"), 12);
+		removeObjectiveIndicatorFromProp(propRefFromName("cantina_obj"));
+	    }
+	}
+    }
+}
+
+function void shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    // Delete the taking off landing ship
+    if (spline ==  propRefFromName("takeoffship_SP"))
+    {
+	if (segment == 2)
+	{
+	    propDelete(ship);
+	}
+    }
+
+    // Delete the Landing Ship for the first spline
+    if (spline ==  propRefFromName("landship1_SP"))
+    {
+	if (segment == 1)
+	{
+	    propDelete(ship);
+	}
+    }
+
+    // Loop the Landing Ship for the second spline
+    if (spline ==  propRefFromName("landship2_SP"))
+    {
+	if (segment == 11)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(landingship2, spline);
+	}
+    }
+
+    // Loop the Landing Ship for the second spline
+    if (spline ==  propRefFromName("distantsp2"))
+    {
+	if (segment == 15)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(landingship3, spline);
+	}
+    }
+
+    // Smaller start ship
+    if (spline ==  propRefFromName("start_spline1"))
+    {
+	if(segment == 1)
+	{
+	    // CIS ship
+	    if(ship = startfighter2)
+	    {
+		BFShipStartScriptedFiring(ship, 1, 3.5f);
+	    }
+	}
+	
+	if(segment == 2)
+	{
+	    // Republic ship
+	    if(ship = startfighter1)
+	    {
+		propKill(ship); //BFShipStartScriptedFiring(ship, 1, 5.5f);
+	    }
+	    
+	    if(ship = startfighter2)
+	    {
+		BFShipStartScriptedFiring(ship, 1, 0.5f);
+	    }
+	}
+	
+	if (segment == 4)
+	{
+	    propDelete(ship);
+	}
+    }
+
+    // Ship strafing the main street
+    if (spline ==  propRefFromName("street_SP1"))
+    {
+	if((segment == 4) || (segment == 5) || (segment == 6))
+	{
+	    if(ship = street_strafe1)
+	    {
+		BFShipStartScriptedFiring(ship, 1, 3.5f);
+	    }
+	}
+
+	if (segment == 9)
+	{
+	    propDelete(ship);
+	}
+    }
+
+    //
+    // Objective 4 Landing Ships
+    //
+    // Landing Ship 1
+    if (spline ==  propRefFromName("obj4_ship1_sp"))
+    {
+	if (segment == 2)
+	{
+	    // have the ship loop
+	    BFShipFollowScriptedSplineNoAvoidance(ship, propRefFromName("obj4_ship1x_sp"));
+	}
+    }
+
+    if (spline ==  propRefFromName("obj4_ship1x_sp"))
+    {
+	if (segment == 2)
+	{
+	    // have the ship loop
+	    BFShipFollowScriptedSplineNoAvoidance(ship, propRefFromName("obj4_ship1_sp"));
+	}
+    }
+
+    // Landing Ship 2 - Spline 1
+    if (spline ==  propRefFromName("obj4_ship2_sp"))
+    {
+	if (segment == 2)
+	{
+	    // Need this ship to join a different spline after the first is complete
+	  //  spline = propRefFromName("obj4_ship2_2_sp");
+	    
+	    BFShipFollowScriptedSplineNoAvoidance(ship, propRefFromName("obj4_ship2x_sp"));
+	}
+    }
+
+    if (spline ==  propRefFromName("obj4_ship2x_sp"))
+    {
+	if (segment == 2)
+	{
+	    // Need this ship to join a different spline after the first is complete
+	  //  spline = propRefFromName("obj4_ship2_2_sp");
+	    
+	    BFShipFollowScriptedSplineNoAvoidance(ship, propRefFromName("obj4_ship2_sp"));
+	}
+    }
+
+    if (spline ==  propRefFromName("obj4_ship3_sp"))
+    {
+	if (segment == 2)
+	{
+	    // have the ship loop
+	    BFShipFollowScriptedSplineNoAvoidance(ship, propRefFromName("obj4_ship3x_sp"));
+	}
+    }
+
+    if (spline ==  propRefFromName("obj4_ship3x_sp"))
+    {
+	if (segment == 2)
+	{
+	    // have the ship loop
+	    BFShipFollowScriptedSplineNoAvoidance(ship, propRefFromName("obj4_ship3_sp"));
+	}
+    }
+
+    // The Landing Ship trying to escape from the Droid control ship
+    if(spline == propRefFromName("dcs_SP1"))
+    {
+	if(segment == 1)
+	{
+    	    propHealthReduceToFractionWithUniformDamage(propRefFromName("dcs_landsp"), 0.0);
+	}
+    }
+
+    // LAAT Gunship coming in to land
+    if(spline == propRefFromName("laat_spline"))
+    {
+	if(segment == 5)
+	{
+	    BFRequestAILandShip(rep_gunship, propRefFromName("laat_landpad"));
+	}
+    }
+
+    // CIS Gunship landing in the Landing Bay (Bonus objective 1)
+    if(spline == propRefFromName("gunship_SP"))
+    {
+	if(segment == 2)
+	{
+	    propDelete(ship);
+	}
+    }
+}
+
+
+/////////////////////////////////////////
+//
+// OBJECTIVES
+//
+/////////////////////////////////////////
+
+function boolean ObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{
+    logStr("-------------> ObjectiveSetup Called");
+    logInt(iObjective);
+    logInt(iSubObjective);        
+    
+    if (iObjective == 1) // PRIMARY OBJECTIVE 1 - ENGANGE DROID INVADERS (ACTIVATE THE COMMUNICATIONS UPLINK)
+    {
+	// For first battle with droids
+	if (iSubObjective == 1)
+	{
+	    // Spawn droids coming coming down the street with the tank
+            spawnGroupSetActive(propRefFromName("cis_street_SG1"), true);
+            lib_SetupGroupZone(cObjectiveName, "cis_street_SG1", "cisstart_h", "", k_objtype_hold_area);
+
+    	    // Spawn a few clones coming to help out
+            spawnGroupSetActive(propRefFromName("rep_street_SG1"), true);
+            lib_SetupGroupZone(cObjectiveName, "rep_street_SG1", "cisstart_h", "", k_objtype_clear_area);
+
+	    // Drive the tank down the main street
+//	    DriveToDestinationBF( cistank1, propRefFromName("cistank_end") );
+
+	    // Spawn a droid to attack the player only
+            spawnGroupSetActive(propRefFromName("targetpl_SG1"), true);
+	    BFNPCGroupObjectiveSetType(cObjectiveName, "targetpl_SG1",  k_objtype_attack_prop);
+	    BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "targetpl_SG1" ,propRefFromName("player_0"), 20, 40);
+
+    	    SetObjectiveTriggered(true, iObjective);
+	}
+	else if (iSubObjective == 2)
+	{ 
+	    // Spawn droids Guarding the Antenna
+            spawnGroupSetActive(propRefFromName("ant_droid_SG"), true);
+            lib_SetupGroupZone(cObjectiveName, "ant_droid_SG", "antenna_h", "", k_objtype_hold_area);
+
+	    // Ship attacking Republic Troops down the main street
+	    street_strafe1 = SpawnAIVehicle(propRefFromName("strt_strafe_DOF"), "cis_battledroid_npc_story", "cis_droidfighter", 0, false, 0);
+	    propRef street_sp1;
+	    street_sp1 = propRefFromName("street_SP1");
+	    BFShipFollowScriptedSplineNoAvoidance(street_strafe1, street_sp1);
+
+	    // Have X1 join with the player
+	    chrAIJoinGroup( propRefFromName("squadx1"), "player" );	    
+	    // Create the players' squad
+	    if(propExists(propRefFromName("squad1")))
+	    {
+    		chrAIJoinGroup( propRefFromName("squad1"), "player" );
+	    }
+//	    chrAIJoinGroup( propRefFromName("squad2"), "player" );
+
+	    // Set a battle going outside the Cantina
+	    // Spawn some infinitely respawning clones to battle the droids
+	    spawnGroupSetActive(propRefFromName("cantina_rep_SG"), true);
+	    lib_SetupGroupZone(cObjectiveName, "cantina_rep_SG", "cantina_t", "", k_objtype_clear_area);
+    	    // Spawn some infinitely respawning clones to battle the droids
+	    spawnGroupSetActive(propRefFromName("cantina_rep_SG2"), true);
+	    lib_SetupGroupZone(cObjectiveName, "cantina_rep_SG2", "cantina_t", "", k_objtype_clear_area);
+	    // Spawn droids
+  	    spawnGroupSetActive(propRefFromName("cantina_cis_SG"), true);
+	    lib_SetupGroupZone(cObjectiveName, "cantina_cis_SG", "cantina_t", "", k_objtype_clear_area);
+	    
+	    // Spawn droids inside the landing bay (SUB-OBJECTIVE 1)
+	    spawnGroupSetActive(propRefFromName("landbay_SG_p1"), true);
+	    lib_SetupGroupZone(cObjectiveName, "landbay_SG_p1", "landbay_h", "", k_objtype_clear_area);
+
+	    // Currently a timer, yet will change once speech is available.
+	    SetObjectiveTimer(10,iObjective);
+    	    //SetObjectiveTriggered(true, iObjective);
+	}
+	else
+	{
+	    // MISSION START
+	    // Enable the Ion Cannon
+	    ionCannonSetRandomFiringEnabled(propRefFromName("base_cannon"), true);
+
+	    // Battle Over the main ground area
+	    BFAddFlyingAIPatrolZoneAABB(vector(70.0f, 75.0f, -120.0f), vector(80.0f, 50.0f, 110.0f));
+	    
+	    setVMPropActive(propRefFromName("vmSkyVeh"), true); 
+	    setNthVMPropStringVar(propRefFromName("vmSkyVeh"), "8", 8); //Rebels
+            setNthVMPropStringVar(propRefFromName("vmSkyVeh"), "10", 9); //Imperials
+	    
+	    // BATTLE OVERHEAD AT LEVEL START
+	    // Republic Ship
+	    startfighter1 = SpawnAIVehicle(propRefFromName("start_fighter"), "rep_clonetrooper_npc_story", "rep_starfighter", 0, false, 0);
+	    SetPropRefInvincible(startfighter1, true);
+	    propRef spline3;
+	    spline3 = propRefFromName("start_spline1");
+	    BFShipFollowScriptedSplineNoAvoidance(startfighter1, spline3);
+	    // Droid Fighter
+	    startfighter2 = SpawnAIVehicle(propRefFromName("start_fighter2"), "cis_battledroid_npc_story", "cis_droidfighter", 0, false, 0);
+	    SetPropRefInvincible(startfighter2, true);
+	    propRef spline3;
+	    spline3 = propRefFromName("start_spline1");
+	    BFShipFollowScriptedSplineNoAvoidance(startfighter2, spline3);
+
+	    // DROID LANDING FLYING OVER THE PLAYABLE AREA
+	    // Spawn the ship
+	    takeoffship = SpawnAIVehicle(propRefFromName("takeoffship"), "cis_battledroid_npc_story", "cis_landing_ship", 0, false, 0); //cis_droidgunship", 0, false, 0);
+	    SetPropRefInvincible(takeoffship, true);
+	    // Make the Landing Ship follow the spline
+	    propRef spline;
+	    spline = propRefFromName("takeoffship_SP");
+	    BFShipFollowScriptedSplineNoAvoidance(takeoffship, spline);
+
+	    // DROID DROPSHIP COMING INTO THE LANDING BAY
+	    propref cis_gunship;
+	    cis_gunship = SpawnAIVehicle(propRefFromName("cis_gunship_sp"), "cis_battledroid_npc_story", "cis_droidgunship", 0, false, 0);
+	    addPropToGroup(propRefFromName("Spwn-11"), cis_gunship);
+
+	    // DROID GUNSHIP TAKING OFF AT LEVEL START
+	    cis_gunship_dist = SpawnAIVehicle(propRefFromName("distant_gship"), "cis_battledroid_npc_story", "cis_droidgunship", 0, false, 0);
+	    // Make the gunship fly into the landing bay
+	    propRef spline4;
+	    spline4 = propRefFromName("gunship_SP");
+	    BFShipFollowScriptedSplineNoAvoidance(cis_gunship_dist, spline4);
+
+	    // DISTANT DROID LANDING SHIP PASSING OVERHEAD
+	    landingship = SpawnAIVehicle(propRefFromName("landship1"), "cis_battledroid_npc_story", "cis_landing_ship", 0, false, 0); //cis_droidgunship", 0, false, 0);
+	    SetPropRefInvincible(landingship, true);
+	    propRef spline;
+	    spline = propRefFromName("landship1_SP");
+	    BFShipFollowScriptedSplineNoAvoidance(landingship, spline);
+
+	    // LANDING SHIP 3 - LOOPING IN DISTANCE
+	    landingship3 = SpawnAIVehicle(propRefFromName("landship3"), "cis_battledroid_npc_story", "cis_landing_ship", 0, false, 0);
+	    SetPropRefInvincible(landingship3, true);
+	    // Make the Landing Ship follow the spline
+	    propRef spline3;
+	    spline3 = propRefFromName("distantsp2");
+	    BFShipFollowScriptedSplineNoAvoidance(landingship3, spline3);
+
+
+	    // Set X1 to be invincible (TODO: Change this - if he dies the mission fails)
+	    SetPropRefInvincible(propRefFromName("squadx1"), true);
+
+	    SetPropRefInvincible(cis_gunship, false);
+
+	    // Make the Droid Gunship hover inside the landing bay
+    	    BFRequestAIHoverAttack(cis_gunship, 9.0f);	    
+
+	    // AI - Get the squad mates of the player to run off and join the battle
+            lib_SetupGroupZone(cObjectiveName, "playersquad_SG", "Start_h", "", k_objtype_hold_area);
+
+	    // X1 speaks to the player
+	    x1 = chrRefFromName("squadx1");
+	    // Play opening speech
+	    //TODO MOVE to Speech Script
+	    chrSpeak(x1, "l01b_040_x1", 0, 0.0f, 45.0f, x1, true, false);
+	    chrSpeak(x1, "l01b_050_x1", 0, 0.0f, 45.0f, x1, true, false);
+	    SetAIState(x1, "AISTATE_PATROL");
+	    beginInGameCutSceneIgnorePerceptsAndDamage(x1);
+	    propSetFrozen(x1, true);	    
+	    chrPlayAnimSlot(x1, "AN_tat_x1_strt", 1.0f, false);
+	    waitForGameTime(3.0f);
+	    propSetFrozen(x1, false);	    	    
+	    // Set x1 back into the story state
+	    SetAIState(x1, "AISTATE_BF_STORY");
+	    // Set x1 to join the fight
+            lib_SetupGroupZone(cObjectiveName, "x1_SG", "Start_h", "", k_objtype_hold_area);
+
+	    // AI - Have some infinitely spawning droids milling around in the street
+	    spawnGroupSetActive(propRefFromName("cis_start_SG"), true);
+            lib_SetupGroupZone(cObjectiveName, "cis_start_SG", "cisstart_h", "", k_objtype_hold_area);
+
+	    // Spawn a tank coming down the main street (TODO: Make this work)
+//	    cistank1 = SpawnAIVehicleWithObjectives(propRefFromName("cistank_start"), "cis_battledroid_npc_story", "cis_aat", 1, true, k_seatPos_driver, StringToChar16("cis_start_SG"));
+
+	    // Spawn the other Republic Troops
+	    spawnGroupSetActive(propRefFromName("rep_SG1"), true);
+            lib_SetupGroupZone(cObjectiveName, "rep_SG1", "Start_h", "", k_objtype_hold_area);
+
+	    SetNumSubObjectives(2, iObjective);
+
+	    SetObjectiveTriggered(true, iObjective);
+	}
+    }
+    else if (iObjective == 2) // PRIMARY 2 - ACTIVATE THE COMMUNICATIONS UPLINK
+    {	    
+	    
+	    // Direct the player towards the Communications Antenna
+            addNewObjectiveIndicatorToProp(propRefFromName("vmTrig2"), k_objectiveIndicatorType_mainObjective);
+
+	    // Play broken sfx at Communications Antenna
+	    //playSoundAtPropPos("tattooine_uplink_off",propRefFromName("antenna_prop1"));
+	    //soundchannel sc1;
+	    //sc1 = playSoundAtProp("tattooine_uplink_off", propRefFromName("antenna_prop1"));
+	    
+	    logstr("HELLO THERE: YOU'RE IN OBJECTIVE 2");
+	    SetObjectiveTriggered(true, iObjective);
+	    //JumpToObjective(3, false);
+	    //return false; //NEW IMPORTANT BIT IF JUMPING
+    }
+    else if (iObjective == 3) // PRIMARY 3 - ACCESS THE GROUND CANNON
+    {
+	if (iSubObjective == 1)
+	{
+	    activateTalkingHeadNew("TatFerroda_LandShip", true);
+	    // TODO MOVe to Speech Script
+	    //chrSpeak(ferroda, "l01d_010_feroda", 0, 0.0f, 45.0f, ferroda, true, false);	    //ferroda hasn't been created yet
+	    logstr("HELLO THERE: YOU'RE IN OBJECTIVE 3_1");
+
+	    // Spawn droids to attack the player only
+	    spawnGroupSetActive(propRefFromName("targetpl_SG2"), true);
+	    BFNPCGroupObjectiveSetType(cObjectiveName, "targetpl_SG2",  k_objtype_attack_prop);
+	    BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "targetpl_SG2" ,propRefFromName("player_0"), 20, 40);
+
+	    // Deactivate all existing spawners
+	    spawnGroupSetActive(propRefFromName("ant_droid_SG"), false);
+	    spawnGroupSetActive(propRefFromName("cis_start_SG"), false);
+	    spawnGroupSetActive(propRefFromName("cis_street_SG1"), false);
+	
+	    // Arrow directed at the Republic Base
+	    addNewObjectiveIndicatorToProp(propRefFromName("dofProp_3"), k_objectiveIndicatorType_mainObjective);	
+	
+	    // Remove the indicator from the Rep Base
+	    removeObjectiveIndicatorFromProp(propRefFromName("vmTrig3"));
+	
+	    // Spawn Battledroids guarding cannon controls
+	    spawnGroupSetActive(propRefFromName("Spwn-3_1"), true);
+	    lib_SetupGroupZone(cObjectiveName, "Spwn-3_1", "ioncannon_h", "", k_objtype_clear_area);
+
+	    // Droids within the base
+	    spawnGroupSetActive(propRefFromName("obj3_cis_spwns1"), true);
+	    lib_SetupGroupZone(cObjectiveName, "obj3_cis_spwns1", "baseint_t", "", k_objtype_clear_area);
+
+	    // More droids fighting within the base
+	    spawnGroupSetActive(propRefFromName("obj3_cis_spwns2"), true);
+	    lib_SetupGroupZone(cObjectiveName, "obj3_cis_spwns2", "baseint2_t", "", k_objtype_clear_area);
+
+	    // Clone troopers fighting within the base
+	    spawnGroupSetActive(propRefFromName("obj3_rep_spwns1"), true);
+	    lib_SetupGroupZone(cObjectiveName, "obj3_rep_spwns1", "baseint_t", "", k_objtype_hold_area);
+
+	    SetObjectiveKillSpawners(1,iObjective);
+	}
+	else
+	{
+	    // Animate the Antenna
+	    propPlayAnimSlot(propRefFromName("antenna_prop1"), "Antenna_Anim");
+//	    soundchannel sc1
+	   // sc1 = playSoundAtPropPos("tattooine_antenna_activate",propRefFromName("antenna_prop1"));
+
+	    // Enable doors leading into Base to be opened. 
+	    enableTrigger(propRefFromName("eventTrig26_"));
+	    enableTrigger(propRefFromName("eventTrig27_"));
+	    enableTrigger(propRefFromName("eventTrig28_"));
+	    enableTrigger(propRefFromName("eventTrig30_"));
+	    enableTrigger(propRefFromName("eventTrig31_"));
+	    enableTrigger(propRefFromName("eventTrig32_"));
+
+	    logstr("HELLO THERE: YOU'RE IN OBJECTIVE 3_0");
+
+	    // Arrow directed at the Republic Base
+	    addNewObjectiveIndicatorToProp(propRefFromName("vmTrig3"), k_objectiveIndicatorType_mainObjective);
+	    removeObjectiveIndicatorFromProp(propRefFromName("vmTrig2"));	
+
+	    spawnGroupSetActive(propRefFromName("landbay_SG_p1"), false);
+	    
+	    // Open Door
+	    forceTriggerTriggered(propRefFromName("eventTrig1"));
+	    
+	    // Ferroda Message
+	    activateTalkingHead(0.02f, 1.68f, -1.59f, 0.015f, 1.68f, -2.0f, 7.0f, "characters/heroes/masterferroda/ferroda_ingame", "AN_lnd_tlk01", "X1, X2, get back to base immediately. I need you up here. We're launching an assault on their Control Ship.");
+
+	    // Spawn Jetpack guy
+	    spawnGroupSetActive(propRefFromName("cantina_rep_SG2"), true);
+	    lib_SetupGroupZone(cObjectiveName, "cantina_rep_SG2", "cantina_t", "", k_objtype_clear_area);
+	    // Spawn other clones running in to the cantina area
+	    spawnGroupSetActive(propRefFromName("rep_gen_SG2"), true);
+	    lib_SetupGroupZone(cObjectiveName, "rep_gen_SG2", "cantina_t", "", k_objtype_hold_area);
+	    // Spawn CIS troops attacking the area outside the cantina
+	    spawnGroupSetActive(propRefFromName("cantina_cis_SG2"), true);
+	    lib_SetupGroupZone(cObjectiveName, "cantina_cis_SG2", "cantina_t", "", k_objtype_clear_area);
+
+	    // Remove the indicator from the Radio transmitter
+	    //removeObjectiveIndicatorFromProp(propRefFromName("vmTrig1_2")); //THERE IS NO PROP CALLED vmTrig1_2, COME ON!
+
+	    // INFINITELY LOOPING LANDING SHIP IN THE DISTANCE
+	    landingship2 = SpawnAIVehicle(propRefFromName("landship2"), "cis_battledroid_npc_story", "cis_landing_ship", 0, false, 0);
+	    SetPropRefInvincible(landingship2, true);
+	    // Make the Landing Ship follow the spline
+	    propRef spline2;
+	    spline2 = propRefFromName("landship2_SP");
+	    BFShipFollowScriptedSplineNoAvoidance(landingship2, spline2);
+
+	    // DODGY HACK FOR THE CANTINA BONUS OBJECTIVE
+	    // Spawn the clones inside the cantina
+	    lib_SetupGroupZone(cObjectiveName, "cantina_clone_SG", "cantina_h", "", k_objtype_hold_area);
+	    // Spawn the battledroids fighting them
+	    lib_SetupGroupZone(cObjectiveName, "Spwn-12_1", "cantina_int", "", k_objtype_hold_area);
+	    SetNumSubObjectives(1, iObjective);
+
+	    //soundWaitUntilFinished(sc1);
+//	    sc1 = playSoundAtPropPos("tattooine_uplink_on",propRefFromName("antenna_prop1"));
+
+	    // Allow the player to go multiple routes
+	 //   SetNumAltRoutes(2, iObjective);
+
+	    SetObjectiveTriggered(true, iObjective);
+	}
+    }
+    else if (iObjective == 4) // PRIMARY 4 - ELIMINATE THE INCOMING LANDING SHIPS
+    {
+	// Delete the ambient ships to avoid confusion
+	propDelete(landingship);
+	propDelete(landingship2);
+	propDelete(landingship3);
+
+	BFKillAllNPCsFromSpawner("Spwn-3_1");
+	
+	removeObjectiveIndicatorFromProp(propRefFromName("dofProp_3"));	
+	addNewObjectiveIndicatorToProp(propRefFromName("base_cannon"), k_objectiveIndicatorType_mainObjective);
+
+	logStr("HELLO YOU'RE HERE IN OBJ 4");
+		
+	propref obj4_ship1;
+	propref obj4_ship2;
+	propref obj4_ship3;
+	propref spline;
+	
+	// Ship 1 (Right to Left)
+	obj4_ship1 = SpawnAIVehicle(propRefFromName("obj4_ship1_st"), "cis_battledroid_npc_story", "cis_landing_ship", 0, false, 0); //cis_droidgunship", 0, false, 0);
+	spline = propRefFromName("obj4_ship1_sp");
+	BFShipFollowScriptedSplineNoAvoidance(obj4_ship1, spline);
+
+	// Ship 2 (Far to close)
+	obj4_ship2 = SpawnAIVehicle(propRefFromName("obj4_ship2_st"), "cis_battledroid_npc_story", "cis_landing_ship", 0, false, 0); //cis_droidgunship", 0, false, 0);
+	spline = propRefFromName("obj4_ship2_sp");
+	BFShipFollowScriptedSplineNoAvoidance(obj4_ship2, spline);
+
+	// Ship 3 (Behind to overhead)
+	obj4_ship3 = SpawnAIVehicle(propRefFromName("obj4_ship3_st"), "cis_battledroid_npc_story", "cis_landing_ship", 0, false, 0); //cis_droidgunship", 0, false, 0);
+	spline = propRefFromName("obj4_ship3_sp");
+	BFShipFollowScriptedSplineNoAvoidance(obj4_ship3, spline);
+
+	addPropToGroup(propRefFromName("Spwn-4"), obj4_ship1);
+	addPropToGroup(propRefFromName("Spwn-4"), obj4_ship2);
+	addPropToGroup(propRefFromName("Spwn-4"), obj4_ship3);
+
+	SetObjectiveKillSpawners(1, iObjective);
+    }
+    else if (iObjective == 5) // PRIMARY 5 - DESTROY THE CIS SPIDER DROID
+    {
+	removeObjectiveIndicatorFromProp(propRefFromName("base_cannon"));
+	
+	// Ferroda Message
+        activateTalkingHead(0.02f, 1.68f, -1.59f, 0.015f, 1.68f, -2.0f, 7.0f, "characters/heroes/masterferroda/ferroda_ingame", "AN_lnd_tlk01", "X1, X2, a Spider Walker is closing on your location. Do what you can!");
+
+	// Delete Door
+	propDelete(propRefFromName("tat_mil_c1"));
+	propDelete(propRefFromName("tat_mil_c3"));
+	propDelete(propRefFromName("tat_mil_c4"));
+	propDelete(propRefFromName("tat_mil_c5"));
+	propDelete(propRefFromName("tat_mil_c6"));
+	propDelete(propRefFromName("tat_mil_c7"));
+	
+	// Create the spider walker
+	propref spider_droid;
+	spider_droid = SpawnPropFromTemplate("cis_spiderdroid", propRefFromName("spiderdrd_DOF"), vector(0.0f, 0.0f, 0.0f));
+
+	// CLAIRE Recreate the looping landing ships
+	// INFINITELY LOOPING LANDING SHIP IN THE DISTANCE
+	landingship2 = SpawnAIVehicle(propRefFromName("landship2"), "cis_battledroid_npc_story", "cis_landing_ship", 0, false, 0);
+	SetPropRefInvincible(landingship2, true);
+	// Make the Landing Ship follow the spline
+    	propRef spline2;
+	spline2 = propRefFromName("landship2_SP");
+	BFShipFollowScriptedSplineNoAvoidance(landingship2, spline2);
+	// LANDING SHIP 3 - LOOPING IN DISTANCE
+	landingship3 = SpawnAIVehicle(propRefFromName("landship3"), "cis_battledroid_npc_story", "cis_landing_ship", 0, false, 0);
+	SetPropRefInvincible(landingship3, true);
+	// Make the Landing Ship follow the spline
+	propRef spline3;
+	spline3 = propRefFromName("distantsp2");
+	BFShipFollowScriptedSplineNoAvoidance(landingship3, spline3);
+
+	// Remove the indicator from the Rep Base
+	removeObjectiveIndicatorFromProp(propRefFromName("obj2_ind"));	
+
+	// Add an arrow to the spider droid
+        addPropToGroup(propRefFromName("Spwn-5"), spider_droid);
+	lib_AddIndicatorsToGroup(propRefFromName("Spwn-5"), 0, true);  
+    
+	//addNewObjectiveIndicatorToProp(spider_droid, k_objectiveIndicatorType_mainObjective);	
+
+	// Spawn clones battling with the Spider Droid
+	spawnGroupSetActive(propRefFromName("basefnt_SG"), true);
+	spawnGroupSetActive(propRefFromName("bridge_SG"), true);
+	spawnGroupSetActive(propRefFromName("basetop_SG"), true);
+
+	// Base group to defend the base
+        lib_SetupGroupZone(cObjectiveName, "basefnt_SG", "basefnt_h", "", k_objtype_hold_area);
+	// Bridge group to hold bridge position
+        lib_SetupGroupZone(cObjectiveName, "bridge_SG", "bridge_h", "", k_objtype_hold_area);
+	// Base roof hold position
+        lib_SetupGroupZone(cObjectiveName, "basetop_SG", "basetop_h", "basetop_h", k_objtype_hold_area);
+
+	// Make the Clones attack the spider droid
+        BFNPCGroupObjectiveSetType(cObjectiveName, "basefnt_SG",  k_objtype_attack_prop);
+    	BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "basefnt_SG",spider_droid, 20, 30);
+	SetObjectiveKillSpawners(1, iObjective);
+    }
+    else if (iObjective == 6)	// PRIMARY 6 - PILOT THE LAAT GUNSHIP
+    {
+	if (iSubObjective == 1)
+	{
+//	    chrPlayAnimSlot(chrRefFromPropRef(ferroda), "AN_tat_ferr_base", 1, false);
+
+	    // Check for original pilot back onto the gunship
+	    BFRequestAIToBeVehiclePassenger(chrRefFromPropRef(laat_pilot),rep_gunship);
+
+	    // Ferroda speech to player
+	    //chrSpeak(ferroda, "l01g_010_feroda", 0, 0.0f, 45.0f, ferroda, true, false);	    	    //ferroda hasn't been created yet
+	}
+	else if (iSubObjective == 2)
+	{
+	    // Check for Ferroda getting back onto the gunship
+//	    BFRequestAIToBeVehiclePassenger(chrRefFromPropRef(ferroda),rep_gunship);
+	    // Get X1 into the gunship also
+	    BFRequestAIToBeVehiclePassenger(chrRefFromName("squadx1"),rep_gunship);
+
+	    nextObjective(iObjective);
+	}
+	else if ( iSubObjective == 3 ) 
+	{
+/*	    int fht;
+	    fht = GetNumberOfPassengers(rep_gunship);
+	    logStr("Setup 6_3");
+	    logStr("Passengers");
+	    logInt(fht);
+	    
+	    // Wait for the passenger to climb on-board (TODO: Need to alter this value when X1 is along for the ride)
+	    if ( GetNumberOfPassengers( rep_gunship ) > 1 )
+	    {*/
+		logstr("HELLO I'm HERE!");
+		nextObjective( iObjective );
+	    //}
+	}
+	else
+	{
+	    // Ferroda Message
+	    activateTalkingHead(0.02f, 1.68f, -1.59f, 0.015f, 1.68f, -2.0f, 7.0f, "characters/heroes/masterferroda/ferroda_ingame", "AN_lnd_tlk01", "X1, X2, we're nearing the landing platform. There isn't much time.");
+//	    BFRemoveFlyingAIPatrolZone(propGetPosFromName("dofIntBall1"));
+	    BFAddFlyingAIPatrolZoneAABB(vector(70.0f, 75.0f, -120.0f), vector(100.0f, 50.0f, 150.0f));
+
+	    // Spawn an LAAT
+//	    rep_gunship = SpawnAIVehicle(propRefFromName("laat_SP"), "rep_engineer_npc_story", "rep_gunship", 0, false, 0);      
+	    rep_gunship = SpawnAIVehicle(propRefFromName("vmTrig6"), "rep_engineer_npc_story", "rep_gunship", 0, false, 0); 
+	    
+	    ferroda = SpawnPropFromTemplate("master_ferroda_npc_story", propRefFromName("ferroda_SP"), vector(0.0, 1.0, 0.0));
+
+	    // Set all 3 to be invincible
+	    SetPropRefInvincible(rep_gunship, true);
+	    SetPropRefInvincible(ferroda, true);
+	    //SetPropRefInvincible(laat_trooper, true);	    //this prop is never created...
+
+	    // LAAT flight path
+	    propRef spline;
+	    spline = propRefFromName("laat_spline");
+//	    BFShipFollowScriptedSplineNoAvoidance(rep_gunship, spline); 	    
+	
+	    // Add Ferroda into the gunship
+	    PassengerVehicleBF(ferroda, rep_gunship, false, "PASSNGR3");
+	    
+	    // Set all 3 to be invincible
+	    SetPropRefInvincible(rep_gunship, true);
+
+	    // Get the vehicle pilot so he can jump back onboard later
+	    laat_pilot = getVehicleDriver(rep_gunship);
+
+	    // Indicator directed at the LAAT gunship
+	    addNewObjectiveIndicatorToProp(rep_gunship, k_objectiveIndicatorType_mainObjective);	
+
+	    // Base group to defend the base
+	    lib_SetupGroupZone(cObjectiveName, "basefnt_SG", "basefnt_h", "", k_objtype_hold_area);
+	    // Bridge group to hold bridge position
+            lib_SetupGroupZone(cObjectiveName, "bridge_SG", "bridge_h", "", k_objtype_hold_area);
+
+	    // Spawn some mode Battledroids assaulting the base
+	    spawnGroupSetActive(propRefFromName("obj5_cis_SG"), true);
+	    lib_SetupGroupZone(cObjectiveName, "obj5_cis_SG", "basefnt_h", "", k_objtype_hold_area);
+
+	    // DODGY HACK TO MAYBE TRIGGER THE PICKUP PILOTS OBJECTIVE
+	    //lib_SetupGroupZone(cObjectiveName, "bonus3_Rep_SG", "desert_h", "", k_objtype_hold_area);	    
+	    lib_SetupGroupZone(cObjectiveName, "Bonus3_CIS_SG", "desert_h", "", k_objtype_hold_area);	    
+
+	    SetNumSubObjectives(3, iObjective);
+	}
+    }
+    else if (iObjective == 7)	// PRIMARY 7 - REGROUP ONBOARD THE ACCLAMATOR
+    {
+	if( iSubObjective == 1 )
+	{
+            JumpToObjective(15,false);
+	    //return false; //NEW IMPORTANT BIT IF JUMPING
+	}
+	else
+	{
+	    // Between the ground and the Republic frigate
+	    BFAddFlyingAIPropCentricPatrolZone(pPlayer, 200.0f);
+	    // Remove previous zone
+	    BFRemoveFlyingAIPatrolZone(vector(70.0f, 75.0f, -120.0f)); // above the ground
+
+	// Try getting Ferroda and X1 to leave the gunship
+//	PassengerVehicleBF(ferroda, rep_gunship, true, "PASSNGR3");
+//	PassengerVehicleBF(x1, rep_gunship, true, "PASSNGR4");
+
+	    ChangePassengerExitWhenDriverless(ferroda, true);
+	    ChangePassengerExitWhenDriverless(x1, true);
+
+	    // Have X1 and the other clones run to ships
+	    propRef ferroda_ship = propRefFromName("ferroda_ship");
+	    chrRef ferroda_CR = chrRefFromPropRef(ferroda);
+//	BFRequestAIDriveVehicle( ferroda_CR, ferroda_ship ); 
+	    BFFlyVehicleFollowPlayer( ferroda_CR, ferroda_ship, 0 );
+
+	    propRef x1_ship = propRefFromName("x1_ship");
+	    BFFlyVehicleFollowPlayer( x1, x1_ship, 0 );
+	    
+	    // Remove any bonus objectives the player hasn't done
+	    BFObjectiveRemoveBonus(StringToChar16("obj_Tat11"), 11); //secondary1
+	    BFObjectiveRemoveBonus(StringToChar16("obj_Tat12"), 12); // secondary2
+
+	    // Remove the indicator from the Droid Gunship
+	    removeObjectiveIndicatorFromProp(rep_gunship);	
+
+	    // Ferroda Message
+	    activateTalkingHead(0.02f, 1.68f, -1.59f, 0.015f, 1.68f, -2.0f, 7.0f, "characters/heroes/masterferroda/ferroda_ingame", "AN_lnd_tlk01", "X2, take us up to our frigate. Quickly!");
+	
+	    addNewObjectiveIndicatorToProp(propRefFromName("obj5_ind"), k_objectiveIndicatorType_mainObjective);	
+
+	    // Disable the previous objective spawners
+	    //spawnGroupSetActive(propRefFromName("cantina_rep_SG1"), false);
+	    spawnGroupSetActive(propRefFromName("cantina_rep_SG2"), false);
+	    //spawnGroupSetActive(propRefFromName("cantina_cis_SG1"), false);
+
+	    // Add the "Pickup Pilots" bonus objective
+	    BFObjectiveAddBonus(StringToChar16("obj_Tat13"), 13); //secondary3
+
+	    ObjectiveSetup(StringToChar16("obj_Tat14"), 13, 0); //secondary4
+	    SetNumSubObjectives(1, iObjective);	    
+
+	    SetObjectiveTriggered(true, iObjective);
+	}
+	// Remove invincibility flags
+//	SetPropRefInvincible(rep_gunship, false);
+    }
+    else if (iObjective == 8)	// PRIMARY 8 - JOIN THE REPUBLIC ASSAULT ON THE DROID CONTROL SHIP
+    {
+	if( iSubObjective == 1 )
+	{
+            activateTalkingHeadNew("TatX1_DcsShield", true);
+	
+	    removeObjectiveIndicatorFromProp(propRefFromName("vmTrig8"));	
+
+	    // Tell X1 to break off and attack the shield generator
+	    BFStopFlyingAIFollowPlayer( x1 );
+
+    	    // Add player-centric patrol zone
+	    BFAddFlyingAIPropCentricPatrolZone(pPlayer, 200.0f);
+
+	    // Timer until X1 blows the shield generator
+	    SetObjectiveTimer(10, iObjective);
+	}
+	else
+	{
+	    // Near the Droid Control Ship
+	    BFAddFlyingAIPatrolZone(vector(241.68f, 1470.0f, 311.16f), 1000.0f);
+	    
+	    // Remove the player-centric patrol zone
+	    BFRemoveFlyingAIPropCentricPatrolZone(pPlayer);
+	
+	    // Take the invincibility flag off the Acclamator
+	    SetPropRefInvincible(propRefFromName("cisfrig"), false);
+
+	    // STEVE! Delete all the ground NPC's
+	    BFKillAllNPCsFromSpawner("ant_droid_SG");
+	    BFKillAllNPCsFromSpawner("cis_start_SG");
+	    BFKillAllNPCsFromSpawner("obj3_rep_spwns1");
+	    BFKillAllNPCsFromSpawner("obj3_cis_spwns2");
+	    BFKillAllNPCsFromSpawner("obj3_cis_spwns1");
+	    BFKillAllNPCsFromSpawner("Spwn-3_1");
+	    BFKillAllNPCsFromSpawner("basefnt_SG");
+	    BFKillAllNPCsFromSpawner("bridge_SG");
+	    BFKillAllNPCsFromSpawner("obj5_cis_SG");
+	    //BFKillAllNPCsFromSpawner("cantina_rep_SG1"); //Doesn't exist
+	    BFKillAllNPCsFromSpawner("cantina_rep_SG2");
+	    BFKillAllNPCsFromSpawner("cantina_rep_SG2");
+	    //BFKillAllNPCsFromSpawner("cantina_rep_SG1"); //Doesn't exist
+	    BFKillAllNPCsFromSpawner("targetpl_SG1");
+	    BFKillAllNPCsFromSpawner("cantina_rep_SG");
+	    BFKillAllNPCsFromSpawner("cantina_cis_SG");
+	    BFKillAllNPCsFromSpawner("landbay_SG_p1");
+	    BFKillAllNPCsFromSpawner("rep_SG1");
+	    BFKillAllNPCsFromSpawner("rep_gen_SG2");
+	    BFKillAllNPCsFromSpawner("cantina_cis_SG2");
+	    BFKillAllNPCsFromSpawner("cantina_clone_SG");
+	    BFKillAllNPCsFromSpawner("Spwn-12_1");
+	    BFKillAllNPCsFromSpawner("targetpl_SG2");
+	    BFKillAllNPCsFromSpawner("basetop_SG");
+
+	    // Deactivate all ground spawners
+	    spawnGroupSetActive(propRefFromName("targetpl_SG1"), false);
+	    spawnGroupSetActive(propRefFromName("cantina_rep_SG"), false);
+	    spawnGroupSetActive(propRefFromName("cantina_cis_SG"), false);
+	    spawnGroupSetActive(propRefFromName("rep_gen_SG2"), false);
+	    spawnGroupSetActive(propRefFromName("cantina_cis_SG2"), false);
+	    spawnGroupSetActive(propRefFromName("cantina_clone_SG"), false);
+	    spawnGroupSetActive(propRefFromName("Spwn-12_1"), false);
+	    spawnGroupSetActive(propRefFromName("targetpl_SG2"), false);
+	    spawnGroupSetActive(propRefFromName("obj3_cis_spwns1"), false);
+	    spawnGroupSetActive(propRefFromName("obj3_cis_spwns2"), false);
+	    spawnGroupSetActive(propRefFromName("obj3_rep_spwns1"), false);
+	    spawnGroupSetActive(propRefFromName("basefnt_SG"), false);
+	    spawnGroupSetActive(propRefFromName("bridge_SG"), false);
+	    spawnGroupSetActive(propRefFromName("basetop_SG"), false);
+	    spawnGroupSetActive(propRefFromName("obj5_cis_SG"), false);
+
+	    BFObjectiveRemoveBonus(StringToChar16("obj_Tat13"), 13);	
+
+	    removeObjectiveIndicatorFromProp(propRefFromName("obj5_ind"));	
+
+	    // Ferroda Message
+	    activateTalkingHead(0.02f, 1.68f, -1.59f, 0.015f, 1.68f, -2.0f, 7.0f, "characters/heroes/masterferroda/ferroda_ingame", "AN_lnd_tlk01", "Their Command Ship is controlling this entire droid assault. X1, I need you to take out the shield generator. X2, get inside and target the main reactor. May the force be with you.");
+	
+	    addNewObjectiveIndicatorToProp(propRefFromName("vmTrig8"), k_objectiveIndicatorType_mainObjective);	
+
+	    SetObjectiveTriggered(true, iObjective);
+
+	    // Add the "Help take out fighters" bonus objective
+	 //   BFObjectiveAddBonus(secondary4, 14);
+	  //  ObjectiveSetup(secondary4, 14, 0);
+
+	    SetNumSubObjectives(1, iObjective);	    
+	}
+    }
+    else if (iObjective == 9)	// PRIMARY 9 - DESTROY THE DROID CONTROL SHIP REACTOR CORE
+    {
+	if (iSubObjective == 1)	
+	{
+	    // Once player is inside the control ship
+	   removeObjectiveIndicatorFromProp(propRefFromName("obj8_ind"));
+
+	   addNewObjectiveIndicatorToProp(propRefFromName("obj9_ind"), k_objectiveIndicatorType_mainObjective);	
+
+	   // Delete all of the enemy ships outside
+
+	}
+	else 
+	{
+	    addNewObjectiveIndicatorToProp(propRefFromName("obj8_ind"), k_objectiveIndicatorType_mainObjective);	
+	    propApplyDamage(propRefFromName("dcs_shield_gen"), 100.0f);
+
+	    logStr("HERE IN 9_0");
+	    logStr("HERE IN 9_0");
+	    // X1 Message
+	    activateTalkingHeadNew("TatX1_Space1", true);	
+	    // Ferroda Response
+	    activateTalkingHeadNew("TatFerroda_Space1", true);
+
+//	    PropDelete(PropRefFromName("tat_dcsbeams1"));
+	    PropDelete(PropRefFromName("ctrlshpdoorr3"));
+	    PropDelete(PropRefFromName("ctrlshpdoorr1"));
+	    PropDelete(PropRefFromName("ctrlshpdoorl1"));
+	    PropDelete(PropRefFromName("ctrlshpdoorl3"));
+
+	    SetNumSubObjectives(1, iObjective);
+
+	    SetObjectiveTriggered(true, iObjective);	    
+	}
+    }
+    else if (iObjective == 10) // PRIMARY 10 - ESCAPE THE CONTROL SHIP
+    {
+	// End the level
+	if (iSubObjective == 1)
+	{
+	    // Destroy the Droid Control Ship
+	    propKill (propRefFromName("cruisership2S"));
+	    propRef p = getPlayerPropRefFromID(GetPlayerId());
+	    BFSetVehicleViewMode(p, 3); 
+	    BFLockCamera(true);
+	    chrSpeak(ferroda, "l01k_050_feroda", 0, 0.0f, 45.0f, ferroda, true, false);	
+	    activateTalkingHeadNew("TatFerroda_End1", true);		    	    
+	    activateTalkingHeadNew("TatX1_End2", true);		    
+	    SetObjectiveTimer(20, iObjective);
+	}
+	else if (iSubObjective == 2)
+	{
+	    BFLockCamera(false);
+	    // End of level
+	    bEndLevel = true;
+	}
+	else
+	{
+	    BFObjectiveRemoveBonus(StringToChar16("obj_Tat14"), 14); //secondary4
+	    
+	    removeObjectiveIndicatorFromProp(propRefFromName("obj9_ind"));
+	    
+	    // Ferroda Message
+	    activateTalkingHead(0.02f, 1.68f, -1.59f, 0.015f, 1.68f, -2.0f, 7.0f, "characters/heroes/masterferroda/ferroda_ingame", "AN_lnd_tlk01", "Great work X2! The ship is beginning to explode from inside. Get out of there now! Hurry!");
+	 
+	    // Take the invincibility flag off the Droid Control Ship
+	    SetPropRefInvincible(propRefFromName("cruisership2S"), false);
+	    // Damage the ship
+	    propHealthReduceToFractionWithUniformDamage(propRefFromName("cruisership2S"), 0.15);
+
+	    // Delete the exit shield
+	    PropDelete(PropRefFromName("tat_dcsbeams3"));
+
+	    // Make the droid control ship follow a spline
+	    propRef dcs_spline;
+	    dcs_spline = propRefFromName("dcs_SP1");
+	    //BFShipFollowScriptedSplineNoAvoidance(dcs_landingship, dcs_spline);   //Problem with this prop (dcs_landingship) doesn't get spawned?
+
+	    // Destroy the Landing Ship
+	    //propHealthReduceToFractionWithUniformDamage(dcs_landingship, 0.0);
+
+	    SetNumSubObjectives(2, iObjective);
+
+	    SetObjectiveTriggered(true, iObjective);	    
+	}
+    }
+    else if (iObjective == 11)	// SECONDARY 1 - RECLAIM CONTROL OF THE LANDING PAD
+    {
+ 	if (iSubObjective == 1)
+	{
+	    // Spawn the clones inside the cantina
+	    removeObjectiveIndicatorFromProp(propRefFromName("cis_gunship_sp"));
+	    SetObjectiveTimer(1, iObjective);
+	}
+	else
+	{
+	    addNewObjectiveIndicatorToProp(propRefFromName("cis_gunship_sp"), k_objectiveIndicatorType_bonusObjective);
+    	    SetObjectiveKillSpawners(1, iObjective);
+	}
+    }
+    else if (iObjective == 12)	// SECONDARY 2 - RESCUE THE TROOPS IN THE CANTINA
+    {
+	if (iSubObjective == 1)
+	{
+	    // Spawn the clones inside the cantina
+	    lib_SetupGroupZone(cObjectiveName, "cantina_clone_SG", "basefnt_h", "", k_objtype_hold_area);
+	    removeObjectiveIndicatorFromProp(propRefFromName("cantina_obj"));
+	    BFObjectiveCompleteObjective(StringToChar16("obj_Tat12"), 12);
+	}
+	else
+	{
+	    // Clone Trooper requesting help
+	    activateTalkingHeadNew("TatTrooper_Cantina1", true);
+	    logStr("12 initial setup");
+	    // Spawn the battledroids fighting them
+	    spawnGroupSetActive(propRefFromName("Spwn-12_1"), true);
+	    lib_SetupGroupZone(cObjectiveName, "Spwn-12_1", "cantina_int", "", k_objtype_hold_area);
+	    
+	    spawnGroupSetActive(propRefFromName("cantina_clone_SG"), true);
+	    lib_SetupGroupZone(cObjectiveName, "cantina_clone_SG", "cantina_h", "", k_objtype_hold_area);
+
+	    SetNumSubObjectives(1, iObjective);
+	}
+    }
+    else if (iObjective == 13)	// SECONDARY 3 - PICKUP PILOTS
+    {
+	if (iSubObjective == 1)
+	{
+	    // This is now in the tick
+    	}
+	else if (iSubObjective == 2)
+	{
+	    // Do setup needed, we are waiting for the AI to get in the transport vehicle
+    	} 
+	else
+	{
+	    // Spawn the troop pinned down in the desert
+	    spawnGroupSetActive(propRefFromName("bonus3_Rep_SG"), true);
+	
+	    // Spawn the droids battling the pinned down clone
+	    spawnGroupSetActive(propRefFromName("Bonus3_CIS_SG"), true);
+	    lib_SetupGroupZone(cObjectiveName, "Bonus3_CIS_SG", "desert_h", "", k_objtype_hold_area);
+    
+//	    addObjectiveIndicatorToProp(propRefFromName("vmTrig13"), vector(0.f, 0.0f, 0.f), vector(0.0, 1.0, 0.0));
+            addNewObjectiveIndicatorToProp(propRefFromName("vmTrig13"), k_objectiveIndicatorType_bonusObjective);	    
+
+	    SetNumSubObjectives(2, iObjective);
+
+	    SetObjectiveTriggered(true, iObjective);
+	}
+    }
+    else if (iObjective == 14)  // SECONDARY 4 - HELP DESTROY CIS FIGHTERS
+    {
+	// Set a number of kills required to complete this objective
+	SetObjectiveKills(10, iObjective);
+    }
+    else if (iObjective == 15)  // PRIMARY 7 - PILOT A STARFIGHTER
+    {
+	// Set a number of kills required to complete this objective
+//	SetObjectiveKills(10, iObjective);
+    }
+
+    logStr("-------------> ObjectiveSetup End");    
+    return true;    
+}
+
+////////////////////////////////////////////
+//
+// GAME LOOP
+//
+////////////////////////////////////////////
+
+//NOTE Try and remove as many of these as possible
+
+// Stop the player from moving so they don't go past triggers before they've been setup
+propRef p = getPlayerPropRefFromID(GetPlayerId());
+chrSetMovementClamped(p, true); 
+
+// Stop the Ion Cannon Firing (spoils the cutscene)
+ionCannonSetRandomFiringEnabled(propRefFromName("base_cannon"), false);
+
+playTimeline("data/bf/timelines/cs01opening.res");
+playTimeline("data/bf/timelines/cs01main.res");
+
+ScriptHasStarted(); //Do any setups
+
+// Allow the player to move again as setup should have happened
+chrSetMovementClamped(p, false); 
+
+// Droid Control Ship generator status
+int dcsgen1_destroyed = 0;
+int dcsgen2_destroyed = 0;
+int dcsgen3_destroyed = 0;
+int dcsgen4_destroyed = 0;
+int dcsgen5_destroyed = 0;
+int generator_destroyed = 0;	// Used to check status of all generators
+
+function void MoveThisToObjectiveTests(int iObjective)
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+	// Landing Ship Destruction (Primary Objective 4)
+	
+	// Has the player got into the LAAT with Ferroda? (obj 6)
+	if (iObjective == 6)
+	{
+	    // Check if the dropship has landed
+	    if (iSubObjective == 0)
+	    {
+		logStr("Testing 6_0");
+		if ( HasFlyingVehicleLanded( rep_gunship ))
+	        {
+		    logStr("Activted 6_0");
+		    nextObjective(iObjective);
+		}
+	    } 
+	    else if (iSubObjective == 1)
+	    {
+		logStr("Testing 6_1");
+		if (IsPlayerInVehicle("STR_VEHICLE_NAME_REP_GUNSHIP"))
+		{
+		    logStr("Activted 6_1");
+		    nextObjective(iObjective);
+		}
+	    }
+	    else if (iSubObjective == 3)
+	    {
+		logStr("Testing 6_3");
+		if (IsPlayerInVehicle("STR_VEHICLE_NAME_REP_GUNSHIP"))
+		{
+		    logStr("Activted 6_3");
+		    nextObjective(iObjective);
+		}
+	    }
+	}
+	else if (iObjective == 15)
+	{
+	    if ((IsPlayerInVehicle("STR_VEHICLE_NAME_REP_STARFIGHTER")))
+	    {
+		logStr("YEAHHHHHHHHHHHHHHHHHHHHHHH");
+
+		JumpToObjective(8, false);
+	    }
+	}
+	
+	// Check for the Droid Control Ship Generators being destroyed
+	if (iObjective == 9)
+	{
+	    // If no generators have been destroyed
+	    if (!generator_destroyed)
+	    {
+		// Generator 1
+		if (!dcsgen1_destroyed && !propValid(propRefFromName("dcs_gen1")))
+		{
+		    dcsgen1_destroyed = 1;
+		    generator_destroyed = 1;
+		}
+		// Generator 2
+		if (!dcsgen2_destroyed && !propValid(propRefFromName("dcs_gen2")))
+		{
+		    dcsgen2_destroyed = 1;
+		    generator_destroyed = 1;
+		}
+		// Generator 3
+		if (!dcsgen3_destroyed && !propValid(propRefFromName("dcs_gen3")))
+		{
+		    dcsgen3_destroyed = 1;
+		    generator_destroyed = 1;
+		}
+		// Generator 4
+		if (!dcsgen4_destroyed && !propValid(propRefFromName("dcs_gen4")))
+		{
+		    dcsgen4_destroyed = 1;
+		    generator_destroyed = 1;
+		}
+		// Generator 5
+		if (!dcsgen5_destroyed && !propValid(propRefFromName("dcs_gen5")))
+		{
+		    dcsgen5_destroyed = 1;
+		    generator_destroyed = 1;
+		}
+	    }
+	    else
+	    {
+		// For now, explode all the other generators. Hopefully someone will do this properly before release as it looks uber dodgy...
+		if (propValid(propRefFromName("dcs_gen1")))
+		{
+		    WaitForGameTime(1.5f);
+		    propKill(propRefFromName("dcs_gen1"));
+		}
+
+		if (propValid(propRefFromName("dcs_gen2")))
+		    propKill(propRefFromName("dcs_gen2"));
+
+		if (propValid(propRefFromName("dcs_gen3")))
+		{
+		    WaitForGameTime(1.0f);
+		    propKill(propRefFromName("dcs_gen3"));
+		}
+
+		if (propValid(propRefFromName("dcs_gen4")))
+		    propKill(propRefFromName("dcs_gen4"));
+
+		if (propValid(propRefFromName("dcs_gen5")))
+		{
+		    WaitForGameTime(0.5f);
+		    propKill(propRefFromName("dcs_gen5"));
+		}
+
+		// Head to the Next Objective
+		nextObjective(iObjective);
+	    }
+	}
+
+	// Check for the gunship landing
+	if ( iObjective == 13 )
+	{
+	    if ( iSubObjective == 1 )
+	    {
+		logstr("HERE1");
+		// Wait for the player to land the ship
+		if ( HasFlyingVehicleLanded( rep_gunship ) )
+		{
+		    // Tell the pilot(s) to climb on-board
+		    BFRequestAIToBeVehiclePassenger(chrRefFromName("bonus3_REP_sp"),rep_gunship);
+		    removeObjectiveIndicatorFromProp(propRefFromName("vmTrig13"));
+	
+		    // Reinstate mortality in the Clone
+	            SetPropRefInvincible(propRefFromName("bonus3_REP_sp"), false);
+	
+		    nextObjective(iObjective);
+		}
+	    }
+	    else if ( iSubObjective == 2 ) 
+	    {
+		logstr("HERE2");
+		// Wait for the passenger to climb on-board
+//		if ( GetNumberOfPassengers( rep_gunship ) > 2 )
+//		{
+//		    nextObjective( iObjective );
+		    BFObjectiveCompleteObjective(StringToChar16("obj_Tat13"), 13);
+//		}
+	    }
+
+            // Set the clone to be invincible until the player gets there
+         //   SetPropRefInvincible(propRefFromName("bonus3_REP_sp"), true);
+	    
+	    // Check for pilot dying
+	    if (!propExists(propRefFromName("bonus3_REP_sp")) || propGetHealthFraction(propRefFromName("bonus3_REP_sp")) <= 0.0f)
+	    {
+	        BFObjectiveFailObjective(StringToChar16("obj_Tat13"), 13);	    
+	    }
+	}   
+}
+    
+//Main game loop
+while(!bEndLevel)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    ProcessCallBacks();    
+    ObjectiveSetupCheck();
+
+    for (i=0; i<iNumActive; i++)
+    {
+        int iObjective = BFObjectiveGetNumForNthActive(i);
+        ObjectiveTests(iObjective);        
+        MoveThisToObjectiveTests(iObjective); 
+	waitForGameTime(0.01f);
+    }
+
+    waitForGameTimeOrLVChange(1.0f, "iObjLV", "iCBLV");
+    logStr("tick");
+    logInt(iObjective);    
+}
+
+NextLevel("coruscant/coruscant_story.res");

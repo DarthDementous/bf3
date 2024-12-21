@@ -1,0 +1,63 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      00096005 00001200     	EXEC ADDR(0x5) CNT(0x6) BOOL_ADDR(0x80)
+05: 10005081 1f1ffe3f 00004000	      FETCH:	SAMPLE	R5.__x_ = R4.xyx CONST(0) ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+06: c8040600 00bebe00 f0000000	   (S)ALU:	DOT3v	R0.__z_ = R0.zxyy, R0.zxyy
+07: c8080600 00b16c00 2101fe00	      ALU:	MULv	R0.___w = C257.yyyy, C510.xxxx
+08: c8010608 01c6b11b ab050100	      ALU:	MULADDv	R8.x___ = -R0.wwww, R5.zzzz, C257.yyyy
+09: 584c0005 00acacc6 a1870280	      ALU:	MULv	R5.__zw = abs(R7).xxxy, C258.xxxy
+                          						    	RECIPSQ_IEEE	R0.__z_ = abs(R0).zzzz
+0a: a8800006 00000002 c2060601	      ALU:	MUL_CONST_0	R0.___w = C257.w, R0.z
+      0950600b 00001200     	EXEC ADDR(0xb) CNT(0x6) BOOL_ADDR(0x80)
+0b: c8030600 00c7b000 e1000000	      ALU:	MULv	R0.xy__ = R0.wzzz, R0.xyyy
+0c: c8030607 00b06cb0 eb000804	      ALU:	MULADDv	R7.xy__ = R4.xyyy, R0.xyyy, R8.xxxx
+0d: b8209081 1f1ff1ff 00004000	      FETCH:	SAMPLE	R9.___x = R4.zwz CONST(2) ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+0e: 104000e1 1f1ffef9 00004000	      FETCH:	SAMPLE	R0.y_w_ = R7.xyx CONST(4) ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+0f: b87000a1 1f1fffdf 00004000	      FETCH:	SAMPLE	R0._w__ = R5.zwz CONST(7) ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+10: c8030608 00c46cb1 8b00fffe	   (S)ALU:	MULADDv	R8.xy__ = C510.yyyy, R0.xzzz, C511.xxxx
+      00006011 00001200     	EXEC ADDR(0x11) CNT(0x6) BOOL_ADDR(0x80)
+11: a8160909 00bcbc41 c10808fe	      ALU:	MULv	R9._yz_ = R8.xxyy, R8.xxyy
+                          						    	MUL_CONST_0	R9.x___ = C510.x, R0.y
+12: c8070604 04bf1b00 a009fe00	      ALU:	ADDv	R4.xyz_ = -R9.wxyy, C510.wwww
+13: c8010600 02c6c600 e0040900	      ALU:	ADDv	R0.x___ = R4.zzzz, -R9.zzzz
+14: a0400806 0000006c e2060680	      ALU:	SQRT_IEEE	R8.__z_ = abs(R0).xxxx
+15: c8010600 00bebe00 f0080100	      ALU:	DOT3v	R0.x___ = R8.zxyy, R1.zxyy
+16: c8040600 00bebe00 f0080200	      ALU:	DOT3v	R0.__z_ = R8.zxyy, R2.zxyy
+      00006017 00001200     	EXEC ADDR(0x17) CNT(0x6) BOOL_ADDR(0x80)
+17: c8020600 00bebe00 f0080300	      ALU:	DOT3v	R0._y__ = R8.zxyy, R3.zxyy
+18: c8080600 00b11b00 e1000300	      ALU:	MULv	R0.___w = R0.yyyy, R3.wwww
+19: c8080600 00c61b1b eb000200	      ALU:	MULADDv	R0.___w = R0.wwww, R0.zzzz, R2.wwww
+1a: c8080600 006c1b1b eb000100	      ALU:	MULADDv	R0.___w = R0.wwww, R0.xxxx, R1.wwww
+1b: 00800006 0000001b e2060600	      ALU:	ADDs	R0.___w = R0.wwww
+1c: c8070600 001bc000 e1000000	      ALU:	MULv	R0.xyz_ = R0.wwww, R0.xyzz
+      0000601d 00001200     	EXEC ADDR(0x1d) CNT(0x6) BOOL_ADDR(0x80)
+1d: 14040600 05c61b6c e0000200	      ALU:	ADDv	R0.__z_ = -R0.zzzz, R2.wwww
+1e: 04280000 04b11b1b e0000301	      ALU:	ADDv	R0.___w = -R0.yyyy, R3.wwww
+                          						    	ADD_PREVs	R0._y__ = R1.wwww
+1f: c8010600 00c3c300 f0000000	      ALU:	DOT3v	R0.x___ = R0.wyzz, R0.wyzz
+20: 58100006 0000006c e2060680	      ALU:	RECIPSQ_IEEE	R0.x___ = abs(R0).xxxx
+21: c8070600 00156c00 e1000000	      ALU:	MULv	R0.xyz_ = R0.yzww, R0.xxxx
+22: c80f0600 00a6cd00 f2000000	      ALU:	CUBEv	R0 = R0.zzxy, R0.yxzz
+      05506023 00001200     	EXEC ADDR(0x23) CNT(0x6) BOOL_ADDR(0x80)
+23: 4c140101 001b1bc6 e2000080	      ALU:	MAXv	R1.__z_ = R0.wwww, R0.wwww
+                          						    	RECIP_IEEE	R1.x___ = abs(R0).zzzz
+24: c8030601 006d6cc6 cb0001fe	      ALU:	MULADDv	R1.xy__ = C510.zzzz, R0.yxxx, R1.xxxx
+25: 90683021 1f1ffe88 0000c000	      FETCH:	SAMPLE	R3.xyz_ = R1.xyz CONST(6) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+26: 103850a1 1f1ff447 00004000	      FETCH:	SAMPLE	R5._xyz = R5.xyx CONST(3) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+27: 105800e1 1f1ff447 00004000	      FETCH:	SAMPLE	R0._xyz = R7.xyx CONST(5) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+28: 101820e1 1f1ff688 00004000	      FETCH:	SAMPLE	R2.xyzw = R7.xyx CONST(1) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+      00026029 00001200     	EXEC ADDR(0x29) CNT(0x6) BOOL_ADDR(0x80)
+29: a8170501 00c0c041 c00606fe	   (S)ALU:	ADDv	R1.xyz_ = R6.xyzz, R6.xyzz
+                          						    	MUL_CONST_0	R5.x___ = C510.x, R0.y
+2a: a8270507 00156c42 810500fe	      ALU:	MULv	R7.xyz_ = R5.yzww, C256.xxxx
+                          						    	MUL_CONST_0	R5._y__ = C510.x, R0.z
+2b: a8470502 00c0c043 c10702fe	      ALU:	MULv	R2.xyz_ = R7.xyzz, R2.xyzz
+                          						    	MUL_CONST_0	R5.__z_ = C510.x, R0.w
+2c: c8070600 00c0c000 e1050300	      ALU:	MULv	R0.xyz_ = R5.xyzz, R3.xyzz
+2d: 14070600 00c0c61b a1000102	      ALU:	MULv	R0.xyz_ = R0.xyzz, C257.zzzz
+2e: c8070600 00c0c0c0 eb020100	      ALU:	MULADDv	R0.xyz_ = R0.xyzz, R2.xyzz, R1.xyzz
+      0000302f 00002200     	EXEC_END ADDR(0x2f) CNT(0x3) BOOL_ADDR(0x80)
+2f: 0c180600 00b16c1b a1040306	      ALU:	MULv	R0.___w = R4.yyyy, C259.xxxx
+                          						    	MUL_PREVs	R6.x___ = R6.wwww
+30: c8088000 006c6c00 e1060400	      ALU:	MULv	export0.___w = R6.xxxx, R4.xxxx	; COLOR
+31: c8078000 001bc000 e1000000	      ALU:	MULv	export0.xyz_ = R0.wwww, R0.xyzz	; COLOR
+      00000000 00000000     	NOP

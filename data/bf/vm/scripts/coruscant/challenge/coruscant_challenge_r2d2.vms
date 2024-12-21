@@ -1,0 +1,266 @@
+// vim: set syntax=c :
+
+propRef ambienta;
+propRef ambientb;
+propRef ambientc;
+propRef obiTarget;
+propRef aniTarget;
+SetPropRefInvincible(propRefFromName("cisfrig1_"), true);
+SetPropRefInvincible(propRefFromName("cisfrig2_"), true);
+SetPropRefInvincible(propRefFromName("cisfrig3_"), true);
+SetPropRefInvincible(propRefFromName("cisfrig4_"), true);
+SetPropRefInvincible(propRefFromName("cisfrig5_"), true);
+SetPropRefInvincible(propRefFromName("cisfrig6_"), true);
+SetPropRefInvincible(propRefFromName("cisfrig7_"), true);
+SetPropRefInvincible(propRefFromName("repfrig1_"), true);
+SetPropRefInvincible(propRefFromName("repfrig2_"), true);
+SetPropRefInvincible(propRefFromName("repfrig3_"), true);
+SetPropRefInvincible(propRefFromName("repfrig4_"), true);
+
+callback void shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    if(spline == propRefFromName("Obi_wan_spline_"))
+    {
+	if(segment == 27)
+	{
+	    // Reached the end of the loop, start again
+	    BFShipFollowScriptedSplineNoAvoidance(ship, spline);
+	}
+    }
+    
+    if(spline == propRefFromName("aniSpline_"))
+    {
+	if(segment == 27)
+	{
+	    // Reached the end of the loop, start again
+	    BFShipFollowScriptedSplineNoAvoidance(ship, spline);
+	}
+    }
+
+    if(obiTarget == ship)
+    {
+	if (segment == 12)
+	{
+//	    BFShipStopFollowingScriptedSpline(ship);
+	    propKill(ship);
+	}
+    }
+    
+    if(aniTarget == ship)
+    {
+	if (segment == 12)
+	{
+//	    BFShipStopFollowingScriptedSpline(ship);
+	    propKill(ship);
+	}
+    }
+    
+    if (segment == 6)
+    {
+	BFShipStartScriptedFiring(ship,1, 8.f);
+    }
+    
+    if (segment == 11)
+    {
+	BFShipStartScriptedFiring(ship,1, 5.f);
+    }
+    
+    if (segment == 15)
+    {
+	BFShipStartScriptedFiring(ship,2, 4.f);
+    }
+    
+    if (segment == 18)
+    {
+	BFShipStartScriptedFiring(ship,1, 7.f);
+    }  
+    
+    if (segment == 22)
+    {
+	BFShipStartScriptedFiring(ship,1, 5.f);
+    }
+    
+    if (segment == 29)
+    {
+	BFShipStartScriptedFiring(ship,1, 8.f);
+    }
+
+    if ((segment == 1) && (ship == (ambienta) || (ambientb) || (ambientc)))
+    {
+	BFShipStartScriptedFiring(ship,1, 5.f);
+    }
+}
+
+callback void artooOrShipDied(int shipDied)
+{
+    if(shipDied == 1)
+    {
+	// The ship died
+	ChallengeEnd();
+    }
+    else
+    {
+	// Artoo died
+	ChallengeEnd();
+    }
+}
+
+callback void buzzDroidDied(int bounty)
+{
+    ChallengeAddScore( bounty );
+}
+
+function void increaseDroids(int droid)
+{
+    ChallengeSetNumBuzzDroidsPerMissile(droid);
+}
+
+function void timeBetweenMissiles(float time)
+{
+    ChallengeSetTimeBetweenBuzzDroidMissiles(time);
+}
+
+AllowCallback(CALLBACK_ShipReachedScriptedSplineSegment, shipReachedScriptedSplineSegment);
+AllowCallback(CALLBACK_BuzzDroidChallengeDroidOrShipDied, artooOrShipDied);
+AllowCallback(CALLBACK_BuzzDroidChallengeBuzzDroidDied, buzzDroidDied);
+
+// Create the ship
+propRef ship;
+ship = SpawnAIVehicle(
+    propRefFromName("obiWanDOF_"),
+    "rep_clonetrooper_npc_story", // todo: young obi wan kenobi 
+    "rep_starfighter_challenge",
+    50, false, k_seatPos_driver);
+
+// Start it on the path
+propRef spline;
+spline = propRefFromName("Obi_wan_spline_");
+BFShipFollowScriptedSplineNoAvoidance(ship, spline);
+SetPropRefInvincible(ship, true);
+
+// Begin the challenge
+ChallengeEnterVehicleDroid(ship);
+ChallengeBeginBuzzDroidAssault(ship, spline);
+ChallengeBegin();
+
+propRef ani;
+ani = SpawnAIVehicle(propRefFromName("aniDOF_"), "rep_clonetrooper_npc_story", "rep_starfighter", 0, false, k_seatPos_driver);
+propRef aniSpline;
+aniSpline = propRefFromName("aniSpline_");
+BFShipFollowScriptedSplineNoAvoidance(ani, aniSpline);
+SetPropRefInvincible(ani, true);
+
+propRef aniChase;
+aniChase = SpawnAIVehicle(propRefFromName("aniChaseDOF_"), "cis_battledroid_npc_story", "cis_tri_fighter", 0, false, k_seatPos_driver);
+BFShipFollowScriptedSplineNoAvoidance(aniChase, aniSpline);
+SetPropRefInvincible(aniChase, true);
+
+propRef obiChase;
+obiChase = SpawnAIVehicle(propRefFromName("obiWanChaseDOF_"), "cis_battledroid_npc_story", "cis_tri_fighter", 0, false, k_seatPos_driver);
+BFShipFollowScriptedSplineNoAvoidance(obiChase, spline);
+SetPropRefInvincible(obiChase, true);
+
+
+obiTarget = SpawnAIVehicle(propRefFromName("obiTargetDOF_"), "cis_battledroid_npc_story", "cis_tri_fighter", 0, false, k_seatPos_driver);
+BFShipFollowScriptedSplineNoAvoidance(obiTarget, spline);
+//SetPropRefInvincible(obiTarget, true);
+
+aniTarget = SpawnAIVehicle(propRefFromName("aniTargetDOF_"), "cis_battledroid_npc_story", "cis_tri_fighter", 0, false, k_seatPos_driver);
+BFShipFollowScriptedSplineNoAvoidance(aniTarget, aniSpline);
+//SetPropRefInvincible(aniTarget, true);
+
+/*
+propRef obiTarget2;
+obiTarget2 = SpawnAIVehicle(propRefFromName("obiTargetDOF2_"), "cis_battledroid_npc_story", "cis_tri_fighter", 0, false, k_seatPos_driver);
+BFShipFollowScriptedSplineNoAvoidance(obiTarget2, spline);
+
+propRef aniTarget2;
+aniTarget2 = SpawnAIVehicle(propRefFromName("aniTargetDOF2_"), "cis_battledroid_npc_story", "cis_tri_fighter", 0, false, k_seatPos_driver);
+BFShipFollowScriptedSplineNoAvoidance(aniTarget2, aniSpline);
+*/
+//ambient fighting
+BFAddFlyingAIPatrolZone(vector(891.5f, 2500.4f, -300.63f), 500.0);  //todo multiple patrol zones.
+
+
+ambienta = SpawnAIVehicle(propRefFromName("ambientDOF1_"), "rep_clonetrooper_npc_story", "rep_starfighter", 0, false, k_seatPos_driver);
+propRef ambientSplinea;
+ambientSplinea = propRefFromName("ambientSpline1_");
+BFShipFollowScriptedSplineNoAvoidance(ambienta, ambientSplinea);
+
+ambientb = SpawnAIVehicle(propRefFromName("ambientDOF2_"), "rep_clonetrooper_npc_story", "rep_starfighter", 0, false, k_seatPos_driver);
+propRef ambientSplineb;
+ambientSplineb = propRefFromName("ambientSpline2_");
+BFShipFollowScriptedSplineNoAvoidance(ambientb, ambientSplineb);
+
+ambientc = SpawnAIVehicle(propRefFromName("ambientDOF3_"), "rep_clonetrooper_npc_story", "rep_starfighter", 0, false, k_seatPos_driver);
+propRef ambientSplinec;
+ambientSplinec = propRefFromName("ambientSpline3_");
+BFShipFollowScriptedSplineNoAvoidance(ambientc, ambientSplinec);
+
+//forceTriggerTriggered(propRefFromName("shipKillTrig_"));
+
+
+
+
+while(1)
+{
+    if (propGroupGetNumOfProps(propRefFromName("DroidSpwns")) < 15)
+    {
+	propRef droid;
+	droid = SpawnAIVehicle(propRefFromName("DroidDOF"), "cis_battledroid_npc_story", "cis_droidfighter", 50, false, k_seatPos_driver);
+	addPropToGroup(propRefFromName("DroidSpwns"), droid);
+    }
+
+    if (propGroupGetNumOfProps(propRefFromName("ARCSpwns")) < 15) 	
+    {
+	propRef starfighter;
+	starfighter = SpawnAIVehicle(propRefFromName("StarDOF"), "rep_clonetrooper_npc_story", "rep_starfighter", 50, false, k_seatPos_driver);
+	addPropToGroup(propRefFromName("ARCSpwns"), starfighter);
+    }
+  
+    if (propGroupGetNumOfProps(propRefFromName("VSpwns")) < 15) 	
+    {
+	propRef vfighter;
+	vfighter = SpawnAIVehicle(propRefFromName("VDOF"), "rep_clonetrooper_npc_story", "rep_vwing", 50, false, k_seatPos_driver);
+	addPropToGroup(propRefFromName("VSpwns"), vfighter);
+    }
+
+    if (propGroupGetNumOfProps(propRefFromName("TriSpwns")) < 15)
+    {
+	propRef tri;
+	tri = SpawnAIVehicle(propRefFromName("TriDOF"), "cis_battledroid_npc_story", "cis_tri_fighter", 50, false, k_seatPos_driver);
+	addPropToGroup(propRefFromName("TriSpwns"), tri);
+    }
+    
+    if (ChallengeGetScore() >= 250)
+    {
+	increaseDroids(2);
+    }
+
+    if (ChallengeGetScore() >= 500)
+    {
+	timeBetweenMissiles(15.f);
+    }
+
+    if (ChallengeGetScore() >= 1000)
+    {
+	increaseDroids(3);
+    }
+    
+    if (ChallengeGetScore() >= 1500)
+    {
+	timeBetweenMissiles(10.f);
+    }
+
+   if (ChallengeGetScore() >= 2000)
+    {
+	increaseDroids(4);
+    }
+    
+    if (ChallengeGetScore() >= 2500)
+    {
+	timeBetweenMissiles(5.f);
+    }
+    waitForGameTime(5.0f);
+}
+

@@ -1,0 +1,8 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      00006001 00002200     	EXEC_END ADDR(0x1) CNT(0x6) BOOL_ADDR(0x80)
+01: 08100404 000000c6 e2040402	      ALU:	MULs	R4.x___ = R2.zzzz
+02: c8010404 00c6c66c eb010104	      ALU:	MULADDv	R4.x___ = R4.xxxx, R1.zzzz, R1.zzzz
+03: c8010404 00c6c66c eb000004	      ALU:	MULADDv	R4.x___ = R4.xxxx, R0.zzzz, R0.zzzz
+04: 58100404 0000006c e2040484	      ALU:	RECIPSQ_IEEE	R4.x___ = abs(R4).xxxx
+05: c8010404 006cc600 e1040100	      ALU:	MULv	R4.x___ = R4.xxxx, R1.zzzz
+06: c80ec000 00716c6c 4cff84ff	      ALU:	CNDEv	export0._yzw = C511.xxxx, C511.yyyx, abs(R4).xxxx	; COLOR

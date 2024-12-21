@@ -1,0 +1,24 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      05546002 00001200     	EXEC ADDR(0x2) CNT(0x6) BOOL_ADDR(0x80)
+02: c8030203 00b0b000 a1830300	      ALU:	MULv	R3.xy__ = abs(R3).xyyy, C259.xyyy
+03: b8180001 1f1ffe3f 00004000	      FETCH:	SAMPLE	R0.__x_ = R0.zwz CONST(1) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+04: 10285021 1f1ffe88 00004000	      FETCH:	SAMPLE	R5.xyz_ = R1.xyx CONST(2) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+05: 10384001 1f1ffe88 00004000	      FETCH:	SAMPLE	R4.xyz_ = R0.xyx CONST(3) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+06: 10081001 1f1ff688 00004000	      FETCH:	SAMPLE	R1.xyzw = R0.xyx CONST(0) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+07: 10480061 1f1ffffb 00004000	      FETCH:	SAMPLE	R0.w___ = R3.xyx CONST(4) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+      00026008 00001200     	EXEC ADDR(0x8) CNT(0x6) BOOL_ADDR(0x80)
+08: c8020200 006cc66c 0b01ffff	   (S)ALU:	MULADDv	R0._y__ = C511.xxxx, C257.xxxx, C511.zzzz
+09: a8280000 00b16c80 810002ff	      ALU:	MULv	R0.___w = R0.yyyy, C258.xxxx
+                          						    	MUL_CONST_0	R0._y__ = C511.y, R0.x
+0a: 14070203 00c0c01b e0020201	      ALU:	ADDv	R3.xyz_ = R2.xyzz, R2.xyzz
+0b: 0c170004 001bc01b e1000402	      ALU:	MULv	R4.xyz_ = R0.wwww, R4.xyzz
+                          						    	MUL_PREVs	R0.x___ = R2.wwww
+0c: c80e0202 00fc6cfc ab050004	      ALU:	MULADDv	R2._yzw = R4.xxyz, R5.xxyz, C256.xxxx
+0d: b8170201 00c0c042 c10301ff	      ALU:	MULv	R1.xyz_ = R3.xyzz, R1.xyzz
+                          						    	SUB_CONST_0	R2.x___ = C511.x, R0.z
+      0000300e 00002200     	EXEC_END ADDR(0xe) CNT(0x3) BOOL_ADDR(0x80)
+0e: b8270201 00c01541 c10102ff	      ALU:	MULv	R1.xyz_ = R1.xyzz, R2.yzww
+                          						    	SUB_CONST_0	R2._y__ = C511.x, R0.y
+0f: 140e0202 00fcb16c e1010200	      ALU:	MULv	R2._yzw = R1.xxyz, R2.yyyy
+10: 0c878000 00156c6c a1020402	      ALU:	MULv	export0.xyz_ = R2.yzww, C260.xxxx	; COLOR
+                          						    	MUL_PREVs	export0.___w = R2.xxxx	; COLOR

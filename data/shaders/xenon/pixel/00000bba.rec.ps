@@ -1,0 +1,26 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      02506002 00001200     	EXEC ADDR(0x2) CNT(0x6) BOOL_ADDR(0x80)
+02: c8030104 00c46cb1 8b01fefe	      ALU:	MULADDv	R4.xy__ = C510.yyyy, R1.xzzz, C510.xxxx
+03: c8030101 00c4c6b0 8b010000	      ALU:	MULADDv	R1.xy__ = C256.xyyy, R1.xzzz, C256.zzzz
+04: 10083021 1f1ffe88 00004000	      FETCH:	SAMPLE	R3.xyz_ = R1.xyx CONST(0) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+05: 10184081 1f1ff688 00004000	      FETCH:	SAMPLE	R4.xyzw = R4.xyx CONST(1) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+06: c8010101 00bebe00 f0020200	   (S)ALU:	DOT3v	R1.x___ = R2.zxyy, R2.zxyy
+07: 58280101 006cb16c 2103fe81	      ALU:	MULv	R1.___w = C259.xxxx, C510.yyyy
+                          						    	RECIPSQ_IEEE	R1._y__ = abs(R1).xxxx
+      00006008 00001200     	EXEC ADDR(0x8) CNT(0x6) BOOL_ADDR(0x80)
+08: 14010101 00a76cb1 af04ff01	      ALU:	DOT4v	R1.x___ = R4.wzxy, C511.xxxx
+09: 0c180103 006c1bb1 a601ff02	      ALU:	SETGTEv	R3.___w = R1.xxxx, C511.wwww
+                          						    	MUL_PREVs	R1.x___ = R2.yyyy
+0a: c8020101 006c6c00 a5010200	      ALU:	SETGTv	R1._y__ = R1.xxxx, C258.xxxx
+0b: c8040102 006cb100 a6010200	      ALU:	SETGTEv	R2.__z_ = R1.xxxx, C258.yyyy
+0c: bc140101 01b16c80 45020102	      ALU:	SETGTv	R1.__z_ = C258.yyyy, R1.xxxx
+                          						    	SUB_CONST_1	R1.x___ = -C258.y, -R1.x
+0d: c8030102 006c6d00 a101ff00	      ALU:	MULv	R2.xy__ = R1.xxxx, C511.yxxx
+      0000600e 00002200     	EXEC_END ADDR(0xe) CNT(0x6) BOOL_ADDR(0x80)
+0e: c8090102 006dc600 a1020200	      ALU:	MULv	R2.x__w = R2.yxxx, C258.zzzz
+0f: 14020102 001b6c1b a002ff03	      ALU:	ADDv	R2._y__ = R2.wwww, C511.xxxx
+10: c8030102 00c6c4b0 ae01ff02	      ALU:	CNDGTv	R2.xy__ = R2.xyyy, R1.zzzz, C511.xzzz
+11: c8070101 00b16cb4 ae01ff02	      ALU:	CNDGTv	R1.xyz_ = R2.xzyy, R1.yyyy, C511.xxxx
+12: c8070101 00c06cc0 ab030101	      ALU:	MULADDv	R1.xyz_ = R1.xyzz, R3.xyzz, C257.xxxx
+13: 0c878000 001bc06c e1010100	      ALU:	MULv	export0.xyz_ = R1.wwww, R1.xyzz	; COLOR
+                          						    	MUL_PREVs	export0.___w = R0.xxxx	; COLOR

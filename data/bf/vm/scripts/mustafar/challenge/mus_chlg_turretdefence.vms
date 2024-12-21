@@ -1,0 +1,488 @@
+// vim: set syntax=c :
+
+///////////////////////////////////
+/*
+    Mustafar turret defence challenge
+ */
+///////////////////////////////////
+
+// vim: set syntax=c :
+
+///////////////////////////////////////////////
+/*
+*/
+///////////////////////////////////////////////
+
+
+boolean Skip = false;
+
+//the naming convention is:
+//[Vehicle][Vehicle number]_[Objective number]
+propref tank0_1, tank1_1;
+propref tank0_2, tank1_2;
+propref tank0_3, tank1_3, tank2_3;
+propref tie_fighter1, tie_fighter2, tie_fighter3;
+propref spline1, spline2, spline3;
+
+///////////// Include Defaults //////////////////////////////////////////////
+
+callback void playerKilled(int victimId, int killerId, int iOppTeam)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iActive = BFObjectiveGetNumForNthActive(i);
+	if (lib_playerKilled(victimId, killerId, iOppTeam, iActive)) 
+	{
+	    nextObjective(iActive);
+	}
+    }
+}
+
+callback int triggeredProp(int inType, char16 inTriggerProp, int pId)
+{    
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iActive = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	iActive = BFObjectiveGetNumForNthActive(i);
+	if (lib_triggeredProp(inTriggerProp, iActive))
+	{
+	    nextObjective(iActive);
+	}
+    }
+    
+    return 0;
+}
+
+function void nextObjective(int inObjNum) 
+{ 
+    int result =   lib_nextObjective(inObjNum);
+
+    if(result==1)
+    {
+	//if next objective returns 1 it has updated a core objective and automatically moved us onto the next
+	//so do objective setup with current objective
+	    int iObjective = BFObjectiveGetCurrent();//GetLevelVarInt("mObjective");
+	    char16 cName = BFObjectiveGetName(iObjective);
+	    ObjectiveSetup( cName, iObjective, BFObjectiveGetSub(iObjective));            
+    }
+
+    if(result==2)
+    {
+	//if nextobjective returns 2 it has updated a bonus objective so we will want to 
+	//objective setup with the objective we passed to next objective
+	    char16 cName = BFObjectiveGetName(inObjNum);
+	    ObjectiveSetup( cName, inObjNum, BFObjectiveGetSub(inObjNum));            
+    }    
+}
+
+function void JumpToObjective(int iStartObj, boolean Skiping)
+{  
+    BFObjectiveSetJumpTo(iStartObj);
+    nextObjective(BFObjectiveGetCurrent());
+    BFKillAllNPCsFromTeam(0);        
+    BFKillAllNPCsFromTeam(1);
+
+    logStr("Jumped To Objective");
+    logInt(BFObjectiveGetCurrent());  
+    Skip = false;
+}
+
+callback void ObjectiveTimeExpired(char16 objName)
+{   
+    int objNum = 0;
+    objNum = BFObjectiveGetNumber(objName);   
+    if (lib_ObjTimeExpired(objNum))
+    {
+	nextObjective(objNum);
+    }
+}
+
+callback void playerSpawned(char16 teamName, int playerId)
+{
+    propRef p = getPlayerPropRefFromID(playerId);    
+}
+
+callback void finiteSpawnerComplete(char16 propId) 
+{
+
+}
+
+
+/////// Defaults END /////////////////////////////////////////////
+
+
+
+
+callback void gameHasStarted()
+{           
+    // Reset all the spawners
+    setTeamOfSpawnPropGroup( "spwnprpgrp1_",  -1 );
+    setTeamOfSpawnPropGroup( "spwnprpgrp2_",  -1 );
+    setTeamOfSpawnPropGroup( "spwnprpgrp3_",  -1 );
+    setTeamOfSpawnPropGroup( "spwnprpgrp4_",  -1 );
+    setTeamOfSpawnPropGroup( "spwnprpgrp5_",  -1 );
+    setTeamOfSpawnPropGroup( "spwnprpgrp6_",  -1 );
+    setTeamOfSpawnPropGroup( "tank1_G",  -1 );
+    setTeamOfSpawnPropGroup( "tank2_G",  -1 );
+    setTeamOfSpawnPropGroup( "tank3_G",  -1 );
+    setTeamOfSpawnPropGroup( "tank4_G",  -1 );
+//    setTeamOfSpawnPropGroup( "Spwn-5",  -1 );
+//    setTeamOfSpawnPropGroup( "Spwn-6",  -1 );
+}
+
+function void ScriptHasStarted()
+{
+    //SetLevelVarsBFStory("obj_Cat", "vmTrig");
+    SetBFStoryPrefixes("obj_MusChlTur", "vmTrig");
+
+    ResetObjectives("mObjTmp", 9);
+/*
+    //Reset Space CPs, Spawners, etc
+    commandPostSetTeam(obj1REP_CP, -1); //Disabled
+    commandPostSetTeam(obj1CIS_CP, -1); //Disabled    
+    commandPostSetTeam(cit_ent_CP, -1); //Disabled
+    commandPostSetTeam(comproom_CP, -1); //Disabled
+    commandPostSetTeam(chamber_CP, -1); //Disabled
+//    commandPostSetTeam(, -1); //Disabled
+*/
+    JumpToObjective(1, false);
+}
+
+
+function void ObjectiveTests(int iObjective) 
+{
+    int iCurrentObjective = BFObjectiveGetCurrent(); 
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+//Do some tests
+       
+   if(iCurrentObjective == 1)
+    {
+	if(iSubObjective == 1)
+	{
+	    if(!propValid(tank0_1))
+	    {
+		nextObjective(BFObjectiveGetCurrent());
+	    }
+	}
+    }
+   
+   if(iCurrentObjective == 2)
+    {
+	if(iSubObjective == 1)
+	{
+	    if(!propValid(tank0_2) && !propValid(tank1_2))
+	    {
+		nextObjective(BFObjectiveGetCurrent());
+	    }
+	}
+    }
+}
+
+callback void shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+
+    if (spline ==  propRefFromName("shipspline1_"))
+    {
+	if (segment == 5)
+	{
+	    propref nextspline;
+	    nextspline = propRefFromName("shipspline3_");
+	    //propTeleportToProp(ship,propRefFromName("dofProp_10_"));
+	    BFShipFollowScriptedSplineNoAvoidance(ship , nextspline );
+	    //propDelete(ship);
+	    //tie_fighter1 = SpawnAIVehicleWithObjectives(propRefFromName("dofProp_10_"), "imp_stormtrooper_npc_story", "tie_fighter", 1, false, k_seatPos_driver, StringToChar16(""));
+	    //BFShipFollowScriptedSplineNoAvoidance(tie_fighter1 , spline );
+
+	}
+    }
+
+    if (spline ==  propRefFromName("shipspline2_"))
+    {
+	if (segment == 8)
+	{
+	    propDelete(ship);
+	    tie_fighter2 = SpawnAIVehicleWithObjectives(propRefFromName("dofProp_11_"), "imp_stormtrooper_npc_story", "tie_fighter", 1, false, k_seatPos_driver, StringToChar16(""));
+	    BFShipFollowScriptedSplineNoAvoidance(tie_fighter2 , spline );
+
+	}
+    }
+
+    if (spline ==  propRefFromName("shipspline3_"))
+    {
+	if (segment == 11)
+	{
+	    //propDelete(ship);
+	    //tie_fighter2 = SpawnAIVehicleWithObjectives(propRefFromName("dofProp_11_"), "imp_stormtrooper_npc_story", "tie_fighter", 1, false, k_seatPos_driver, StringToChar16(""));
+	    BFShipFollowScriptedSplineNoAvoidance(ship , spline );
+
+	}
+    }
+
+
+    if (spline ==  propRefFromName("shipspline4_"))
+    {
+	if (segment == 5)
+	{
+	    propref nextspline;
+	    nextspline = propRefFromName("shipspline5_");
+	    BFShipFollowScriptedSplineNoAvoidance(ship , nextspline );
+	}
+    }
+
+    if (spline ==  propRefFromName("shipspline5_"))
+    {
+	if (segment == 11)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , spline );
+
+	}
+    }
+
+    if (spline ==  propRefFromName("shipspline6_"))
+    {
+	if (segment == 5)
+	{
+	    propref nextspline;
+	    nextspline = propRefFromName("shipspline8_");
+	    BFShipFollowScriptedSplineNoAvoidance(ship , nextspline );
+	}
+    }
+
+    if (spline ==  propRefFromName("shipspline8_"))
+    {
+	if (segment == 13)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , spline );
+
+	}
+    }
+
+    if (spline ==  propRefFromName("shipspline7_"))
+    {
+	if (segment == 8)
+	{
+	    propref nextspline;
+	    nextspline = propRefFromName("shipspline8_");
+	    BFShipFollowScriptedSplineNoAvoidance(ship , nextspline );
+	}
+    }
+
+    if (spline ==  propRefFromName("shipspline8_"))
+    {
+	if (segment == 17)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , spline );
+
+	}
+    }
+
+
+
+
+
+}
+
+
+///////////////////////////////////////// OBJECTIVES
+
+function void ObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{
+    if (iObjective == 1)	// 1st wave 
+    {
+        if (iSubObjective == 1)
+	{
+	    tie_fighter1 = SpawnAIVehicleWithObjectives(propRefFromName("dofProp_2_"), "imp_stormtrooper_npc_story", "tie_fighter", 1, false, k_seatPos_driver, StringToChar16(""));
+	   // tie_fighter2 = SpawnAIVehicleWithObjectives(propRefFromName("dofProp_3_"), "imp_stormtrooper_npc_story", "tie_fighter", 1, false, k_seatPos_driver, StringToChar16(""));
+	    spline1 = propRefFromName("shipspline7_");
+	    //spline2 = propRefFromName("shipspline7_");
+	    BFShipFollowScriptedSplineNoAvoidance(tie_fighter1 , spline1 );
+	    //BFShipFollowScriptedSplineNoAvoidance(tie_fighter2 , spline2 );
+	    /*
+	    tie_fighter1 = SpawnAIVehicleWithObjectives(propRefFromName("dofProp_10_"), "imp_stormtrooper_npc_story", "tie_fighter", 1, false, k_seatPos_driver, StringToChar16(""));
+	    tie_fighter2 = SpawnAIVehicleWithObjectives(propRefFromName("dofProp_11_"), "imp_stormtrooper_npc_story", "tie_fighter", 1, false, k_seatPos_driver, StringToChar16(""));
+	    tie_fighter3 = SpawnAIVehicleWithObjectives(propRefFromName("dofProp_1_"), "imp_stormtrooper_npc_story", "tie_fighter", 1, false, k_seatPos_driver, StringToChar16(""));
+	    spline1 = propRefFromName("shipspline1_");
+	    spline2 = propRefFromName("shipspline2_");
+	    spline3 = propRefFromName("shipspline4_");
+	    BFShipFollowScriptedSplineNoAvoidance(tie_fighter1 , spline1 );
+	    BFShipFollowScriptedSplineNoAvoidance(tie_fighter2 , spline2 );
+	    BFShipFollowScriptedSplineNoAvoidance(tie_fighter3 , spline3 );
+	    */
+	}
+	else
+	{
+	    spawnGroupSetActive(propRefFromName("spwnprpgrp1_"), true);
+	    spawnGroupSetActive(propRefFromName("spwnprpgrp2_"), true);
+	    spawnGroupSetActive(propRefFromName("spwnprpgrp3_"), true);
+	    spawnGroupSetActive(propRefFromName("spwnprpgrp4_"), true);
+	    spawnGroupSetActive(propRefFromName("spwnprpgrp5_"), true);
+	    spawnGroupSetActive(propRefFromName("spwnprpgrp6_"), true);
+
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp1_", "rightbridge", "rbridge_targ", k_objtype_clear_area);    
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp3_", "rightbridge", "rbridge_targ", k_objtype_clear_area);    
+
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp2_", "leftbridge", "lbridge_targ", k_objtype_clear_area);    
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp4_", "leftbridge", "lbridge_targ", k_objtype_clear_area);    
+
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp5_", "side_path", "side_path", k_objtype_clear_area);    
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp6_", "side_path", "side_path", k_objtype_clear_area);    
+
+	//tank orders
+	    lib_SetupGroupZone(cObjectiveName, "tank1_G", "frontofbase", "frontofbase", k_objtype_clear_area);    
+/*
+	    tie_fighter = SpawnAIVehicleWithObjectives(propRefFromName("flySpwnDOF1"), "imp_stormtrooper_npc_story", "tie_fighter", 1, false, k_seatPos_driver, StringToChar16(""));
+	    tie_fighter = SpawnAIVehicleWithObjectives(propRefFromName("flySpwnDOF2"), "imp_stormtrooper_npc_story", "tie_fighter", 1, false, k_seatPos_driver, StringToChar16(""));
+	    tie_fighter = SpawnAIVehicleWithObjectives(propRefFromName("flySpwnDOF3"), "imp_stormtrooper_npc_story", "tie_fighter", 1, false, k_seatPos_driver, StringToChar16(""));
+	    tie_fighter = SpawnAIVehicleWithObjectives(propRefFromName("flySpwnDOF4"), "imp_stormtrooper_npc_story", "tie_fighter", 1, false, k_seatPos_driver, StringToChar16(""));
+	    tie_fighter = SpawnAIVehicleWithObjectives(propRefFromName("flySpwnDOF5"), "imp_stormtrooper_npc_story", "tie_fighter", 1, false, k_seatPos_driver, StringToChar16(""));
+*/
+
+	    tank0_1 = SpawnAIVehicleWithObjectives(propRefFromName("vehSpwnDOF1"), "imp_stormtrooper_npc_story", "cis_aat", 1, false, k_seatPos_driver, StringToChar16("tank1_G"));
+
+	    SetObjectiveTimer(10, iObjective);
+
+	    SetNumSubObjectives(1, iObjective);
+	    activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 10.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "1st wave...kill that tank!");
+	}
+    } 
+    else if (iObjective == 2)	// 2nd wave
+    {
+        if (iSubObjective == 1)
+	{
+	    
+//	    activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "");
+	}
+	else
+	{
+
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp1_", "rightbridge", "rbridge_targ", k_objtype_clear_area);    
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp3_", "rightbridge", "rbridge_targ", k_objtype_clear_area);    
+
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp2_", "leftbridge", "lbridge_targ", k_objtype_clear_area);    
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp4_", "leftbridge", "lbridge_targ", k_objtype_clear_area);    
+
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp5_", "side_path", "side_path", k_objtype_clear_area);    
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp6_", "side_path", "side_path", k_objtype_clear_area);    
+
+	//tank orders
+	    lib_SetupGroupZone(cObjectiveName, "tank1_G", "frontofbase", "frontofbase", k_objtype_clear_area);    
+
+	    tank0_2 = SpawnAIVehicleWithObjectives(propRefFromName("vehSpwnDOF3"), "imp_stormtrooper_npc_story", "cis_aat", 1, false, k_seatPos_driver, StringToChar16("tank1_G"));
+	    tank1_2 = SpawnAIVehicleWithObjectives(propRefFromName("vehSpwnDOF4"), "imp_stormtrooper_npc_story", "cis_aat", 1, false, k_seatPos_driver, StringToChar16("tank1_G"));
+	    
+	    SetObjectiveTimer(5, iObjective);
+	    
+	    SetNumSubObjectives(1, iObjective);
+	    activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 10.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "2nd Wave. Take out those two tanks");
+	}
+    }
+    else if (iObjective == 3)	// 3rd wave 
+    { 
+        if (iSubObjective == 1)
+	{
+	    activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "3rd Objective, just objective");
+	}
+	else
+	{
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp1_", "rightbridge", "rbridge_targ", k_objtype_clear_area);    
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp3_", "rightbridge", "rbridge_targ", k_objtype_clear_area);    
+
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp2_", "leftbridge", "lbridge_targ", k_objtype_clear_area);    
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp4_", "leftbridge", "lbridge_targ", k_objtype_clear_area);    
+
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp5_", "side_path", "side_path", k_objtype_clear_area);    
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp6_", "side_path", "side_path", k_objtype_clear_area);    
+
+	//tank orders
+	    lib_SetupGroupZone(cObjectiveName, "tank1_G", "frontofbase", "frontofbase", k_objtype_clear_area);    
+
+	    SetObjectiveTimer(5, iObjective);
+	    SetNumSubObjectives(1, iObjective);
+	    activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "3rd Objective");
+	}
+    } 
+    else if (iObjective == 4)	// 4th wave 
+    { 
+        if (iSubObjective == 1)
+	{
+
+	}
+	else
+	{
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp1_", "rightbridge", "rbridge_targ", k_objtype_clear_area);    
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp3_", "rightbridge", "rbridge_targ", k_objtype_clear_area);    
+
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp2_", "leftbridge", "lbridge_targ", k_objtype_clear_area);    
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp4_", "leftbridge", "lbridge_targ", k_objtype_clear_area);    
+
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp5_", "side_path", "side_path", k_objtype_clear_area);    
+	    lib_SetupGroupZone(cObjectiveName, "spwnprpgrp6_", "side_path", "side_path", k_objtype_clear_area);    
+
+	//tank orders
+	    lib_SetupGroupZone(cObjectiveName, "tank1_G", "frontofbase", "frontofbase", k_objtype_clear_area);    
+
+	    SetObjectiveTimer(5, iObjective);
+	    SetNumSubObjectives(1, iObjective);
+	    activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "4th wave");
+	}
+    } 
+    else
+    {
+	// The end
+	//CompleteLevel();
+    }
+    
+    //Call this to complete the level
+//    CompleteLevel();
+}
+
+AllowCallback(CALLBACK_PlayerSpawned, playerSpawned);
+AllowCallback(CALLBACK_PlayerKilledBF, playerKilled);
+AllowCallback(CALLBACK_TriggeredProp, triggeredProp);
+AllowCallback(CALLBACK_ObjectiveTimeExpired, ObjectiveTimeExpired);
+AllowCallback(CALLBACK_GameHasStarted, gameHasStarted);
+AllowCallback(CALLBACK_FSpawnerComplete, finiteSpawnerComplete);
+AllowCallback(CALLBACK_ShipReachedScriptedSplineSegment, shipReachedScriptedSplineSegment);
+
+///////////////This Script Actions
+
+
+
+ScriptHasStarted(); //Do any setups
+
+
+//Main game loop
+while(1)
+{
+
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iObjective = BFObjectiveGetNumForNthActive(i);
+	ObjectiveTests(iObjective);
+
+	logStr("tick");
+	logInt(iObjective);
+	int iSubObjective = BFObjectiveGetSub(i);
+	logInt(iSubObjective);
+    }
+    waitForGameTime(1.0f);
+    
+    //Check to see if the player has died
+    if (propGetHealthFraction(propRefFromName("player_0")) <= 0.0f)
+    {
+	activateTalkingHead(0.0f, 1.725f, -1.f, 0.0f, -0.25f, -1.0f, 5.0f, "characters/soldiers/rep/rep_clonesharpshooter/rep_clonesharpshooter", "AN_hm_ter_lp", "You failed. Game Over.");
+//	waitForGameTime(5.0f);
+	CompleteLevel();
+    }
+}
+
+

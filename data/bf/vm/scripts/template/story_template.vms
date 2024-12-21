@@ -1,0 +1,279 @@
+// vim: set syntax=c :
+
+///////////////////////////////////
+/*
+   story_template.vms
+
+   Created By Mark Kevern
+   please do not modify without asking me!
+   or comment where you have modified
+
+ */
+///////////////////////////////////
+
+boolean Skip = false;
+propRef pPlayer = getPlayerPropRefFromID(GetPlayerId());
+boolean bEndLevel = false;
+
+/////////////////////////////          INCLUDE DEFAULTS           /////////////////
+
+callback void playerKilled(int iKiller, int iResult, int iVictim)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+        int iActive = BFObjectiveGetNumForNthActive(i);
+        if (lib_playerKilled(iKiller, iResult, iVictim, iActive)) 
+        {
+            nextObjective(iActive);
+        }
+    }
+}
+function void Trigger(char16 inTriggerProp) //Used so can be called elsewhere in script (cant call a callback)
+{    
+    int iResult = 0;
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iActive = 0;
+    for (i=0; i<iNumActive; i++)
+    {
+        iActive = BFObjectiveGetNumForNthActive(i);
+        iResult = lib_triggeredProp(inTriggerProp, iActive);
+        iResult = ObjectiveTriggerTests(iActive, inTriggerProp, iResult);
+
+        if (iResult >= 1) nextObjective(iActive);
+    }
+}
+callback int triggeredProp(int inType, char16 inTriggerProp, int pId)
+{   
+    Trigger(inTriggerProp);     
+    return 0;
+}
+
+function void ObjectiveSetupCheck()
+{
+    int iTempObj = GetLevelVarInt("iObjLV");
+    
+    if (iTempObj != -1)
+    {
+        char16 cName = BFObjectiveGetName(iTempObj);
+        if (ObjectiveSetup(cName, iTempObj, BFObjectiveGetSub(iTempObj)))
+            SetLevelVarInt("iObjLV", -1);
+
+        waitForGameTime(0.1f);        
+    }
+}
+
+function void SetObjectiveSetup(int iObj)
+{
+    logStr("SetObjectiveSetup Called");
+    logInt(iObj);
+    SetLevelVarInt("iObjLV", iObj);
+}
+
+function void nextObjective(int inObjNum) 
+{    
+    int result = lib_nextObjective(inObjNum);
+
+    if(result == 1)
+    {
+        //if next objective returns 1 it has updated a core objective and automatically moved us onto the next
+        //so do objective setup with current objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(BFObjectiveGetCurrent());
+        }
+    }
+
+    if(result == 2)
+    {
+        //if nextobjective returns 2 it has updated a bonus objective so we will want to 
+        //objective setup with the objective we passed to next objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(inObjNum);
+        }
+    }
+}
+
+function void JumpToObjective(int iStartObj, boolean bTeleport)
+{       
+    if (iStartObj != BFObjectiveGetCurrent())
+    {
+        BFObjectiveSetJumpTo(iStartObj);		
+        nextObjective(BFObjectiveGetCurrent());
+
+        if (bTeleport)
+        {
+            char16 tSpawn;
+            tSpawn = LevelVarToChar16("mCurrentSpawner");
+            if (propExists(propRefFromChar16(tSpawn)))
+                propTeleportToProp(pPlayer, propRefFromChar16(tSpawn));        
+        }
+
+        logStr("Jumped To Objective");
+        logInt(BFObjectiveGetCurrent());
+    }
+}
+
+callback void ObjectiveTimeExpired(char16 objName)
+{   
+    //if (lib_ObjTimeExpired()) nextObjective();
+
+    int objNum = 0;
+    objNum = BFObjectiveGetNumber(objName);   
+    if (lib_ObjTimeExpired(objNum))
+    {
+        nextObjective(objNum);
+    }
+
+}
+callback void playerSpawned(char16 teamName, int playerId)
+{
+    //int iObjective = GetLevelVarInt("mObjective");
+    logStr("teamName: ");
+    logchar16(teamName);
+}
+callback void finiteSpawnerComplete(char16 propId) 
+{
+    AddVMDebugHUDMsg("FINITE SPAWNER IS DEADED", 1, "test_objective_message");
+}
+
+/////////////////////////////          DEFAULTS END            /////////////////
+
+callback void gameHasStarted()
+{           
+}
+
+function void ResetProps()
+{
+    // e.g    disableTrigger(propRefFromName("DeathTrigger"));       
+}
+
+function void ScriptHasStarted()
+{
+    //SetLevelVarsBFStory("obj_Mus", "vmTrig");
+    SetBFStoryPrefixes("obj_Mus", "vmTrig");
+    // obj_Mus is the link into the bf/mgrsetup/objectivesmgr.res file.
+    // It will look for objectives in objectivesmgr: obj_Mus1, obj_Mus2 etc. so rename it for your level
+    // vmTrig is the reference for trigger prop names in the editor, e.g. first trigger should be renamed to vmTrig1, then vmTrig2 etc
+    // Remember to paste into each trigger props action variable:
+    // propHasEnteredTriggerScript = "gamemodeTriggerSimple(triggerPropRef, thisPropRef);"
+
+    ResetObjectives("mObjTmp", 15);
+
+    //Reset CPs, Spawners, etc
+    ResetProps();
+
+    JumpToObjective(1, true);
+}
+
+function int ObjectiveTriggerTests(int iObjective, char16 inTriggerProp, int iResult) 
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+
+    //e.g for an alternate route
+    if (iResult >= 1) //1 is normal route e.g vmTrig1, 2 is route 1 e.g vmTrig1r1
+    {    
+        if (iObjective == 1)
+        {
+            if (iResult == 1)
+                JumpToObjective(10, true);
+            else
+                JumpToObjective(20, true);                
+        }
+    }
+
+    //No Change
+    return iResult;
+}
+
+/////////////////////////////          OBJECTIVE TESTS            /////////////////
+
+// We can test if certain objectives have been completed here, rather than trigger them immediately
+// This is because sometimes it is much easier on the CPU to test here rather than set up triggers
+// Also we can do complex objective tests here which aren't otherwise possible (e.g. if prop is destroyed)
+function void ObjectiveTests(int iObjective) 
+{
+    //Tests for each game tick
+
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+
+    if (iObjective == 1)
+    {
+        if (iSubObjective == 1)
+        {
+
+        }
+        else
+        {
+
+        }
+    }
+}
+
+/////////////////////////////          OBJECTIVES            /////////////////
+
+// MAIN OBJECTIVE SETUP FUNCTION (most of your code will go here)
+// Set up what each objective actually is (the code for it anyway) and trigger events happening as player completes objectives
+// Objective description strings and numbers are in mgrsetup/objectivesmgr.res + strings localisation file
+
+function boolean ObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{
+    if (iObjective == 1) 
+    { 
+        if (iSubObjective == 1)
+        {        
+        }
+        else
+        {
+            //e.g
+            SetObjectiveTimer(60, iObjective);
+            SetNumSubObjectives(1, iObjective);
+        }
+    } 
+
+    return true;
+}
+
+AllowCallback(CALLBACK_PlayerSpawned, playerSpawned);
+AllowCallback(CALLBACK_PlayerKilledBF, playerKilled);
+AllowCallback(CALLBACK_TriggeredProp, triggeredProp);
+AllowCallback(CALLBACK_ObjectiveTimeExpired, ObjectiveTimeExpired);
+AllowCallback(CALLBACK_GameHasStarted, gameHasStarted);
+AllowCallback(CALLBACK_FSpawnerComplete, finiteSpawnerComplete);
+
+
+///////////////This Script Actions
+
+wholeScreenFade(0.0f, 1.0f, false);
+waitForGameTime(0.1f);
+ScriptHasStarted(); //Do any setups
+waitForGameTime(1.0f);
+wholeScreenFade(1.0f, 0.0f, false);
+
+//Main game loop
+while(!bEndLevel)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    ObjectiveSetupCheck();
+
+    for (i=0; i<iNumActive; i++)
+    {
+        int iObjective = BFObjectiveGetNumForNthActive(i);
+        ObjectiveTests(iObjective);        
+        waitForGameTime(0.01f);
+    }
+
+    waitForGameTimeOrLVChange(1.0f, "iObjLV");
+    //waitForGameTime(1.0f);
+    logStr("tick");
+    logInt(iObjective);    
+}
+
+//Nextlevel Stuff Here
+

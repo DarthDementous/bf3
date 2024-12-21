@@ -1,0 +1,27 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      00096002 00001200     	EXEC ADDR(0x2) CNT(0x6) BOOL_ADDR(0x80)
+02: 10085041 1f1ff688 00004000	      FETCH:	SAMPLE	R5.xyzw = R2.xyx CONST(0) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+03: c8080300 001b1b00 e1050300	   (S)ALU:	MULv	R0.___w = R5.wwww, R3.wwww
+04: 64470204 00c0c061 c0030300	      ALU:	ADDv	R4.xyz_ = R3.xyzz, R3.xyzz
+                          						    	SUBs	R2.__z_ = C256.yyxx
+05: 64810203 00bebecb d0000000	      ALU:	DOT3v	R3.x___ = R0.zxyy, R0.zxyy
+                          						    	SUBs	R2.___w = C256.wwzz
+06: 58230302 001a6c6c a582ff83	      ALU:	SETGTv	R2.xy__ = abs(R2).zwww, C511.xxxx
+                          						    	RECIPSQ_IEEE	R3._y__ = abs(R3).xxxx
+07: a0170305 00c06c6c a1050183	      ALU:	MULv	R5.xyz_ = R5.xyzz, C257.xxxx
+                          						    	SQRT_IEEE	R3.x___ = abs(R3).xxxx
+      00006008 00001200     	EXEC ADDR(0x8) CNT(0x6) BOOL_ADDR(0x80)
+08: c8078000 00c0c000 e1050400	      ALU:	MULv	export0.xyz_ = R5.xyzz, R4.xyzz	; COLOR
+09: c8070300 00b1c000 e1030000	      ALU:	MULv	R0.xyz_ = R3.yyyy, R0.xyzz
+0a: c8020303 006c6c00 a6030000	      ALU:	SETGTEv	R3._y__ = R3.xxxx, C256.xxxx
+0b: bc240003 01bebe80 f0000100	      ALU:	DOT3v	R3.__z_ = R0.zxyy, R1.zxyy
+                          						    	SUB_CONST_1	R0._y__ = -C256.y, -R3.x
+0c: 4c110300 02c61b1b a0830002	      ALU:	ADDv	R0.x___ = abs(R3).zzzz, -C256.wwww
+                          						    	RECIP_IEEE	R3.x___ = R2.wwww
+0d: 4c840303 00c6c6c6 a6830002	      ALU:	SETGTEv	R3.__z_ = abs(R3).zzzz, C256.zzzz
+                          						    	RECIP_IEEE	R3.___w = R2.zzzz
+      0000400e 00002200     	EXEC_END ADDR(0xe) CNT(0x4) BOOL_ADDR(0x80)
+0e: c9090303 00b01800 e1000300	      ALU:	MULv	R3.x__w = R0.xyyy, R3.xwww CLAMP
+0f: c8030303 00b06fc5 ee020303	      ALU:	CNDGTv	R3.xy__ = R3.yzzz, R2.xyyy, R3.wxxx
+10: c8040303 001b6c00 e1000300	      ALU:	MULv	R3.__z_ = R0.wwww, R3.xxxx
+11: c8088000 00c6b100 e1030300	      ALU:	MULv	export0.___w = R3.zzzz, R3.yyyy	; COLOR

@@ -1,0 +1,33 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      09546003 00001200     	EXEC ADDR(0x3) CNT(0x6) BOOL_ADDR(0x80)
+03: 20100303 0100006c e2030383	      ALU:	SETGTs	R3.x___ = -abs(R3).xxxx
+04: 10382041 1f1ffe88 00004000	      FETCH:	SAMPLE	R2.xyz_ = R2.xyx CONST(3) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+05: 10080001 1f1ffe88 00004000	      FETCH:	SAMPLE	R0.xyz_ = R0.xyx CONST(0) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+06: 10183021 1f1ffe3f 00004000	      FETCH:	SAMPLE	R3.__x_ = R1.xyx CONST(1) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+07: 00283061 1f1ffff8 00004000	      FETCH:	SAMPLE	R3.x___ = R3.xxx CONST(2) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+08: b4200303 000000c0 e20303ff	   (S)ALU:	ADD_CONST_1	R3._y__ = C511.z, R3.x
+      00006009 00001200     	EXEC ADDR(0x9) CNT(0x6) BOOL_ADDR(0x80)
+09: 4c210303 02c66cb1 a0030003	      ALU:	ADDv	R3.x___ = R3.zzzz, -C256.xxxx
+                          						    	RECIP_IEEE	R3._y__ = R3.yyyy
+0a: 4c180303 021bc66c 20000003	      ALU:	ADDv	R3.___w = C256.wwww, -C256.zzzz
+                          						    	RECIP_IEEE	R3.x___ = R3.xxxx
+0b: c8080300 016cb1c6 8b030000	      ALU:	MULADDv	R0.___w = -C256.zzzz, R3.xxxx, C256.yyyy
+0c: ac100303 00000041 e2030302	      ALU:	MUL_CONST_1	R3.x___ = C258.x, R3.y
+0d: 4c170301 006cc0b1 c1030002	      ALU:	MULv	R1.xyz_ = R3.xxxx, R0.xyzz
+                          						    	RECIP_IEEE	R3.x___ = C258.yyyy
+0e: c8070300 00c06c6c cb0103ff	      ALU:	MULADDv	R0.xyz_ = C511.xxxx, R1.xyzz, R3.xxxx
+      0000600f 00001200     	EXEC ADDR(0xf) CNT(0x6) BOOL_ADDR(0x80)
+0f: 4c870303 00c06c1b a001ff03	      ALU:	ADDv	R3.xyz_ = R1.xyzz, C511.xxxx
+                          						    	RECIP_IEEE	R3.___w = R3.wwww
+10: 4d180303 001b1b6c e1000303	      ALU:	MULv	R3.___w = R0.wwww, R3.wwww CLAMP
+                          						    	RECIP_IEEE	R3.x___ = R3.xxxx
+11: 4c280303 001b6cb1 a1030103	      ALU:	MULv	R3.___w = R3.wwww, C257.xxxx
+                          						    	RECIP_IEEE	R3._y__ = R3.yyyy
+12: 4c470300 00c0c0c6 e1010003	      ALU:	MULv	R0.xyz_ = R1.xyzz, R0.xyzz
+                          						    	RECIP_IEEE	R3.__z_ = R3.zzzz
+13: c8070303 00c0c000 e1000300	      ALU:	MULv	R3.xyz_ = R0.xyzz, R3.xyzz
+14: c8070303 01c0b1c0 ab03ff02	      ALU:	MULADDv	R3.xyz_ = -R2.xyzz, R3.xyzz, C511.yyyy
+      00001015 00002200     	EXEC_END ADDR(0x15) CNT(0x1) BOOL_ADDR(0x80)
+15: c88fc000 001bc0c0 eb030302	      ALU:	MULADDv	export0 = R2.xyzz, R3.wwww, R3.xyzz	; COLOR
+                          						    	RETAIN_PREV	export0.___w = R2.xyzz	; COLOR
+      00000000 00000000     	NOP

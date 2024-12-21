@@ -1,0 +1,133 @@
+// vim: set syntax=c :
+
+//////////////////////////////////////
+//
+// Mark Kevern
+//
+// chr_patrol_danim.vms
+//
+// Allows a character to patrol, if player gets close they will turn and face, while playing an anim
+// Mainly used for training salutes
+//
+// To use:
+// Add to a VMProp
+//
+// In the StringVars[]
+// 0: chrprop
+// 1: distance, to do a distance test
+// 2: loop, to loop the patrol route
+// 3: patrol prop template (e.g dofWalk_, would work for dofWalk_0, dofWalk_1, etc )
+// 4, 5, 6, 7, 8, 9: Anims
+//
+////////////////////////////////////////
+
+logStr("************* BEGIN SCRIPT"); 
+
+waitForGameTime( 5.0f );
+
+int iChrNum = 0;
+int iPatrolNum = 3;
+int iLoopNum = 2;
+
+boolean bDistanceCheck = false;
+
+propRef pPlayer = getPlayerPropRefFromID(GetPlayerId());
+
+propRef pProp;
+pProp = propRefFromChar16(getNthVMPropStringVar(me, iChrNum));
+
+char16 sPatrolTmp;
+sPatrolTmp = getNthVMPropStringVar(me, iPatrolNum);
+
+char16 sStr;
+sStr = getNthVMPropStringVar(me, 1);
+
+int iPatrolNum = 1;
+
+function propRef getPoint(int iNum)
+{
+    char16 cCurrentPoint;
+    cCurrentPoint = Char16CatInt(sPatrolTmp, iNum);    
+    return propRefFromChar16(cCurrentPoint);
+}
+
+function void Patrol(propRef pChr)
+{
+    propRef pPoint = getPoint(iPatrolNum);
+
+    beginInGameCutSceneWithFlags(k_vmFlag_ResumeScriptAfterHitReact, pChr);
+
+    boolean walking = false;
+    boolean breakout = false;    
+    
+    while (!breakout)
+    {
+        if (!walking)
+        {
+            if (propExists(pPoint))
+            {
+                chrRunToPadAndAlign(pChr, propGetPos(pPoint), propGetDir(pPoint), 800.0f);
+                walking = true;
+            }
+        }
+        else
+        {
+            if (testIfPropsAreClose(pChr, pPoint, 1.0f))
+            {
+                walking = false;
+                iPatrolNum++;
+                pPoint = getPoint(iPatrolNum);
+
+                if (!propExists(pPoint)) 
+                {
+                    iPatrolNum = 1;
+                    pPoint = getPoint(iPatrolNum);
+                }
+            }
+        }
+
+        if (bDistanceCheck)
+            if (testIfPlayerCloseToProp(pChr, 5.0f))
+                breakout = true;
+        
+        waitForGameTime( 0.5f );
+    }
+}
+
+setAIState(pProp, "AISTATE_PATROL");
+waitForGameTime( 0.01f );
+
+if (!char16cmp(sStr, "distance"))
+{
+    char16 sLoop;
+    propRef pChr;
+    pChr = propSpawnerGetNthSpawnedProp(pProp, 0);
+    
+    while (char16cmp(sLoop, "loop"))
+    {        
+        //Will only work for ungrouped peeps
+        bDistanceCheck = true;        
+        Patrol(pChr);
+
+        chrRunToPadAndAlign(pChr, propGetPos(pChr), propGetDir(pChr), 800.0f); //Stop Them Moving
+        vmFacePropAnimateDist(pChr, pPlayer, 10.0f, 5.0f, getNthVMPropStringVar(me, 4), /*getNthVMPropStringVar(me, 5), getNthVMPropStringVar(me, 6),*/ getNthVMPropStringVar(me, 7));
+        vmFaceDirAnimateDist(pChr, propGetDirRad(pProp), pPlayer, 10.0f, -5.0f, getNthVMPropStringVar(me, 8),  getNthVMPropStringVar(me, 9));
+
+        endInGameCutScene();
+        sLoop = getNthVMPropStringVar(me, iLoopNum); //Should I loop?        
+    }        
+}
+else
+{
+    char16 sLoop;
+    
+    while(char16cmp(sLoop, "loop"))
+    {
+        Patrol(propSpawnerGetNthSpawnedProp(pProp, 0));
+        endInGameCutScene();
+        sLoop = getNthVMPropStringVar(me, iLoopNum); //Should I loop?
+    }
+}
+
+//logStr("************* END SCRIPT"); 
+

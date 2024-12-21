@@ -1,0 +1,14 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      00006002 00001200     	EXEC ADDR(0x2) CNT(0x6) BOOL_ADDR(0x80)
+02: c8030001 00c4b000 a6000100	      ALU:	SETGTEv	R1.xy__ = R0.xzzz, C257.xyyy
+03: 08430000 001ac461 66010001	      ALU:	SETGTEv	R0.xy__ = C257.zwww, R0.xzzz
+                          						    	MULs	R0.__z_ = R1.yyxx
+04: 28400000 000000c6 e2000000	      ALU:	SETNEs	R0.__z_ = R0.zzzz
+05: c8040000 006cc600 e1000000	      ALU:	MULv	R0.__z_ = R0.xxxx, R0.zzzz
+06: 28100000 000000c6 e2000000	      ALU:	SETNEs	R0.x___ = R0.zzzz
+07: c8010000 00b16c00 e1000000	      ALU:	MULv	R0.x___ = R0.yyyy, R0.xxxx
+      00002008 00002200     	EXEC_END ADDR(0x8) CNT(0x2) BOOL_ADDR(0x80)
+08: c8010000 006cb16c 8c00ffff	      ALU:	CNDEv	R0.x___ = C511.xxxx, R0.xxxx, C511.yyyy
+09: 14878000 006cc01b 81000000	      ALU:	MULv	export0.xyz_ = R0.xxxx, C256.xyzz	; COLOR
+                          						    	MAXs	export0.___w = C256.wwww	; COLOR
+      00000000 00000000     	NOP

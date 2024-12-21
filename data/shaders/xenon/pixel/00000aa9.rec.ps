@@ -1,0 +1,13 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      00096002 00001200     	EXEC ADDR(0x2) CNT(0x6) BOOL_ADDR(0x80)
+02: 10085081 1f1ffff8 00004000	      FETCH:	SAMPLE	R5.x___ = R4.xyx CONST(0) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+03: 08200505 000000c6 e2050502	   (S)ALU:	MULs	R5._y__ = R2.zzzz
+04: c806c000 046cb100 a585ff00	      ALU:	SETGTv	export0._yz_ = -abs(R5).xxxx, C511.yyyy	; COLOR
+05: c8020505 00c6c6b1 eb010105	      ALU:	MULADDv	R5._y__ = R5.yyyy, R1.zzzz, R1.zzzz
+06: c8020505 00c6c6b1 eb000005	      ALU:	MULADDv	R5._y__ = R5.yyyy, R0.zzzz, R0.zzzz
+07: 58210505 046c6cb1 a005ff85	      ALU:	ADDv	R5.x___ = -R5.xxxx, C511.xxxx
+                          						    	RECIPSQ_IEEE	R5._y__ = abs(R5).yyyy
+      00002008 00002200     	EXEC_END ADDR(0x8) CNT(0x2) BOOL_ADDR(0x80)
+08: c8020505 00b1c600 e1050100	      ALU:	MULv	R5._y__ = R5.yyyy, R1.zzzz
+09: c8088000 00b16c00 e1850500	      ALU:	MULv	export0.___w = abs(R5).yyyy, R5.xxxx	; COLOR
+      00000000 00000000     	NOP

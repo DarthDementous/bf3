@@ -1,0 +1,22 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      05006002 00001200     	EXEC ADDR(0x2) CNT(0x6) BOOL_ADDR(0x80)
+02: c8020000 00b1b100 a0010000	      ALU:	ADDv	R0._y__ = R1.yyyy, C256.yyyy
+03: 14110002 006c6c6c a0010001	      ALU:	ADDv	R2.x___ = R1.xxxx, C256.xxxx
+                          						    	MAXs	R0.x___ = R1.xxxx
+04: 14280202 02b1b1b1 a0010001	      ALU:	ADDv	R2.___w = R1.yyyy, -C256.yyyy
+                          						    	MAXs	R2._y__ = R1.yyyy
+05: 14440201 026c6c6c a0010001	      ALU:	ADDv	R1.__z_ = R1.xxxx, -C256.xxxx
+                          						    	MAXs	R2.__z_ = R1.xxxx
+06: 10080021 1f1ffeff 00004000	      FETCH:	SAMPLE	R0.__w_ = R1.xyx CONST(0) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+07: 10080001 1f1ffffa 00004000	      FETCH:	SAMPLE	R0.z___ = R0.xyx CONST(0) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+      00956008 00001200     	EXEC ADDR(0x8) CNT(0x6) BOOL_ADDR(0x80)
+08: b8080041 1f1fffd7 00004000	      FETCH:	SAMPLE	R0._z__ = R2.zwz CONST(0) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+09: 98081021 1f1ffffa 00004000	      FETCH:	SAMPLE	R1.z___ = R1.zyz CONST(0) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+0a: 10080041 1f1ff5ff 00004000	      FETCH:	SAMPLE	R0.___z = R2.xyx CONST(0) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+0b: c8080000 006c1b00 e0010000	   (S)ALU:	ADDv	R0.___w = R1.xxxx, R0.wwww
+0c: c8020000 001bb100 e0000000	      ALU:	ADDv	R0._y__ = R0.wwww, R0.yyyy
+0d: c8010000 00b16c00 e0000000	      ALU:	ADDv	R0.x___ = R0.yyyy, R0.xxxx
+      0000300e 00002200     	EXEC_END ADDR(0xe) CNT(0x3) BOOL_ADDR(0x80)
+0e: c8020000 00c66c6c ab000100	      ALU:	MULADDv	R0._y__ = R0.xxxx, R0.zzzz, C257.xxxx
+0f: a8100000 00000041 c2000002	      ALU:	MUL_CONST_0	R0.x___ = C258.x, R0.y
+10: c80cc000 00ecec00 e2000000	      ALU:	MAXv	export0.__zw = R0.xxxz, R0.xxxz	; COLOR

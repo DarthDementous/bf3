@@ -1,0 +1,42 @@
+/******************************************************************************
+** stage minimum needed templates.res
+** 11/11/04
+******************************************************************************/
+
+#include "data\common\templates\chrlod.res"
+#include "data\common\templates\sound_scenes.res"
+#include "data\common\templates\scene_descriptors.res"
+#include "data\common\templates\core_sound.res"
+#include "data\common\templates\core.res"
+#include "data\common\templates\ragdoll.res"
+#include "data\common\templates\fx.res"
+#include "data\common\templates\speech.res"
+#include "data\common\templates\stickywall.res"
+#include "data\common\templates\chr.res"
+#include "data\common\templates\controls.res"
+#include "data\common\templates\inventory.res"
+#include "data\common\templates\humanplanning.res"	    // g5 specific
+#include "data\common\templates\soundmixers.res"
+#include "data\common\templates\vm.res"
+#include "data\common\templates\events.res"
+#include "data\common\templates\weapons.res"
+#include "data\common\templates\input_tweaker.res"
+#include "data\common\templates\gui.res"
+#include "data\common\templates\player.res"
+#include "data\common\templates\chrmoveanims.res"
+#include "data\common\templates\ai.res"
+#include "data\common\templates\vehicles.res"
+#include "data\common\templates\cover_props.res"
+#include "data\common\templates\particlesystem.res"
+#include "data\common\templates\particles.res"
+#include "data\common\templates\clothmaterial.res"
+#include "data\common\templates\conspire.res"
+#include "data\common\templates\physicsmaterials.res"
+#include "data\common\templates\stage.res"
+#include "data\common\templates\mgr_templates.res"
+#include "data\common\templates\csg_templates.res"
+#include "data\common\templates\effects.res"
+#include "data\common\mgrsetup\managers.res"
+#include "data/common/templates/teamsquad.res"
+#include "data/common/templates/hitindicator.res"
+

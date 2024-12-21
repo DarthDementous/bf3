@@ -1,0 +1,13 @@
+// vim: set syntax=c :
+
+
+
+propRef lobot     = propRefFromName("lobot");
+chrRef chr_lobot    = chrRefFromName("lobot");
+chrSetPatrolState(chr_lobot);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_lobot);
+chrRunToPadAndAlign(chr_lobot, propGetPosFromName("actpntLobotType"), propGetDirFromName("actpntLobotType"), 800.f);
+waitUntilVMsDone(chr_lobot);
+chrPlayAnimSlot(chr_lobot, "AN_hm_ter_lp", 1, true);
+propSetFrozen(chr_lobot, true);
+

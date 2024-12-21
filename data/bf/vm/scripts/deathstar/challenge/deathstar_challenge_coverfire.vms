@@ -1,0 +1,423 @@
+// vim: set syntax=c :
+
+///////////////////////////////////
+/*
+    deathstar_challenge_coverfire.vms
+
+    Created By Leigh Griffiths
+    please do not modify without asking me,
+    or comment where you have modified
+
+*/
+///////////////////////////////////
+
+
+int iObjectiveNum = 0;
+
+/////////////MAKE SURE TO INCLUDE A BFStorylevelVarProp in your level
+
+//Declare the CPs, less expensive?
+//Example of declaration
+
+
+
+boolean HasActivatedStarFighter = false;
+boolean Skip = false;
+
+///////////// Include Defaults //////////////////////////////////////////////
+
+
+function void Trigger(char16 inTriggerProp) //Used so can be called elsewhere in script (cant call a callback)
+{    
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iActive = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	iActive = BFObjectiveGetNumForNthActive(i);
+	int iResult = lib_triggeredProp(inTriggerProp, iActive);
+	iResult = ObjectiveTriggerTests(iActive, inTriggerProp, iResult);
+	if (iResult >= 1) nextObjective(iActive);
+    }
+}
+
+callback int triggeredProp(int inType, char16 inTriggerProp, int pId)
+{   
+    Trigger(inTriggerProp);     
+
+    return 0;
+}
+
+callback void playerKilled(int killerId, int iResult, int iSpare)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    
+    propRef pKiller;
+    pKiller = propRefFromInt(killerId);    
+    
+    if (isPlayerProp(pKiller) && iResult == 1)
+    {
+	ChallengeAddScore( 50 );
+    }
+
+    propRef pKiller;
+    pKiller = propRefFromInt(killerId);
+
+//	if(killerId == 0 && victimId != 0)
+//	if (isPlayerProp(pKiller) && iResult == 1)
+	if (isPlayerProp(pKiller) && iResult == 1)
+		{
+		ChallengeAddScore(10);
+		}	
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iActive = BFObjectiveGetNumForNthActive(i);
+	if (lib_playerKilled(killerId, iResult, iSpare, iActive)) 
+	{
+	    nextObjective(iActive);
+	}
+    }
+}
+
+//callback int triggeredProp(int inType, char16 inTriggerProp, int pId)
+//{    
+//    if (lib_triggeredProp(inTriggerProp) >= 1) nextObjective();
+//    
+//    return 0;
+//}
+
+function void nextObjective(int inObjNum) 
+{    
+    int result =   lib_nextObjective(inObjNum);
+
+    if(result==1)
+    {
+	//if next objective returns 1 it has updated a core objective and automatically moved us onto the next
+	//so do objective setup with current objective
+	if (!Skip)
+	{
+	    int iObjective = BFObjectiveGetCurrent();//GetLevelVarInt("mObjective");
+	    char16 cName = BFObjectiveGetName(iObjective);
+	    ObjectiveSetup( cName, iObjective, BFObjectiveGetSub(iObjective));            
+	}
+    }
+
+    if(result==2)
+    {
+	//if nextobjective returns 2 it has updated a bonus objective so we will want to 
+	//objective setup with the objective we passed to next objective
+	if (!Skip)
+	{
+	    char16 cName = BFObjectiveGetName(inObjNum);
+	    ObjectiveSetup( cName, inObjNum, BFObjectiveGetSub(inObjNum));            
+	}
+    }
+}
+
+function void JumpToObjective(int iStartObj, boolean Skiping)
+{    
+    Skip = Skiping;
+   // while (GetLevelVarInt("mObjective") < iStartObj)
+   // {
+   //   if (GetLevelVarInt("mObjective") == iStartObj-1) Skip = false;
+   //   nextObjective();
+   // }
+
+    Skip = false;
+
+    BFObjectiveSetJumpTo(iStartObj);
+    nextObjective(BFObjectiveGetCurrent());
+
+    logStr("Jumped To Objective");
+    logInt(BFObjectiveGetCurrent());
+    logInt(iStartObj);
+    
+}
+
+function int ObjectiveTriggerTests(int iObjective, char16 inTriggerProp, int iResult) 
+{
+
+}
+
+callback void ObjectiveTimeExpired(char16 objName)
+{   
+    int objNum = 0;
+    objNum = BFObjectiveGetNumber(objName);   
+    if (lib_ObjTimeExpired(objNum))
+    {
+	nextObjective(objNum);
+    }
+}
+
+callback void playerSpawned(char16 teamName, int playerId)
+{
+    propRef p = getPlayerPropRefFromID(playerId);    
+}
+
+callback void finiteSpawnerComplete(char16 propId) 
+{
+
+}
+
+function void ObjectiveTests(int inObjNum) 
+{
+  int iSubObjective = BFObjectiveGetSub(inObjNum);
+
+ if (inObjNum == 1) 
+ { 
+       if (iSubObjective == 1)
+	{
+		propRef pChr;
+		pChr = propSpawnerGetNthSpawnedProp(propRefFromName("chewie_spawn"), 0);
+		if (!propExists(pChr))
+		{
+			nextObjective(inObjNum);
+		}
+	}
+ }
+
+if (inObjNum == 2) 
+ { 
+       if (iSubObjective == 1)
+	{
+		propRef pChr;
+		pChr = propSpawnerGetNthSpawnedProp(propRefFromName("leia_spawn"), 0);
+		if (!propExists(pChr))
+		{
+			nextObjective(inObjNum);
+		}
+	}
+ }
+
+if (inObjNum == 3) 
+ { 
+       if (iSubObjective == 1)
+	{
+		propRef pChr;
+		pChr = propSpawnerGetNthSpawnedProp(propRefFromName("threepio_spawn"), 0);
+		if (!propExists(pChr))
+		{
+			nextObjective(inObjNum);
+		}
+	}
+ }
+
+if (inObjNum == 4) 
+ { 
+       if (iSubObjective == 1)
+	{
+		propRef pChr;
+		pChr = propSpawnerGetNthSpawnedProp(propRefFromName("artoo_spawn"), 0);
+		if (!propExists(pChr))
+		{
+			nextObjective(inObjNum);
+		}
+	}
+ }
+
+if (inObjNum == 5) 
+ { 
+       if (iSubObjective == 1)
+	{
+		propRef pChr;
+		pChr = propSpawnerGetNthSpawnedProp(propRefFromName("luke_spawn"), 0);
+		if (!propExists(pChr))
+		{
+			nextObjective(inObjNum);
+		}
+	}
+ }
+
+}
+
+
+/////// Defaults END /////////////////////////////////////////////
+
+
+
+
+callback void gameHasStarted()
+{           
+    
+}
+
+function void ScriptHasStarted()
+{
+
+    SetBFStoryPrefixes("obj_cvr", "vmTrig");
+	    
+    ResetObjectives("mObjTmp", 6);
+
+
+
+   	JumpToObjective(1, true);
+}
+
+
+//function void ObjectiveTests() 
+//{
+//Do some tests
+//}
+
+/////////////////////////////////////////OBJECTIVES
+
+function void ObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{
+    if (iObjective == 1) 
+    { 
+	if (iSubObjective == 1)
+	{
+	  setVMPropActive(propRefFromName("vmChewie"), true);
+	}
+	else if (iSubObjective == 2)
+	{
+	  SetObjectiveTimer(3, iObjective);
+	}      
+       else
+       {
+	  ChallengeBegin();
+	  propRef p = getPlayerPropRefFromID(GetPlayerId());
+	  chrSetMovementClamped(p, true);
+	  lib_SetupGroupZone(cObjectiveName, "door_a_spawner", "troopers_home", "troopers_route", k_objtype_hold_area);
+	  lib_SetupGroupZone(cObjectiveName, "door_b_spawner", "troopers_home", "troopers_route", k_objtype_hold_area);
+	  lib_SetupGroupZone(cObjectiveName, "door_c_spawner", "troopers_home", "troopers_route", k_objtype_hold_area);
+	  ActivateSpawner("chewie_spawn");
+//	  ActivateSpawner("luke_spawn"); // will be spawned from the start eventually, for now spawns as all other chars
+	  setAIState(propRefFromName("chewie_spawn"), "AISTATE_PATROL");
+	  setAIState(propRefFromName("luke_spawn"), "AISTATE_PATROL");
+	  ActivateSpawner("doorB_wave1");
+	  ActivateSpawner("doorC_wave1");
+	  SetNumSubObjectives(2, iObjective);
+	  SetObjectiveTimer(1, iObjective);
+       }
+    }
+
+    else if (iObjective == 2) 
+    { 
+	if (iSubObjective == 1)
+	{
+	  setVMPropActive(propRefFromName("vmLeia"), true);
+	}
+	else if (iSubObjective == 2)
+	{
+	  SetObjectiveTimer(3, iObjective);
+	}
+      
+       else
+       {
+	  ActivateSpawner("leia_spawn");
+	  ActivateSpawner("doorA_wave1");
+	  ActivateSpawner("doorC_wave2");
+	  SetNumSubObjectives(2, iObjective);
+	  SetObjectiveTimer(1, iObjective);
+       }
+    }
+    else if (iObjective == 3) 
+    { 
+	if (iSubObjective == 1)
+	{
+	  setVMPropActive(propRefFromName("vmThreepio"), true);
+	}
+	else if (iSubObjective == 2)
+	{
+	  SetObjectiveTimer(3, iObjective);
+	}
+      
+       else
+       {
+	  ActivateSpawner("threepio_spawn");
+	  ActivateSpawner("doorB_wave2");
+	  ActivateSpawner("doorC_wave3");
+	  SetNumSubObjectives(2, iObjective);
+	  SetObjectiveTimer(1, iObjective);
+       }
+    }
+
+    else if (iObjective == 4) 
+    { 
+	if (iSubObjective == 1)
+	{
+	  setVMPropActive(propRefFromName("vmArtoo"), true);
+	}
+	else if (iSubObjective == 2)
+	{
+	  SetObjectiveTimer(3, iObjective);
+	}
+      
+       else
+       {
+	  ActivateSpawner("artoo_spawn");
+	  ActivateSpawner("doorB_wave3");
+	  ActivateSpawner("doorA_wave2");
+	  SetNumSubObjectives(2, iObjective);
+	  SetObjectiveTimer(1, iObjective);
+       }
+    }
+
+    else if (iObjective == 5) 
+    { 
+	if (iSubObjective == 1)
+	{
+	  setVMPropActive(propRefFromName("vmLuke"), true);
+	  SetObjectiveTimer(15, iObjective);
+	}
+	else if (iSubObjective == 2)
+	{
+	  SetObjectiveTimer(3, iObjective);
+	}
+      
+       else
+       {
+	  ActivateSpawner("luke_spawn");
+	  ActivateSpawner("doorB_wave4");
+	  ActivateSpawner("doorA_wave3");
+	  ActivateSpawner("doorC_wave4");
+	  SetNumSubObjectives(2, iObjective);
+	  SetObjectiveTimer(1, iObjective);
+       }
+    }
+
+
+    else if (iObjective == 6) 
+    { 
+	{
+	  ChallengeEnd();
+	}
+    }
+}
+
+AllowCallback(CALLBACK_PlayerSpawned, playerSpawned);
+AllowCallback(CALLBACK_PlayerKilledBF, playerKilled);
+AllowCallback(CALLBACK_TriggeredProp, triggeredProp);
+AllowCallback(CALLBACK_ObjectiveTimeExpired, ObjectiveTimeExpired);
+AllowCallback(CALLBACK_GameHasStarted, gameHasStarted);
+AllowCallback(CALLBACK_FSpawnerComplete, finiteSpawnerComplete);
+
+
+///////////////This Script Actions
+
+
+waitForGameTime(0.25f);
+ScriptHasStarted(); //Do any setups
+
+
+// Main game loop
+while(1)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iObjective = BFObjectiveGetNumForNthActive(i);
+	ObjectiveTests(iObjective);
+
+	logStr("tick");
+	logInt(iObjective);
+    }
+    waitForGameTime(1.0f);
+}
+

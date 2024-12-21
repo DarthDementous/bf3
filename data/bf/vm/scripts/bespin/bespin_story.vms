@@ -1,0 +1,1183 @@
+// vim: set syntax=c :
+
+///////////////////////////////////
+/*
+    bespin_story_pt1.vms
+*/
+///////////////////////////////////
+
+/////////////MAKE SURE TO INCLUDE A BFStorylevelVarProp in your level
+
+//Declare the CPs, less expensive?
+propRef archway_cp = propRefFromName( "archwayCP" );
+
+boolean moving1 = false;
+boolean moving2 = false;
+boolean moving3 = false;
+boolean moving4 = false;
+
+int var = 0;
+int destroyed = 0;
+int iTiesDead = 0; //to check during the 2nd objective
+boolean bEndLevel = false;
+boolean Skip = false;
+propRef pPlayer = getPlayerPropRefFromID(GetPlayerId());
+
+boolean loadAI = true;
+///////////// Include Defaults //////////////////////////////////////////////
+
+//////////////////////////CALLBACK INFO DO NOT CHANGE
+
+//PlayerKilled Callback Info
+boolean bCB_PK = false;
+int iCB_PK_KillerId = -1;
+int iCB_PK_Victim = -1;
+int iCB_PK_Result = -1;
+
+//triggeredProp Callback Info
+boolean bCB_TP = false;
+char16 cCB_TP_Prop = StringToChar16("");
+
+//ObjectiveTimeExpired Callback Info
+boolean bCB_OTE = false;
+char16 cCB_OTE_ObjName = StringToChar16("");
+
+//shipReachedScriptedSplineSegment  Callback Info
+boolean bCB_SRSS = false;
+propRef pCB_SRSS_Ship;
+propRef pCB_SRSS_Spline;
+int iCB_SRSS_Segment = -1;
+
+//////////////////////////END CALLBACK INFO
+
+function void ProcessCallbacks()
+{
+    //No else's as could be waiting to process two or more!
+
+    if (GetLevelVarInt("iCBLV") != -1)
+    {
+        if (bCB_PK) // playerKilled callback
+        {
+            playerKilled(iCB_PK_KillerId, iCB_PK_Result, iCB_PK_Victim);
+            bCB_PK = false;
+        }
+
+        if (bCB_TP) // triggeredProp callback
+        {
+            Trigger(cCB_TP_Prop);
+            bCB_TP = false;
+        }
+
+        // ObjectiveTimeExpired callback
+        if (bCB_OTE)
+        {
+            ObjectiveTimeExpired(cCB_OTE_ObjName);
+            bCB_OTE = false;
+        }
+
+        // shipReachedScriptedSplineSegment callback
+        if (bCB_SRSS)
+        {
+            ShipReachedScriptedSplineSegment(pCB_SRSS_Ship, pCB_SRSS_Spline, iCB_SRSS_Segment);
+            bCB_SRSS = false;
+        }
+
+        SetLevelVarInt("iCBLV", -1);    
+        waitForGameTime(0.1f);
+    }
+}
+
+callback void CB_PlayerKilled(int iKiller, int iResult, int iVictim)
+{
+    logStr("CB_PlayerKilled");
+   /* if (bCB_PK)
+        VMAssertMsg("CB_PlayerKilled - Already Waiting To Do Callback");
+
+    bCB_PK = true;
+    iCB_PK_KillerId = iKiller;
+    iCB_PK_Victim = iVictim;
+    iCB_PK_Result = iResult;
+
+    SetLevelVarInt("iCBLV", 1);    */
+    playerKilled(iKiller, iResult, iVictim);
+}
+
+callback int CB_TriggeredProp(int inType, char16 inTriggerProp, int pId)
+{    
+    logStr("CB_TriggeredProp");    
+    /*if (bCB_TP)
+        VMAssertMsg("CB_TriggeredProp - Already Waiting To Do Callback");
+
+    bCB_TP = true;
+    cCB_TP_Prop = inTriggerProp;
+
+    SetLevelVarInt("iCBLV", 1);    
+*/
+    Trigger(inTriggerProp);
+    return 0;
+}
+
+callback void CB_ObjectiveTimeExpired(char16 objName)
+{
+    logStr("CB_ObjectiveTimeExpired");        
+  /*  if (bCB_OTE)
+        VMAssertMsg("CB_ObjectiveTimeExpired - Already Waiting To Do Callback");
+
+    bCB_OTE = true;
+    cCB_OTE_ObjName = objName;
+
+    SetLevelVarInt("iCBLV", 1); */
+    ObjectiveTimeExpired(objName);
+}
+
+callback void CB_shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    logStr("CB_shipReachedScriptedSplineSegment");            
+  /*  if (bCB_SRSS)
+        VMAssertMsg("CB_shipReachedScriptedSplineSegment - Already Waiting To Do Callback");
+    
+    bCB_SRSS = true;
+    pCB_SRSS_Ship = ship;
+    pCB_SRSS_Spline = spline;
+    iCB_SRSS_Segment = segment;
+
+    SetLevelVarInt("iCBLV", 1);*/
+    ShipReachedScriptedSplineSegment(ship, spline, segment);
+
+}
+
+AllowCallback(CALLBACK_PlayerKilledBF, CB_playerKilled);
+AllowCallback(CALLBACK_TriggeredProp, CB_triggeredProp);
+AllowCallback(CALLBACK_ObjectiveTimeExpired, CB_ObjectiveTimeExpired);
+AllowCallback(CALLBACK_ShipReachedScriptedSplineSegment, CB_shipReachedScriptedSplineSegment);
+
+//////////////////////////END CALLBACKS
+
+function void playerKilled(int iKiller, int iResult, int iVictim)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iActive = BFObjectiveGetNumForNthActive(i);
+	if (lib_playerKilled(iKiller, iResult, iVictim, iActive)) 
+	{
+	    nextObjective(iActive);
+	}
+	int iSubObjective = BFObjectiveGetSub(iActive);
+	propRef pKiller = propRefFromInt(iKiller);
+
+	if ((iResult == 1)&&(isPlayerProp(pKiller )))
+	{
+	    if ((iActive == 2)&&(iSubObjective == 0))
+	    {
+		iTiesDead++;
+		
+		AddVMDebugHUDMsg("this many ties dead ", iTiesDead, "test_objective_message");
+
+		if (iTiesDead > 3)
+		{
+		    nextObjective(iActive);
+		}
+	    }
+	}
+
+    }
+}
+function void Trigger(char16 inTriggerProp) //Used so can be called elsewhere in script (cant call a callback)
+{    
+    int iResult = 0;
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iActive = 0;
+    for (i=0; i<iNumActive; i++)
+    {
+        iActive = BFObjectiveGetNumForNthActive(i);
+        iResult = lib_triggeredProp(inTriggerProp, iActive);
+        iResult = ObjectiveTriggerTests(iActive, inTriggerProp, iResult);
+
+        if (iResult >= 1) nextObjective(iActive);
+    }
+}
+
+function void ObjectiveSetupCheck()
+{
+    int iTempObj = GetLevelVarInt("iObjLV");
+    
+    if (iTempObj != -1)
+    {
+        char16 cName = BFObjectiveGetName(iTempObj);
+        if (ObjectiveSetup(cName, iTempObj, BFObjectiveGetSub(iTempObj)))
+            SetLevelVarInt("iObjLV", -1);
+
+        waitForGameTime(0.1f);        
+    }
+}
+
+function void SetObjectiveSetup(int iObj)
+{
+    logStr("SetObjectiveSetup Called");
+    logInt(iObj);
+    SetLevelVarInt("iObjLV", iObj);
+}
+
+function void nextObjective(int inObjNum) 
+{    
+    int result = lib_nextObjective(inObjNum);
+
+    if(result == 1)
+    {
+        //if next objective returns 1 it has updated a core objective and automatically moved us onto the next
+        //so do objective setup with current objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(BFObjectiveGetCurrent());
+        }
+    }
+    if(result == 2)
+    {
+        //if nextobjective returns 2 it has updated a bonus objective so we will want to 
+        //objective setup with the objective we passed to next objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(inObjNum);
+        }
+    }
+}
+
+function void JumpToObjective(int iStartObj, boolean bTeleport)
+{       
+	BFObjectiveSetJumpTo(iStartObj);	
+    nextObjective(BFObjectiveGetCurrent());
+    
+    if (bTeleport)
+    {
+        char16 tSpawn;
+        tSpawn = LevelVarToChar16("mCurrentSpawner");
+        if (propExists(propRefFromChar16(tSpawn)))
+            propTeleportToProp(pPlayer, propRefFromChar16(tSpawn));        
+    }
+    
+    logStr("Jumped To Objective");
+    logInt(BFObjectiveGetCurrent());
+}
+
+function void ObjectiveTimeExpired(char16 objName)
+{  
+    /////
+    // If timer weirdness starts, set to == 1, == 2, etc. for all objectives using a timer
+    ////
+    //if (lib_ObjTimeExpired()) nextObjective();
+    int objNum = 0;
+    objNum = BFObjectiveGetNumber(objName);   
+    if (lib_ObjTimeExpired(objNum))
+    {
+	nextObjective(objNum);
+    }
+}
+
+/* NOT NEEDED
+callback void playerSpawned(char16 teamName, int playerId)
+{
+    propRef p = getPlayerPropRefFromID(playerId);    
+}
+
+callback void finiteSpawnerComplete(char16 propId) 
+{
+
+}
+
+callback void gameHasStarted()
+{           
+ 
+}
+*/
+/////// Defaults END /////////////////////////////////////////////
+
+
+
+function void ScriptHasStarted()
+{
+    SetPropRefInvincible(propRefFromName("dest_gas_plt1_"), true);
+    SetPropRefInvincible(propRefFromName("dest_gas_plt2_"), true);
+    SetPropRefInvincible(propRefFromName("dest_gas_plt3_"), true);
+    SetPropRefInvincible(propRefFromName("dest_gas_plt4_"), true);
+    SetPropRefInvincible(propRefFromName("lando"), true);
+    
+    SetBFStoryPrefixes("obj_Bes", "vmTrigger");
+    
+    ResetObjectives("mObjTmp", 15); //upped the number to include the bonus objectives
+
+    JumpToObjective(1, true);
+}
+
+function int ObjectiveTriggerTests(int iObjective, char16 inTriggerProp, int iResult) 
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+
+    if (iObjective == 3)
+    {
+        if (iSubObjective == 0)
+        { 
+            char16 cObjTrigTestName = BFObjectiveGetName(iObjective);
+            if (iResult >= 1) //1 is normal route e.g vmTrig1, 2 is route 1 e.g vmTrig1r1
+            {
+
+                if (iResult == 1) //Route 1
+                {
+		    //logStr("hello");
+		    if (1)//(loadAI)
+		    {
+		    spawnGroupSetActive(propRefFromName("archway_squareG"), true);//enemies at the gate
+		    lib_SetupGroupZone(cObjTrigTestName, "archway_squareG", "archway_front", "landing_area", k_objtype_hold_area);
+		    chrAIJoinGroup( propRefFromName("grndsqd01"), "player" );
+		    chrAIJoinGroup( propRefFromName("grndsqd02"), "player" );
+		    chrAIJoinGroup( propRefFromName("grndsqd03"), "player" );
+		    }
+		}
+                else //Route 2
+                {
+		    //logStr("goodbye");
+		    if (loadAI)
+		    {
+		    spawnGroupSetActive(propRefFromName("upper_imp_G"), true);//enemies from the square who go to the upper landing pad
+		    spawnGroupSetActive(propRefFromName("upper_imp2_G"), true);//enemies from the upper area
+		    lib_SetupGroupZone(cObjTrigTestName, "upper_imp_G", "upper_arch_front", "tot_upper_area", k_objtype_clear_area);
+		    lib_SetupGroupZone(cObjTrigTestName, "upper_imp2_G", "upper_arch_front", "tot_upper_area", k_objtype_clear_area);
+		    chrAIJoinGroup( propRefFromName("grndsqd07"), "player" );
+		    chrAIJoinGroup( propRefFromName("grndsqd08"), "player" );
+		    chrAIJoinGroup( propRefFromName("grndsqd09"), "player" );
+		    }
+		}
+            }
+        }
+    }
+    //No Change
+    return iResult;
+}
+
+function void ObjectiveTests(int iObjective)
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+    
+    int numSGuns1;  //, numSGuns2, totSGuns;
+    numSGuns1 = propGroupSpCountAliveSpawnedProps(propRefFromName("sentry_gun_G"));
+//    numSGuns2 = propGroupSpCountAliveSpawnedProps(propRefFromName("sentry_gun_2_G"));
+//    totSGuns = numSGuns1 + numSGuns2;
+
+    checkGasCanisters();
+    
+    //  check if the gas platform is destroyed
+    if (iObjective == 2 && !destroyed && !propValid(propRefFromName("impstrdstryr"))) //    if (GetLevelVarInt("mObjective") == 2 && moving1 )            
+    {
+        destroyed = 1;
+/*
+        propref tieFighter;
+        tieFighter = SpawnAIVehicle(propRefFromName("dofProp_21_"), "imp_stpr_snpc", "tie_fighter", 0, false,k_seatPos_driver);
+        tieFighter = SpawnAIVehicle(propRefFromName("dofProp_22_"), "imp_stpr_snpc", "tie_fighter", 0, false,k_seatPos_driver);
+        tieFighter = SpawnAIVehicle(propRefFromName("dofProp_23_"), "imp_stpr_snpc", "tie_fighter", 0, false,k_seatPos_driver);
+        tieFighter = SpawnAIVehicle(propRefFromName("dofProp_24_"), "imp_stpr_snpc", "tie_fighter", 0, false,k_seatPos_driver);
+        tieFighter = SpawnAIVehicle(propRefFromName("dofProp_25_"), "imp_stpr_snpc", "tie_fighter", 0, false,k_seatPos_driver);
+        tieFighter = SpawnAIVehicle(propRefFromName("dofProp_26_"), "imp_stpr_snpc", "tie_fighter", 0, false,k_seatPos_driver);
+*/
+	JumpToObjective(3, false);
+    } 
+    else if (iObjective == 14)   // Destroy the imperial defences  (bonus)
+    {
+        if (propGroupSpCountAliveSpawnedProps(propRefFromName("sentry_gun_G")) == 14) //there are 18 in total
+        {
+            nextObjective(iObjective); 
+        }
+    }
+
+    if (iObjective < 2) // For the first objective
+    {
+        //These are the vehicles patroling around the Star Destroyer at the beginning of the mission. They are infinite spawners.
+        if (loadAI)
+        {
+	    lib_SpawnActiveVehicleG(propRefFromName("initialTIEs_G"), propRefFromName("initialTIEs_DOF"),"imp_stpr_snpc", "tie_fighter", 50, 1);    //4
+	}
+    }
+
+    if (iObjective < 2) // Used to be for the first two objectives, is too hard with current ai - change back when better
+    {
+	if (loadAI)
+	{
+        //These are the vehicles patroling around the Star Destroyer when it decloaks. They are infinite spawners.
+        lib_SpawnActiveVehicleG(propRefFromName("flyPtrol1_G"), propRefFromName("flyPtrol1DOF"),"imp_stpr_snpc", "tie_fighter", 50, 1);		//3
+//        lib_SpawnActiveVehicleG(propRefFromName("flyPtrol2_G"), propRefFromName("flyPtrol2DOF"),"imp_stpr_snpc", "tie_interceptor", 50, 1);	//3
+//        lib_SpawnActiveVehicleG(propRefFromName("flyPtrol3_G"), propRefFromName("flyPtrol3DOF"),"imp_stpr_snpc", "tie_bomber", 50, 1);		//2
+	}
+    }
+
+    if (iObjective > 2) // from "destroy the remaining fighters" objective
+    {
+	if (loadAI)
+	{
+        //These are the two squads which fly over the city
+        if(iObjective < 6) //we only want the Imperials for the first few objectives
+        {
+            lib_SpawnActiveVehicleG(propRefFromName("flyCtImp1_G"), propRefFromName("flyCtImp1DOF"),"imp_stpr_snpc", "tie_fighter", 50, 2);
+            lib_SpawnActiveVehicleG(propRefFromName("flyCtImp2_G"), propRefFromName("flyCtImp2DOF"),"imp_stpr_snpc", "tie_interceptor", 50, 2);
+            lib_SpawnActiveVehicleG(propRefFromName("flyCtImp3_G"), propRefFromName("flyCtImp3DOF"),"imp_stpr_snpc", "tie_bomber", 50, 2);
+        }
+        lib_SpawnActiveVehicleG(propRefFromName("flyCtReb1_G"), propRefFromName("flyCtReb1DOF"),"reb_sol_snpc", "xwing_fighter", 50, 2);
+        lib_SpawnActiveVehicleG(propRefFromName("flyCtReb2_G"), propRefFromName("flyCtReb2DOF"),"reb_sol_snpc", "xwing_fighter", 50, 2);
+        lib_SpawnActiveVehicleG(propRefFromName("flyCtReb3_G"), propRefFromName("flyCtReb3DOF"),"reb_sol_snpc", "xwing_fighter", 50, 2);
+	}
+    }
+
+    if (iObjective == 4) // Clear the square
+    {
+	    AddVMDebugHUDMsg("upper_imp_G : ",propGroupSpCountAliveSpawnedProps(propRefFromName("upper_imp_G")) , "test_objective_message");
+	    AddVMDebugHUDMsg("archway_squareG : ",propGroupSpCountAliveSpawnedProps(propRefFromName("archway_squareG")) , "test_objective_message");
+	    AddVMDebugHUDMsg("inSquare_G : ",propGroupSpCountAliveSpawnedProps(propRefFromName("inSquareG")) , "test_objective_message");
+	if (iSubObjective == 1)
+	{
+	    if ((propGroupSpCountAliveSpawnedProps(propRefFromName("upper_imp_G")) == 0)||(propGroupSpCountAliveSpawnedProps(propRefFromName("archway_squareG")) == 0))
+	    {
+		if ((propGroupSpCountAliveSpawnedProps(propRefFromName("inSquareG")) == 0))
+		{
+		    nextObjective(iObjective);
+		}
+	    }
+	}
+    }
+
+    //  tell lobot to follow the player
+    if (var == 0 && propValid(propRefFromName("player_0")) && propValid(propRefFromName("lobot")))
+    {
+        var = 1;
+        propSetFrozen(propRefFromName("lobot"),false);
+        chrFollow(propRefFromName("lobot"), propRefFromName("player_0"));
+        SetPropRefInvincible(propRefFromName("lobot"), true);
+    }
+
+    //  check if Lobot has died
+    //if (var == 1 && !propValid(propRefFromName("lobot")))
+    if (var == 1 && propGetHealthFraction(propRefFromName("lobot")) <= 0.0f)
+    {
+        activateTalkingHeadNew("BesLando10", true);
+        waitForGameTime(10.0f);
+        logStr("lobot Died");        
+        CompleteLevel();
+    }    
+}
+
+/*
+       if ((propGroupSpCountAliveSpawnedProps("Option-1_1") == 0)||(propGroupSpCountAliveSpawnedProps("Option-1_1") == 0))
+       {
+           if ((propGroupSpCountAliveSpawnedProps("Definite-1_1") == 0))
+           {
+               nextObjective(iObjective);
+           }
+       } 
+
+*/
+
+
+function void shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+/*
+    if (spline ==  propRefFromName("xwingFlyby1"))
+    {
+	if (segment == 5)
+	    {
+	    
+	    }
+    }
+*/
+}
+
+///////////////////////////////////////// OBJECTIVES
+
+function boolean ObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{
+
+    if (iObjective == 1) //Engage the Imperial Remnant
+    { 	
+	if (iSubObjective == 1)
+	{     
+	    activateTalkingHeadNew("BesLando2", true);	    
+
+	    //tell player's flying squad to get in their ships and form up around player
+	    propRef ship1 = propRefFromName("rep_strfghtr1_");
+	    chrRef npc1	  = chrRefFromName("flysquad1");
+	    BFFlyVehicleFollowPlayer( npc1, ship1, 0 );
+	    propRef ship2 = propRefFromName("rep_strfghtr2_");
+	    chrRef npc2	  = chrRefFromName("flysquad2");
+	    BFFlyVehicleFollowPlayer( npc2, ship2, 0 );
+	    
+	    SetObjectiveTriggered(true, iObjective);
+	}
+	else
+	{
+	    //set up the sentry gun group
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF1"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF2"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF3"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF4"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF5"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF6"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF7"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF8"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF9"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF10"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF11"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF12"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF13"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF14"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF15"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF16"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF17"));
+	    addPropToGroup(propRefFromName("sentry_gun_G"), propRefFromName("besSenGunBF18"));
+	    
+	    activateTalkingHeadNew("BesLando1", true);	
+	    
+	    setVMPropActive(propRefFromName("vmProp3_") ,true);
+
+	    setTeamOfSpawnPropGroup( "gas_platG_", 0 ); //Spawn players here
+
+	    //The Star Destroyer needs to be set to invincible until we are ready to destroy it
+	    //It's set to destructible in the gas cannister code below
+	    SetPropRefInvincible(propRefFromName("impstrdstryr"), true);
+	    propSetVisible(0, propRefFromName("impstrdstryr"));
+	    //****The Imperial ships that circle the Star Destroyer are listed and handled in ObjectiveTests() above
+
+	    addNewObjectiveIndicatorToProp(propRefFromName("square_DOF"), k_objectiveIndicatorType_mainObjective);
+
+	    BFAddFlyingAIPatrolZoneAABB(vector(-575.0f, 70.0f, 2310.0f),vector(250.f, 260.0f, 225.0f)); //near the gas platform
+
+	    SetObjectiveTriggered(true, iObjective);
+	    SetNumSubObjectives(1, iObjective);
+
+	    // Spawn in the squad members (they are set to patrol state in the setup file)
+	    spawnGroupSetActive(propRefFromName("gasPlatSqdG_"), true);//player squad (flying)
+
+	    commandPostSetTeam(archway_cp, 2);//set archway cp to neutral
+	}
+    } 
+    else if (iObjective == 2) //Sabotage the Tibanna Gas Platform above the Star Destroyer
+    { 
+	//This objective is triggered in the main game loop at the bottom of this script
+        //It is baseed on the player destroying the Gas Platform which kills the Star Destroyer
+
+	if (iSubObjective == 1)
+	{
+	    activateTalkingHeadNew("BesLando3", true); //"shoot out the cans"	
+	    addNewObjectiveIndicatorToProp(propRefFromName("dest_gas_can23_"), k_objectiveIndicatorType_mainObjective);
+	    removeObjectiveIndicatorFromProp(propRefFromName("stardestr_DOF"));
+	}
+	else
+	{
+	    //tell players flying squad to break off and engage
+	    chrRef npc1	  = chrRefFromName("flysquad1");
+	    BFStopFlyingAIFollowPlayer( npc1 );
+	    chrRef npc2	  = chrRefFromName("flysquad2");
+	    BFStopFlyingAIFollowPlayer( npc2 );
+	    
+	    SetObjectiveTimer(25, iObjective);
+	    //SetObjectiveKills(4, iObjective);
+
+	    removeObjectiveIndicatorFromProp(propRefFromName("square_DOF"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("stardestr_DOF"), k_objectiveIndicatorType_mainObjective);
+	    SetNumSubObjectives(1, iObjective);
+	    
+	    propSetVisible(1, propRefFromName("impstrdstryr"));
+	}
+
+    } 
+    else if (iObjective == 3) //Land on Cloud City
+    { 
+	activateTalkingHeadNew("BesLando5", true);
+
+	activateTalkingHeadNew("BesLando11", true); //"fly low over the city"	
+	
+	BFAddFlyingAIPatrolZoneAABB(vector(-30.0f, -40.0f, 15.0f),vector(250.f, 140.0f, 240.0f)); //over the city
+	BFRemoveFlyingAIPatrolZone(vector(-575.0f, 70.0f, 2310.0f)); //near the gas platform
+	
+	//tell player's flying squad to reform around player 
+	chrRef npc1	  = chrRefFromName("flysquad1");
+	BFSetFlyingAIFollowPlayer( npc1, 0 ); // This function is for when AI are already in ships
+	chrRef npc2	  = chrRefFromName("flysquad2");
+	BFSetFlyingAIFollowPlayer( npc2, 0 ); // This function is for when AI are already in ships 
+
+	SetObjectiveTriggered(true, iObjective);
+        SetNumAltRoutes(1, iObjective);
+
+	addNewObjectiveIndicatorToProp(propRefFromName("landingpadG"), k_objectiveIndicatorType_mainObjective);
+	addNewObjectiveIndicatorToProp(propRefFromName("vmTrigger3-r1"), k_objectiveIndicatorType_mainObjective);
+	if (loadAI)
+	{
+	//Rebels on lower landing pad
+	spawnGroupSetActive(propRefFromName("landingpadG"), true);	//spawn player squad on the landing pad
+	spawnGroupSetActive(propRefFromName("landingpadAltG_"), true);	//spawn player squad on the landing pad
+	lib_SetupTeamZone(cObjectiveName, 0, "strip", "archway_front", k_objtype_hold_area);
+	lib_SetupGroupZone(cObjectiveName, "landingpadAltG_", "strip2", "landing_area", k_objtype_hold_area);
+	//Rebels on upper landing pad
+	spawnGroupSetActive(propRefFromName("up_lpad_reb_G"), true);//rebels in the upper area
+	lib_SetupGroupZone(cObjectiveName, "up_lpad_reb_G", "upper_arch_front", "tot_upper_area", k_objtype_hold_area);
+
+ //  } 
+	//Imperials in the square
+	spawnGroupSetActive(propRefFromName("inSquareG"), true);//enemies in the Square
+	spawnGroupSetActive(propRefFromName("square_snip_G"), true);//enemies in the Square
+	lib_SetupTeamZone(cObjectiveName, 1, "square_centre", "tot_square", k_objtype_clear_area);
+	}
+	removeObjectiveIndicatorFromProp(propRefFromName("stardestr_DOF"));
+	//lib_SetupGroupZone(cObjectiveName, "upper_imp_G", "square_centre", "tot_square", k_objtype_clear_area);
+
+	// An Imperial and Rebel flying squad each get triggered to fly over the city
+	// as listed in ObjectiveTests() above. The spawn groups are set up to be infinite
+	// so that there will always be ships fighting for the duration of the mission
+
+	//bonus objectives
+        char16 besBonus1 = StringToChar16("obj_Bes14"); //
+        BFObjectiveAddBonus(besBonus1, 14);	        // 
+	ObjectiveSetup(besBonus1, 14, 0);
+	char16 besBonus2 = StringToChar16("obj_Bes15"); //
+        BFObjectiveAddBonus(besBonus2, 15);	        // 
+	ObjectiveSetup(besBonus2, 15, 0);
+    } 
+    else if (iObjective == 4) // Clear the square
+    { 
+	if (iSubObjective == 1)
+	{
+	    activateTalkingHeadNew("BesLando7", true);
+
+	    lib_SetupTeamZone(cObjectiveName, 0, "archway_front", "archway_front", k_objtype_clear_area);
+	    //lib_SetupTeamZone(cObjectiveName, 0, "square_centre", "tot_square", k_objtype_clear_area);
+	    lib_SetupTeamZone(cObjectiveName, 1, "square_centre", "tot_square", k_objtype_clear_area);
+	    if (loadAI)
+	    {
+	    lib_SetupGroupZone(cObjectiveName, "inCarbonFreezeG", "tot_carb_freez", "tot_carb_freez", k_objtype_hold_area);
+	    
+	    //lib_SetupGroupZone(cObjectiveName, "upper_imp_G", "upper_arch_front", "tot_upper_area", k_objtype_hold_area);
+	    //lib_SetupGroupZone(cObjectiveName, "upper_imp2_G", "upper_arch_front", "tot_upper_area", k_objtype_hold_area);
+
+	    }
+	    
+		//This is triggered in ObjectiveTests
+	    //SetObjectiveTriggered(true, iObjective);
+	}
+	else	    //player has landed on one of the landing pads on the city
+	{
+	    //Deactivate the bonus objectives
+	    char16 besBonus1 = StringToChar16("obj_Bes14"); //
+	    BFObjectiveRemoveBonus(besBonus1, 14); 
+	    char16 besBonus2 = StringToChar16("obj_Bes15"); //
+	    BFObjectiveRemoveBonus(besBonus2, 15); 
+
+	    activateTalkingHeadNew("BesLando6", true);
+
+	    commandPostSetTeam(archway_cp, -1);
+	    //spawnGroupSetActive(propRefFromName("archway_squareG"), true);//enemies at the gate
+	    
+	    removeObjectiveIndicatorFromProp(propRefFromName("landingpadG"));
+	    removeObjectiveIndicatorFromProp(propRefFromName("vmTrigger3-r1"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("square_DOF"), k_objectiveIndicatorType_mainObjective);
+
+	    //set up the player squad
+	    //chrAIJoinGroup( propRefFromName("grndsqd01"), "player" );
+	    //chrAIJoinGroup( propRefFromName("grndsqd02"), "player" );
+	    //chrAIJoinGroup( propRefFromName("grndsqd03"), "player" );
+
+	    lib_SetupTeamZone(cObjectiveName, 0, "archway_front", "landing_area", k_objtype_clear_area);
+	    lib_SetupTeamZone(cObjectiveName, 1, "square_centre", "tot_square", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "archway_squareG", "archway_front", "landing_area", k_objtype_hold_area);
+	    
+	    lib_SetupGroupZone(cObjectiveName, "upper_imp_G", "upper_arch_front", "tot_upper_area", k_objtype_hold_area);
+	    lib_SetupGroupZone(cObjectiveName, "upper_imp2_G", "upper_arch_front", "tot_upper_area", k_objtype_hold_area);
+	    
+	    SetObjectiveTriggered(true, iObjective);
+
+	    SetNumAltRoutes(1, iObjective);
+	    SetNumSubObjectives(1, iObjective);
+	}
+
+    }
+    else if (iObjective == 5) //Liberate Lobot from his cell
+    { 
+	if (iSubObjective == 1)
+	{
+	    removeHelpMessage();//turn off STR_HELPPROMPT_CROUCH
+	    removeObjectiveIndicatorFromProp(propRefFromName("carbonf_DOF"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("incin_DOF"), k_objectiveIndicatorType_mainObjective);
+
+	    //addNewObjectiveIndicatorToProp(propRefFromName("vmTrigger5_2"), k_objectiveIndicatorType_mainObjective);
+	    if (loadAI)
+	    {
+	    spawnGroupSetActive(propRefFromName("incinerator_G_"), true);//enemies in the incinerator
+	    }
+	    activateTalkingHeadNew("BesLando8", true);
+
+	    lib_SetupTeamZone(cObjectiveName, 0, "incinerator_cent", "tot_incinerator", k_objtype_clear_area);
+	    lib_SetupTeamZone(cObjectiveName, 1, "tot_incinerator", "tot_incinerator", k_objtype_hold_area);
+
+	    SetObjectiveTriggered(true, iObjective);
+	}
+	else if (iSubObjective == 2)
+	{
+	    addHelpMessage("STR_HELPPROMPT_GRENADE", 5.f);
+	    if (loadAI)
+	    {
+	    spawnGroupSetActive(propRefFromName("attackcellG"), true);//enemies around the cell
+	    }
+	    ActivateSpawner("bfBesLobSp1_"); //lobot in his cell
+	    //At this point Lobot is told (in the main game loop) to follow the player
+	    removeObjectiveIndicatorFromProp(propRefFromName("incin_DOF"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("vmTrigger5_2"), k_objectiveIndicatorType_mainObjective);
+
+	    addPropToGroup(propRefFromName("Spwn-5_2"), propRefFromName("vmTrigger5_2"));
+
+	    lib_SetupTeamZone(cObjectiveName, 0, "cell_ext_cent", "tot_cell_ext", k_objtype_hold_area);
+	    lib_SetupTeamZone(cObjectiveName, 1, "cell_ext_cent", "tot_cell_ext", k_objtype_clear_area);
+	    
+	    SetObjectiveKillSpawners(1, iObjective);
+//	    SetObjectiveTriggered(true, iObjective);
+	}
+	else
+	{
+	    propref carbondoor;
+	    carbondoor = propRefFromName("besdorCrbDwn1_");
+	    hingeDoorOpen(carbondoor, 1, true);
+
+	    removeObjectiveIndicatorFromProp(propRefFromName("square_DOF"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("carbonf_DOF"), k_objectiveIndicatorType_mainObjective);
+	    
+	    //  Show a HUD message
+	    addHelpMessage("STR_HELPPROMPT_CROUCH", 5.f );	    
+	    //removeObjectiveIndicatorFromProp(propRefFromName("fusion_cut_DOF"));
+	    //addNewObjectiveIndicatorToProp(propRefFromName("incin_DOF"), k_objectiveIndicatorType_mainObjective);
+
+	    lib_SetupTeamZone(cObjectiveName, 0, "carb_freez_cent", "tot_carb_freez", k_objtype_clear_area);
+	    lib_SetupTeamZone(cObjectiveName, 1, "tot_carb_freez", "tot_carb_freez", k_objtype_hold_area);
+	    if (loadAI)
+	    {
+	    lib_SetupGroupZone(cObjectiveName, "inCarbonFreezeG", "tot_square", "tot_square", k_objtype_hold_area);
+	    lib_SetupGroupZone(cObjectiveName, "CarbFrzAlt_G", "carb_freez_cent", "tot_carb_freez", k_objtype_hold_area);
+	    spawnGroupSetActive(propRefFromName("CarbFrzAlt_G"), true);//enemies in the Carbon Freezing room
+	    spawnGroupSetActive(propRefFromName("inCarbonFreezeG"), true);//enemies in the Carbon Freezing room
+	    }
+	    SetObjectiveTriggered(true, iObjective);
+	    SetNumSubObjectives(2, iObjective);
+	}
+    }
+    else if (iObjective == 6) //Reach the citys Central Computer with Lobot
+    { 
+	if (iSubObjective == 1)
+	{
+	    lib_SetupGroupZone(cObjectiveName, "generator2_G", "tot_generator", "tot_generator", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "int_corrG", "tot_lightshaft", "tot_int_cor_1", k_objtype_hold_area);
+	    
+	    SetObjectiveTriggered(true, iObjective);
+	}
+	else if (iSubObjective == 2)
+	{     
+	    //In case the multiple spawner hasn't exhausted itself yet, turn it off
+	    DeactivateSpawner("generator2_G");
+	    if (loadAI)
+	    {
+	    //spawnGroupSetActive(propRefFromName("int_corrG"), true);// corridoor enemies
+	    spawnGroupSetActive(propRefFromName("int_corr2G"), true);// corridoor enemies
+	    }
+	    lib_SetupTeamZone(cObjectiveName, 0, "int_cor_1_cent", "tot_int_cor_1", k_objtype_clear_area);
+	    lib_SetupTeamZone(cObjectiveName, 1, "tot_lightshaft", "tot_int_cor_1", k_objtype_hold_area);
+	    lib_SetupGroupZone(cObjectiveName, "int_corr2G", "int_cor_1_cent", "tot_lightshaft", k_objtype_clear_area);
+	    
+	    SetObjectiveTriggered(true, iObjective);
+	}    
+	else if (iSubObjective == 3)
+	{     
+	    lib_SetupTeamZone(cObjectiveName, 0, "lightshaft_cent", "tot_lightshaft", k_objtype_hold_area);
+	    lib_SetupTeamZone(cObjectiveName, 1, "lightshaft_cent", "tot_lightshaft", k_objtype_clear_area);
+	    
+	    //If the multiple spawner hasn't exhausted itself already, turn it off
+	    DeactivateSpawner("int_corr2G");
+	    if (loadAI)
+	    {
+	    spawnGroupSetActive(propRefFromName("lightshaftG"), true);// enemies coming from around the lightshaft
+	    }
+	    removeObjectiveIndicatorFromProp(propRefFromName("lightshaft_DOF"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("actpntLobotType"), k_objectiveIndicatorType_mainObjective);
+
+	    SetObjectiveTriggered(true, iObjective);
+	}  
+	else if (iSubObjective == 4)
+	{
+	    if (loadAI)
+	    {
+	    spawnGroupSetActive(propRefFromName("Spwn-6_4"), true);// corridoor enemies
+	    //spawnGroupSetActive(propRefFromName("upstrslghtsft_G_"), true);// corridoor enemies
+	    }
+	    lib_SetupTeamZone(cObjectiveName, 0, "comp_room_cent", "tot_comp_room", k_objtype_clear_area);
+	    lib_SetupTeamZone(cObjectiveName, 1, "tot_comp_room", "tot_comp_room", k_objtype_hold_area);
+
+	    //activateSceneEventDisplay(-90.3, -244.40, -23.36, -79.60, -246.0, -34.88, 95.0);
+
+//	    SetObjectiveKillSpawners(1, iObjective);
+	    SetObjectiveTriggered(true, iObjective);
+	}
+	else
+	{
+	    removeHelpMessage();//turn off STR_HELPPROMPT_CROUCH
+	
+	    activateTalkingHeadNew("BesLando9", true);
+	    if (loadAI)
+	    {
+	    spawnGroupSetActive(propRefFromName("generator_G_"), true);// generator enemies
+	    spawnGroupSetActive(propRefFromName("generator2_G"), true);// generator enemies (multiple spawner)
+
+	    lib_SetupTeamZone(cObjectiveName, 0, "generator_cent", "tot_generator", k_objtype_clear_area);
+	    lib_SetupTeamZone(cObjectiveName, 1, "tot_generator", "tot_generator", k_objtype_hold_area);
+	    //lib_SetupTeamZone(cObjectiveName, 1, "generator_cent", "tot_generator", k_objtype_hold_area);
+	    lib_SetupGroupZone(cObjectiveName, "generator2_G", "tot_generator", "tot_generator", k_objtype_clear_area);
+
+	    spawnGroupSetActive(propRefFromName("int_corrG"), true);// ground floor corridoor enemies
+	    lib_SetupGroupZone(cObjectiveName, "int_corrG", "tot_lightshaft", "tot_int_cor_1", k_objtype_hold_area);
+	    }
+	    removeObjectiveIndicatorFromProp(propRefFromName("vmTrigger5_2"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("lightshaft_DOF"), k_objectiveIndicatorType_mainObjective);
+
+	    SetObjectiveTriggered(true, iObjective);
+	    
+	    //open the cell doors
+	    propRef celldoor1, celldoor2;
+	    celldoor1 = propRefFromName("bes_celldoor1_");
+	    celldoor2 = propRefFromName("bes_celldoor2_");
+	    hingeDoorOpen(celldoor1, 1, true);
+	    hingeDoorOpen(celldoor2, 1, true);
+
+	    //open the computer room doors (where lobot is ultimately heading to)
+	    propRef compdoor1, compdoor2;
+	    compdoor1 = propRefFromName("besdorbalcny2");
+	    compdoor2 = propRefFromName("besdorbalcny3");
+	    hingeDoorOpen(compdoor1, 1, true);
+	    hingeDoorOpen(compdoor2, 1, true);
+
+	    //close the door from the square to the carbon freeze to stop the player backtracking
+	    propRef carbdoor;
+	    carbdoor = propRefFromName("besdorCrbDwn1_");
+	    doorClose(carbdoor,true);
+
+
+	    //Move the flying AI patrol zone while the player is indoors so the 
+	    //end of mission XWings have a clear sky above the square to give maximum effect
+	    BFAddFlyingAIPatrolZone(vector(-607.54f, 50.4f, 2258.63f), 250.0f); //above the Star Destroyer
+	    BFRemoveFlyingAIPatrolZone(vector(-66.2f, -80.0f, 4.39f)); //above the city
+
+	    SetNumSubObjectives(4, iObjective);
+	}
+    } 
+    else if (iObjective == 7) //Protect Lobot while he hacks into the city  
+    { 
+	if (iSubObjective == 1)
+	{
+	    if (loadAI)
+	    {
+	    // End of mission reinforcements
+	    spawnGroupSetActive(propRefFromName("endMissRebG"), true);
+	    lib_SetupGroupZone(cObjectiveName, "endMissRebG", "square_centre", "tot_square", k_objtype_clear_area);
+	    spawnGroupSetActive(propRefFromName("endMissImpG"), true);
+	    lib_SetupGroupZone(cObjectiveName, "endMissImpG", "square_centre", "tot_square", k_objtype_clear_area);
+	    ActivateSpawner("bfBesLanSp2_");
+	    // End of mission flyby. Bespin...f*%$ YEAH!
+	    propref AIXWing1, AIXWing2, AIXWing3, spline1, spline2, spline3;
+	    AIXWing1 = SpawnAIVehicleWithObjectives(propRefFromName("xwingFlyby1DOF"), "rep_troop_snpc", "xwing_fighter", 1, false, k_seatPos_driver, StringToChar16(""));
+	    AIXWing2 = SpawnAIVehicleWithObjectives(propRefFromName("xwingFlyby2DOF"), "rep_troop_snpc", "xwing_fighter", 1, false, k_seatPos_driver, StringToChar16(""));
+	    AIXWing3 = SpawnAIVehicleWithObjectives(propRefFromName("xwingFlyby3DOF"), "rep_troop_snpc", "xwing_fighter", 1, false, k_seatPos_driver, StringToChar16(""));
+	    spline1 = propRefFromName("xwingFlyby1");
+	    spline2 = propRefFromName("xwingFlyby2");
+	    spline3 = propRefFromName("xwingFlyby3");
+	    BFShipFollowScriptedSplineNoAvoidance(AIXWing1 , spline1 );
+	    BFShipFollowScriptedSplineNoAvoidance(AIXWing2 , spline2 );
+	    BFShipFollowScriptedSplineNoAvoidance(AIXWing3 , spline3 );
+	    }
+	    
+	    //The doors that Lobot opens in this objective
+	    propRef door1, door2, door3, door4;
+	    door1 = propRefFromName("besdorbalcny1_"); //end of upper corridor
+	    door2 = propRefFromName("besdorLzrBig1"); //blocking way to upper landing area
+	    door3 = propRefFromName("besdorBigCrt1_"); //door from sweeping stairs to courtyard
+	    door4 = propRefFromName("besdorCrtHal1_"); //above Carbon Freezing (from interior to courtyard)
+	    propDelete(door2);
+	    
+	    activateSceneEventDisplay(-89.3, -243.99, -25.36, 4036.60, -1994.0, -3486.88, 5.0);
+	    
+	    hingeDoorOpen(door1, 1, true); //propref, direction, unlock
+	    //hingeDoorOpen(door2, 1, true);
+	    hingeDoorOpen(door3, 1, true);
+	    hingeDoorOpen(door4, 1, true);
+	    //END:The doors that Lobot opens in this objective	    
+	    DeactivateSpawner("endMissCmpRm_G");
+
+	    SetObjectiveTimer(10, iObjective);
+	}
+	/*
+	else if (iSubObjective == 2)
+	{
+	}
+	*/
+	else
+	{
+	    //When the player triggers this objective they also trigger a vmProp in the level
+	    //that tells Lobot to run to a point and loop an animation. The file it runs is "bespin_lobot_type.vms"
+	    //Set the lobot typing script off
+	    setVMPropActive(propRefFromName("vmProp2_") ,true);
+	    
+	    lib_SetupTeamZone(cObjectiveName, 0, "comp_room_cent", "tot_comp_room", k_objtype_hold_area);
+ 	    lib_SetupTeamZone(cObjectiveName, 1, "comp_room_cent", "comp_room_cent", k_objtype_clear_area);
+ 	    //lib_SetupTeamZone(cObjectiveName, 1, "comp_room_cent", "tot_comp_room", k_objtype_clear_area);
+	    if (1) //(loadAI)
+	    {
+	    //don't want to spawn these guys yet..
+	    spawnGroupSetActive(propRefFromName("endMissCmpRm_G"), true);
+	    }
+	    
+	    SetObjectiveTimer(40, iObjective);
+
+	    SetNumSubObjectives(1, iObjective);
+	}
+
+    } 
+    else if (iObjective == 8) //Eliminate the remaining resistance
+    {
+        if (loadAI)
+	{
+	spawnGroupSetActive(propRefFromName("Spwn-8"), true);
+	lib_SetupGroupZone(cObjectiveName, "Spwn-8", "doublstrs_hom", "doublstrs_tar", k_objtype_clear_area);
+	/* Put this back when it works!
+        BFNPCTeamObjectiveSetType(cObjectiveName, 1,  k_objtype_attack_prop);
+        BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1 ,propRefFromName("player_0"), 10, 20);
+	*/
+	}
+	removeObjectiveIndicatorFromProp(propRefFromName("actpntLobotType"));
+        addNewObjectiveIndicatorToProp(propRefFromName("Spwn-8"), k_objectiveIndicatorType_mainObjective);
+	
+	// Square reinforcements orders
+	lib_SetupGroupZone(cObjectiveName, "endMissRebG", "square_centre", "tot_square", k_objtype_clear_area);
+	lib_SetupGroupZone(cObjectiveName, "endMissImpG", "square_centre", "tot_square", k_objtype_clear_area);
+    
+	SetObjectiveKillSpawners(1, iObjective);
+    }
+    else if (iObjective == 9) //Kill the darktroopers
+    {
+        if (loadAI)
+	{
+	spawnGroupSetActive(propRefFromName("Spwn-9"), true);
+	}
+	lib_SetupGroupZone(cObjectiveName, "Spwn-9", "int_cor_1_cent", "tot_int_cor_1", k_objtype_clear_area);
+	/* Put this back when it works!
+        BFNPCTeamObjectiveSetType(cObjectiveName, 1,  k_objtype_attack_prop);
+        BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1 ,propRefFromName("player_0"), 10, 20);
+	*/
+
+	removeObjectiveIndicatorFromProp(propRefFromName("Spwn-8"));
+	addNewObjectiveIndicatorToProp(propRefFromName("Spwn-9"), k_objectiveIndicatorType_mainObjective);
+	
+	// Square reinforcements orders
+	lib_SetupGroupZone(cObjectiveName, "endMissRebG", "square_centre", "tot_square", k_objtype_clear_area);
+	lib_SetupGroupZone(cObjectiveName, "endMissImpG", "square_centre", "tot_square", k_objtype_clear_area);
+	    
+	SetObjectiveKillSpawners(1, iObjective);
+	
+    }
+    else if (iObjective == 10)
+    {
+	    //Set this to complete the level
+	    bEndLevel = true;
+    }
+/////////////////////////////////
+//    Bonus Objectives
+/////////////////////////////////
+
+    else if (iObjective == 14) // Destroy the Imperial Defences
+    {
+	//This bonus objective is completed in ObjectiveTests()
+	
+    }
+    else if (iObjective == 15) //Eliminate the reamining ties
+    {
+	SetObjectiveKills(6, iObjective);
+    }
+
+    return true;
+}
+
+///////////////This Script Actions
+
+/////////////////////GAS PLATFORM///////////////////
+
+function void checkGasCanisters(void) 
+{
+
+    int fallOnNumOfCansPlat1 = 47;
+    int fallOnNumOfCansPlat2 = 40;
+    int fallOnNumOfCansPlat3 = 40;
+    int fallOnNumOfCansPlat4 = 40;
+
+    int totalNumOfCans = 48;
+    int pauseAfterExplodingNumOfCans = 8;
+    int explodedCans=0;
+    
+    string canNamePlat1 = "dest_gas_can";
+    string canNamePlat2 = "plat2gas_can";
+    string canNamePlat3 = "plat3gas_can";
+    string canNamePlat4 = "plat4gas_can";
+
+    int tempCanCount = 0;
+    int numOfProps = 0;
+    char16 cName;
+    
+    numOfProps =  propGroupGetNumOfProps(propRefFromName("cangroup1_1")) + propGroupGetNumOfProps(propRefFromName("cangroup1_2")) 
+	+ propGroupGetNumOfProps(propRefFromName("cangroup1_3")) + propGroupGetNumOfProps(propRefFromName("cangroup1_4"));
+	
+    //platform 1
+    if(numOfProps < (fallOnNumOfCansPlat1+1)) 
+    {
+	explodedCans=0;
+	if(!moving1)
+	{
+	    //kill all remaining cans and start falling
+	    while(tempCanCount < (totalNumOfCans))
+	    {
+		tempCanCount++;		
+		cName = StringCatInt(canNamePlat1, tempCanCount, "_");
+		propExplodeD(propRefFromChar16(cName), "B_G*");
+		//activateSceneEventDisplay(camPos.x, camPos.y, camPos.z, camLookAt.x, camLookAt.y, camLookAt.z, displayTime)
+		activateSceneEventDisplay(-869.6, 159.0, 2163.5, -914.0, -418.0, 1234.0, 15.0);
+		//activateSceneEventDisplay(propRefFromName("impstrdstryr"), 60, 800);
+
+		explodedCans++;
+		if(explodedCans>pauseAfterExplodingNumOfCans)
+		{
+		    explodedCans=0;
+		    waitForGameTime(0.8);
+		}
+	    }
+	    moving1 = true;
+	    SetPropRefInvincible(propRefFromName("impstrdstryr"), false);
+	    propStartStaticPropMove(propRefFromName("dest_gas_plt1_"));
+	}
+    }
+    //platform 2
+    tempCanCount = 0;
+    numOfProps =  propGroupGetNumOfProps(propRefFromName("cangroup2_1")) + propGroupGetNumOfProps(propRefFromName("cangroup2_2")) 
+	+ propGroupGetNumOfProps(propRefFromName("cangroup2_3")) + propGroupGetNumOfProps(propRefFromName("cangroup2_4"));
+    
+    if(numOfProps < (fallOnNumOfCansPlat2+1)) 
+    {
+	explodedCans=0;
+	if(!moving2)
+	{
+	    //kill all remaining cans and start falling
+	    while(tempCanCount < (totalNumOfCans))
+	    {
+		tempCanCount++;	    
+		cName = StringCatInt(canNamePlat2, tempCanCount, "_");
+		propExplodeD(propRefFromChar16(cName), "B_G*");
+		
+		explodedCans++;
+		if(explodedCans>pauseAfterExplodingNumOfCans)
+		{
+		    explodedCans=0;
+		    waitForGameTime(0.8);
+		}
+	    }
+
+	    moving2 = true;
+	    propStartStaticPropMove(propRefFromName("dest_gas_plt2_"));
+	}
+    }
+    //platform 3
+    tempCanCount = 0;
+    numOfProps =  propGroupGetNumOfProps(propRefFromName("cangroup3_1")) + propGroupGetNumOfProps(propRefFromName("cangroup3_2")) 
+	+ propGroupGetNumOfProps(propRefFromName("cangroup3_3")) + propGroupGetNumOfProps(propRefFromName("cangroup3_4"));
+    
+    if(numOfProps < (fallOnNumOfCansPlat3+1)) 
+    {
+	explodedCans=0;
+	if(!moving3)
+	{
+	    //kill all remaining cans and start falling
+	    while(tempCanCount < (totalNumOfCans))
+	    {
+		tempCanCount++;	    
+		cName = StringCatInt(canNamePlat3, tempCanCount, "_");
+		propExplodeD(propRefFromChar16(cName), "B_G*");
+		
+		explodedCans++;
+		if(explodedCans>pauseAfterExplodingNumOfCans)
+		{
+		    explodedCans=0;
+		    waitForGameTime(0.8);
+		}
+	    }
+
+	    moving3 = true;
+	    propStartStaticPropMove(propRefFromName("dest_gas_plt3_"));
+	}
+    }
+    //platform 4
+    tempCanCount = 0;
+    numOfProps =  propGroupGetNumOfProps(propRefFromName("cangroup4_1")) + propGroupGetNumOfProps(propRefFromName("cangroup4_2")) 
+	+ propGroupGetNumOfProps(propRefFromName("cangroup4_3")) + propGroupGetNumOfProps(propRefFromName("cangroup4_4"));
+    if(numOfProps < (fallOnNumOfCansPlat4+1)) 
+    {
+	explodedCans=0;
+	if(!moving4)
+	{
+	    //kill all remaining cans and start falling
+	    while(tempCanCount < (totalNumOfCans))
+	    {
+		tempCanCount++;	    
+		cName = StringCatInt(canNamePlat4, tempCanCount, "_");
+		propExplodeD(propRefFromChar16(cName), "B_G*");
+
+		explodedCans++;
+		if(explodedCans>pauseAfterExplodingNumOfCans)
+		{
+		    explodedCans=0;
+		    waitForGameTime(0.8);
+		}
+	    }
+
+	    moving4 = true;
+	    propStartStaticPropMove(propRefFromName("dest_gas_plt4_"));
+	}
+    }
+}
+
+///////////////////////GAS PLATFORM///////////////////////////////
+//**************PUT ME BACK IN WHEN YOU COMMIT**********
+//playTimelineOffset("data/bf/timelines/cs13.res", vector(-1000.f, -1000.f, 1000.f));
+
+wholeScreenFade(0.0f, 1.0f, false);
+waitForGameTime(0.1f);
+ScriptHasStarted(); //Do any setups
+waitForGameTime(1.0f);
+wholeScreenFade(1.0f, 0.0f, false);
+
+//Main game loop
+while(!bEndLevel)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    ProcessCallbacks();
+    ObjectiveSetupCheck();
+
+    for (i=0; i<iNumActive; i++)
+    {
+        int iObjective = BFObjectiveGetNumForNthActive(i);
+        ObjectiveTests(iObjective);        
+        waitForGameTime(0.01f);
+    }
+
+    waitForGameTimeOrLVChange(0.5f, "iObjLV", "iCBLV");
+    logStr("tick");
+    logInt(iObjective);    
+}
+
+NextLevel("dathomir/dathomir_story.res");

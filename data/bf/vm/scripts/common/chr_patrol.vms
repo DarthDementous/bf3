@@ -1,0 +1,211 @@
+// vim: set syntax=c :
+
+//////////////////////////////////////
+//
+// Mark Kevern
+//
+// chr_patrol.vms
+//
+// For moving a player about
+//
+// To use:
+// Add to a VMProp
+//
+// In the StringVars[]
+// 0: Spawnprop, SpawnGroup (will only work for first in group)
+// 1: patrol prop template (e.g dofWalk_, would work for dofWalk_0, dofWalk_1, etc )
+// 2: run, to run
+// 3: freeze, to freeze on arrival, destroy to destroy on arrival, highlight, to highlight (can combine with onarrival)
+// 4: trigger prop name
+// 5: onarrival, to do things on arrival
+// 6: loop, to loop
+// 7: cover, to take cover at points (can combine with onarrival), animonall to animate at ALL points
+// 8: AnimPadProp, to do anim on (e.g dofWalk_1)
+// 9: name of anim to do
+//
+////////////////////////////////////////
+
+logStr("SCRIPT RUNNING");
+
+int iCurrent = 0;
+char16 sGroup = getNthVMPropStringVar(me, 0);
+char16 sPadTmp = getNthVMPropStringVar(me, 1);
+char16 sRun = getNthVMPropStringVar(me, 2);
+char16 sFreeze = getNthVMPropStringVar(me, 3); //also destroy prop, trigger, etc..
+char16 sTrigger = getNthVMPropStringVar(me, 4);
+char16 sOnArrival = getNthVMPropStringVar(me, 5);
+char16 sLoop = getNthVMPropStringVar(me, 6);
+char16 sCover = getNthVMPropStringVar(me, 7);
+char16 sAnimPad = getNthVMPropStringVar(me, 8);
+char16 sAnim = getNthVMPropStringVar(me, 9);
+
+boolean bRun = false;
+boolean bFreeze = false;
+boolean bHighlight = false;
+boolean bOnArrival = false;
+boolean bLoop = false;
+boolean bLoopAnim = false;
+boolean bCover = false;
+boolean bPause = false;
+boolean bDestroy = false;
+boolean bAnimOnAll = false;
+boolean bTrigger = false;
+propRef pTrigger;
+
+if (!char16cmp(sRun, "run"))
+    bRun = true;
+
+if (!char16cmp(sFreeze, "freeze"))
+    bFreeze = true;
+else if (!char16cmp(sFreeze, "destroy"))
+    bDestroy = true;
+else if (!char16cmp(sFreeze, "highlight"))
+    bHighlight = true;
+    
+if (char16cmp(sTrigger, "null")) //not equal
+{
+    bTrigger = true;
+    pTrigger = propRefFromChar16(sTrigger);
+}
+
+if (!char16cmp(sOnArrival, "onarrival"))
+    bOnArrival = true;   
+
+if (!char16cmp(sLoop, "loop"))
+    bLoop = true;   
+else if (!char16cmp(sLoop, "loopanim"))
+    bLoopAnim = true;  
+
+if (!char16cmp(sCover, "cover"))
+    bCover = true;   
+else if (!char16cmp(sCover, "animonall"))
+    bAnimOnAll = true;  
+    
+propRef pGroup = propRefFromChar16(sGroup);
+
+char16 sPad;
+sPad = Char16CatInt(sPadTmp, iCurrent);        
+propRef pPad = propRefFromChar16(sPad);
+
+propRef pChr;
+propRef pSpawn;
+if (isGroupComponentProp(pGroup))
+    pSpawn = GetNthPropFromGroup(pGroup, 0);
+else
+    pSpawn = pGroup;
+
+if (isSpawnProp(pSpawn))   
+    pChr = propSpawnerGetNthSpawnedProp(pSpawn, 0);
+else
+    pChr = pSpawn;
+    
+waitForGameTime(0.1f);
+setAIState(pChr, "AISTATE_BF_PATROL");
+beginInGameCutSceneWithFlags(k_vmFlag_ResumeScriptAfterHitReact, pChr);
+propSetFrozen(pChr, false); //just incase
+
+if (!bOnArrival)
+{
+    if (bHighlight)
+        addNewObjectiveIndicatorToProp(pChr, 0);
+}
+
+while (propExists(pPad)&&propExists(pChr))
+{    
+    if (chrHasReachedDest(pChr))
+    {
+        sPad = Char16CatInt(sPadTmp, iCurrent);        
+        pPad = propRefFromChar16(sPad);            
+        if (propExists(pPad))
+        {
+            logStr("Walking To Next Destination");
+            boolean bOnTriggerPad = false;
+            bOnTriggerPad = !char16_char16cmp(sAnimPad, sPad);
+            
+            if (bRun)
+            {
+                if (bOnTriggerPad)
+                    chrRunToPadAndAlign(pChr, propGetPos(pPad), propGetDir(pPad), 800.0f);            
+                else
+                    chrRunToPos(pChr, propGetPos(pPad));
+            }
+            else
+            {
+                if (bOnTriggerPad)                
+                    chrWalkToPadAndAlign(pChr, propGetPos(pPad), propGetDir(pPad), 800.0f);                            
+                else
+                    chrWalkToPos(pChr, propGetPos(pPad));
+            }
+            
+            waitUntilVMsDone(pChr);
+            logStr("Arrived at Dof");
+
+            if (bOnTriggerPad || bAnimOnAll)
+            {
+                if ((!bOnArrival && bTrigger) && (bOnTriggerPad)) //Only do trigger on animpad
+                    forceTriggerTriggered(pTrigger);
+               
+                if (char16cmp(sAnim, "null")) //Not equal
+                {                
+                    logStr("Animating");
+                    chrPlayAnim(pChr, sAnim, 0.1f, bLoopAnim);
+                    playerWaitUntilAnimDone(pChr);
+                }
+            }
+            
+            if ((!bOnArrival)&&(bCover))
+            {
+                //TODO: add cover stuff
+                waitForGameTime(1.5f);
+            }
+            
+            iCurrent++;
+        }     
+        else
+        {
+            iCurrent--;
+
+            if (bLoop)
+            {
+                iCurrent = 0;
+                sPad = Char16CatInt(sPadTmp, iCurrent);        
+                pPad = propRefFromChar16(sPad);                
+            }
+        }
+    }
+
+    waitForGameTime(0.5f);
+}
+
+logStr("Patrol Ended");
+//Align on last pad
+
+sPad = Char16CatInt(sPadTmp, iCurrent);
+pPad = propRefFromChar16(sPad);
+chrWalkToPadAndAlign(pChr, propGetPos(pPad), propGetDir(pPad), 800.0f);
+waitUntilVMsDone(pChr);
+
+if (bOnArrival)
+{
+    if (bHighlight)
+        addNewObjectiveIndicatorToProp(pChr, 0);
+
+    if (bCover)
+    {
+        //TODO: add cover stuff
+        waitForGameTime(1.5f);
+    }
+
+    if (bTrigger)
+        forceTriggerTriggered(pTrigger);
+}
+
+if (bFreeze)
+    propSetFrozen(pChr, true);
+else if (bDestroy)
+    DeleteSpawnerProp(pSpawn);
+
+endInGameCutScene();
+setAIState(pChr, "AISTATE_BF_STORY");
+waitForGameTime(0.5f);
+logStr("Script Ended");

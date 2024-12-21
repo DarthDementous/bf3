@@ -1,0 +1,132 @@
+// vim: set syntax=c :
+
+/// chrRefs for wookiee workers from their spawnee names ///
+
+chrRef chr_slave1 = chrRefFromName("slave_1");
+chrRef chr_slave2 = chrRefFromName("slave_2");
+chrRef chr_slave3 = chrRefFromName("slave_3");
+chrRef chr_slave4 = chrRefFromName("slave_4");
+chrRef chr_slave5 = chrRefFromName("slave_5");
+chrRef chr_slave6 = chrRefFromName("slave_6");
+chrRef chr_slave7 = chrRefFromName("slave_7");
+chrRef chr_slave8 = chrRefFromName("slave_8");
+chrRef chr_slave9 = chrRefFromName("slave_9");
+chrRef chr_slave10 = chrRefFromName("slave_10");
+
+/// chrRefs for wookiee prisoners from their spawnee names ///
+
+chrRef chr_c_slave1 = chrRefFromName("c_slave_1");
+chrRef chr_c_slave2 = chrRefFromName("c_slave_2");
+chrRef chr_c_slave3 = chrRefFromName("c_slave_3");
+chrRef chr_c_slave4 = chrRefFromName("c_slave_4");
+chrRef chr_c_slave5 = chrRefFromName("c_slave_5");
+chrRef chr_c_slave6 = chrRefFromName("c_slave_6");
+chrRef chr_c_slave7 = chrRefFromName("c_slave_7");
+chrRef chr_c_slave8 = chrRefFromName("c_slave_8");
+chrRef chr_c_slave9 = chrRefFromName("c_slave_9");
+
+//chrSetPatrolState(chr_slave1);
+//chrSetPatrolState(chr_slave2);
+
+/// make sure ALL idling wookiees start in patrol state, else things get messy! ///
+
+setAIState(chr_slave1, "AISTATE_BF_PATROL");
+setAIState(chr_slave2, "AISTATE_BF_PATROL");
+setAIState(chr_slave3, "AISTATE_BF_PATROL");
+setAIState(chr_slave4, "AISTATE_BF_PATROL");
+setAIState(chr_slave5, "AISTATE_BF_PATROL");
+setAIState(chr_slave6, "AISTATE_BF_PATROL");
+setAIState(chr_slave7, "AISTATE_BF_PATROL");
+setAIState(chr_slave8, "AISTATE_BF_PATROL");
+setAIState(chr_slave9, "AISTATE_BF_PATROL");
+setAIState(chr_slave10, "AISTATE_BF_PATROL");
+
+setAIState(chr_c_slave1, "AISTATE_BF_PATROL");
+setAIState(chr_c_slave2, "AISTATE_BF_PATROL");
+setAIState(chr_c_slave3, "AISTATE_BF_PATROL");
+setAIState(chr_c_slave4, "AISTATE_BF_PATROL");
+setAIState(chr_c_slave5, "AISTATE_BF_PATROL");
+setAIState(chr_c_slave6, "AISTATE_BF_PATROL");
+setAIState(chr_c_slave7, "AISTATE_BF_PATROL");
+setAIState(chr_c_slave8, "AISTATE_BF_PATROL");
+setAIState(chr_c_slave9, "AISTATE_BF_PATROL");
+
+/// setup for making idlers move to an action point, if needed ///
+
+//chrRunToPadAndAlign(chr_slave1, propGetPosFromName("actpnt1"), propGetDirFromName("actpnt1"), 800.f);
+
+
+/// "ignore everything" setup for the idling wookiee workers around the base ///
+
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_slave1);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_slave2);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_slave3);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_slave4);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_slave5);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_slave6);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_slave7);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_slave8);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_slave9);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_slave10);
+
+/// "ignore everything" setup for the the idling wookiees in the cells ///
+
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_c_slave1);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_c_slave2);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_c_slave3);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_c_slave4);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_c_slave5);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_c_slave6);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_c_slave7);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_c_slave8);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_c_slave9);
+
+/// setup to ensure nothing else happens until they get to their action point, if needed ///
+
+//waitUntilVMsDone(chr_slave1);
+
+
+/// setup for the idle anims for workers ///
+
+chrPlayAnimSlot(chr_slave1, "AN_DesWooFiSt03", 1, true);
+chrPlayAnimSlot(chr_slave2, "AN_DesWooFiSt03", 1, true);
+chrPlayAnimSlot(chr_slave3, "AN_DesWooFiCr03", 1, true);
+chrPlayAnimSlot(chr_slave4, "AN_DesWooFiCr04", 1, true);
+chrPlayAnimSlot(chr_slave5, "AN_WookCelIdl04", 1, true);
+chrPlayAnimSlot(chr_slave6, "AN_DesWooFiCr02", 1, true);
+chrPlayAnimSlot(chr_slave7, "AN_DesWooFiCr02", 1, true);
+chrPlayAnimSlot(chr_slave8, "AN_DesWooFiSt01", 1, true);
+chrPlayAnimSlot(chr_slave9, "AN_DesWooFiSt01", 1, true);
+chrPlayAnimSlot(chr_slave10, "AN_DesWooFiCr02", 1, true);
+
+
+/// setup for the idle anims for caged wookiees ///
+
+chrPlayAnimSlot(chr_c_slave1, "AN_WookCelIdl03", 1, true);
+chrPlayAnimSlot(chr_c_slave2, "AN_WookCelIdl04", 1, true);
+chrPlayAnimSlot(chr_c_slave3, "AN_WookCelIdl02", 1, true);
+chrPlayAnimSlot(chr_c_slave4, "AN_WookCelIdl01", 1, true);
+chrPlayAnimSlot(chr_c_slave5, "AN_WookCelIdl04", 1, true);
+chrPlayAnimSlot(chr_c_slave6, "AN_WookCelIdl05", 1, true);
+chrPlayAnimSlot(chr_c_slave7, "AN_WookCelIdl02", 1, true);
+chrPlayAnimSlot(chr_c_slave8, "AN_WookCelIdl05", 1, true);
+chrPlayAnimSlot(chr_c_slave9, "AN_WookCelIdl03", 1, true);
+
+/// freeze the worker wookiees on the spot (NOT the ones in the cells) ///
+
+propSetFrozen(chr_slave1, true);
+propSetFrozen(chr_slave2, true);
+propSetFrozen(chr_slave3, true);
+propSetFrozen(chr_slave4, true);
+propSetFrozen(chr_slave5, true);
+propSetFrozen(chr_slave6, true);
+propSetFrozen(chr_slave7, true);
+propSetFrozen(chr_slave8, true);
+propSetFrozen(chr_slave9, true);
+propSetFrozen(chr_slave10, true);
+
+
+//propSetFrozen(chr_c_slave1, true);
+//propSetFrozen(chr_c_slave2, true);
+
+

@@ -1,0 +1,3 @@
+playerCutsceneTemplate playerCutsceneMgr
+{
+}

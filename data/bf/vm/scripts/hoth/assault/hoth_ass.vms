@@ -1,0 +1,631 @@
+// vim: set syntax=c :
+
+//////////////////////////////////////////
+//                                      //
+//            Hoth Assault              //
+//                                      //
+//////////////////////////////////////////
+
+/////////////MAKE SURE TO INCLUDE A BFStorylevelVarProp in your level
+
+int m_attackingTeamNum = 1;
+int m_defendingTeamNum = 0;
+
+// Declare the CPs
+propRef attk_phase1_cp = propRefFromName( "AttkPhase1_CP" );
+propRef def_phase1_cp = propRefFromName( "DefPhase1_CP" );
+propRef attk_phase2_cp = propRefFromName( "AttkPhase2_CP" );
+propRef def_phase2_cp = propRefFromName( "DefPhase2_CP" );
+propRef attk_phase3_cp = propRefFromName( "AttkPhase3_CP" );
+propRef def_phase3_cp = propRefFromName( "DefPhase3_CP" );
+propRef attk_phase4_cp = propRefFromName( "AttkPhase4_CP" );
+propRef def_phase4_cp = propRefFromName( "DefPhase4_CP" );
+propRef attk_phase5_cp = propRefFromName( "AttkPhase5_CP" );
+propRef def_phase5_cp = propRefFromName( "DefPhase5_CP" );
+propRef attk_phase6_cp = propRefFromName( "AttkPhase6_CP" );
+propRef def_phase6_cp = propRefFromName( "DefPhase6_CP" );
+propRef attk_phase7_cp = propRefFromName( "AttkPhase7_CP" );
+propRef def_phase7_cp = propRefFromName( "DefPhase7_CP" );
+propRef attk_phase8_cp = propRefFromName( "AttkPhase8_CP" );
+propRef def_phase8_cp = propRefFromName( "DefPhase8_CP" );
+propRef attk_phase9_cp = propRefFromName( "AttkPhase9_CP" );
+propRef def_phase9_cp = propRefFromName( "DefPhase9_CP" );
+
+// Declare Any Props
+propRef generator = propRefFromName("generator");
+propRef pointer1 = propRefFromName("dofProp_1_");
+propRef pointer2 = propRefFromName("dofProp_2_");
+
+
+boolean Skip = false;
+
+///////////// Include Defaults //////////////////////////////////////////////
+
+callback void playerKilled(int victimId, int killerId, int iOppTeam)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iActive = BFObjectiveGetNumForNthActive(i);
+	if (lib_playerKilled(victimId, killerId, iOppTeam, iActive)) 
+	{
+	    nextObjective(iActive);
+	}
+    }
+}
+
+callback int triggeredProp(int inType, char16 inTriggerProp, int pId)
+{  
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iActive = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	iActive = BFObjectiveGetNumForNthActive(i);
+
+	// Check if the player has got into an escape pod
+	if (iActive == 9)
+	{
+	    if (!char16cmp(inTriggerProp, "EscapePod1")
+		    ||!char16cmp(inTriggerProp, "EscapePod2")
+		    ||!char16cmp(inTriggerProp, "EscapePod3")
+		    ||!char16cmp(inTriggerProp, "EscapePod4")
+		    ||!char16cmp(inTriggerProp, "EscapePod5")
+		    ||!char16cmp(inTriggerProp, "EscapePod6"))
+	    {
+		nextObjective(iActive);
+	    }
+	}
+	else if (lib_triggeredProp(inTriggerProp, iActive) >= 1)
+	{
+	    nextObjective(iActive);
+	}
+    }
+
+    return 0;
+}
+
+function void nextObjective( int inObjNum) 
+{    
+    int result =   lib_nextObjective(inObjNum);
+
+    if(result==1)
+    {
+	//if next objective returns 1 it has updated a core objective and automatically moved us onto the next
+	//so do objective setup with current objective
+	if (!Skip)
+	{
+	    int iObjective = BFObjectiveGetCurrent();//GetLevelVarInt("mObjective");
+	    char16 cName = BFObjectiveGetName(iObjective);
+	    ObjectiveSetup( cName, iObjective, BFObjectiveGetSub(iObjective));            
+	}
+    }
+
+    if(result==2)
+    {
+	//if nextobjective returns 2 it has updated a bonus objective so we will want to 
+	//objective setup with the objective we passed to next objective
+	if (!Skip)
+	{
+	    char16 cName = BFObjectiveGetName(inObjNum);
+	    ObjectiveSetup( cName, inObjNum, BFObjectiveGetSub(inObjNum));            
+	}
+    }
+}
+
+function void JumpToObjective(int iStartObj, boolean Skiping)
+{    
+    Skip = Skiping;
+   /* while (GetLevelVarInt("mObjective") < iStartObj)
+    {
+        if (GetLevelVarInt("mObjective") == iStartObj-1) Skip = false;
+        nextObjective();
+    }*/
+    Skip = false;
+    BFObjectiveSetJumpTo(iStartObj);
+    nextObjective(BFObjectiveGetCurrent());
+
+    logStr("Jumped To Objective");
+    logInt(BFObjectiveGetCurrent());
+    
+}
+
+callback void ObjectiveTimeExpired(char16 objName)
+{   
+    int objNum = 0;
+    objNum = BFObjectiveGetNumber(objName);
+    
+    if (lib_ObjTimeExpired(objNum)) 
+    {
+        if (objNum == 9) 
+        {
+            Skip = true;
+            nextObjective(objNum);
+            Skip = false;
+            nextObjective(objNum);
+        }
+        else
+        {
+            nextObjective(objNum);
+        }
+    }
+}
+
+callback void playerSpawned(char16 teamName, int playerId)
+{
+    propRef p = getPlayerPropRefFromID(playerId);    
+}
+
+callback void finiteSpawnerComplete(char16 propId) 
+{
+
+}
+
+/////// Defaults END /////////////////////////////////////////////
+
+callback void gameHasStarted()
+{           
+    // Let the gamemode know which team is attacking and which is defending
+    BFSetAssaultTeamNumbers( m_attackingTeamNum, m_defendingTeamNum );  
+
+    // Reset the spawners
+    setTeamOfSpawnPropGroup( "AttkPhase1_SG", -1 );
+    setTeamOfSpawnPropGroup( "AttkPhase2_SG", -1 );
+    setTeamOfSpawnPropGroup( "AttkPhase3_SG", -1 );
+    setTeamOfSpawnPropGroup( "AttkPhase4_SG", -1 );
+    setTeamOfSpawnPropGroup( "AttkPhase5_SG", -1 );
+    setTeamOfSpawnPropGroup( "AttkPhase6_SG", -1 );
+    setTeamOfSpawnPropGroup( "AttkPhase7_SG", -1 );
+    setTeamOfSpawnPropGroup( "AttkPhase8_SG", -1 );
+    setTeamOfSpawnPropGroup( "AttkPhase9_SG", -1 );
+    setTeamOfSpawnPropGroup( "DefPhase1_SG", -1 );
+    setTeamOfSpawnPropGroup( "DefPhase2_SG", -1 );
+    setTeamOfSpawnPropGroup( "DefPhase3_SG", -1 );
+    setTeamOfSpawnPropGroup( "DefPhase4_SG", -1 );
+    setTeamOfSpawnPropGroup( "DefPhase5_SG", -1 );
+    setTeamOfSpawnPropGroup( "DefPhase5_SG", -1 );
+    setTeamOfSpawnPropGroup( "DefPhase6_SG", -1 );
+    setTeamOfSpawnPropGroup( "DefPhase7_SG", -1 );
+    setTeamOfSpawnPropGroup( "DefPhase8_SG", -1 );
+    setTeamOfSpawnPropGroup( "DefPhase9_SG", -1 );
+
+    // Make all CP's Neutral
+    commandPostSetTeam(attk_phase1_cp, -1); 
+    commandPostSetTeam(attk_phase2_cp, -1); 
+    commandPostSetTeam(attk_phase3_cp, -1); 
+    commandPostSetTeam(attk_phase4_cp, -1); 
+    commandPostSetTeam(attk_phase5_cp, -1); 
+    commandPostSetTeam(attk_phase6_cp, -1); 
+    commandPostSetTeam(attk_phase7_cp, -1); 
+    commandPostSetTeam(attk_phase8_cp, -1); 
+    commandPostSetTeam(attk_phase9_cp, -1); 
+    commandPostSetTeam(def_phase1_cp, -1); 
+    commandPostSetTeam(def_phase2_cp, -1); 
+    commandPostSetTeam(def_phase3_cp, -1); 
+    commandPostSetTeam(def_phase4_cp, -1); 
+    commandPostSetTeam(def_phase5_cp, -1); 
+    commandPostSetTeam(def_phase6_cp, -1); 
+    commandPostSetTeam(def_phase7_cp, -1); 
+    commandPostSetTeam(def_phase8_cp, -1); 
+    commandPostSetTeam(def_phase9_cp, -1); 
+
+    // Make all the CP's invisible?
+    PropSetVisible(0, attk_phase1_cp);
+    PropSetVisible(0, attk_phase2_cp);
+    PropSetVisible(0, attk_phase3_cp);
+    PropSetVisible(0, attk_phase4_cp);
+    PropSetVisible(0, attk_phase5_cp);
+    PropSetVisible(0, attk_phase6_cp);
+    PropSetVisible(0, attk_phase7_cp);
+    PropSetVisible(0, attk_phase8_cp);
+    PropSetVisible(0, attk_phase9_cp);
+    PropSetVisible(0, def_phase1_cp);
+    PropSetVisible(0, def_phase2_cp);
+    PropSetVisible(0, def_phase3_cp);
+    PropSetVisible(0, def_phase4_cp);
+    PropSetVisible(0, def_phase5_cp);
+    PropSetVisible(0, def_phase6_cp);
+    PropSetVisible(0, def_phase7_cp);
+    PropSetVisible(0, def_phase8_cp);
+    PropSetVisible(0, def_phase9_cp);
+}
+
+function void ScriptHasStarted()
+{
+    //SetLevelVarsBFStory("obj_HotAss", "vmTrig");
+    SetBFStoryPrefixes("obj_HotAss", "vmTrig");
+
+    ResetObjectives("mObjTmp", 10);  // Number of objectives
+
+    //Reset Space CPs, Spawners, etc
+    
+    JumpToObjective(1, true);
+}
+
+function void ObjectiveTests(int iObjective) 
+{
+
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+    
+    //Do some tests
+    if (iObjective == 2)
+    {
+        if ((propGetHealthFraction(generator)) <= 0.0f)
+        {
+            AddVMDebugHUDMsg("Generator Destroyed", 1, "test_objective_message");
+            endOfGameWinText("Attackers Win - Generator Destroyed");
+            waitForGameTime(3.0f);
+            CompleteLevel();
+        }
+    } 
+}
+
+/////////////////////////////////////////OBJECTIVES
+
+function void ObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{
+    //////////////////////////////////////////////////////////////////////
+    //////////////////// PHASE 1: AT-AT LANDING CRAFT ////////////////////
+    //////////////////////////////////////////////////////////////////////
+    if (iObjective == 1)         
+    { 
+        // Activate spawners
+        setTeamOfSpawnPropGroup( "AttkPhase1_SG", 1 ); 
+        setTeamOfSpawnPropGroup( "DefPhase1_SG", 0 ); 
+
+        // Set the hot spots 
+        commandPostSetTeam(attk_phase2_cp, 0); 
+        commandPostSetTeam(attk_phase1_cp, 1); 
+        
+        // For testing, enable the active CP's
+        PropSetVisible(1, attk_phase2_cp);
+        PropSetVisible(1, attk_phase1_cp);
+
+        addObjectiveIndicatorToProp(pointer1, vector(0, 0.5, 0), vector(0.5, 0.5, 0.5)); // Add HUD Pointer to forward defences
+        
+        // Allow objective to be completed through a trigger
+        SetObjectiveTriggered(true, iObjective);       
+    }
+/*    
+    ////////////////////////////////////////////////////////////
+    //////////////////// PHASE 2: ECHO BASE ////////////////////
+    ////////////////////////////////////////////////////////////
+    else if (iObjective == 2)	
+    {
+        // Disable the previous spawners...
+        setTeamOfSpawnPropGroup( "AttkPhase1_SG", -1 );
+        setTeamOfSpawnPropGroup( "DefPhase1_SG", -1 );
+        // ...and enable the new ones
+        setTeamOfSpawnPropGroup( "AttkPhase2_SG", 1 );
+        setTeamOfSpawnPropGroup( "DefPhase2_SG", 0 );
+        
+        // Set the hot spots  
+        commandPostSetTeam(def_phase2_cp, 0);
+        commandPostSetTeam(attk_phase2_cp, 1);
+        // ...and clear the previous ones 
+        commandPostSetTeam(def_phase1_cp, -1);
+        commandPostSetTeam(attk_phase1_cp, -1);
+
+        // Hide the previous CP's...
+        PropSetVisible(0, def_phase1_cp);
+        PropSetVisible(0, attk_phase1_cp);
+        // ...and show the new ones
+        PropSetVisible(1, attk_phase2_cp);
+        PropSetVisible(1, def_phase2_cp);
+
+        SetObjectiveKills(10);
+    }
+*/    
+    ////////////////////////////////////////////////////////////
+    //////////////////// PHASE 3: GENERATOR ////////////////////
+    ////////////////////////////////////////////////////////////
+    else if (iObjective == 2)	
+    {
+        // Disable the previous spawners...
+        setTeamOfSpawnPropGroup( "AttkPhase2_SG", -1 );
+        setTeamOfSpawnPropGroup( "DefPhase2_SG", -1 );
+        // ... and enable the new ones
+        setTeamOfSpawnPropGroup( "AttkPhase3_SG", 1 );
+        setTeamOfSpawnPropGroup( "DefPhase3_SG", 0 );
+
+        // Set the hot spots  
+        commandPostSetTeam(def_phase3_cp, 0);
+        commandPostSetTeam(attk_phase3_cp, 1);
+        // commandPostSetTeam(attk_phase3_cp, 1);
+        // ...and clear the previous ones 
+        commandPostSetTeam(attk_phase1_cp, -1);  
+        commandPostSetTeam(attk_phase2_cp, -1);
+        //commandPostSetTeam(def_phase3_cp, -1);
+        
+        // Hide the previous CP's...
+        PropSetVisible(0, attk_phase1_cp);
+        PropSetVisible(0, attk_phase2_cp);
+        // ...and show the new one
+        PropSetVisible(1, def_phase3_cp);
+        PropSetVisible(1, attk_phase3_cp);
+
+        removeObjectiveIndicatorFromProp(pointer1);  // Remove previous HUD marker        
+        addObjectiveIndicatorToProp(pointer2, vector(0, 0.5, 0), vector(0.5, 0.5, 0.5)); // Add HUD Pointer to forward defences        
+
+        // This is dodgy...
+	    BFKillAllNPCsFromTeam(1);
+        BFKillAllNPCsFromTeam(0);
+    
+        propRef atat1;
+	    atat1 = SpawnAIVehicle(propRefFromName("atat1"), "cis_battledroid_npc_story", "imp_atat", 0, false, k_seatPos_driver);
+        propRef atat2;
+	    atat2 = SpawnAIVehicle(propRefFromName("atat2"), "cis_battledroid_npc_story", "imp_atat", 0, false, k_seatPos_driver);
+        propRef atst1;
+	    atst1 = SpawnAIVehicle(propRefFromName("atst1"), "cis_battledroid_npc_story", "imp_atst", 0, false, k_seatPos_driver);
+        propRef atst2;
+	    atst2 = SpawnAIVehicle(propRefFromName("atst2"), "cis_battledroid_npc_story", "imp_atst", 0, false, k_seatPos_driver);
+        
+        // This objective is cleared by the generator being destroyed or not
+        // in the objective tests
+    }
+/*    
+    ///////////////////////////////////////////////////////////////////
+    //////////////////// PHASE 4 : REBEL TRANSPORT ////////////////////
+    ///////////////////////////////////////////////////////////////////
+    else if (iObjective == 4)	
+    {
+        // Disable the previous spawners...
+        setTeamOfSpawnPropGroup( "AttkPhase3_SG", -1 );
+        setTeamOfSpawnPropGroup( "DefPhase3_SG", -1 );
+        // ...and enable the new ones
+        setTeamOfSpawnPropGroup( "AttkPhase4_SG", 0 );
+        setTeamOfSpawnPropGroup( "DefPhase4_SG", 1 );
+
+        // Set the hot spots  
+        commandPostSetTeam(def_phase4_cp, 1);
+        commandPostSetTeam(attk_phase4_cp, 0);
+        // ...and clear the previous ones 
+        commandPostSetTeam(attk_phase3_cp, 0);
+        commandPostSetTeam(def_phase3_cp, 0);
+
+        // Hide the previous CP...
+        PropSetVisible(0, def_phase3_cp);
+        PropSetVisible(0, attk_phase3_cp);
+        // ...and show the new ones
+        PropSetVisible(1, def_phase4_cp);
+        PropSetVisible(1, attk_phase4_cp);
+
+        SetObjectiveKills(10);
+    }
+    ////////////////////////////////////////////////////////////////////////
+    //////////////////// PHASE 5 : BOARD STAR DESTROYER ////////////////////
+    ////////////////////////////////////////////////////////////////////////
+    else if (iObjective == 5)	
+    {
+        // Disable the previous spawners...
+        setTeamOfSpawnPropGroup( "AttkPhase4_SG", -1 );
+        setTeamOfSpawnPropGroup( "DefPhase4_SG", -1 );
+        // ...and enable the new ones
+        setTeamOfSpawnPropGroup( "AttkPhase5_SG", 0 );
+        setTeamOfSpawnPropGroup( "DefPhase5_SG", 1 );
+
+        // Set the hot spots
+        commandPostSetTeam(def_phase5_cp, 1);
+        commandPostSetTeam(attk_phase5_cp, 0);
+        // ...and clear the previous ones 
+        commandPostSetTeam(def_phase4_cp, -1);
+        commandPostSetTeam(attk_phase4_cp, -1);
+        
+        // Hide the previous CP's...
+        PropSetVisible(0, def_phase4_cp);
+        PropSetVisible(0, def_phase4_cp);
+        // ...and show the new ones
+        PropSetVisible(1, def_phase5_cp);
+        PropSetVisible(1, attk_phase5_cp);
+        
+        SetObjectiveKills(10);
+    }
+    ////////////////////////////////////////////////////////////////////
+    //////////////////// PHASE 6 : TURBOLASER ARRAY ////////////////////
+    ////////////////////////////////////////////////////////////////////
+    else if (iObjective == 6)	
+    {
+        // Disable the previous spawners...
+        setTeamOfSpawnPropGroup( "AttkPhase5_SG", -1 );
+        setTeamOfSpawnPropGroup( "DefPhase5_SG", -1 );
+        // ...and enable the new ones
+        setTeamOfSpawnPropGroup( "AttkPhase6_SG", 0 );
+        setTeamOfSpawnPropGroup( "DefPhase6_SG", 1 );
+
+        // Set the hot spots
+        commandPostSetTeam(def_phase6_cp, 1);
+        commandPostSetTeam(attk_phase6_cp, 0);
+        // ...and clear the previous ones 
+        commandPostSetTeam(def_phase5_cp, -1);
+        commandPostSetTeam(attk_phase5_cp, -1);
+
+        // Hide the previous CP's...
+        PropSetVisible(0, def_phase5_cp);
+        PropSetVisible(0, def_phase5_cp);
+        // ...and show the new ones
+        PropSetVisible(1, def_phase6_cp);
+        PropSetVisible(1, attk_phase6_cp);
+        
+        // This is dodgy... Kill all the NPC's from both teams so they start spawning on the Cruiser
+        BFKillAllNPCsFromTeam(0);
+        BFKillAllNPCsFromTeam(1);
+
+        SetObjectiveKills(10);
+    }
+    //////////////////////////////////////////////////////////////////
+    //////////////////// PHASE 7 : REACTOR SHIELD ////////////////////
+    //////////////////////////////////////////////////////////////////
+    else if (iObjective == 7)	
+    {
+        // Disable the previous spawners...
+        setTeamOfSpawnPropGroup( "AttkPhase6_SG", -1 );
+        setTeamOfSpawnPropGroup( "DefPhase6_SG", -1 );
+        // ...and enable the new ones
+        setTeamOfSpawnPropGroup( "AttkPhase7_SG", 0 );
+        setTeamOfSpawnPropGroup( "DefPhase7_SG", 1 );
+
+        // Set the hot spots
+        commandPostSetTeam(def_phase7_cp, 1);
+        commandPostSetTeam(attk_phase7_cp, 0);
+        // ...and clear the previous ones 
+        commandPostSetTeam(def_phase6_cp, -1);
+        commandPostSetTeam(attk_phase6_cp, -1);
+
+        // Hide the previous CP's...
+        PropSetVisible(0, def_phase6_cp);
+        PropSetVisible(0, def_phase6_cp);
+        // ...and show the new ones
+        PropSetVisible(1, def_phase7_cp);
+        PropSetVisible(1, attk_phase7_cp);
+
+        SetObjectiveKills(10);
+    }
+    ///////////////////////////////////////////////////////////////////
+    //////////////////// PHASE 8 : REACTOR DESTROY ////////////////////
+    ///////////////////////////////////////////////////////////////////
+    else if (iObjective == 8)	
+    {
+        // Disable the previous spawners...
+        setTeamOfSpawnPropGroup( "AttkPhase7_SG", -1 );
+        setTeamOfSpawnPropGroup( "DefPhase7_SG", -1 );
+        // ...and enable the new ones
+        setTeamOfSpawnPropGroup( "AttkPhase8_SG", 0 );
+        setTeamOfSpawnPropGroup( "DefPhase8_SG", 1 );
+
+        // Set the hot spots
+        commandPostSetTeam(def_phase8_cp, 1);
+        commandPostSetTeam(attk_phase8_cp, 0);
+        // ...and clear the previous ones 
+        commandPostSetTeam(def_phase7_cp, -1);
+        commandPostSetTeam(attk_phase7_cp, -1);
+
+        // Hide the previous CP's...
+        PropSetVisible(0, def_phase7_cp);
+        PropSetVisible(0, def_phase7_cp);
+        // ...and show the new ones
+        PropSetVisible(1, def_phase8_cp);
+        PropSetVisible(1, attk_phase8_cp);
+
+        SetObjectiveKills(10);
+    }
+    ///////////////////////////////////////////////////////////////////
+    //////////////////// PHASE 9 : BONUS - ESCAPE! ////////////////////
+    ///////////////////////////////////////////////////////////////////
+    else if (iObjective == 9)	
+    {
+        // Disable the previous spawners...
+        setTeamOfSpawnPropGroup( "AttkPhase8_SG", -1 );
+        setTeamOfSpawnPropGroup( "DefPhase8_SG", -1 );
+        // ...and enable the new ones
+        setTeamOfSpawnPropGroup( "AttkPhase9_SG", 0 );
+        setTeamOfSpawnPropGroup( "DefPhase9_SG", 1 );
+
+        // Set the hot spots
+        commandPostSetTeam(def_phase9_cp, 1);
+        commandPostSetTeam(attk_phase9_cp, 0);
+        // ...and clear the previous ones 
+        commandPostSetTeam(def_phase8_cp, -1);
+        commandPostSetTeam(attk_phase8_cp, -1);
+
+        // Hide the previous CP's...
+        PropSetVisible(0, def_phase8_cp);
+        PropSetVisible(0, def_phase8_cp);
+        // ...and show the new ones
+        PropSetVisible(1, def_phase7_cp);
+        PropSetVisible(1, attk_phase7_cp);
+
+        // Allow the escape pods to be used
+        propSetCanBeActivated(propRefFromName("EscapePod1"), true);
+        propSetCanBeActivated(propRefFromName("EscapePod2"), true);
+        propSetCanBeActivated(propRefFromName("EscapePod3"), true);
+        propSetCanBeActivated(propRefFromName("EscapePod4"), true);
+        propSetCanBeActivated(propRefFromName("EscapePod5"), true);
+        propSetCanBeActivated(propRefFromName("EscapePod6"), true);
+
+        setObjectiveTriggered(true);
+
+        addObjectiveIndicatorToProp(propRefFromName("EscapePod1"), vector(0.f, 1.0f, 0.f), vector(1.f, 1.f, 0.f));
+        addObjectiveIndicatorToProp(propRefFromName("EscapePod2"), vector(0.f, 1.0f, 0.f), vector(1.f, 1.f, 0.f));
+        addObjectiveIndicatorToProp(propRefFromName("EscapePod3"), vector(0.f, 1.0f, 0.f), vector(1.f, 1.f, 0.f));
+        addObjectiveIndicatorToProp(propRefFromName("EscapePod4"), vector(0.f, 1.0f, 0.f), vector(1.f, 1.f, 0.f));
+        addObjectiveIndicatorToProp(propRefFromName("EscapePod5"), vector(0.f, 1.0f, 0.f), vector(1.f, 1.f, 0.f));
+        addObjectiveIndicatorToProp(propRefFromName("EscapePod6"), vector(0.f, 1.0f, 0.f), vector(1.f, 1.f, 0.f));
+
+        // Shake the camera for effect
+        camShakeAll(45.0f, 0.00001f, 0.0005f);
+
+        // Set a timer for this objective - when this reaches zero the ship explodes
+        SetObjectiveTimer(cObjectiveName, 45);
+    }
+    ///////////////////////////////////////////////////////////////////
+    //////////////////// PHASE 10 : MISSION COMPLETE //////////////////
+    ///////////////////////////////////////////////////////////////////
+    else if (iObjective == 10)	 // If the player escapes successfully 
+    {
+        // Remove all Escape Pod arrows
+        removeObjectiveIndicatorFromProp(propRefFromName("EscapePod1"));        
+        removeObjectiveIndicatorFromProp(propRefFromName("EscapePod2"));        
+        removeObjectiveIndicatorFromProp(propRefFromName("EscapePod3"));        
+        removeObjectiveIndicatorFromProp(propRefFromName("EscapePod4"));        
+        removeObjectiveIndicatorFromProp(propRefFromName("EscapePod5"));        
+        removeObjectiveIndicatorFromProp(propRefFromName("EscapePod6"));        
+
+        // The End - Success!
+        CompleteLevel();
+    }
+    else if (iObjective == 11)  // If the player fails to leave the cruiser before the countdown timer
+    {
+        // Remove all Escape Pod arrows
+        removeObjectiveIndicatorFromProp(propRefFromName("EscapePod1"));        
+        removeObjectiveIndicatorFromProp(propRefFromName("EscapePod2"));        
+        removeObjectiveIndicatorFromProp(propRefFromName("EscapePod3"));        
+        removeObjectiveIndicatorFromProp(propRefFromName("EscapePod4"));        
+        removeObjectiveIndicatorFromProp(propRefFromName("EscapePod5"));        
+        removeObjectiveIndicatorFromProp(propRefFromName("EscapePod6"));
+
+        // Explode the CIS Cruiser - crashes the game currently
+        //propKill(propRefFromName("cruisership2S"));
+
+        CompleteLevel();
+    }
+    else
+    {
+        // All over
+    }
+*/    
+}
+
+AllowCallback(CALLBACK_PlayerSpawned, playerSpawned);
+AllowCallback(CALLBACK_PlayerKilledBF, playerKilled);
+AllowCallback(CALLBACK_TriggeredProp, triggeredProp);
+AllowCallback(CALLBACK_ObjectiveTimeExpired, ObjectiveTimeExpired);
+AllowCallback(CALLBACK_GameHasStarted, gameHasStarted);
+AllowCallback(CALLBACK_FSpawnerComplete, finiteSpawnerComplete);
+
+///////////////This Script Actions
+
+waitForGameTime(1.0f);
+
+ScriptHasStarted(); //Do any setups
+
+//Main game loop
+while(1)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iObjective = BFObjectiveGetNumForNthActive(i);
+	ObjectiveTests(iObjective);
+
+	logStr("tick");
+	logInt(iObjective);
+    }
+
+    waitForGameTime(1.0f);
+
+}

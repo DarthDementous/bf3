@@ -1,0 +1,27 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      00946002 00001200     	EXEC ADDR(0x2) CNT(0x6) BOOL_ADDR(0x80)
+02: c8030007 00b06c00 a1040000	      ALU:	MULv	R7.xy__ = R4.xyyy, C256.xxxx
+03: 10084081 1f1ffe88 00004000	      FETCH:	SAMPLE	R4.xyz_ = R4.xyx CONST(0) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+04: 101870e1 1f1ffe88 00004000	      FETCH:	SAMPLE	R7.xyz_ = R7.xyx CONST(1) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+05: 14020009 006c6c6c a1010301	   (S)ALU:	MULv	R9._y__ = R1.xxxx, C259.xxxx
+06: 0c140909 006c6c6c 81010402	      ALU:	MULv	R9.__z_ = R1.xxxx, C260.xxxx
+                          						    	MUL_PREVs	R9.x___ = C258.xxxx
+07: 1402000a 00b1b1b1 a1010301	      ALU:	MULv	R10._y__ = R1.yyyy, C259.yyyy
+      00006008 00001200     	EXEC ADDR(0x8) CNT(0x6) BOOL_ADDR(0x80)
+08: 0c170a0b 00c06cb1 00060102	      ALU:	ADDv	R11.xyz_ = C262.xyzz, C257.xxxx
+                          						    	MUL_PREVs	R10.x___ = C258.yyyy
+09: 14010000 00bebeb1 f0000001	      ALU:	DOT3v	R0.x___ = R0.zxyy, R0.zxyy
+0a: 0c470a08 04c0b1b1 8007ff04	      ALU:	ADDv	R8.xyz_ = -R7.xyzz, C511.yyyy
+                          						    	MUL_PREVs	R10.__z_ = C260.yyyy
+0b: a0270001 00c0c06c e00b0680	      ALU:	ADDv	R1.xyz_ = R11.xyzz, R6.xyzz
+                          						    	SQRT_IEEE	R0._y__ = abs(R0).xxxx
+0c: aa870003 00c01b41 c10a03ff	      ALU:	MULv	R3.xyz_ = R10.xyzz, R3.wwww
+                          						    	MUL_CONST_0	R0.___w = C511.x, R0.y CLAMP
+0d: c8070000 00c01bc0 eb090203	      ALU:	MULADDv	R0.xyz_ = R3.xyzz, R9.xyzz, R2.wwww
+      0000500e 00002200     	EXEC_END ADDR(0xe) CNT(0x5) BOOL_ADDR(0x80)
+0e: c8070002 001bc0c0 eb000807	      ALU:	MULADDv	R2.xyz_ = R7.xyzz, R0.wwww, R8.xyzz
+0f: c8070002 00c0c000 e1020400	      ALU:	MULv	R2.xyz_ = R2.xyzz, R4.xyzz
+10: c8070000 00c0c000 e1000400	      ALU:	MULv	R0.xyz_ = R0.xyzz, R4.xyzz
+11: c8070000 00c0c0c0 eb020100	      ALU:	MULADDv	R0.xyz_ = R0.xyzz, R2.xyzz, R1.xyzz
+12: 14878000 00c06c1b a1000505	      ALU:	MULv	export0.xyz_ = R0.xyzz, C261.xxxx	; COLOR
+                          						    	MAXs	export0.___w = R5.wwww	; COLOR

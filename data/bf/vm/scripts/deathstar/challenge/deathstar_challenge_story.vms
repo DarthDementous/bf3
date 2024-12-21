@@ -1,0 +1,361 @@
+// vim: set syntax=c :
+
+///////////////////////////////////
+/*
+   Deathstar Challenge Story Classic
+
+   Created By Simon Vickers
+   please do not modify without asking me!
+   or comment where you have modified
+
+ */
+///////////////////////////////////
+
+int officer1_des = 0;
+int officer2_des = 0;
+int officer3_des = 0;
+int officer4_des = 0;
+int officer5_des = 0;
+
+propRef officer1;
+propRef officer2;
+propRef officer3;
+propRef officer4;
+propRef officer5;
+propRef player = getPlayerPropRefFromID(GetPlayerId());
+propRef escape = propRefFromName("xwing");
+
+boolean Skip = false;
+
+/////////////////////////////          INCLUDE DEFAULTS           /////////////////
+
+callback void playerKilled(int victimId, int killerId, int iOppTeam)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iActive = BFObjectiveGetNumForNthActive(i);
+	if (lib_playerKilled(victimId, killerId, iOppTeam, iActive)) 
+	{
+	    nextObjective(iActive);
+	}
+    }
+    //if (lib_playerKilled(victimId, killerId, iOppTeam)) nextObjective();    
+}
+function void Trigger(char16 inTriggerProp) //Used so can be called elsewhere in script (cant call a callback)
+{    
+    int iResult = 0;
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iActive = 0;
+    for (i=0; i<iNumActive; i++)
+    {
+	iActive = BFObjectiveGetNumForNthActive(i);
+	iResult = lib_triggeredProp(inTriggerProp, iActive);
+	iResult = ObjectiveTriggerTests(iNumActive, inTriggerProp, iResult);
+
+	if (iResult >= 1) nextObjective(iNumActive);
+    }
+}
+callback int triggeredProp(int inType, char16 inTriggerProp, int pId)
+{   
+    Trigger(inTriggerProp);     
+    return 0;
+}
+function void nextObjective(int iObjNum) 
+{    
+    int result =   lib_nextObjective(iObjNum);
+
+    if(result==1)
+    {
+	//if next objective returns 1 it has updated a core objective and automatically moved us onto the next
+	//so do objective setup with current objective
+	if (!Skip)
+	{
+	    int iObjective = BFObjectiveGetCurrent();//GetLevelVarInt("mObjective");
+	    char16 cName = BFObjectiveGetName(iObjective);
+	    ObjectiveSetup( cName, iObjective, BFObjectiveGetSub(iObjective));            
+	}
+    }
+
+    if(result==2)
+    {
+	//if nextobjective returns 2 it has updated a bonus objective so we will want to 
+	//objective setup with the objective we passed to next objective
+	if (!Skip)
+	{
+	    char16 cName = BFObjectiveGetName(iObjNum);
+	    ObjectiveSetup( cName, iObjNum, BFObjectiveGetSub(iObjNum));            
+	}
+    }
+}
+
+function void JumpToObjective(int iStartObj, boolean Skiping)
+{       
+    Skip = Skiping;
+    ResetProps();
+
+    if (Skip)
+    {
+	BFObjectiveSetJumpTo(iStartObj);
+    }
+
+    Skip = false;
+    nextObjective(BFObjectiveGetCurrent());
+
+    char16 tSpawn;
+    tSpawn = LevelVarToChar16("mCurrentSpawner");
+    if (propExists(propRefFromChar16(tSpawn)))
+        propTeleportToProp(getPlayerPropRefFromID(GetPlayerId()), propRefFromChar16(tSpawn));        
+
+    logStr("Jumped To Objective");
+    logInt(BFObjectiveGetCurrent());
+
+}
+
+callback void ObjectiveTimeExpired(char16 objName)
+{   
+    //if (lib_ObjTimeExpired()) nextObjective();
+
+    int objNum = 0;
+    objNum = BFObjectiveGetNumber(objName);   
+    if (lib_ObjTimeExpired(objNum))
+    {
+	nextObjective(objNum);
+    }
+
+}
+callback void playerSpawned(char16 teamName, int playerId)
+{
+    //int iObjective = GetLevelVarInt("mObjective");
+    logStr("teamName: ");
+    logchar16(teamName);
+}
+callback void finiteSpawnerComplete(char16 propId) 
+{
+    AddVMDebugHUDMsg("FINITE SPAWNER IS DEADED", 1, "test_objective_message");
+}
+
+/////////////////////////////          DEFAULTS END            /////////////////
+
+callback void gameHasStarted()
+{           
+}
+
+function void ResetProps()
+{
+// e.g    disableTrigger(propRefFromName("DeathTrigger"));       
+}
+
+function void ScriptHasStarted()
+{
+    SetBFStoryPrefixes("obj_Swsc", "SwscTrig");
+
+    SetPropRefInvincible(escape, true);
+	
+    ResetObjectives("mObjTmp", 3);
+    JumpToObjective(1, true);
+} 
+
+function int ObjectiveTriggerTests(int iObjective, char16 inTriggerProp, int iResult) 
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+
+    //e.g for an alternate route
+    if (iObjective == 1)
+    {
+        if (iResult == 1)
+            JumpToObjective(10, true);
+    }
+
+    //No Change
+        return iResult;
+}
+
+/////////////////////////////          OBJECTIVE TESTS            /////////////////
+
+// We can test if certain objectives have been completed here, rather than trigger them immediately
+// This is because sometimes it is much easier on the CPU to test here rather than set up triggers
+// Also we can do complex objective tests here which aren't otherwise possible (e.g. if prop is destroyed)
+
+
+
+function void ObjectiveTests(int iObjective) 
+{
+    //Tests for each game tick
+    
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+
+     if(iObjective == 1)
+    {
+	if(iSubObjective == 2)
+	{
+		if (!officer1_des && !propValid(officer1))
+		{
+	    		officer1_des = 1;
+	   		removeObjectiveIndicatorFromProp(officer1);
+			spawnGroupSetActive(propRefFromName("ofcr1bdygds_2"), true);
+		}
+
+		if (!officer2_des && !propValid(officer2))
+		{
+	    		officer2_des = 1;
+	    		removeObjectiveIndicatorFromProp(officer2);
+			spawnGroupSetActive(propRefFromName("ofcr2bdygds_2"), true);
+		}
+
+		if (!officer3_des && !propValid(officer3))
+		{
+	    		officer3_des = 1;
+	    		removeObjectiveIndicatorFromProp(officer3);
+			spawnGroupSetActive(propRefFromName("ofcr3bdygds_2"), true);
+		}
+
+		if (!officer4_des && !propValid(officer4))
+		{
+	    		officer4_des = 1;
+	    		removeObjectiveIndicatorFromProp(officer4);
+			spawnGroupSetActive(propRefFromName("ofcr4bdygds_2"), true);
+		}
+
+		if (!officer5_des && !propValid(officer5))
+		{
+	    		officer5_des = 1;
+	    		removeObjectiveIndicatorFromProp(officer5);
+			spawnGroupSetActive(propRefFromName("ofcr5bdygds_2"), true);
+		}
+    	}
+   }
+
+	if(iObjective == 2)
+	{
+		if (IsPlayerInVehicle("STR_VEHICLE_NAME_XWING_FIGHTER")) 
+		{	
+	    		nextObjective(iObjective);
+	    		removeObjectiveIndicatorFromProp(escape);
+		}
+	}
+  }
+
+     
+/////////////////////////////          OBJECTIVES            /////////////////
+
+// MAIN OBJECTIVE SETUP FUNCTION (most of your code will go here)
+// Set up what each objective actually is (the code for it anyway) and trigger events happening as player completes objectives
+// Objective description strings and numbers are in mgrsetup/objectivesmgr.res + strings localisation file
+
+function void ObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{
+    
+/////////////////////// OBJECTIVE 1: Collect the plans from the Imperial Officers    
+    if (iObjective == 1) 
+    { 
+       if (iSubObjective == 1)
+       {
+        	officer1 = propRefFromName("officer1_");
+		addNewObjectiveIndicatorToProp(officer1, k_objectiveIndicatorType_mainObjective);
+		officer2 = propRefFromName("officer2_");
+		addNewObjectiveIndicatorToProp(officer2, k_objectiveIndicatorType_mainObjective);
+		officer3 = propRefFromName("officer3_");
+		addNewObjectiveIndicatorToProp(officer3, k_objectiveIndicatorType_mainObjective);
+		officer4 = propRefFromName("officer4_");
+		addNewObjectiveIndicatorToProp(officer4, k_objectiveIndicatorType_mainObjective);
+		officer5 = propRefFromName("officer5_");
+		addNewObjectiveIndicatorToProp(officer4, k_objectiveIndicatorType_mainObjective);
+    		lib_SetupGroupZone(cObjectiveName, "ofcr1bdygds_1", "officer1hold", "officer1target", k_objtype_hold_area);
+		lib_SetupGroupZone(cObjectiveName, "ofcr2bdygds_1", "officer2hold", "officer2target", k_objtype_hold_area);
+		lib_SetupGroupZone(cObjectiveName, "ofcr3bdygds_1", "officer3hold", "officer3target", k_objtype_hold_area);
+		lib_SetupGroupZone(cObjectiveName, "ofcr4bdygds_1", "officer4hold", "officer4target", k_objtype_hold_area);
+		lib_SetupGroupZone(cObjectiveName, "ofcr5bdygds_1", "officer5hold", "officer5target", k_objtype_hold_area);
+		lib_SetupGroupZone(cObjectiveName, "CnnRmGrp", "CnnRmhold", "CnnRmtarget", k_objtype_hold_area);
+		lib_SetupGroupZone(cObjectiveName, "MiscRmsGrp", "MiscRmshold", "MiscRmstarget", k_objtype_hold_area);
+		lib_SetupGroupZone(cObjectiveName, "GrnRmGrp", "GrnRmhold", "GrnRmtarget", k_objtype_hold_area);
+		lib_SetupGroupZone(cObjectiveName, "LndngBayGrp", "HangarHold", "HangarHold", k_objtype_hold_area);   		
+		BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "ofcr1bdygds_2", player , 10.f, 20.f);
+   		BFNPCGroupObjectiveSetType(cObjectiveName, "ofcr1bdygds_2", k_objtype_attack_prop); 
+		BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "ofcr2bdygds_2", player , 10.f, 20.f);
+   		BFNPCGroupObjectiveSetType(cObjectiveName, "ofcr2bdygds_2", k_objtype_attack_prop); 
+		BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "ofcr3bdygds_2", player , 10.f, 20.f);
+   		BFNPCGroupObjectiveSetType(cObjectiveName, "ofcr3bdygds_2", k_objtype_attack_prop); 
+     		BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "ofcr4bdygds_2", player , 10.f, 20.f);
+   		BFNPCGroupObjectiveSetType(cObjectiveName, "ofcr4bdygds_2", k_objtype_attack_prop); 
+		BFNPCGroupObjectiveSetTargetProp(cObjectiveName, "ofcr5bdygds_2", player , 10.f, 20.f);
+   		BFNPCGroupObjectiveSetType(cObjectiveName, "ofcr5bdygds_2", k_objtype_attack_prop);
+		SetObjectiveKillSpawners(1, iObjective);
+	}
+       
+       else
+       {
+		spawnGroupSetActive(propRefFromName("LndngBayGrp"), true);
+    		spawnGroupSetActive(propRefFromName("Spwn-1_1"), true);
+    		SetNumSubObjectives(2, iObjective);
+    		SetObjectiveTimer(2, iObjective);
+       }
+    }
+
+/////////////////////// OBJECTIVE 2: Return to your ship
+    else if (iObjective == 2) 
+    { 
+	spawnGroupSetActive(propRefFromName("HangarGrp"), true);		
+	lib_SetupGroupZone(cObjectiveName, "HangarGrp", "EndGroup", "EndGroupTarget", k_objtype_hold_area);        	
+	spawnGroupSetActive(propRefFromName("spawnees"), true);
+	addNewObjectiveIndicatorToProp(escape, k_objectiveIndicatorType_mainObjective);
+	propSetCanBeActivated(escape, true);
+	BFNPCTeamObjectiveSetTargetProp(cObjectiveName, 1, player , 10.f, 20.f);
+	BFNPCTeamObjectiveSetType(cObjectiveName, 1, k_objtype_attack_prop);
+    }
+
+/////////////////////// OBJECTIVE 3: Mission Complete
+    else if (iObjective == 3)
+    {
+	endOfGameWinText("Challenge Complete!");
+       	waitForGameTime(3.0f);
+        wholeScreenFade(3.0f, 1.0f, false); 	// Screen Fade Down To Black
+        waitForGameTime(3.0f);
+        
+	//CompleteLevel();
+	ChallengeEnd();
+    }
+
+}
+
+AllowCallback(CALLBACK_PlayerSpawned, playerSpawned);
+AllowCallback(CALLBACK_PlayerKilledBF, playerKilled);
+AllowCallback(CALLBACK_TriggeredProp, triggeredProp);
+AllowCallback(CALLBACK_ObjectiveTimeExpired, ObjectiveTimeExpired);
+AllowCallback(CALLBACK_GameHasStarted, gameHasStarted);
+AllowCallback(CALLBACK_FSpawnerComplete, finiteSpawnerComplete);
+
+
+///////////////This Script Actions
+wholeScreenFade(0.0f, 1.0f, false);
+
+waitForGameTime(0.1f);
+ScriptHasStarted(); //Do any setups
+
+wholeScreenFade(3.0f, 0.0f, false); 
+
+ChallengeBegin();
+
+//Main game loop
+while(1)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+	int iObjective = BFObjectiveGetNumForNthActive(i);
+	ObjectiveTests(iObjective);
+
+	logStr("tick");
+	logInt(iObjective);
+
+    }
+
+    waitForGameTime(1.0f);
+}
+
+

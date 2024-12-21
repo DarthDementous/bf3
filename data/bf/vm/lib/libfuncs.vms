@@ -1,0 +1,727 @@
+// vm library functions
+// vim: set syntax=c :
+
+library void SetObjectiveTriggered(boolean bTrig, int inObjNum) 
+{
+    if (bTrig)
+    {
+        int iObjective = BFObjectiveGetCurrent();
+	
+	    char16 name = StringToChar16("");
+    	BFObjectiveSetTriggered(name, inObjNum);	
+    }
+} 
+
+library void SetObjectiveKillType(string sType, int inObjNum) 
+{
+    char16 name = StringToChar16("");
+    BFObjectiveSetKillType(name, inObjNum, sType);
+}
+
+library void SetObjectiveKillPercent(float fPercent, int inObjNum) 
+{
+    char16 name = StringToChar16("");
+    BFObjectiveSetKillPercent(name, inObjNum, fPercent);
+}
+
+library void SetObjectiveKills(int iNum, int inObjNum) 
+{
+    char16 name = StringToChar16("");
+    BFObjectiveSetKills(name, inObjNum, iNum);
+}
+
+library void SetObjectiveKillSpawners(int iNum, int inObjNum) 
+{
+    char16 name = StringToChar16("");
+    BFObjectiveSetSpawnerKills(name, inObjNum, iNum);
+}
+
+library void SetObjectiveTimer(int iNum, int inObjNum) 
+{
+    if (iNum > 0)
+    {
+    	char16 name = StringToChar16("");
+	    BFObjectiveSetTimer(name, inObjNum, iNum);
+    }
+}
+
+library void SetNumSubObjectives(int iNum, int inObjNum) 
+{
+    char16 name = StringToChar16("");
+    BFObjectiveSetNumSubObjectives(name, inObjNum, iNum);
+    BFObjectiveSetSubObjective(name, inObjNum, 0);
+}
+
+library void SetNumAltRoutes(int iNum, int inObjNum) 
+{
+    char16 name = StringToChar16("");
+    BFObjectiveSetNumRoutes(name, inObjNum, iNum);
+}
+
+library void ActivateSpawnerChar16(char16 cProp)
+{
+    logstr("Spawn Prop Activated: ");        
+    logChar16(cProp);
+
+    if (isGroupComponentProp(propRefFromChar16(cProp))) 
+        spawnGroupSetActive(propRefFromChar16(cProp), true);                        
+    else 
+        setActiveStateOfSpawnProp(propRefFromChar16(cProp), true); 
+}
+
+library void ActivateSpawner(string sProp) 
+{
+    char16 cProp;
+    cProp = StringToChar16(sProp);
+
+    ActivateSpawnerChar16(cProp);
+}
+
+library void DeactivateSpawner(string sProp) 
+{   
+    char16 cProp;
+    cProp = StringToChar16(sProp);
+
+    DeactivateSpawnerChar16(cProp);
+}
+
+library void DeactivateSpawnerChar16(char16 cProp) 
+{
+    logstr("Spawn Prop Deactivated: ");        
+    logChar16(cProp);
+
+    if (isGroupComponentProp(propRefFromChar16(cProp))) 
+        spawnGroupSetActive(propRefFromChar16(cProp), false);
+    else 
+        setActiveStateOfSpawnProp(propRefFromChar16(cProp), false);    
+}
+
+library void ResetObjectives(string sString, int NumObjectives) 
+{
+
+    BFObjectiveReset(NumObjectives);
+}
+
+library void SetBFStoryPrefixes(string sStringA, string sStringB)
+{
+    BFObjectiveSetPrefixes(sStringA, sStringB, "Spwn");
+    //TODO: Setup a script has started lib funcs so we can add things like this without trawling all scripts
+    BFSetAllChrClassSwitchable(true);
+    //the hero templates shouldn't have activate components but just in case
+    //anyone gets a bit copy/paste trigger happy
+    BFSetChrClassSwitchable(k_chrClassHeroTier1, false);
+    BFSetChrClassSwitchable(k_chrClassHeroTier2, false);
+    BFSetChrClassSwitchable(k_chrClassMelee, false);
+}
+
+library int lib_ObjTimeExpired(int inObjNum)
+{        
+    char16 name = StringToChar16("");
+    
+    int flags = 0;
+    flags = vmOrFlags(k_obj_condition_timer);
+
+    return BFObjectiveRemoveCondition(name, inObjNum, flags);
+}
+
+library int lib_CheckNumAlive(string kTemplate)
+{
+    VMAssertMsg("Redundant function call lib_checkNumAlive - we shouldn't be here");
+    return 0;
+}
+
+library int lib_playerKilled(int iKiller, int iResult, int iVictim, int inObjNum)
+{
+    int iReturn = 0;
+    logStr("lib_playerKilled - called");
+
+    propRef pKiller = propRefFromInt(iKiller);
+    propRef pVictim = propRefFromInt(iVictim);
+    
+    iReturn = BFObjectivePlayerKilled(pKiller, pVictim, iResult, inObjNum);
+    
+    if (iReturn == -1)
+    {
+        logStr("KILLED YOUR OWN TEAMMATE");
+        addSpeechMessage("STR_FRIENDLYFIRE_WARNING", 5.0f);
+        iReturn = 0;
+    }
+    else if (iReturn == -2)
+    {
+        logStr("KILLED TOO MANY TEAMMATES");
+        addSpeechMessage("STR_FRIENDLYFIRE_KILL", 10.0f);
+        propKill(pKiller);
+        iReturn = 0;    
+    }
+        
+    return iReturn;
+}
+
+
+library int lib_triggeredProp(char16 inTriggerProp, int inObjNum) 
+{
+    logStr("lib_triggeredProp - called");
+
+    int iReturn = 0;    
+    char16 name = StringToChar16("");
+    
+    iReturn = BFObjectivePropTriggered(inTriggerProp, name, inObjNum);    
+
+    if (iReturn != 0)
+    {
+        logStr("lib_triggeredProp - success");
+        AddVMDebugHUDMsg("Triggered: ", iReturn-1, "test_objective_message");
+    }
+    else
+    {
+        logStr("lib_triggeredProp - failed");
+    }
+
+    return iReturn;
+}
+
+library void PlayerSpawnerSetup(int iObjective, int iSubObjective) 
+{
+    char16 cSpawn;
+    cSpawn = LevelVarToChar16("mCurrentSpawner");
+
+    char16 cNewSpawn;
+    cNewSpawn = StringCatInt("playerSpawn", iObjective, "");
+ 
+    //If theres a new spawner available activate it and deactivate the old one
+    if (propExists(propRefFromChar16(cNewSpawn)))
+    {
+        if (propExists(propRefFromChar16(cSpawn)))
+            DeactivateSpawnerChar16(cSpawn);
+
+        ActivateSpawnerChar16(cNewSpawn); 
+        SetLevelVarStringFromChar16("mCurrentSpawner", cNewSpawn); 
+    }
+    else
+    {
+        //Dont want to teleport back to previous spawn so clear out the value
+        SetLevelVarString("mCurrentSpawner", "");         
+    }
+}
+
+library int lib_nextObjective(int inObjNum) 
+{
+    logStr("lib_nextObjective - called");
+
+    int objectiveAtStart = BFObjectiveGetCurrent();
+
+    int iReturn = 0;   
+    char16 name = StringToChar16("");
+    iReturn = BFObjectiveNextObjective(name, inObjNum);
+
+    if (iReturn > 0) 
+    {        
+        if (iReturn != 2) //2 means bonus objective so dont want to setup spawner
+            PlayerSpawnerSetup(BFObjectiveGetCurrent(), BFObjectiveGetSub(BFObjectiveGetCurrent()));
+        
+        AddVMDebugHUDMsg("Current Obj: ", BFObjectiveGetCurrent(), "test_objective_message");
+        logStr("lib_nextObjective - success");     
+        SetLevelVarInt("iAnger", -1);
+
+        // We have moved on a whole objective so do a checkpoint save
+        if ( objectiveAtStart < BFObjectiveGetCurrent() )
+        {
+            CheckPointSave();
+        }
+    }
+    else
+    {
+        logStr("lib_nextObjective - failed");
+    } 
+
+    return iReturn;
+}
+
+library propRef AddToVehicle(propRef pPlayer, propRef pVeh, int preferredPos ) 
+{
+    if (preferredPos == k_seatPos_driver)
+        DriveVehicleBF( pPlayer, pVeh, true ); //Takeoff mode
+    else if (preferredPos == 3) //Descistion Mode
+    {
+        vector vPos = propGetPos(pVeh);
+        if (vPos.y < 0) //Probably in a Hangar
+            DriveVehicleBF( pPlayer, pVeh, true ); //Takeoff mode
+        else
+            DriveVehicleBF( pPlayer, pVeh, false ); //Flight mode
+    }
+    else if (preferredPos == 4)    
+        PassengerVehicleBF( pPlayer, pVeh, true ); // true = exit vehicle when driverless
+    else
+        PassengerVehicleBF( pPlayer, pVeh, false ); // false = don't exit vehicle when driverless
+}
+
+library propRef SpawnInVehicle(propRef pPlayer, propRef pSpwnPoint, char16 cVehTmplate, int iRand, int preferredPos ) 
+{   
+    vector vOffSet = vector(0.f, 0.f, 0.f);
+
+    if (iRand != 0) 
+        vOffSet = vector(rndInRange(-iRand, iRand), rndInRange(-iRand, iRand), rndInRange(-iRand, iRand));
+
+    propRef pVeh;
+    pVeh = SpawnVehicleBF(cVehTmplate, pSpwnPoint, vOffSet);
+
+    AddToVehicle(pPlayer, pVeh, preferredPos);
+    
+    return pVeh;
+}
+
+library propRef SpawnAIVehicle(propRef pSpwnPoint, string sCharTmplate, string sVehTmplate, int iRand, boolean ReturnPlayer, int preferredPos)
+{
+    propRef pPlayer;   
+    propRef pVeh;
+    pPlayer = SpawnPropFromTemplate(sCharTmplate, pSpwnPoint, vector(0.f, 10.0f, 0.f)); //+10 so no collision
+    pVeh = SpawnInVehicle(pPlayer, pSpwnPoint, StringToChar16(sVehTmplate), iRand, preferredPos);
+
+    if (ReturnPlayer)
+        return pPlayer;
+
+    return pVeh;
+}
+
+library propRef SpawnAIVehicleWithObjC(propRef pSpwnPoint, char16 cCharTmplate, char16 cVehTmplate, int iRand, boolean ReturnPlayer, int preferredPos, char16 cGroupName)
+{
+    logStr("SpawnAIVehicleWithObjC");
+    waitForGameTime(0.1f);    
+    propRef pPlayer;
+    propRef pVeh;   
+    pPlayer = SpawnPropFromTemplateChar16(cCharTmplate, pSpwnPoint, vector(0.f, 10.0f, 0.f)); //+10 so no collision
+
+    //Must be done before AI is in Driver State    
+    char16 cObjectiveName = BFObjectiveGetName( BFObjectiveGetCurrent() );
+    PushAIObjectiveState(cObjectiveName, propRefFromChar16(cGroupName), pPlayer); //Default to temam obj for vehicles
+
+    pVeh = SpawnInVehicle(pPlayer, pSpwnPoint, cVehTmplate, iRand, preferredPos);
+
+    if (ReturnPlayer)
+        return pPlayer;
+
+    return pVeh;
+}
+
+library propRef SpawnAIVehicleWithObjectives(propRef pSpwnPoint, string sCharTmplate, string sVehTmplate, int iRand, boolean ReturnPlayer, int preferredPos, char16 cGroupName)
+{
+    return SpawnAIVehicleWithObjC(pSpwnPoint, StringToChar16(sCharTmplate), StringToChar16(sVehTmplate), iRand, ReturnPlayer, preferredPos, cGroupName);
+}
+
+library void SpawnVehicleGroup(int iNum, propRef pSpwnPoint, string sCharTmplate, string sVehTmplate, int iRand, int preferredPos )
+{
+    VMAssertMsg("SpawnVehicleGroup: Please take a look a using use lib_SpawnActiveVehicleG instead (less expensive)");
+}
+
+library void lib_SetupTeamZone(char16 cObjectiveName, int TeamNum, string hZone, string tZone, int iType)
+{
+    char16 homeZone;
+    char16 targetZone;    
+    homeZone = StringToChar16(hZone);
+    targetZone = StringToChar16(tZone);
+
+    BFNPCTeamObjectiveSetZone(cObjectiveName, TeamNum, homeZone);
+    BFNPCTeamObjectiveSetTargetZone(cObjectiveName, TeamNum, targetZone);    
+    BFNPCTeamObjectiveSetType(cObjectiveName, TeamNum, iType);        
+}
+
+library void lib_SetupGroupZone(char16 cObjectiveName, string gName, string hZone, string tZone, int iType)
+{
+    char16 homeZone;
+    char16 targetZone;    
+    homeZone = StringToChar16(hZone);
+    targetZone = StringToChar16(tZone);
+
+    BFNPCGroupObjectiveSetZone(cObjectiveName, gName, homeZone);
+    BFNPCGroupObjectiveSetTargetZone(cObjectiveName, gName, targetZone);
+    BFNPCGroupObjectiveSetType(cObjectiveName, gName, iType);    
+}
+
+library void FillGunShip(propRef pVeh, char16 cCharTmplate)
+{
+    int i = 0;
+
+    for (i=0; i<6; i++)
+    {
+        //Need To Fill it with people
+        propRef pPlayer;
+        pPlayer = SpawnPropFromTemplateChar16(cCharTmplate, pVeh, vector(0.f, 10.f, 0.f)); //+10 so no collision
+        AddToVehicle(pPlayer, pVeh, 3); //passenger and will get out
+        waitForGameTime(0.1f);
+    }
+}
+
+library propRef lib_SpawnActiveVehicleCG(propRef pGroup, propRef pSpwnPoint, char16 cCharTmplate, char16 cVehTmplate, int iRand, int iNum)
+{
+    propRef veh;
+
+    //Only call this function in ObjectiveTests()
+    //This will be called everyframe so dont loop
+    if (propGroupGetNumOfProps(pGroup) < iNum)
+    {               
+        logStr("lib_SpawnActiveVehicleG - Spawning Somebody");
+        logInt(iNum);
+        veh = SpawnAIVehicleWithObjC(pSpwnPoint, cCharTmplate, cVehTmplate, iRand, false, 3, GetPropName(pGroup)); //Takeoff Decision mode
+        addPropToGroup(pGroup, veh);
+
+        if (!char16cmp(cVehTmplate, "rep_gunship"))
+            FillGunShip(veh, cCharTmplate);
+
+	    waitForGameTime(0.1f);
+                
+        //AddVMDebugHUDMsg(sGroup, propGroupGetNumOfProps(sGroup), "test_objective_message");
+        return veh;        
+    }
+
+    return veh;    
+}
+
+library propRef lib_SpawnActiveVehicleG(propRef pGroup, propRef pSpwnPoint, string sCharTmplate, string sVehTmplate, int iRand, int iNum)
+{
+    return lib_SpawnActiveVehicleCG(pGroup, pSpwnPoint, StringToChar16(sCharTmplate), StringToChar16(sVehTmplate), iRand, iNum);
+}
+
+library boolean lib_SpawnPropGAtDof(propRef pGroup, string sPropTmplate, string sSpwnTmp, int iNum)
+{
+    //Only call this function in ObjectiveTests()   
+    int iProps = propGroupGetNumOfProps(pGroup);
+    
+    if (iProps < iNum)
+    {               
+        char16 cDof;
+        cDof = StringCatInt(sSpwnTmp, iProps, "");
+        propRef pDof = propRefFromChar16(cDof);        
+        
+        if (propExists(pDof))
+        {        
+            propRef veh;            
+            logStr("lib_SpawnPropGAtDof - Spawning Something");
+            veh = SpawnPropFromTemplate(sPropTmplate, pDof, vector(0, 0, 0));        
+            addPropToGroup(pGroup, veh);
+            return false;
+        }
+        else
+        {
+            logStr("lib_SpawnPropGAtDof - Couldn't Find Dof, FAILURE");
+        }
+    }
+
+    //True when finished
+    return true;    
+}
+
+
+library int lib_SpawnActiveEscapePodG(string sGroup, string sCruiser, int iCruiserDofs, int iLandingDofs, int iNum)
+{
+    //Only call this function in ObjectiveTests()
+    //This will be called everyframe so dont loop
+    if (propGroupGetNumOfProps(propRefFromName(sGroup)) < iNum)
+    {                
+        propRef pod;
+        pod = lib_LaunchEscapePod(propRefFromName(sCruiser), iCruiserDofs, iLandingDofs);
+        addPropToGroup(propRefFromName(sGroup), pod);                
+
+        //AddVMDebugHUDMsg(sGroup, propGroupGetNumOfProps(sGroup), "test_objective_message");        
+        return 1;
+    }
+
+    return 0;
+}
+
+library propRef lib_LaunchEscapePod(propRef pCruiser, int iCruiserDofs, int iLandingDofs)
+{
+    propRef pod;
+    int i = rndInRange(1, iCruiserDofs);
+
+    char16 cCruiseDOF;
+
+    if (i < 10)
+        cCruiseDOF = StringCatInt("ESCAPEPOD_0", i, "");
+    else
+        cCruiseDOF = StringCatInt("ESCAPEPOD_", i, "");
+
+    pod = BFCreateEscapePodChar16(pCruiser, cCruiseDOF, "imp_escapepod");
+
+    char16 cCrashDOF;        
+    i = rndInRange(1, iLandingDofs);
+    cCrashDOF = StringCatInt("dofEsc_", i, "");
+
+    BFCrashShipAtPos(pod, propGetPosFromNameChar16(cCrashDOF));
+
+    return pod;
+}
+
+library boolean lib_FacePlayer(propRef pProp, float fSpeed, float fTimeDelta)
+{
+    propRef pPlayer = getPlayerPropRefFromID(GetPlayerId());
+    boolean bResult;
+    bResult = FacePosY(pProp, propGetPos(pPlayer), fSpeed, fTimeDelta);
+
+    return bResult;
+}
+
+library boolean lib_FaceOrigin(propRef pProp, float fSpeed, float fTimeDelta)
+{
+    boolean bResult;
+    bResult = FaceSpawnerDirY(pProp, fSpeed, fTimeDelta);
+
+    return bResult;
+}
+
+library void lib_AddIndicatorsToGroup(propRef g, int Type, boolean bOn)
+{
+    //k_objectiveIndicatorType_mainObjective
+    propRef p;
+
+    int i = 0;
+    while (i != -1)
+    {
+        p = getNthPropFromGroup(g, i);
+        if (propExists(p))
+        {
+            //addObjectiveIndicatorToProp(p, OffSet, Color);
+            if (bOn)
+                addNewObjectiveIndicatorToProp(p, Type);                                 
+            else
+                removeObjectiveIndicatorFromProp(p);
+
+            i++;
+        }
+        else
+            i = -1;
+    }        
+}
+
+library void lib_GroupBeginCutscene(propRef pGroup)
+{
+    if (isGroupComponentProp(pGroup))
+    {
+        int i = 0;
+        for (i=0; i < propGroupGetNumOfProps(pGroup); i++)
+        {
+            propRef pTemp;
+            pTemp = GetNthPropFromGroup(pGroup, i);
+
+            propRef pChr;
+            pChr = propSpawnerGetNthSpawnedProp(pTemp, 0);
+            beginInGameCutSceneWithFlags(k_vmFlag_ResumeScriptAfterHitReact, pChr);
+        }
+    }
+}
+
+library void DistTestGroupAnim(propRef pGroup, propRef pDistTest, char16 cAnim, boolean bLoop, float fDist)
+{
+    int i = 0;
+    
+    for (i=0; i < propGroupGetNumOfProps(pGroup); i++)
+    {
+        propRef pTemp;
+        pTemp = GetNthPropFromGroup(pGroup, i);
+
+        if (testIfPropsAreClose(pDistTest, pTemp, fDist))
+        {
+//            chrPlayAnim(pTemp, cAnim, 0.1f, bLoop);
+            chrPlayQAnim(pTemp, cAnim, bLoop);
+        }
+        waitForGameTime(0.1f);
+    }
+}
+
+library int lib_DoRandomIdleAnim(propRef pChr, boolean bLoopAnim)
+{
+    char16 sAnim;
+    float fRnd = rndInRange(0, 100);
+
+    if (fRnd < 12.5)
+        sAnim = StringToChar16("AN_TalkinAngry2");
+    else if (fRnd < 25)
+        sAnim = StringToChar16("AN_TalkinMedium");
+    else if (fRnd < 37.5)
+        sAnim = StringToChar16("AN_TalkinSolemn");
+    else if (fRnd < 50)
+        sAnim = StringToChar16("AN_TalkinGestu1");
+    else if (fRnd < 62.5)
+        sAnim = StringToChar16("AN_TalkinGestu2");
+    else if (fRnd < 75)
+        sAnim = StringToChar16("AN_TalkinGestu3");
+    else if (fRnd < 87.5)
+        sAnim = StringToChar16("AN_TalkinGestu4");    
+    else
+        sAnim = StringToChar16("AN_TalkingAngry");
+
+    chrPlayAnim(pChr, sAnim, 0.1f, bLoopAnim);
+
+    return fRnd;
+}
+
+library void lib_GetAngry()
+{
+    SetLevelVarInt("iAnger", 0);
+}
+
+library boolean lib_CanbeAngry()
+{
+    if (GetLevelVarInt("iAnger") != -1)
+        return true;
+
+    return false;
+}
+
+library boolean X1Anger(propRef pChr, propRef pPlayer, int iStartTime)
+{   
+    int iPhase2 = 25;
+    string sSpeech = "null";
+    int iNumber = GetLevelVarInt("iAnger");
+    
+    if (iNumber == iStartTime)           
+        sSpeech = "l00e_050_x1"; //Whats taking so long
+    else if (iNumber == iStartTime+iPhase2)
+        sSpeech = "l00e_060_x1"; //
+    else if (iNumber == iStartTime+(iPhase2*2))
+        sSpeech = "l00e_070_x1"; //
+    else if (iNumber == iStartTime+(iPhase2*3))
+        sSpeech = "l00e_080_x1"; //
+    else if (iNumber == iStartTime+(iPhase2*4))
+        sSpeech = "l00e_090_x1"; //
+    else if (iNumber == iStartTime+(iPhase2*5))
+        sSpeech = "l00e_100_x1"; //
+    else if (iNumber == iStartTime+(iPhase2*6))
+        sSpeech = "l00e_110_x1"; //
+    else if (iNumber == iStartTime+(iPhase2*7))
+        sSpeech = "l00e_120_x1"; //
+    else if (iNumber == iStartTime+(iPhase2*8))
+        sSpeech = "l00e_130_x1"; //
+    else if (iNumber == iStartTime+(iPhase2*9))
+        sSpeech = "l00e_140_x1"; //
+    else if (iNumber == iStartTime+(iPhase2*10))
+        sSpeech = "l00e_150_x1"; //
+    else if (iNumber == iStartTime+(iPhase2*11))
+        sSpeech = "l00e_160_x1"; //
+    else if (iNumber == iStartTime+(iPhase2*12))
+        sSpeech = "l00e_170_x1"; //
+    else if (iNumber == iStartTime+(iPhase2*13))
+        sSpeech = "l00e_180_x1"; //
+    else if (iNumber == iStartTime+(iPhase2*14))
+        sSpeech = "l00e_190_x1"; //       
+    else if (iNumber == iStartTime+(iPhase2*15))    
+        iNumber = iStartTime;
+
+    iNumber++;
+    SetLevelVarInt("iAnger", iNumber);
+
+    if (strcmp(sSpeech, "null")) //not equal
+    {
+        chrSpeak(pChr, sSpeech, 0, 0.0f, 40.0f, pPlayer, false, false);
+        chrWaitUntilFinishedSpeaking(pChr);
+        return true;
+    }    
+
+    return false;
+}
+
+library boolean FerrodaAnger(propRef pChr, propRef pPlayer, int iStartTime)
+{
+    int iPhase2 = 25;
+    string sSpeech = "null";
+    int iNumber = GetLevelVarInt("iAnger");
+    logStr("FerrodaAnger: ");
+    logInt(iNumber);
+    
+    if (iNumber == iStartTime)           
+        sSpeech = "l00h_040_feroda"; //Are you coming
+    else if (iNumber == iStartTime+iPhase2)
+        sSpeech = "l00h_050_feroda"; //
+    else if (iNumber == iStartTime+(iPhase2*2))
+        sSpeech = "l00h_060_feroda"; //
+    else if (iNumber == iStartTime+(iPhase2*3))
+        sSpeech = "l00h_070_feroda"; //
+    else if (iNumber == iStartTime+(iPhase2*4))
+        sSpeech = "l00h_080_feroda"; //
+    else if (iNumber == iStartTime+(iPhase2*5))
+        sSpeech = "l00h_090_feroda"; //
+    else if (iNumber == iStartTime+(iPhase2*6))
+        sSpeech = "l00h_100_feroda"; //
+    else if (iNumber == iStartTime+(iPhase2*7))
+        iNumber = iStartTime;
+     
+    iNumber++;
+    SetLevelVarInt("iAnger", iNumber);
+
+    if (strcmp(sSpeech, "null")) //not equal
+    {
+        chrSpeak(pChr, sSpeech, 0, 0.0f, 40.0f, pPlayer, false, false);
+        chrWaitUntilFinishedSpeaking(pChr);
+        return true;
+    }
+
+    return false;
+}
+
+library void ActivateSpawnerIfDead(string sProp)
+{
+    propRef pProp;
+    pProp = propRefFromName(sProp);
+    
+    if (propGroupSpCountAliveSpawnedProps(pProp) == 0)
+    {
+        ResetSpawner(pProp);        
+        ActivateSpawner(sProp);
+    }
+}
+
+library propRef GetPropFromGroupSpawner(propRef pGroup, int iGroupNum, int iSpawnNum)
+{
+    propRef pChr;
+    propRef pSpawn;
+    
+    if (isGroupComponentProp(pGroup))
+        pSpawn = GetNthPropFromGroup(pGroup, iGroupNum);
+    else
+        pSpawn = pGroup;
+
+    if (propExists(pSpawn))
+    {
+        if (isSpawnProp(pSpawn))   
+            pChr = propSpawnerGetNthSpawnedProp(pSpawn, iSpawnNum);
+        else
+            pChr = pSpawn;
+
+        if (propExists(pChr))
+            return pChr;        
+    }
+
+    VMAssertMsg("GetPropFromGroupSpawner - Prop Doesnt Exist FAILED");
+    return pGroup;
+}
+
+library void MoveToPoint(propRef pGroup, propRef pPoint, boolean bWalk)
+{
+    propRef pChr = GetPropFromGroupSpawner(pGroup, 0, 0);
+    setAIState(pChr, "AISTATE_BF_PATROL");
+    beginInGameCutSceneWithFlags(k_vmFlag_ResumeScriptAfterHitReact, pChr);    
+
+    if (bWalk)
+        chrWalkToPadAndAlign(pChr, propGetPos(pPoint), propGetDir(pPoint), 800.0f);            
+    else
+        chrRunToPadAndAlign(pChr, propGetPos(pPoint), propGetDir(pPoint), 800.0f);            
+    waitUntilVMsDone(pChr);
+
+    endInGameCutScene();
+}
+
+library void CamShake(int iScale) 
+{
+    if (iScale == 1)
+    {
+        camShakeAll(10, 0.00001, 0.001);
+    }
+    else if (iScale == 2)
+    {
+        camShakeAll(10, 0.00001, 0.001);
+    }
+    else if (iScale == 3)
+    {
+        camShakeAll(10, 0.00001, 0.001);
+    }    
+}
+ 

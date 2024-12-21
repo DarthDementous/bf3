@@ -1,0 +1,1800 @@
+// vim: set syntax=c :
+
+///////////////////////////////////
+/*
+   dathomir_story.vms
+
+   Created By Simon Vickers
+   Aww yeah it is :) 
+ 
+ */
+///////////////////////////////////
+
+boolean Skip = false; 
+boolean bEndLevel = false;
+
+int comsDestroyed = 0;
+int numOfRebs = 0;
+int numOfGuides = 0;
+
+int Obj = 0;
+int routeChosen = 0;
+int sharaReached = 0;
+int hasLanded = 0;
+
+boolean playCutscene = false;
+boolean playCutscene2 = false;
+propRef player = getPlayerPropRefFromID(GetPlayerId());
+
+/////////////////////////////          INCLUDE DEFAULTS           /////////////////
+
+//////////////////////////CALLBACK INFO DO NOT CHANGE
+
+//PlayerKilled Callback Info
+boolean bCB_PK = false;
+int iCB_PK_KillerId = -1;
+int iCB_PK_Victim = -1;
+int iCB_PK_Result = -1;
+
+//triggeredProp Callback Info
+boolean bCB_TP = false;
+char16 cCB_TP_Prop = StringToChar16("");
+
+//ObjectiveTimeExpired Callback Info
+boolean bCB_OTE = false;
+char16 cCB_OTE_ObjName = StringToChar16("");
+
+//shipReachedScriptedSplineSegment  Callback Info
+boolean bCB_SRSS = false;
+propRef pCB_SRSS_Ship;
+propRef pCB_SRSS_Spline;
+int iCB_SRSS_Segment = -1;
+
+//////////////////////////END CALLBACK INFO
+
+function void ProcessCallbacks()
+{
+    //No else's as could be waiting to process two or more!
+
+    if (GetLevelVarInt("iCBLV") != -1)
+    {
+        if (bCB_PK) // playerKilled callback
+        {
+            playerKilled(iCB_PK_KillerId, iCB_PK_Result, iCB_PK_Victim);
+            bCB_PK = false;
+        }
+
+        if (bCB_TP) // triggeredProp callback
+        {
+            Trigger(cCB_TP_Prop);
+            bCB_TP = false;
+        }
+
+        // ObjectiveTimeExpired callback
+        if (bCB_OTE)
+        {
+            ObjectiveTimeExpired(cCB_OTE_ObjName);
+            bCB_OTE = false;
+        }
+
+        // shipReachedScriptedSplineSegment callback
+        if (bCB_SRSS)
+        {
+            ShipReachedScriptedSplineSegment(pCB_SRSS_Ship, pCB_SRSS_Spline, iCB_SRSS_Segment);
+            bCB_SRSS = false;
+        }
+
+        SetLevelVarInt("iCBLV", -1);    
+        waitForGameTime(0.1f);
+    }
+}
+
+callback void CB_PlayerKilled(int iKiller, int iResult, int iVictim)
+{
+    logStr("CB_PlayerKilled");
+    bCB_PK = true;
+    iCB_PK_KillerId = iKiller;
+    iCB_PK_Victim = iVictim;
+    iCB_PK_Result = iResult;
+
+    SetLevelVarInt("iCBLV", 1);    
+}
+
+callback int CB_TriggeredProp(int inType, char16 inTriggerProp, int pId)
+{    
+    logStr("CB_TriggeredProp");    
+    bCB_TP = true;
+    cCB_TP_Prop = inTriggerProp;
+
+    SetLevelVarInt("iCBLV", 1);    
+    return 0;
+}
+
+callback void CB_ObjectiveTimeExpired(char16 objName)
+{
+    logStr("CB_ObjectiveTimeExpired");        
+    bCB_OTE = true;
+    cCB_OTE_ObjName = objName;
+
+    SetLevelVarInt("iCBLV", 1);    
+}
+
+callback void CB_shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    logStr("CB_shipReachedScriptedSplineSegment");            
+    bCB_SRSS = true;
+    pCB_SRSS_Ship = ship;
+    pCB_SRSS_Spline = spline;
+    iCB_SRSS_Segment = segment;
+
+    SetLevelVarInt("iCBLV", 1);
+}
+
+AllowCallback(CALLBACK_PlayerKilledBF, CB_playerKilled);
+AllowCallback(CALLBACK_TriggeredProp, CB_triggeredProp);
+AllowCallback(CALLBACK_ObjectiveTimeExpired, CB_ObjectiveTimeExpired);
+AllowCallback(CALLBACK_ShipReachedScriptedSplineSegment, CB_shipReachedScriptedSplineSegment);
+
+//////////////////////////END CALLBACKS
+
+function void playerKilled(int iKiller, int iResult, int iVictim)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+        int iActive = BFObjectiveGetNumForNthActive(i);
+        if (lib_playerKilled(iKiller, iResult, iVictim, iActive)) 
+        {
+            nextObjective(iActive);
+        }
+    }
+}
+function void Trigger(char16 inTriggerProp) //Used so can be called elsewhere in script (cant call a callback)
+{    
+    int iResult = 0;
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iActive = 0;
+    for (i=0; i<iNumActive; i++)
+    {
+        iActive = BFObjectiveGetNumForNthActive(i);
+        iResult = lib_triggeredProp(inTriggerProp, iActive);
+        iResult = ObjectiveTriggerTests(iActive, inTriggerProp, iResult);
+
+        if (iResult >= 1) nextObjective(iActive);
+    }
+}
+
+function void ObjectiveSetupCheck()
+{
+    int iTempObj = GetLevelVarInt("iObjLV");
+    
+    if (iTempObj != -1)
+    {
+        char16 cName = BFObjectiveGetName(iTempObj);
+        if (ObjectiveSetup(cName, iTempObj, BFObjectiveGetSub(iTempObj)))
+            SetLevelVarInt("iObjLV", -1);
+
+        waitForGameTime(0.1f);        
+    }
+}
+
+function void SetObjectiveSetup(int iObj)
+{
+    logStr("SetObjectiveSetup Called");
+    logInt(iObj);
+    SetLevelVarInt("iObjLV", iObj);
+}
+
+function void nextObjective(int inObjNum) 
+{    
+    int result = lib_nextObjective(inObjNum);
+
+    if(result == 1)
+    {
+        //if next objective returns 1 it has updated a core objective and automatically moved us onto the next
+        //so do objective setup with current objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(BFObjectiveGetCurrent());
+        }
+    }
+
+    if(result == 2)
+    {
+        //if nextobjective returns 2 it has updated a bonus objective so we will want to 
+        //objective setup with the objective we passed to next objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(inObjNum);
+        }
+    }
+}
+
+function void JumpToObjective(int iStartObj, boolean bTeleport)
+{       
+	BFObjectiveSetJumpTo(iStartObj);	
+    nextObjective(BFObjectiveGetCurrent());
+    
+    if (bTeleport)
+    {
+        char16 tSpawn;
+        tSpawn = LevelVarToChar16("mCurrentSpawner");
+        if (propExists(propRefFromChar16(tSpawn)))
+            propTeleportToProp(player, propRefFromChar16(tSpawn));        
+    }
+    
+    logStr("Jumped To Objective");
+    logInt(BFObjectiveGetCurrent());
+}
+
+function void ObjectiveTimeExpired(char16 objName)
+{   
+    int objNum = 0;
+    objNum = BFObjectiveGetNumber(objName);   
+    
+    if (lib_ObjTimeExpired(objNum))
+    {
+        if (objNum == 20)
+        {
+            char16 emptyString = StringToChar16("");
+            int currentObjectiveNumber = BFObjectiveGetCurrent();
+            BFObjectiveFailObjective(emptyString, currentObjectiveNumber); 	    
+        }
+        else
+        {
+            nextObjective(objNum);
+        }	    
+    }
+}
+
+/* NOT NEEEDED
+callback void playerSpawned(char16 teamName, int playerId)
+{
+    //int iObjective = GetLevelVarInt("mObjective");
+    logStr("teamName: ");
+    logchar16(teamName);
+}
+callback void finiteSpawnerComplete(char16 propId) 
+{
+    AddVMDebugHUDMsg("FINITE SPAWNER IS DEADED", 1, "test_objective_message");
+}
+
+callback void gameHasStarted()
+{           
+}
+*/
+
+/////////////////////////////          DEFAULTS END            /////////////////
+
+
+function void ResetProps()
+{
+    // e.g    disableTrigger(propRefFromName("DeathTrigger"));       
+}
+
+function void ScriptHasStarted()
+{
+    
+    SetBFStoryPrefixes("obj_Dat_St", "vmTrig");
+    ResetObjectives("mObjTmp", 11);     
+
+    ResetProps();  
+
+    propSetVisible(0, propRefFromName("x1_act32"));
+    
+    disableTrigger(propRefFromName("eventTrig1"));
+    disableTrigger(propRefFromName("eventTrig7"));
+    disableTrigger(propRefFromName("eventTrig8"));
+    disableTrigger(propRefFromName("eventTrig9"));
+    disableTrigger(propRefFromName("eventTrig5"));
+    disableTrigger(propRefFromName("typeTrig"));
+    disableTrigger(propRefFromName("eventTrig11"));
+    disableTrigger(propRefFromName("sharaDoor"));
+    disableTrigger(propRefFromName("towerDoor"));
+    disableTrigger(propRefFromName("doorHackTrig"));
+    disableTrigger(propRefFromName("compHackTrig"));
+    JumpToObjective(1, true);
+}
+
+function int ObjectiveTriggerTests(int iObjective, char16 inTriggerProp, int iResult) 
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+
+    /* NOTE We're not using this right?
+    //e.g for an alternate route
+    if (iResult >= 1) //1 is normal route e.g vmTrig1, 2 is route 1 e.g vmTrig1r1
+    {    
+        if (iObjective == 1)
+        {
+            if (iResult == 1)
+            {
+                JumpToObjective(10, true);
+                iResult = 0;
+            }
+            else
+            {
+                JumpToObjective(20, true);                
+                iResult = 0;
+                }
+        }
+    }
+    */
+
+    //No Change
+    return iResult;
+}
+
+
+function void killAllGuides(propRef teamToKill)
+{
+    int i;
+    propRef toKill;
+    for(i = propGroupGetNumOfProps(teamToKill); i>=0; i--)
+    {
+	toKill = GetNthPropFromGroup(teamToKill, i);
+	propKill(toKill);
+    }
+}
+
+function void removeAllGuides(propRef teamToKill)
+{
+    int i;
+    propRef toKill;
+    for(i = propGroupGetNumOfProps(teamToKill); i>=0; i--)
+    {
+	toKill = GetNthPropFromGroup(teamToKill, i);
+	removeObjectiveIndicatorFromProp(toKill);
+    }
+}
+
+function void addAllGuides(propRef teamToKill)
+{
+    int i;
+    propRef toKill;
+    for(i = propGroupGetNumOfProps(teamToKill); i>=0; i--)
+    {
+	toKill = GetNthPropFromGroup(teamToKill, i);
+	addNewObjectiveIndicatorToProp(toKill, k_objectiveIndicatorType_mainObjective);
+    }
+}
+
+function void spawnFlyingImps(int spwnRnge1, int spwnRnge2, int numToSpawn, propRef spwnLoc, boolean toSpline, string whichSpline)
+{
+    int numOfImps;
+    numOfImps = propGroupGetNumOfProps(spwnLoc);
+    if (numOfImps <= numToSpawn)
+    {	
+	int i = rndInRange(1, 3);
+        int s = rndInRange(spwnRnge1, spwnRnge2);
+        char16 cPoint;
+        cPoint = StringCatInt("impFlySpwn", s, "");
+        string sVehicle;
+	string pilot;
+        	    
+	if (i <=3)
+	{
+	    sVehicle = "tie_fighter";
+	}
+	    
+	else 
+	{
+	    sVehicle = "tie_interceptor";
+	}
+	    
+	propRef impShip;
+	impShip = SpawnAIVehicle(propRefFromChar16(cPoint), "imp_eng_snpc", sVehicle , 0, false, k_seatPos_driver);
+	addPropToGroup(spwnLoc, impShip);
+
+	if (toSpline)
+	{
+	    char16 splineName;
+	    splineName = StringCatInt(whichSpline, s, "_");
+	    BFShipFollowScriptedSplineNoAvoidance(impShip , propRefFromChar16(splineName));
+	}
+    }
+}
+
+function void spawnGuideRebs(int section)
+{
+    int numOfRebs;
+    numOfRebs = propGroupGetNumOfProps(propRefFromName("rebGuideGrp"));
+
+    if (numOfRebs <= 3)
+    {
+    	int i = rndInRange(1, 6);
+        int s = rndInRange(1, 3);
+        char16 splineStage;
+        splineStage = StringCatInt("guideSpline", s, "_");
+	char16 spawnStage;
+	spawnStage = StringCatInt("guideSpawn", s, "_");
+	char16 cPoint;
+	cPoint = Char16CatInt(spawnStage, section);
+	char16 splineName;
+	splineName = Char16CatInt(splineStage, section);
+	
+        string sVehicle;
+	if (i <=3)
+	{
+	    sVehicle = "awing_fighter";
+	}
+	
+	else if ((i <=5) && (i>3))
+	{
+	    sVehicle = "awing_fighter";
+	}
+
+	else
+	{
+	    sVehicle = "awing_fighter";
+	}		    
+	propRef guide;
+	guide = SpawnAIVehicle(propRefFromChar16(cPoint), "dat_rebel1_npc_story", sVehicle , 0, false, k_seatPos_driver);	
+        addPropToGroup(propRefFromName("rebGuideGrp"), guide);
+	BFShipFollowScriptedSplineNoAvoidance(guide, propRefFromChar16(splineName));
+	addNewObjectiveIndicatorToProp(guide, k_objectiveIndicatorType_mainObjective);
+    }
+}
+
+function void shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    if (spline == propRefFromName("guideSpline1_1"))
+    {
+	if (Obj == 1)
+	{
+	    if (segment >= 2)
+	    {
+		propDelete(ship);
+	    }
+	}
+
+	if (segment == 7)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline1_2"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline2_1"))
+    {
+	if (Obj == 1)
+	{
+	    if (segment >= 2)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 7)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline2_2"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline3_1"))
+    {
+	if (Obj == 1)
+	{
+	    if (segment >= 2)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 8)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline3_2"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline1_2"))
+    {
+	if (Obj == 2)
+	{
+	    if (segment >= 2)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 5)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline1_3"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline2_2"))
+    {
+	if (Obj == 2)
+	{
+	    if (segment >= 2)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 6)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline2_3"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline3_2"))
+    {
+    	if (Obj == 2)
+	{
+	    if (segment >= 2)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 6)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline3_3"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline1_3"))
+    {
+	if (Obj == 3)
+	{
+	    if (segment >= 2)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 6)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline1_4"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline2_3"))
+    {
+	if (Obj == 3)
+	{
+	    if (segment >= 2)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 7)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline2_4"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline3_3"))
+    {
+	if (Obj == 3)
+	{
+	    if (segment >= 2)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 6)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline3_4"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline1_4"))
+    {
+	if (Obj == 4)
+	{
+	    if (segment >= 3)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 9)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline1_5"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline2_4"))
+    {
+	if (Obj == 4)
+	{
+	    if (segment >= 3)
+	    {
+		propDelete(ship);
+	    }
+	}
+
+	if (segment == 11)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline2_5"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline3_4"))
+    {
+	if (Obj == 4)
+	{
+	    if (segment >= 3)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 9)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline3_5"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline1_5"))
+    {
+	if (segment == 4)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("comSplineStart1"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline2_5"))
+    {
+	if (segment == 4)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("comSplineStart2"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline3_5"))
+    {
+	if (segment == 5)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("comSplineStart3"));
+	}
+    }
+   
+    if (spline == propRefFromName("comSplineStart1"))
+    {
+	if (segment == 4)
+	{
+	    if (Obj == 6)
+	    {
+		BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline1_6"));
+	    }
+
+	    else
+	    {
+		BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("comSplineEnd1"));
+	    }
+	}
+    }
+
+    if (spline == propRefFromName("comSplineStart2"))
+    {
+	if (segment == 4)
+	{
+	    if (Obj == 6)
+	    {
+		BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline2_6"));
+	    }
+	    
+	    else
+	    {
+		BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("comSplineEnd2"));
+	    }
+	}
+    }
+
+    if (spline == propRefFromName("comSplineStart3"))
+    {
+	if (segment == 6)
+	{
+	    if (Obj == 6)
+	    {
+		BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline3_6"));
+	    }
+	    
+	    else
+	    {
+		BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("comSplineEnd3"));
+	    }
+	}
+    }
+
+    if (spline == propRefFromName("comSplineEnd1"))
+    {
+	if (segment == 5)
+	{	
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("comSplineStart1"));
+	}
+    }
+
+    if (spline == propRefFromName("comSplineEnd2"))
+    {
+	if (segment == 8)
+	{	
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("comSplineStart2"));
+	}
+    }
+
+    if (spline == propRefFromName("comSplineEnd3"))
+    {
+	if (segment == 8)
+	{    
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("comSplineStart2"));
+	}
+    }
+    
+    if (spline == propRefFromName("guideSpline1_6"))
+    {
+	if (segment == 5)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline1_7"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline2_6"))
+    {
+	if (segment == 5)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline2_7"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline3_6"))
+    {
+	if (segment == 5)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline3_7"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline1_7"))
+    {
+	if (Obj == 5)
+	{
+	    if (segment >= 3)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 5)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline1_8"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline2_7"))
+    {
+	if (Obj == 5)
+	{
+	    if (segment >= 3)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 11)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline2_8"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline3_7"))
+    {
+	if (Obj == 5)
+	{
+	    if (segment >= 3)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 11)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline3_8"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline1_8"))
+    {
+	if (Obj == 6)
+	{
+	    if (segment >= 3)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 8)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline1_9"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline2_8"))
+    {
+	if (Obj == 6)
+	{
+	    if (segment >= 3)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 4)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline2_9"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline3_8"))
+    {
+	if (Obj == 6)
+	{
+	    if (segment >= 3)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 4)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline3_9"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline1_9"))
+    {
+	if (Obj == 7)
+	{
+	    if (segment >= 3)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 7)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline1_10"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline2_9"))
+    {
+	if (Obj == 7)
+	{
+	    if (segment >= 3)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 10)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline2_10"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline3_9"))
+    {
+	if (Obj == 7)
+	{
+	    if (segment >= 3)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 8)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline3_10"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline1_10"))
+    {
+	if (Obj == 8)
+	{
+	    if (segment >= 3)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 8)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline1_11"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline2_10"))
+    {
+	if (Obj == 9)
+	{
+	    if (segment >= 3)
+	    {
+		propDelete(ship);
+	    }
+	}
+
+	if (segment == 7)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline2_11"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline3_10"))
+    {
+	if (Obj == 9)
+	{
+	    if (segment >= 3)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 7)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline3_11"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline1_11"))
+    {
+	if (Obj == 10)
+	{
+	    if (segment >= 2)
+	    {
+		propDelete(ship);
+	    }
+	}
+	
+	if (segment == 3)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline1_12"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline2_11"))
+    {
+	if (Obj == 10)
+	{
+	    if (segment >= 2)
+	    {
+		propDelete(ship);
+	    }
+	}
+
+	if (segment == 4)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline2_12"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline3_11"))
+    {
+	if (Obj == 10)
+	{
+	    if (segment >= 2)
+	    {
+		propDelete(ship);
+	    }
+	}
+
+	if (segment == 3)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline3_12"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline1_12"))
+    {
+	if (segment == 4)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline1_13"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline2_12"))
+    {
+	if (segment == 6)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline2_13"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline3_12"))
+    {
+	if (segment == 6)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline3_13"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline1_13"))
+    {
+	if (segment == 13)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline1_13"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline2_13"))
+    {
+	if (segment == 13)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline2_13"));
+	}
+    }
+
+    if (spline == propRefFromName("guideSpline3_13"))
+    {
+	if (segment == 14)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("guideSpline3_13"));
+	}
+    }
+
+
+/////////////////////////////////////////////////// Imp Splines 
+    if (spline == propRefFromName("comSpline7_"))
+    {
+	if (segment == 8)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("comSpline7_"));
+	}
+    }
+
+    if (spline == propRefFromName("comSpline8_"))
+    {
+	if (segment == 8)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("comSpline8_"));
+	}
+    }
+    
+    if (spline == propRefFromName("comSpline9_"))
+    {
+	if (segment == 9)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("comSpline9_"));
+	}
+    }
+
+    if (spline == propRefFromName("comSpline10_"))
+    {
+	if (segment == 11)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("comSpline10_"));
+    	}
+    }
+
+    if (spline == propRefFromName("comSpline11_"))
+    {
+	if (segment == 11)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("comSpline11_"));
+	}
+    }
+
+    if (spline == propRefFromName("coreSpline12_"))
+    {
+	if (segment == 9)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("coreSpline12_"));
+	}
+    }
+
+    if (spline == propRefFromName("coreSpline13_"))
+    {
+	if (segment == 11)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("coreSpline13_"));
+	}
+    }
+
+    if (spline == propRefFromName("coreSpline14_"))
+    {
+	if (segment == 10)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("coreSpline14_"));
+	}
+    }
+
+    if (spline == propRefFromName("coreSpline15_"))
+    {
+	if (segment == 15)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("coreSpline15_"));
+	}
+    }
+
+    if (spline == propRefFromName("coreSpline16_"))
+    {
+	if (segment == 12)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("coreSpline16_"));
+	}
+    }
+
+    if (spline == propRefFromName("coreSpline21_"))
+    {
+	if (segment == 5)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("coreSpline16_"));
+	}
+    }
+
+    if (spline == propRefFromName("coreSpline20_"))
+    {
+	if (segment == 5)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("coreSpline14_"));
+	}
+    }
+
+    if (spline == propRefFromName("coreSpline19_"))
+    {
+	if (segment == 3)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("coreSpline13_"));
+	}
+    }
+
+    if (spline == propRefFromName("coreSpline18_"))
+    {
+	if (segment == 4)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("coreSpline15_"));
+	}
+    }
+
+    if (spline == propRefFromName("coreSpline17_"))
+    {
+	if (segment == 3)
+	{
+	    BFShipFollowScriptedSplineNoAvoidance(ship , propRefFromName("coreSpline12_"));
+	}
+    }
+///////////////////////////////////////////////////////////////
+    
+}
+
+/////////////////////////////          OBJECTIVE TESTS            /////////////////
+
+// We can test if certain objectives have been completed here, rather than trigger them immediately
+// This is because sometimes it is much easier on the CPU to test here rather than set up triggers
+// Also we can do complex objective tests here which aren't otherwise possible (e.g. if prop is destroyed)
+
+function void ObjectiveTests(int iObjective) 
+{   
+    //Tests for each game tick
+
+    int iSubObjective = BFObjectiveGetSub(iObjective);   
+ 
+/////////////////////////////////////////////////////////////////////////////////////////////////////GUIDES
+      
+    if (iObjective == 2)
+    {
+	if (iObjective == 2)
+	{
+	    if (iSubObjective == 3)
+	    {
+		 spawnGuideRebs(4);
+	    }
+	    
+	    else if (iSubObjective == 2)
+	    {
+		spawnGuideRebs(3);
+	    }
+
+	    else if (iSubObjective == 1)
+	    {
+		spawnGuideRebs(2);
+	    }
+
+	    else
+	    {
+		spawnGuideRebs(1);
+	    }
+	}
+    }
+    
+    if (iObjective == 3)
+    {
+        if (iSubObjective == 1)
+        {
+	    spawnGuideRebs(5);
+	}
+
+	else
+	{
+	    spawnGuideRebs(4);
+	}
+    }
+
+    if (iObjective == 4)
+    {
+	if (iSubObjective == 1)
+	{
+	    spawnGuideRebs(8);
+	}
+
+	else if (iSubObjective == 2)
+	{
+	    spawnGuideRebs(9);
+	}
+
+	else if (iSubObjective == 3)
+	{
+	    spawnGuideRebs(10);
+	}
+
+	else if (iSubObjective == 4)
+	{
+	    spawnGuideRebs(11);
+	}
+    
+	else if (iSubObjective == 5)
+	{
+	    spawnGuideRebs(12);
+	}
+
+	else if (iSubObjective == 6)
+	{
+	    spawnGuideRebs(13);
+	}
+	
+	else
+	{
+	    spawnGuideRebs(7);
+	}
+    }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    if (iObjective <= 2)
+    {
+	numOfRebs = propGroupGetNumOfProps(propRefFromName("rebFlyGrp"));
+	if (numOfRebs <= 6)
+	{
+	    int i = rndInRange(1, 6);
+	    int s = rndInRange(1, 5);
+	    char16 cPoint;
+	    cPoint = StringCatInt("rebFlySpwn", s, "");
+	    string sVehicle;
+	    
+	    if (i <=3)
+	    {
+		sVehicle = "xwing_fighter";
+	    }
+	    else if ((i <=5) && (i>3))
+	    {
+		sVehicle = "bwing_fighter";
+	    }
+
+	    else
+	    {
+		sVehicle = "ywing_fighter";
+	    }		
+	    propRef rebShip;
+	    rebShip = SpawnAIVehicle(propRefFromChar16(cPoint), "dat_rebel1_npc_story", sVehicle, 50, false,k_seatPos_driver);
+	    addPropToGroup(propRefFromName("rebFlyGrp"), rebShip);
+    	}
+
+	spawnFlyingImps(1, 6, 8, propRefFromName("impFlyGrp"), false, "");
+    }    
+    
+    if (iObjective == 3)
+    {
+	if (!propValid(propRefFromName("shipyard_com1")))
+	{
+	    comsDestroyed = 1;
+	    nextObjective(iObjective);
+    	}
+
+	else
+	{
+	    removeAllGuides(propRefFromName("rebGuideGrp"));
+	    spawnFlyingImps(9, 11, 7, propRefFromName("impFlyGrpInt"), true, "comSpline");
+    	}
+    }
+
+    if (iObjective == 4)
+    {
+	if (propValid(propRefFromName("shipyard_core1")))
+	{
+	    if (iSubObjective == 1)
+	    {
+		spawnFlyingImps(17, 21, 8, propRefFromName("impFlyGrpCore"), true, "coreSpline");
+    	    }
+
+	    else
+	    {
+		spawnFlyingImps(12, 16, 4, propRefFromName("impFlyGrpCore"), true, "coreSpline");
+	    }
+	}
+
+	else
+	{
+	    nextObjective(iObjective);
+	}
+    }
+
+    if (iObjective == 6)
+    {
+	killAllGuides(propRefFromName("rebGuideGrp"));
+    	if (iSubObjective == 1)
+	{
+	    if (!IsPlayerInVehicle("STR_VEHICLE_NAME_A_WING_FIGHTER") && triggerPropIsActive(propRefFromName("playerHasLanded")) && !hasLanded)
+	    {
+		hasLanded = 1;
+		nextObjective(iObjective);
+		activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 5.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "Nice work X2, but we could really do with some help down here");  
+    	    }
+	}
+    }
+
+    if (iObjective == 7)
+    {
+	if (iSubObjective == 3)
+	{
+	    if (testIfPropsAreClose(propRefFromName("sharaJoin"), propRefFromName("sharaDoorHack"), 10.0f))
+	    {
+		nextObjective(iObjective);
+	    }
+	}
+    }
+    
+    if (iObjective == 8)
+    {
+	if (iSubObjective == 1)
+	{
+	    if (!propValid(propRefFromName("x1_act32")))
+	    {
+		nextObjective(iObjective);
+	    }
+	}
+    }
+
+    if (iObjective == 9)
+    {
+	if (triggerPropIsActive(propRefFromName("eventTrig8")) && !routeChosen)
+	{
+	    routeChosen = 1;
+	    lib_SetupGroupZone(BFObjectiveGetName(iObjective), "balconyGrp", "roofHold", "roofTarget", k_objtype_hold_area);
+	}
+
+        if (iSubObjective == 1)
+	{
+	    if (testIfPropsAreClose(propRefFromName("shara2Join"), player, 20.0f))
+	    {
+		nextObjective(iObjective);
+	    }
+	}
+
+    }
+
+    
+    if (playCutscene)
+    {
+	playTimeline("data/bf/timelines/cs14.res");
+	playCutscene = false;
+	nextObjective(iObjective);
+    }
+
+    if (playCutscene2)
+    {
+	playTimeline("data/bf/timelines/cs14a.res");
+	playCutscene2 = false;
+	nextObjective(iObjective);
+    }
+}
+
+/////////////////////////////          OBJECTIVES            /////////////////
+
+// MAIN OBJECTIVE SETUP FUNCTION (most of your code will go here)
+// Set up what each objective actually is (the code for it anyway) and trigger events happening as player completes objectives
+// Objective description strings and numbers are in mgrsetup/objectivesmgr.res + strings localisation file
+
+function boolean ObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{
+logStr("-------------> ObjectiveSetup Called");
+    logInt(iObjective);
+    logInt(iSubObjective); 
+
+
+//////////OBJECTIVE 1: Investigate the Star Destroyer Graveyard
+
+    if (iObjective == 1)
+    {
+	SpawnInVehicle(player, propRefFromName("playerStartDOF"), StringToChar16("awing_fighter"), 5, k_seatPos_driver );
+	SetObjectiveTimer(15, iObjective);	
+    }
+
+//////////OBJECTIVE 2: Enter the Shipyard
+
+    else if (iObjective == 2)
+    {
+        
+	if (iSubObjective == 1)
+	{
+	    Obj = 2;
+	    activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 5.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "Hurry, it up X2! We're getting torn to pieces out here");   	     	     
+	    removeObjectiveIndicatorFromProp(propRefFromName("vmTrig2"));
+	    killAllGuides(propRefFromName("rebFlyGrp"));
+	    killAllGuides(propRefFromName("impFlyGrp"));
+	    SetObjectiveTriggered(true, iObjective);
+	}
+
+	else if (iSubObjective == 2)
+	{
+	    Obj = 3;
+	    SetObjectiveTriggered(true, iObjective);
+	}
+
+	else if (iSubObjective == 3)
+	{
+	    Obj = 4;
+	    SetObjectiveTriggered(true, iObjective);
+	}
+	
+        else
+	{
+	    activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 8.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "Look out pilots! That shipyard's anything but abandoned. X2, get inside and take it and those star destroyers out! We'll keep them busy");
+	    Obj = 1;
+	    SetNumSubObjectives(3, iObjective);
+	    SetObjectiveTriggered(true, iObjective);
+	}	
+    }
+
+//////////OBJECTIVE 3: Destroy the Shield Gen
+
+    else if (iObjective == 3)
+    {
+	if (iSubObjective == 1)
+	{ 
+	    activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 8.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "You're going to have to take out the communications array at the shipyards base. It should stop them from calling in reinforcements"); 
+	    addNewObjectiveIndicatorToProp(propRefFromName("vmTrig3"), k_objectiveIndicatorType_mainObjective);	    
+	}
+
+	else
+	{
+	    Obj = 5;
+	    SetNumSubObjectives(1, iObjective);
+	    SetObjectiveTriggered(true,iObjective);
+	}
+    }
+
+//////////OBJECTIVE 4: Destroy the Power Core
+
+    else if (iObjective == 4)
+    {
+	if (iSubObjective == 1)
+	{
+	    Obj = 7;
+	    SetObjectiveTriggered(true,iObjective);
+	}
+
+	else if (iSubObjective == 2)
+	{
+	    Obj = 8;
+	    SetObjectiveTriggered(true,iObjective);
+	}
+	
+	else if (iSubObjective == 3)
+	{
+	    Obj = 9;
+	    SetObjectiveTriggered(true,iObjective);
+	}
+
+	else if (iSubObjective == 4)
+	{
+	    Obj = 10;
+	    SetObjectiveTriggered(true,iObjective);
+	}
+
+	else if (iSubObjective == 5)
+	{
+	    Obj = 11;
+	    SetObjectiveTriggered(true,iObjective);
+	}
+
+	else if (iSubObjective == 6)
+	{
+	    addNewObjectiveIndicatorToProp(propRefFromName("shipyard_core1"), k_objectiveIndicatorType_mainObjective);
+	}    
+	 
+	else
+	{	    
+	    Obj = 6;
+	    removeObjectiveIndicatorFromProp(propRefFromName("vmTrig3"));
+	    addAllGuides(propRefFromName("rebGuideGrp"));
+	    SetObjectiveTriggered(true,iObjective);
+	    SetNumSubObjectives(6, iObjective);
+	}	    
+    }
+
+//////////OBJECTIVE 5: Escape before boom time
+
+    else if (iObjective == 5)
+    {	
+	if (iSubObjective == 1)
+	{
+    	     playCutscene2 = true;
+	}
+
+	
+	else if (iSubObjective == 2)
+	{
+	     propRef playerVehicle;
+	     playerVehicle = getDriverVehicle( player ); 
+	     propTeleportToProp( playerVehicle, propRefFromName("cheatDOF"));     
+	     activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 5.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "-------------------CUTSCENE HAPPENS FOR THIS OBJECTIVE----------------");	     
+	     addNewObjectiveIndicatorToProp(propRefFromName("vmTrig5_1"), k_objectiveIndicatorType_mainObjective);
+	     removeObjectiveIndicatorFromProp(propRefFromName("vmTrig5")); 
+	     SetObjectiveTimer(2, iObjective);
+	}
+
+        else
+	{ 
+	     activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 3.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "You did it X2! Get out quick, it's orbit is deteriating fast, not to mention exploding!. We'll meet you on the planets surface");
+	     addNewObjectiveIndicatorToProp(propRefFromName("vmTrig5"), k_objectiveIndicatorType_mainObjective);
+	     removeObjectiveIndicatorFromProp(propRefFromName("shipyard_core1"));
+	     SetNumSubObjectives(2, iObjective);
+	     SetObjectiveTriggered(true, iObjective);
+	}	
+    }
+    
+///////////////////////////OBJECTIVE 6: Regroup with the Rebels on the Ground at the Ruins
+
+    else if (iObjective == 6)
+    {   
+	if (iSubObjective == 1)
+	{ 
+	    ActivateSpawner("firstImps");
+	    ActivateSpawner("playerGrp");
+	    ActivateSpawner("villageRebs");
+	    chrAIJoinGroup( propRefFromName("sharaJoin"), "player" );
+	    lib_SetupGroupZone(cObjectiveName, "villageRebs", "landingPad", "villageMain", k_objtype_hold_area);
+	    lib_SetupGroupZone(cObjectiveName, "playerGrp", "landingPad", "villageMain", k_objtype_hold_area);
+	    lib_SetupGroupZone(cObjectiveName, "firstImps", "impBattle1", "villageMain", k_objtype_clear_area);
+    	}
+
+	
+	else if (iSubObjective == 2)
+	{
+	    DeactivateSpawner("firstImps");
+	    ActivateSpawner("Spwn1-6_3");
+	    removeObjectiveIndicatorFromProp(propRefFromName("playerHasLanded"));
+	    lib_SetupGroupZone(cObjectiveName, "villageRebs", "landingPad", "villageMain", k_objtype_hold_area);
+	    lib_SetupGroupZone(cObjectiveName, "Spwn1-6_3", "impBattle1", "villageMain", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "playerGrp", "landingPad", "villageMain", k_objtype_hold_area);
+    	    SetObjectiveKills(6, iObjective);
+	}
+	
+	else if (iSubObjective == 3)
+	{
+	    ActivateSpawner("Spwn2-6_3");
+	    lib_SetupGroupZone(cObjectiveName, "villageRebs", "landingPad2", "villageMain", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "playerGrp", "landingPad2", "villageMain", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "Spwn1-6_3", "impBattle2", "villageMain", k_objtype_hold_area);
+	    lib_SetupGroupZone(cObjectiveName, "Spwn2-6_3", "impBattle4", "villageMain", k_objtype_hold_area);
+	    SetObjectiveKills(5, iObjective);
+
+	}
+	
+	else if (iSubObjective == 4)
+	{
+	    DeactivateSpawner("Spwn2-6_3");
+	    DeactivateSpawner("Spwn1-6_3");
+	    lib_SetupGroupZone(cObjectiveName, "villageRebs", "rebVillage", "villageMain", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "playerGrp", "impBattle3", "villageMain", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "Spwn1-6_3", "impBattle3", "villageMain", k_objtype_hold_area);
+	    lib_SetupGroupZone(cObjectiveName, "Spwn2-6_3", "impBattle4", "villageMain", k_objtype_hold_area);
+	    SetObjectiveKills(7, iObjective);
+	}
+	
+	else if (iSubObjective == 5)
+	{
+	    lib_SetupGroupZone(cObjectiveName, "villageRebs", "caveEntH", "villageMain", k_objtype_hold_area);
+	    lib_SetupGroupZone(cObjectiveName, "playerGrp", "caveEntH", "caveEntH", k_objtype_hold_area);
+
+	    DeactivateSpawner("villageRebs");
+	    activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 8.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "B squad stay here and finish them off, they shouldn't be too much trouble. X2, A squad fall back to the entrance to the cave cluster");   
+	    addNewObjectiveIndicatorToProp(propRefFromName("vmTrig6_5"), k_objectiveIndicatorType_mainObjective);
+	    SetObjectiveTriggered(true, iObjective);
+	}
+
+	else
+	{ 
+//	    ActivateSpawner("roofDefenseGrp");
+//	    lib_SetupGroupZone(cObjectiveName, "roofDefenseGrp", "roofDefense", "roofDefense", k_objtype_hold_area);
+//    	    SpawnInVehicle(player, propRefFromName("cheatDOF"), StringToChar16("awing_fighter"), 5, k_seatPos_driver );
+	    addNewObjectiveIndicatorToProp(propRefFromName("playerHasLanded"), k_objectiveIndicatorType_mainObjective);
+	    removeObjectiveIndicatorFromProp(propRefFromName("vmTrig5_2"));
+	    SetObjectiveTriggered(true, iObjective);
+	    SetNumSubObjectives(5, iObjective);	    
+	}
+    }
+
+////////////////////////////OBJECTIVE 7: Gain Entry to the Base Through the Back Door
+
+    else if (iObjective == 7)
+    {
+	if (iSubObjective == 1)
+	{
+	    ActivateSpawner("Spwn-7_2");
+	    SetObjectiveTriggered(true, iObjective);
+	}
+
+	else if (iSubObjective == 2)
+	{
+	    activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 8.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "Woah, nice pet... I can't get close enough to the door with him in the way. We're going to have to take it down");
+	    SetObjectiveKillSpawners(1, iObjective);
+	}
+
+	else if (iSubObjective == 3)
+	{
+	    activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 8.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "Good job X2! Your training certainly paid off. B squad, regroup on our position. I'll get this door open in the meantime");
+	    enableTrigger(propRefFromName("doorHackTrig"));
+	}
+
+	else if (iSubObjective == 4)
+	{
+	    DeactivateSpawner("impReinfGrp"); 
+	    BFKillAllNPCsFromSpawner("impReinfGrp");
+	    SetObjectiveTimer(9, iObjective);
+	}
+	
+	else
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("vmTrig6_5"));
+	    lib_SetupGroupZone(cObjectiveName, "playerGrp", "caves", "caves", k_objtype_hold_area);
+	    activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 8.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "The base is too heavily guarded for a frontal attack. We're going to have to go throught the caves and find a backdoor. 'A' squad you're with X2 and myself, 'B' squad keep any Imperials off our backs");
+	    SetObjectiveTriggered(true, iObjective);
+	    SetNumSubObjectives(4, iObjective);
+	}
+    }
+
+
+///////////////////////////OBJECTIVE 8: Access Imperial Databank
+
+    else if (iObjective == 8)
+    {
+	if (iSubObjective == 1)
+	{  
+	    enableTrigger(propRefFromName("compHackTrig"));
+	}
+	
+	else
+	{
+	    activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 8.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "There we go, lets get inside and find out what's going on here. After you X2");
+	    enableTrigger(propRefFromName("eventTrig1"));
+	    ActivateSpawner("Spwn-8");
+	    lib_SetupGroupZone(cObjectiveName, "Spwn-8", "cntrlRmHold", "cntrlRmTarget", k_objtype_hold_area);
+	    lib_SetupGroupZone(cObjectiveName, "villageRebs", "cntrlRmHold", "cntrlRmTarget", k_objtype_clear_area);
+	    lib_SetupGroupZone(cObjectiveName, "playerGrp", "cntrlRmHold", "cntrlRmTarget", k_objtype_clear_area);
+
+	    SetObjectiveKillSpawners(1, iObjective);
+	    SetNumSubObjectives(1, iObjective);
+	}
+    }
+	
+////////////////////////////////////OBJECTIVE 9: Locate the Nightsister Cloning Chambers
+
+    else if (iObjective == 9)
+    {
+	if (iSubObjective == 1)
+	{
+	    propDelete(propRefFromName("sharaJoin"));
+	    activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 3.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "Im on my way X2");
+	    chrAIJoinGroup( propRefFromName("shara2Join"), "player" );
+	}
+	
+	else if (iSubObjective == 2)
+	{
+	    activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 3.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "Come on X2 it'll be just through this door.");
+	    enableTrigger(propRefFromName("eventTrig9"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("dofProp_1"), k_objectiveIndicatorType_mainObjective);
+	    SetObjectiveTriggered(true, iObjective);
+	}
+
+	else if (iSubObjective == 3)
+	{ 
+	    lib_SetupGroupZone(cObjectiveName, "Spwn-10", "chmbrCor", "chmbrCor", k_objtype_hold_area);
+	    ActivateSpawner("bfStrmTrprSp34");
+	    ActivateSpawner("bfStrmTrprSp35");
+	    ActivateSpawner("bfStrmTrprSp36");
+	    SetObjectiveTriggered(true, iObjective);
+	}
+	
+	else
+	{
+	    ActivateSpawner("shara2Grp");
+	    enableTrigger(propRefFromName("eventTrig11"));
+	    enableTrigger(propRefFromName("eventTrig8"));
+	    enableTrigger(propRefFromName("eventTrig5"));
+	    enableTrigger(propRefFromName("eventTrig7"));
+
+	    ActivateSpawner("balconyGrp");
+	    ActivateSpawner("roofGrp");
+	    ActivateSpawner("stairsGrp");
+	    lib_SetupGroupZone(cObjectiveName, "balconyGrp", "balcony", "roofTarget", k_objtype_hold_area);
+	    lib_SetupGroupZone(cObjectiveName, "roofGrp", "roofHold", "roofTarget", k_objtype_hold_area);
+	    lib_SetupGroupZone(cObjectiveName, "stairsGrp", "stairwellHold", "stairwellTarget", k_objtype_hold_area);
+	    SetObjectiveTriggered(true, iObjective);
+	    SetNumSubObjectives(3, iObjective);
+	}
+    }
+
+/////////////////////////////////////////OBJECTIVE 10: Defeat the Nightsister Clones
+
+    else if (iObjective == 10)
+    {
+	removeObjectiveIndicatorFromProp(propRefFromName("dofProp_1"));
+	ActivateSpawner("Spwn-10");
+	activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 3.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "Look out! Theyve got lightsabres!");
+	lib_SetupGroupZone(cObjectiveName, "Spwn-10", "cloneRmHold", "cloneRmHold", k_objtype_hold_area);
+	SetObjectiveKillSpawners(1, iObjective);
+    }
+
+    else if (iObjective == 11)
+    {
+	if (iSubObjective == 1)
+	{    
+	    bEndLevel = true;
+	}
+
+	else
+	{
+	    playCutscene = true;
+	    SetNumSubObjectives(1, iObjective);
+	}
+    }
+
+logStr("-------------> ObjectiveSetup End");    
+    return true;    
+    
+}
+
+///////////////This Script Actions
+
+//Fade ins
+wholeScreenFade(0.0f, 1.0f, false);
+waitForGameTime(0.1f);
+ScriptHasStarted(); //Do any setups
+waitForGameTime(1.0f);
+wholeScreenFade(1.0f, 0.0f, false);
+
+//Main game loop
+while(!bEndLevel)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    ProcessCallbacks();
+    ObjectiveSetupCheck();
+
+    for (i=0; i<iNumActive; i++)
+    {
+        int iObjective = BFObjectiveGetNumForNthActive(i);
+        ObjectiveTests(iObjective);        
+        waitForGameTime(0.01f);
+    }
+
+    waitForGameTimeOrLVChange(0.5f, "iObjLV", "iCBLV");
+    logStr("tick");
+    logInt(iObjective);    
+}
+
+NextLevel("mustafar/mustafar_story.res");//kashyyyk/kashyyyk_story.res");
+
+
+
+

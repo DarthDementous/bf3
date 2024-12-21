@@ -1,0 +1,270 @@
+// vim: set syntax=c :
+
+logStr("SCRIPT RUNNING");
+
+propRef pGroup;
+pGroup = propRefFromChar16(getNthVMPropStringVar(me, 0));
+
+char16 sDofTmp = getNthVMPropStringVar(me, 1);
+char16 sLoopAnim = getNthVMPropStringVar(me, 2);
+char16 sWaitForArrival = getNthVMPropStringVar(me, 3);
+char16 sEnd = getNthVMPropStringVar(me, 9);
+
+int iNumDofs = 0;
+char16 sPad;
+boolean bLoopAnim = false;
+boolean bWaitForArrival = false;
+
+if (!char16cmp(sLoopAnim, "loopAnim"))
+bLoopAnim = true;  
+
+if (!char16cmp(sWaitForArrival, "wait"))
+bWaitForArrival = true;  
+
+sPad = Char16CatInt(sDofTmp, iNumDofs);
+propRef pPad = propRefFromChar16(sPad);    
+
+setAISpawnState(pGroup, "AISTATE_BF_PATROL", true);  //dont move 
+
+int iLastFree = 0;
+int idof1 = -1;
+int idof2 = -1;
+int idof3 = -1;
+int idof4 = -1;
+int idof5 = -1;
+int idof6 = -1;
+int idof7 = -1;
+int idof8 = -1;
+int idof9 = -1;
+int idof10 = -1;
+int idof11 = -1;
+int idof12 = -1;
+int idof13 = -1;
+int idof14 = -1;
+int idof15 = -1;
+int idof16 = -1;
+int idof17 = -1;
+int idof18 = -1;
+int idof19 = -1;
+int idof20 = -1;
+int idof21 = -1;
+int idof22 = -1;
+
+function int getDOF(int iNum)
+{
+    waitForGameTime(0.01f);    
+    logStr("getDOF");            
+    if (idof1 == iNum) return 1;
+    else if (idof2 == iNum) return 2;
+    else if (idof3 == iNum) return 3;
+    else if (idof4 == iNum) return 4;
+    else if (idof5 == iNum) return 5;
+    else if (idof6 == iNum) return 6;
+    else if (idof7 == iNum) return 7;    
+    else if (idof8 == iNum) return 8;        
+    else if (idof9 == iNum) return 9;    
+
+    waitForGameTime(0.01f);
+    if (idof10 == iNum) return 10; 
+    else if (idof11 == iNum) return 11;
+    else if (idof12 == iNum) return 12;
+    else if (idof13 == iNum) return 13; 
+    else if (idof14 == iNum) return 14; 
+    else if (idof15 == iNum) return 15; 
+    else if (idof16 == iNum) return 16; 
+    else if (idof17 == iNum) return 17; 
+    else if (idof18 == iNum) return 18; 
+    else if (idof19 == iNum) return 19; 
+    else if (idof20 == iNum) return 20; 
+    else if (idof21 == iNum) return 21; 
+    else if (idof22 == iNum) return 22;  
+    waitForGameTime(0.01f);
+
+    return -1;
+}
+
+function void setDOF(int iDOF, int iNum)
+{
+    waitForGameTime(0.01f);
+    logStr("setDOF");        
+    if (iDOF == 1) idof1 = iNum;
+    else if (iDOF == 2) idof2 = iNum;
+    else if (iDOF == 3) idof3 = iNum;
+    else if (iDOF == 4) idof4 = iNum;
+    else if (iDOF == 5) idof5 = iNum;
+    else if (iDOF == 6) idof6 = iNum;
+    else if (iDOF == 7) idof7 = iNum;    
+    else if (iDOF == 8) idof8 = iNum;        
+    else if (iDOF == 9) idof9 = iNum;    
+
+    waitForGameTime(0.01f);
+    if (iDOF == 10) idof10 = iNum; 
+    else if (iDOF == 11) idof11 = iNum;
+    else if (iDOF == 12) idof12 = iNum;
+    else if (iDOF == 13) idof13 = iNum;    
+    else if (iDOF == 14) idof14 = iNum;    
+    else if (iDOF == 15) idof15 = iNum;        
+    else if (iDOF == 16) idof16 = iNum;    
+    else if (iDOF == 17) idof17 = iNum;    
+    else if (iDOF == 18) idof18 = iNum;    
+    else if (iDOF == 19) idof19 = iNum;    
+    else if (iDOF == 20) idof20 = iNum;    
+    else if (iDOF == 21) idof21 = iNum;    
+    else if (iDOF == 22) idof22 = iNum;   
+    waitForGameTime(0.01f);
+}
+
+function int DOFisFree(int iDOF)
+{
+    waitForGameTime(0.01f);
+    logStr("DOFisFree");    
+    if ((iDOF == 1)&&(idof1==-1)) return 1;
+    else if ((iDOF == 2)&&(idof2==-1)) return 2;
+    else if ((iDOF == 3)&&(idof3==-1)) return 3;
+    else if ((iDOF == 4)&&(idof4==-1)) return 4;
+    else if ((iDOF == 5)&&(idof5==-1)) return 5;
+    else if ((iDOF == 6)&&(idof6==-1)) return 6;
+    else if ((iDOF == 7)&&(idof7==-1)) return 7;  
+    else if ((iDOF == 8)&&(idof8==-1)) return 8;     
+    else if ((iDOF == 9)&&(idof9==-1)) return 9;    
+
+    waitForGameTime(0.01f);
+    if ((iDOF == 10)&&(idof10==-1)) return 10;
+    else if ((iDOF == 11)&&(idof11==-1)) return 11;
+    else if ((iDOF == 12)&&(idof12==-1)) return 12;
+    else if ((iDOF == 13)&&(idof13==-1)) return 13;
+    else if ((iDOF == 14)&&(idof14==-1)) return 14;
+    else if ((iDOF == 15)&&(idof15==-1)) return 15;
+    else if ((iDOF == 16)&&(idof16==-1)) return 16;
+    else if ((iDOF == 17)&&(idof17==-1)) return 17;
+    else if ((iDOF == 18)&&(idof18==-1)) return 18;
+    else if ((iDOF == 19)&&(idof19==-1)) return 19;
+    else if ((iDOF == 20)&&(idof20==-1)) return 20;
+    else if ((iDOF == 21)&&(idof21==-1)) return 21;
+    else if ((iDOF == 22)&&(idof22==-1)) return 22;
+    waitForGameTime(0.01f);
+
+    return -1;
+}
+
+function int getFreeDOF()
+{
+    logStr("getFreeDOF");
+    int iResult = -1;
+    int i = iLastFree;
+
+    while (iResult == -1)
+    {
+        //i = rndInRange(1, 22);
+        logInt(i);
+        iResult = DOFisFree(i);
+        waitForGameTime(0.5f);        
+        i++;
+    }
+
+    iLastFree = i;
+    if (iLastFree > iNumDofs) iLastFree = 0;
+
+    return iResult;
+}
+
+int iCount = 0;
+
+for (iCount=0; iCount<propGroupSpCountAliveSpawnedProps(pGroup); iCount++)
+{
+    //Put in initial Spaces
+    propRef pChr;
+    pChr = GetPropFromGroupSpawner(pGroup, 0, iCount);
+    propTeleportToProp(pChr, pPad);
+    lib_DoRandomIdleAnim(pChr, bLoopAnim);
+    setDOF(iCount, iCount); 
+
+    //NextPad Dofs
+    sPad = Char16CatInt(sDofTmp, iCount);
+    pPad = propRefFromChar16(sPad);
+    waitForGameTime(0.1f);
+    logStr("Teleporting NPC to Dof: ");
+    logInt(iCount);
+}
+
+logStr("Num Dofs: ");
+logInt(iNumDofs);
+boolean bEnd = false;
+
+while ((!bEnd)&&(propGroupSpCountAliveSpawnedProps(pGroup) > 0))
+{          
+    int iNumSp = propGroupSpCountAliveSpawnedProps(pGroup)-1;
+    int iChr = rndInRange(0, iNumSp);
+
+    propRef pChr;
+    pChr = GetPropFromGroupSpawner(pGroup, 0, iChr);
+
+    if (propExists(pChr))
+    {
+        logStr("Next Guy");        
+        setAISpawnState(pChr, "AISTATE_BF_PATROL", true);        
+        waitForGameTime(0.1f);
+
+        if (chrHasReachedDest(pChr))
+        {           
+            float iRandom = rndInRange(0, 10);
+
+            if (iRandom < 2)
+            {
+                int iGoal = getFreeDOF();  
+
+                if (iGoal != -1)
+                {        
+                    waitForGameTime(0.1f);
+                    int iCurrentDof = getDOF(iChr);
+                    if (iCurrentDof != -1)
+                        setDOF(iCurrentDof, -1);
+
+                    beginInGameCutSceneWithFlags(k_vmFlag_ResumeScriptAfterHitReact, pChr);
+
+                    char16 sPad;
+                    sPad = Char16CatInt(sDofTmp, iGoal);        
+                    propRef pPad = propRefFromChar16(sPad);
+                    waitForGameTime(0.1f);
+
+                    if (propExists(pPad))
+                    {
+                        setDOF(iGoal, iChr);  
+                        logStr("Walking To Destination");
+                        chrWalkToPadAndAlign(pChr, propGetPos(pPad), propGetDir(pPad), 800.0f);
+
+                        if (bWaitForArrival)
+                        {
+                            waitUntilVMsDone(pChr);
+                            lib_DoRandomIdleAnim(pChr, bLoopAnim);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                lib_DoRandomIdleAnim(pChr, bLoopAnim);
+            }
+        }
+    }
+
+    if (bWaitForArrival)
+        waitForGameTime(1.0f);
+    else
+    {
+        int iWaitTime = rndInRange(1, 5);
+        waitForGameTime(iWaitTime);        
+    }        
+
+    sEnd = getNthVMPropStringVar(me, 9);
+    if (!char16cmp(sEnd, "end"))
+        bEnd = true;    
+}
+
+for (iCount=0; iCount<propGroupSpCountAliveSpawnedProps(pGroup); iCount++)
+{
+    endInGameCutScene();
+}
+
+logStr("Script Has Ended");
+

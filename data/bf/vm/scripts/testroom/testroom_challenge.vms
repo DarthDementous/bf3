@@ -1,0 +1,34 @@
+// vim: set syntax=c :
+
+callback void somethingKilled(int victimId, int killerId, int iOppTeam)
+{
+    if(killerId == 0 && victimId != 0)
+    {
+	// A droid has been killed by the player
+	ChallengeSetScore(ChallengeGetScore() + 1);
+    }
+}
+
+callback void challengeEnded(int medal)
+{
+    if(medal >= 1) // bronze or above
+    {
+	ChallengeUnlock("testroom2");
+	ChallengeUnlock("testroom3");
+
+	ChallengeUnlock("saberskills1");
+	ChallengeUnlock("saberskills2");
+	ChallengeUnlock("saberskills3");
+    }
+}
+
+AllowCallback(CALLBACK_PlayerKilledBF, somethingKilled);
+AllowCallback(CALLBACK_ChallengeEnded, challengeEnded);
+
+ChallengeBegin();
+
+while(1)
+{
+   waitForGameTime(10.0f);
+}
+

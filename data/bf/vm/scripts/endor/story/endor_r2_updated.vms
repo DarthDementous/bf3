@@ -1,0 +1,57 @@
+// vim: set syntax=c :
+
+
+int iObjective, iSubObjective, r2Objective, r2SubObjective;
+
+
+iObjective = 1;
+iSubObjective = 1;
+r2Objective = -1;
+r2SubObjective = -1;
+
+propRef lobot     = propRefFromName("lobot");
+chrRef chr_lobot    = chrRefFromName("lobot"); //Declares prop ref as lobot
+chrSetPatrolState(chr_lobot);	//sets lobot in patrol state
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_lobot);	//ignores damage
+
+//iObjective = BFObjectiveGetCurrent();
+//iSubObjective = BFObjectiveGetSub(IObjective);
+
+while(1) 
+{
+    iObjective = BFObjectiveGetCurrent();
+    iSubObjective = BFObjectiveGetSub(iObjective);
+    
+    if (iObjective==1 && (iObjective!=r2Objective))
+    {
+	if (iSubObjective==0 && (iSubObjective!=r2subObjective))    //main objective loop
+	{
+	    //character running around code
+	    r2SubObjective = iSubObjective;
+	}
+	else if (iSubObjective==1 && (iSubObjective!=r2subObjective))
+	{
+	    //character running around code
+	    r2SubObjective = iSubObjective;
+	}
+	else if (iSubObjective==2 && (iSubObjective!=r2subObjective))
+	{
+	    //character running around code
+	    r2Objective = iObjective; // only add this in the last subObjective for each Objective
+	    r2SubObjective = iSubObjective;
+	}
+    }
+    else if (iObjective==3 && (iObjective!=r2Objective))
+    {
+	//character running around code
+	r2Objective = iObjective;
+    }
+    else if (iObjective==4 && (iObjective!=r2Objective))
+    {
+	r2Objective = iObjective;
+	chrRunToPadAndAlign(chr_lobot, propGetPosFromName("point3"), propGetDirFromName("point3"), 800.f);  //Moves the char to the pad, get position and direction from action point
+	waitUntilVMsDone(chr_lobot);
+	chrPlayAnimSlot(chr_lobot, "AN_hm_ter_lp", 0, true);
+	//propSetFrozen(chr_lobot, true);
+    }
+}

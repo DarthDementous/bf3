@@ -1,0 +1,1376 @@
+// vim: set syntax=c :
+
+///////////////////////////////////
+/*
+   mustafar_story.vms
+
+   Created By Mark Kevern
+   please do not modify without asking me!
+   or comment where you have modified
+
+ */
+///////////////////////////////////
+
+/////////////MAKE SURE TO INCLUDE A BFStorylevelVarProp in your level
+
+propRef pPlayer = getPlayerPropRefFromID(GetPlayerId());
+
+boolean Skip = false;
+int iObjectiveSetup = -1;
+boolean bEndLevel = false;
+int iAsteroids = 0;
+int iLastroids = 0;
+float fPermMsgTime = 10000.0f;
+
+propRef pChr_Ferroda;
+propRef pChr_X1;
+propRef pChr_Temp;
+
+///////////// Include Defaults //////////////////////////////////////////////
+
+//////////////////////////CALLBACK INFO DO NOT CHANGE
+
+//PlayerKilled Callback Info
+boolean bCB_PK = false;
+int iCB_PK_KillerId = -1;
+int iCB_PK_Victim = -1;
+int iCB_PK_Result = -1;
+
+//triggeredProp Callback Info
+boolean bCB_TP = false;
+char16 cCB_TP_Prop = StringToChar16("");
+
+//ObjectiveTimeExpired Callback Info
+boolean bCB_OTE = false;
+char16 cCB_OTE_ObjName = StringToChar16("");
+
+//shipReachedScriptedSplineSegment  Callback Info
+boolean bCB_SRSS = false;
+propRef pCB_SRSS_Ship;
+propRef pCB_SRSS_Spline;
+int iCB_SRSS_Segment = -1;
+
+//////////////////////////END CALLBACK INFO
+
+function void ProcessCallbacks()
+{
+    //No else's as could be waiting to process two or more!
+
+    if (GetLevelVarInt("iCBLV") != -1)
+    {
+        if (bCB_PK) // playerKilled callback
+        {
+           // playerKilled(iCB_PK_KillerId, iCB_PK_Result, iCB_PK_Victim);
+            bCB_PK = false;
+        }
+
+        if (bCB_TP) // triggeredProp callback
+        {
+            //Trigger(cCB_TP_Prop); Move to Callback to Fix Bug
+            bCB_TP = false;
+        }
+
+        // ObjectiveTimeExpired callback
+        if (bCB_OTE)
+        {
+            //ObjectiveTimeExpired(cCB_OTE_ObjName);
+            bCB_OTE = false;
+        }
+
+        // shipReachedScriptedSplineSegment callback
+        if (bCB_SRSS)
+        {
+           // ShipReachedScriptedSplineSegment(pCB_SRSS_Ship, pCB_SRSS_Spline, iCB_SRSS_Segment);
+            bCB_SRSS = false;
+        }
+
+        SetLevelVarInt("iCBLV", -1);    
+    }
+}
+
+callback void CB_PlayerKilled(int iKiller, int iResult, int iVictim)
+{
+    logStr("CB_PlayerKilled");
+   /* if (bCB_PK)
+        VMAssertMsg("CB_PlayerKilled - Already Waiting To Do Callback");
+
+    bCB_PK = true;
+    iCB_PK_KillerId = iKiller;
+    iCB_PK_Victim = iVictim;
+    iCB_PK_Result = iResult;
+
+    SetLevelVarInt("iCBLV", 1);    */
+    playerKilled(iKiller, iResult, iVictim);
+}
+
+callback int CB_TriggeredProp(int inType, char16 inTriggerProp, int pId)
+{    
+    logStr("CB_TriggeredProp");    
+    /*if (bCB_TP)
+        VMAssertMsg("CB_TriggeredProp - Already Waiting To Do Callback");
+
+    bCB_TP = true;
+    cCB_TP_Prop = inTriggerProp;
+
+    SetLevelVarInt("iCBLV", 1);    
+*/
+    Trigger(inTriggerProp);
+    return 0;
+}
+
+callback void CB_ObjectiveTimeExpired(char16 objName)
+{
+    logStr("CB_ObjectiveTimeExpired");        
+  /*  if (bCB_OTE)
+        VMAssertMsg("CB_ObjectiveTimeExpired - Already Waiting To Do Callback");
+
+    bCB_OTE = true;
+    cCB_OTE_ObjName = objName;
+
+    SetLevelVarInt("iCBLV", 1); */
+    ObjectiveTimeExpired(objName);
+}
+
+callback void CB_shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    logStr("CB_shipReachedScriptedSplineSegment");            
+  /*  if (bCB_SRSS)
+        VMAssertMsg("CB_shipReachedScriptedSplineSegment - Already Waiting To Do Callback");
+    
+    bCB_SRSS = true;
+    pCB_SRSS_Ship = ship;
+    pCB_SRSS_Spline = spline;
+    iCB_SRSS_Segment = segment;
+
+    SetLevelVarInt("iCBLV", 1);*/
+    ShipReachedScriptedSplineSegment(ship, spline, segment);
+
+}
+
+callback void kraytChangedState( int kraytState ) //TODO: Fix Some works like rest
+{
+    // TODO
+    // kraytState:
+    //    0 = entrance
+    //    1 = attack stage 1 - knocking firing soliders
+    //    2 = attack stage 2 - tail swipe
+    //    3 = attack stage 3 - charge
+    //    4 = dead
+
+    if (kraytState == 4)
+        nextObjective(BFObjectiveGetCurrent());
+}
+
+AllowCallback(CALLBACK_PlayerKilledBF, CB_playerKilled);
+AllowCallback(CALLBACK_TriggeredProp, CB_triggeredProp);
+AllowCallback(CALLBACK_ObjectiveTimeExpired, CB_ObjectiveTimeExpired);
+AllowCallback(CALLBACK_ShipReachedScriptedSplineSegment, CB_shipReachedScriptedSplineSegment);
+AllowCallback(CALLBACK_KraytDragonChangedState, kraytChangedState);
+
+//////////////////////////END CALLBACKS
+
+function void playerKilled(int iKiller, int iResult, int iVictim)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+    	int iActive = BFObjectiveGetNumForNthActive(i);
+        playerKilledTests(iActive);
+        
+    	if (lib_playerKilled(iKiller, iResult, iVictim, iActive)) 
+    	{
+    	    nextObjective(iActive);
+    	}
+    }   
+}
+
+function void playerKilledTests(int iObjective)
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+
+    if (iObjective == 7)
+    {
+        //Tusken Waves
+        if (iSubObjective <= 3)
+        {
+            float fRnd = rndInRange(0, 100);
+
+            if (fRnd < 25)
+            {
+                //Keep it up
+                chrSpeak(pChr_X1, "l00c_070_x1", 0, 0.0f, 20.0f, pPlayer);
+            }
+            else if (fRnd < 50)
+            {
+                //Yah
+                chrSpeak(pChr_X1, "l00c_160_x1", 0, 0.0f, 20.0f, pPlayer);
+            }
+            else if (fRnd < 75)
+            {
+                //hit him
+                chrSpeak(pChr_X1, "l00c_170_x1", 0, 0.0f, 20.0f, pPlayer);
+            }            
+            else
+            {
+                //Ha! your a menace
+                chrSpeak(pChr_X1, "l00c_180_x1", 0, 0.0f, 20.0f, pPlayer);
+            }
+        }
+    }
+}
+
+function void Trigger(char16 inTriggerProp)
+{    
+    int iResult = 0;
+    
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iActive = 0;
+
+    for (i=0; i<iNumActive; i++)
+    {
+        iActive = BFObjectiveGetNumForNthActive(i);
+        iResult = lib_triggeredProp(inTriggerProp, iActive);
+
+        iResult = ObjectiveTriggerTests(iActive, inTriggerProp, iResult);
+
+        if (iResult >= 1) nextObjective(iActive);
+    }
+}
+
+function void ObjectiveSetupCheck()
+{
+    int iTempObj = GetLevelVarInt("iObjLV");
+    
+    if (iTempObj != -1)
+    {
+        char16 cName = BFObjectiveGetName(iTempObj);
+        if (ObjectiveSetup(cName, iTempObj, BFObjectiveGetSub(iTempObj)))
+            SetLevelVarInt("iObjLV", -1);
+
+        waitForGameTime(0.1f);        
+    }
+}
+
+function void SetObjectiveSetup(int iObj)
+{
+    logStr("SetObjectiveSetup Called");
+    logInt(iObj);
+    SetLevelVarInt("iObjLV", iObj);
+}
+
+function void nextObjective(int inObjNum) 
+{    
+    int result = lib_nextObjective(inObjNum);
+
+    if(result == 1)
+    {
+        //if next objective returns 1 it has updated a core objective and automatically moved us onto the next
+        //so do objective setup with current objective
+        if (!Skip)
+        {
+            SetObjectiveSetup(BFObjectiveGetCurrent());
+        }
+    }
+
+    if(result == 2)
+    {
+        //if nextobjective returns 2 it has updated a bonus objective so we will want to 
+        //objective setup with the objective we passed to next objective
+        if (!Skip)
+        {
+          SetObjectiveSetup(inObjNum);
+        }
+    }
+}
+
+function void JumpToObjective(int iStartObj, boolean bTeleport)
+{       
+	BFObjectiveSetJumpTo(iStartObj);	
+    nextObjective(BFObjectiveGetCurrent());
+    
+    if (bTeleport)
+    {
+        char16 tSpawn;
+        tSpawn = LevelVarToChar16("mCurrentSpawner");
+        if (propExists(propRefFromChar16(tSpawn)))
+            propTeleportToProp(pPlayer, propRefFromChar16(tSpawn));        
+    }
+    
+    logStr("Jumped To Objective");
+    logInt(BFObjectiveGetCurrent());
+}
+
+function void ObjectiveTimeExpired(char16 objName)
+{   
+    logStr("ObjectiveTimeExpired");
+    logChar16(objName);    
+
+    int objNum = BFObjectiveGetNumber(objName);   
+    if (lib_ObjTimeExpired(objNum))
+    	nextObjective(objNum);
+}
+
+/*
+callback void playerSpawned(char16 teamName, int playerId)
+{
+    int iObjective = GetLevelVarInt("mObjective");
+
+    logStr("teamName: ");
+    logchar16(teamName);
+}
+
+callback void finiteSpawnerComplete(char16 propId) 
+{
+    AddVMDebugHUDMsg("FINITE SPAWNER IS DEADED", 1, "test_objective_message");
+}
+
+callback void gameHasStarted()
+{           
+
+}
+*/
+
+function void shipReachedScriptedSplineSegment(propRef ship, propRef spline, int segment)
+{
+    int iObjective = BFObjectiveGetNumForNthActive(0); //Only Works For Main Objective
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+    
+    if (spline == propRefFromName("LaatSpline"))
+    {
+        logStr("Passed Segment: ");
+        logInt(segment);
+        if (segment == 5)
+        {
+        //    BFLandShipAtLandingPad(ship, propRefFromName("LaatLand"));
+        }
+    }
+    else if (spline == propRefFromName("LaatGSpline"))
+    {
+        AddVMDebugHUDMsg("SEGMENT G: ", segment, "test_objective_message");
+
+        if (segment == 2)
+        {
+            propRef pLaat = GetNthPropFromGroup(propRefFromName("laatG"), 0);
+            BFShipFollowScriptedSplineNoAvoidance(pLaat, propRefFromName("LaatGSplineC"));	    
+        }
+    }
+    else if (spline == propRefFromName("LaatGSplineC"))
+    {
+        AddVMDebugHUDMsg("SEGMENT C: ", segment, "test_objective_message");
+
+        //10 minus two lead in and outs
+        if (segment == 8)
+        {
+            if (iObjective == 6)
+            {
+                if (iSubObjective == 1)
+                {            
+                    propRef pLaat = GetNthPropFromGroup(propRefFromName("laatG"), 0);
+                    BFRequestAILandShip(pLaat, propRefFromName("LaatGLand"), true);
+                }
+                else
+                {
+                    propRef pLaat = GetNthPropFromGroup(propRefFromName("laatG"), 0);
+                    BFShipFollowScriptedSplineNoAvoidance(pLaat, propRefFromName("LaatGSplineC"));
+                }
+            }
+        }
+    }    
+}
+
+/////// Defaults END /////////////////////////////////////////////
+
+
+function void ResetProps()
+{    
+    disableTrigger(propRefFromName("deathOutP"));
+}
+
+function void ScriptHasStarted()
+{
+    SetBFStoryPrefixes("obj_Train", "vmTrig");
+    BFObjectiveSetCopy(true);
+    ResetProps();
+
+    //LEVEL BEGIN
+    JumpToObjective(1, true);
+    ObjectiveSetupCheck();
+}
+
+
+/////////////////////////////////////////OBJECTIVES
+
+function int ObjectiveTriggerTests(int iObjective, char16 inTriggerProp, int iResult) 
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+
+    if (iObjective == 2)
+    { 
+        if (iSubObjective == 1)
+        {
+            if (!char16cmp(inTriggerProp, "vmTrigH"))
+            {
+                //TODO: Change to something smarter
+                nextObjective(iObjective);
+            }
+        }
+    }
+    else if (iObjective == 3) //asteroids
+    {    
+        if (iSubObjective < 6)
+        {
+            if (!char16cmp(inTriggerProp, "vmCountA"))
+            {                             
+                float fRnd = rndInRange(0, 75);
+
+                if (fRnd < 25)
+                    chrSpeak(pPlayer, "l00b_050_x1", 0, 0.0f, 20.0f, pPlayer);
+                else if (fRnd < 50)                    
+                    chrSpeak(pPlayer, "l00b_060_x1", 0, 0.0f, 20.0f, pPlayer);
+                else
+                    chrSpeak(pPlayer, "l00b_070_x1", 0, 0.0f, 20.0f, pPlayer);
+                
+                iAsteroids++;
+                int ToFire = ((iSubObjective-1)-(iAsteroids-iLastroids));
+                
+                //Check Correct Num Asteroids for SubObjective
+                if (ToFire <= 0)
+                {
+                    AddVMDebugHUDMsg("Hooray", 1, "test_objective_message");                                    
+                    iLastroids = iAsteroids;
+                    nextObjective(iObjective);
+                }
+            }                
+        }
+    }    
+    else if (iObjective == 4) //Landing in hangar
+    { 
+        if (iSubObjective == 0)
+        {
+            if (!IsPlayerInVehicle("ANY_VEHICLE"))
+            {
+                if (!char16cmp(inTriggerProp, "vmTrig4"))                    
+                {
+                    addSpeechMessage("Good Landing X2, Right on Target!", 5.0f);
+                    nextObjective(iObjective);
+                }
+            }
+
+        }
+    }
+
+    //No Change
+    return iResult;
+}
+
+function void AngerTests(int iObjective, int iSubObjective)
+{    
+    if (iObjective == 1)
+    {
+        FerrodaAnger(pChr_Ferroda, pPlayer, 100);
+    }
+    else if (iObjective == 3)
+    {
+        X1Anger(pPlayer, pPlayer, 100);
+    }
+    else
+    {
+        X1Anger(pChr_X1, pPlayer, 100);
+    }
+
+    waitForGameTime(0.1f);
+}
+
+function void ObjectiveTests(int iObjective) 
+{
+    int iSubObjective = BFObjectiveGetSub(iObjective);
+
+    if (lib_CanbeAngry())
+        AngerTests(iObjective, iSubObjective);
+        
+    if (iObjective == 2)
+    {
+        if (iSubObjective == 0)
+        {
+            if (IsPlayerInVehicle("ANY_VEHICLE"))
+                nextObjective(iObjective);
+        }
+    }    
+    else if (iObjective == 3)
+    {
+        if (iSubObjective == 6)
+        {
+            if (playerInputIsPressed(pPlayer, "evasiveLR") || playerInputIsPressed(pPlayer, "evasiveUD"))//flyToggleEvade
+                nextObjective(iObjective);
+        }
+    }    
+    else if (iObjective == 4) //Landing in hangar
+    { 
+        if (iSubObjective == 0)
+        {
+            if (!IsPlayerInVehicle("ANY_VEHICLE"))
+            {
+                addSpeechMessage("X2 you missed the landing pad! HaHa", 5.0f);
+                nextObjective(iObjective);
+            }
+        }
+        else if (iSubObjective == 1)
+        {
+            if (IsPlayerInVehicle("STR_VEHICLE_NAME_REP_GUNSHIP"))
+                nextObjective(iObjective);
+        }
+    }    
+    else if (iObjective == 6)
+    {
+        if (iSubObjective == 1)
+        {  
+            if (!IsPlayerInVehicle("ANY_VEHICLE"))
+                nextObjective(iObjective);
+        }
+    }    
+    else if (iObjective == 7)
+    {
+        if (iSubObjective == 0)
+        {
+            if (playerInputIsPressed(pPlayer, "weaponMelee"))
+                nextObjective(iObjective);
+        }
+    }
+    else if (iObjective == 8)
+    {
+        if (iSubObjective == 1)
+        {
+            //Repair the Speeder
+            propRef pProp = propRefFromName("barcspdr3");
+            if (propGetHealthFraction(pProp) == 1)
+                nextObjective(iObjective);
+        }
+        else if (iSubObjective == 2)
+        {
+            if (IsPlayerInVehicle("ANY_VEHICLE"))
+                nextObjective(iObjective);
+
+        }
+        else
+        {
+            if (chrGetClass(pPlayer) != 0) //Changed To Engineer
+                nextObjective(iObjective);
+        }
+    }
+}
+
+function void AddShipToSpline(propRef pSpline, propRef pGroup, string sType)
+{
+    propRef pLaat;
+    pLaat = SpawnAIVehicleWithObjectives(pSpline, "rep_troop_snpc", sType, 0, false, 3, StringToChar16(""));
+    AddPropToGroup(pGroup, pLaat); 
+    waitForGameTime(0.1f);    
+    BFShipFollowScriptedSpline(pLaat, pSpline);
+}
+
+function boolean ObjectiveSetup(char16 cObjectiveName, int iObjective, int iSubObjective)
+{
+    logStr("-------------> ObjectiveSetup Called");
+    logInt(iObjective);
+    logInt(iSubObjective);
+
+    if (iObjective == 1)
+    {
+        if (iSubObjective == 1)
+        {                        
+            //Start
+            MoveToPoint(pChr_Ferroda, propRefFromName("dofFerStart"), true);
+            waitUntilVMsDone(pChr_Ferroda);
+
+            removeAllHelpMessages();
+            addHelpMessage("STR_TRAINING_MENU", fPermMsgTime);
+            addHelpMessage("STR_TRAINING_LOOK", fPermMsgTime);            
+            
+            chrPlayAnim(pChr_Ferroda, StringToChar16("AN_TalkinGestu4"), 0.1f, false);
+            //Back On Board...
+            chrSpeak(pChr_Ferroda, "l00a_050_feroda", 0, 0.0f, 10.0f, pChr_X1, true, true);
+            chrWaitUntilFinishedSpeaking(pChr_Ferroda);
+            
+            removeAllHelpMessages();
+            addHelpMessage("STR_TRAINING_STRAFE", fPermMsgTime);            
+            addHelpMessage("STR_TRAINING_WALK", fPermMsgTime);
+            addHelpMessage("STR_TRAINING_MOVE", fPermMsgTime);
+            
+            //Follow To Hallway
+            propSetFrozen(pPlayer, false);
+            setVMPropActive(propRefFromName("vmCloneGuide"), true);
+            setVMPropActive(propRefFromName("vmFollow"), true);                        
+            //We have a unit...
+            chrSpeak(pChr_Ferroda, "l00a_060_feroda", 0, 0.0f, 10.0f, pChr_X1, true, true);
+            chrWaitUntilFinishedSpeaking(pChr_Ferroda);            
+            //Thank you
+            chrSpeak(pChr_X1, "l00a_070_x1", 0, 0.0f, 10.0f, pChr_Ferroda, true, true);
+            chrWaitUntilFinishedSpeaking(pChr_X1);
+            
+            lib_GetAngry();            
+            SetObjectiveTriggered(true, iObjective);            
+        }
+        else if (iSubObjective == 2)
+        { 
+            removeAllHelpMessages();
+
+            //Follow To End Of Hallway
+            setNthVMPropStringVar(propRefFromName("vmCloneGuide"), "dofHall_", 1);
+            setNthVMPropStringVar(propRefFromName("vmCloneGuide"), "vmTrig1_2", 4);            
+            setVMPropActive(propRefFromName("vmCloneGuide"), true);
+
+            //It seems you two...
+            chrSpeak(pChr_Ferroda, "l00a_080_feroda", 0, 0.0f, 10.0f, pChr_X1, true, true);
+            chrWaitUntilFinishedSpeaking(pChr_Ferroda);
+            //About time..
+            chrSpeak(pChr_X1, "l00a_090_x1", 0, 0.0f, 10.0f, pChr_Ferroda, true, true);
+            chrWaitUntilFinishedSpeaking(pChr_X1);
+            
+            lib_GetAngry();    
+            
+            SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 3)
+        {
+            //Door Shut Forever
+            DisableTrigger(propRefFromName("eventTrig2"));            
+            //TODO: Need way of ending scripts
+  //          setNthVMPropStringVar(propRefFromName("vmCrateIdle"), "end", 9);
+//            setNthVMPropStringVar(propRefFromName("vmEngAtte"), "end", 9);
+            
+            //Kill Of Unused Guys
+            BFKillAllNPCsFromSpawner("CrateIdleSp");                        
+            BFKillAllNPCsFromSpawner("EngAtteSp");   
+
+            //EndScript
+            setNthVMPropStringVar(propRefFromName("vmFollow"), "end", 9);
+            waitForGameTime(0.5f);
+
+            //DOF TO ALIGN TO FOR SPEECH           
+            MoveToPoint(pChr_Ferroda, propRefFromName("dofFerHall"), true); 
+            MoveToPoint(pChr_X1, propRefFromName("dofX1Hall"), true);
+            waitUntilVMsDone(pChr_Ferroda);
+            waitUntilVMsDone(pChr_X1);            
+            
+            //Do Ferroda Talk Anim
+            chrPlayAnim(pChr_Ferroda, StringToChar16("AN_TalkinAngry2"), 0.1f, false);
+            chrPlayAnim(pChr_X1, StringToChar16("AN_TalkinSolemn"), 0.1f, false);
+
+            ActivateSpawner("SaluteG");                       
+            ActivateSpawner("bfRandomSp1");
+            ActivateSpawner("bfRandomSp3");
+            ActivateSpawner("bfRandomSp4");
+            ActivateSpawner("bfRandomSp5");
+            ActivateSpawner("bfRandomSp6");
+            ActivateSpawner("bfRandomSp7");
+            ActivateSpawner("bfRandomSp8");
+            ActivateSpawner("bfRandomSp9");   
+            waitForGameTime(0.1f);
+
+            //X1, celebrating the...
+            chrSpeak(pChr_Ferroda, "l00a_100_feroda", 0, 0.0f, 10.0f, pChr_X1, true, true);            
+            chrWaitUntilFinishedSpeaking(pChr_Ferroda);            
+            //if you say so...
+            chrSpeak(pChr_X1, "l00a_110_x1", 0, 0.0f, 10.0f, pChr_Ferroda, true, true);
+            chrWaitUntilFinishedSpeaking(pChr_X1);
+            enableTrigger(propRefFromName("eventTrig3"));
+            
+            setVMPropActive(propRefFromName("vmGunSIdle"), true);
+            setVMPropActive(propRefFromName("vmGunSIdle1"), true);
+            setVMPropActive(propRefFromName("vmBombIdle"), true);
+            setVMPropActive(propRefFromName("vmBombIdle1"), true);
+            setVMPropActive(propRefFromName("vmVIdle"), true);
+            setVMPropActive(propRefFromName("vmStarIdle1"), true);
+            setVMPropActive(propRefFromName("vmStarIdle"), true);            
+            setVMPropActive(propRefFromName("vmRndIdle"), true);
+            waitForGameTime(0.1f);
+
+            playerWaitUntilAnimDone(pChr_Ferroda);
+            playerWaitUntilAnimDone(pChr_X1);       
+                        
+            //DOORS OPEN
+            //Follow Again
+            //setNthVMPropStringVar(propRefFromName("vmFollow"), "bfMFerroda1", 1);
+            //setVMPropActive(propRefFromName("vmFollow"), true);  
+            forceTriggerTriggered(propRefFromName("eventTrig3"));            
+            nextObjective(iObjective);
+            return false;
+        }
+        else if (iSubObjective == 4)
+        {             
+            chrPlayQAnim(propRefFromName("SaluteG"), StringToChar16("AN_TrprSaluteTo"), false);
+            chrPlayQAnim(propRefFromName("SaluteG"), StringToChar16("AN_TrprSaluHold"), false);
+            
+            //Walk to End
+            setNthVMPropStringVar(propRefFromName("vmCloneGuide"), "dofEnd_", 1);
+            setNthVMPropStringVar(propRefFromName("vmCloneGuide"), "vmTrig1_4", 4);            
+            setVMPropActive(propRefFromName("vmCloneGuide"), true);
+            //X1 Walk
+            MoveToPoint(pChr_X1, propRefFromName("vmTrig1_4"), true);
+            
+          /*  propRef pLaat;
+            pLaat = SpawnAIVehicleWithObjectives(propRefFromName("dofLaat"), "rep_troop_snpc", "rep_gunship", 0, false, 3, StringToChar16(""));
+            waitForGameTime(0.1f);
+            BFShipFollowScriptedSplineNoAvoidance(pLaat, propRefFromName("LaatSpline"));*/
+            lib_GetAngry();           
+            
+            SetObjectiveTriggered(true, iObjective);
+        }
+        else if (iSubObjective == 5)
+        {                     
+            //Door Shut Forever
+            DisableTrigger(propRefFromName("eventTrig3"));            
+            //Do Ferroda End Talk Anim
+            chrPlayAnim(pChr_Ferroda, StringToChar16("AN_TalkinGestu1"), 0.1f, false);
+            chrPlayAnim(pChr_X1, StringToChar16("AN_TalkinGestu2"), 0.1f, false);            
+
+//CLONE            chrSpeak(pChr_Ferroda, "l00a_120_clone", 0, 0.0f, 20.0f, pChr_X1, true, true);                        
+//CLONE            chrSpeak(pChr_Ferroda, "l00a_130_clone", 0, 0.0f, 20.0f, pChr_X1, true, true);                        
+//CLONE            chrSpeak(pChr_Ferroda, "l00a_140_clone", 0, 0.0f, 20.0f, pChr_X1, true, true);                                    
+            chrSpeak(pChr_Ferroda, "l00a_150_feroda", 0, 0.0f, 10.0f, pChr_X1, true, false);            
+            chrWaitUntilFinishedSpeaking(pChr_Ferroda);            
+            chrSpeak(pChr_X1, "l00a_160_x1", 0, 0.0f, 10.0f, pChr_Ferroda, true, false);
+            chrWaitUntilFinishedSpeaking(pChr_X1);     
+
+            playerWaitUntilAnimDone(pChr_Ferroda);
+            playerWaitUntilAnimDone(pChr_X1);    
+            
+            nextObjective(iObjective);
+            return false;
+        }
+        else
+        {           
+            disableTrigger(propRefFromName("eventTrig3")); //Disable End Door
+            propSetFrozen(pPlayer, true, true);
+            ActivateSpawner("bfRepX2Sp1");            
+            ActivateSpawner("bfMFerroda1");
+            ActivateSpawner("CrateIdleSp");     
+            ActivateSpawner("EngAtteSp");                        
+
+            waitForGameTime(2.0f);
+            pChr_Ferroda = GetPropFromGroupSpawner(propRefFromName("bfMFerroda1"), 0, 0);
+            pChr_X1 = GetPropFromGroupSpawner(propRefFromName("bfRepX2Sp1"), 0, 0); 
+            SetPropRefInvincible(pChr_Ferroda, true);
+            SetPropRefInvincible(pChr_X1, true);
+            
+            setVMPropActive(propRefFromName("vmCrateIdle"), true);            
+            setVMPropActive(propRefFromName("vmEngAtte"), true);                        
+            waitForGameTime(2.0f);
+
+            SetNumSubObjectives(5, iObjective);            
+            nextObjective(iObjective);
+            return false;
+        }        
+    }
+    else if (iObjective == 2)
+    {
+        if (iSubObjective == 1)
+        {
+            //EndScript
+            setNthVMPropStringVar(propRefFromName("vmFollow"), "end", 9);
+            waitForGameTime(1.0f);
+
+            BFFlyVehicleFollowPlayer(chrRefFromPropRef(pChr_X1), propRefFromName("X1StarFighter"), GetPlayerId());            
+            chrSpeak(pChr_X1, "l00a_170_x1", 0, 0.0f, 10.0f, pPlayer, true, true);                            
+            removeObjectiveIndicatorFromProp(propRefFromName("X2StarFighter"));   
+            //Exit Hanger in trigger tests
+        }
+        else
+        {
+            removeAllHelpMessages();
+//            addHelpMessage("STR_TRAINING_SPRINT1", fPermMsgTime); No Draining Stamina
+            addHelpMessage("STR_TRAINING_SPRINT", fPermMsgTime);
+            addHelpMessage("STR_TRAINING_MARKER", fPermMsgTime);
+            
+            //HIDE SPACE JUNK
+            propSetVisible(0, propRefFromName("spacejunk_1"));
+            propSetVisible(0, propRefFromName("spacejunk_2"));  
+            propSetVisible(0, propRefFromName("spacejunk_3"));
+            propSetVisible(0, propRefFromName("spacejunk_4")); 
+            propSetVisible(0, propRefFromName("spacejunk_5"));
+            propSetVisible(0, propRefFromName("spacejunk_6"));
+            propSetVisible(0, propRefFromName("spacejunk_7"));
+            propSetVisible(0, propRefFromName("spacejunk_9"));
+            propSetVisible(0, propRefFromName("spacejunk_10"));
+            propSetVisible(0, propRefFromName("spacejunk_11"));
+            propSetVisible(0, propRefFromName("spacejunk_12")); 
+            
+/*            ActivateSpawner("bfRepX2Sp3");
+            waitForGameTime(4.0f);
+            
+            pChr_X1 = GetPropFromGroupSpawner(propRefFromName("bfRepX2Sp3"), 0, 0);
+            
+            waitForGameTime(0.5);
+            setNthVMPropStringVar(propRefFromName("vmFollow"), "bfRepX2Sp3", 0);*/
+
+            setNthVMPropStringVar(propRefFromName("vmFollow"), "player_0", 1);
+            setNthVMPropStringVar(propRefFromName("vmFollow"), "null", 9);
+            setVMPropActive(propRefFromName("vmFollow"), true);
+            
+            addNewObjectiveIndicatorToProp(propRefFromName("X2StarFighter"), 0);
+            AddShipToSpline(propRefFromName("AmbientSpl_0"), propRefFromName("AmbientSpwns"), "rep_gunship");
+            AddShipToSpline(propRefFromName("AmbientSpl_1"), propRefFromName("AmbientSpwns"), "rep_gunship");
+            AddShipToSpline(propRefFromName("AmbientSpl_2"), propRefFromName("AmbientSpwns"), "rep_gunship");
+            AddShipToSpline(propRefFromName("AmbientSpl_3"), propRefFromName("AmbientSpwns"), "rep_gunship");
+            AddShipToSpline(propRefFromName("AmbientSpl_0"), propRefFromName("AmbientSpwns"), "rep_gunship");
+            AddShipToSpline(propRefFromName("AmbientSpl_1"), propRefFromName("AmbientSpwns"), "rep_gunship");
+            AddShipToSpline(propRefFromName("AmbientSpl_2"), propRefFromName("AmbientSpwns"), "rep_gunship");
+            AddShipToSpline(propRefFromName("AmbientSpl_3"), propRefFromName("AmbientSpwns"), "rep_gunship");
+            
+            SetNumSubObjectives(1, iObjective);
+        }
+    }
+    else if (iObjective == 3)
+    {
+        float aTime = 60.0f;
+        //CleanUp The Skies
+        if (iSubObjective == 1)
+        {
+            removeAllHelpMessages();            
+            //Theres some..
+            chrSpeak(pPlayer, "l00b_020_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+            //chrWaitUntilFinishedSpeaking(pPlayer);
+            propSetVisible(1, propRefFromName("spacejunk_1"));
+            addNewObjectiveIndicatorToProp(propRefFromName("spacejunk_1"), 0);
+          //  SetObjectiveTimer(aTime, iObjective);
+            //Or Test in ObjectiveTriggerTests
+
+            propRef pLaat;
+            pLaat = SpawnPropFromTemplate("rep_gunship", propRefFromName("LaatLand"), vector(0,0,0));            
+            AddPropToGroup(propRefFromName("laatG"), pLaat);
+
+            lib_GetAngry();
+        }
+        else if (iSubObjective == 2)
+        {
+            //Alright where the next...
+            chrSpeak(pPlayer, "l00b_090_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+           // chrWaitUntilFinishedSpeaking(pPlayer);
+            propSetVisible(1, propRefFromName("spacejunk_2"));            
+            addNewObjectiveIndicatorToProp(propRefFromName("spacejunk_2"), 0);
+           // SetObjectiveTimer(aTime, iObjective);
+            //Or Test in ObjectiveTriggerTests
+
+            lib_GetAngry();
+        }
+        else if (iSubObjective == 3)
+        {
+            //can you see the next...
+            chrSpeak(pPlayer, "l00b_100_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+           // chrWaitUntilFinishedSpeaking(pPlayer);
+            propSetVisible(1, propRefFromName("spacejunk_3"));
+            propSetVisible(1, propRefFromName("spacejunk_4"));            
+            addNewObjectiveIndicatorToProp(propRefFromName("spacejunk_3"), 0);
+            addNewObjectiveIndicatorToProp(propRefFromName("spacejunk_4"), 0);            
+          //  SetObjectiveTimer(aTime, iObjective);
+            //Or Test in ObjectiveTriggerTests            
+            lib_GetAngry();
+        }
+        else if (iSubObjective == 4)
+        {
+            //Theres more around...
+            chrSpeak(pPlayer, "l00b_110_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+           // chrWaitUntilFinishedSpeaking(pPlayer);
+            propSetVisible(1, propRefFromName("spacejunk_5"));
+            propSetVisible(1, propRefFromName("spacejunk_6"));
+            propSetVisible(1, propRefFromName("spacejunk_7"));            
+            addNewObjectiveIndicatorToProp(propRefFromName("spacejunk_5"), 0);
+            addNewObjectiveIndicatorToProp(propRefFromName("spacejunk_6"), 0);            
+            addNewObjectiveIndicatorToProp(propRefFromName("spacejunk_7"), 0);
+           // SetObjectiveTimer(aTime, iObjective);
+            //Or Test in ObjectiveTriggerTests   
+            lib_GetAngry();
+        }
+        else if (iSubObjective == 5)
+        {
+            //Good Job
+            chrSpeak(pPlayer, "l00b_040_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+          //  chrWaitUntilFinishedSpeaking(pPlayer);
+            propSetVisible(1, propRefFromName("spacejunk_9"));
+            propSetVisible(1, propRefFromName("spacejunk_10"));
+            propSetVisible(1, propRefFromName("spacejunk_11"));
+            propSetVisible(1, propRefFromName("spacejunk_12"));            
+            addNewObjectiveIndicatorToProp(propRefFromName("spacejunk_9"), 0);
+            addNewObjectiveIndicatorToProp(propRefFromName("spacejunk_10"), 0);            
+            addNewObjectiveIndicatorToProp(propRefFromName("spacejunk_11"), 0);
+            addNewObjectiveIndicatorToProp(propRefFromName("spacejunk_12"), 0);            
+
+            //This'll take all day...
+           // chrSpeak(pPlayer, "l00b_030_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+           // chrWaitUntilFinishedSpeaking(pPlayer);
+            
+            //SetObjectiveTimer(aTime, iObjective);
+            lib_GetAngry();
+            //Or Test in ObjectiveTriggerTests            
+        }        
+        else if (iSubObjective == 6)        
+        {
+            //Too Slow Etc
+            if (iAsteroids < 3)
+            {
+                AddVMDebugHUDMsg("Rubbish", iAsteroids, "test_objective_message");
+            }
+            else
+            {
+                AddVMDebugHUDMsg("Good", iAsteroids, "test_objective_message");
+            }
+            
+            //Good work...
+            chrSpeak(pPlayer, "l00b_120_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+            chrWaitUntilFinishedSpeaking(pPlayer);
+
+            //By the way i've been working... evasive
+            chrSpeak(pPlayer, "l00b_130_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+            chrWaitUntilFinishedSpeaking(pPlayer);            
+
+            removeAllHelpMessages();
+            addHelpMessage("STR_TRAINING_EVASIVE", fPermMsgTime);            
+        }
+        else if (iSubObjective == 7)        
+        {
+            removeAllHelpMessages();
+            //Not bad. Not bad. I could do better...
+            chrSpeak(pPlayer, "l00b_140_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+            chrWaitUntilFinishedSpeaking(pPlayer);
+                
+            ActivateTalkingHeadNew("TH_Trn_Obj3", true);
+            waitForGameTime(3.0f);
+            //l00b_170_feroda
+            //Copy that general ferroda...
+            chrSpeak(pPlayer, "l00b_180_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+            chrWaitUntilFinishedSpeaking(pPlayer); 
+                
+            nextObjective(iObjective);
+            return false;
+        }
+        else
+        {                        
+            waitForGameTime(2.0f);
+            //Explain Flight Controls
+            //Alight Little Brother... (Radio Imitate)
+            chrSpeak(pPlayer, "l00b_010_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+            chrWaitUntilFinishedSpeaking(pPlayer);
+            
+            removeAllHelpMessages();
+            addHelpMessage("STR_TRAINING_FLIGHT1", fPermMsgTime);            
+            addHelpMessage("STR_TRAINING_FLIGHT", fPermMsgTime);
+            
+            waitForGameTime(2.0f);
+                        
+            SetObjectiveTimer(10, iObjective);
+            SetNumSubObjectives(7, iObjective);
+        }
+
+    }
+    else if (iObjective == 4)
+    {
+        //Land back in acclamator
+        if (iSubObjective == 1)
+        {            
+            removeObjectiveIndicatorFromProp(propRefFromName("vmTrig4"));
+            addNewObjectiveIndicatorToProp(propRefFromName("LaatLand"), 0);
+            //Get In The GunShip
+            lib_GetAngry();
+        }
+        else
+        {
+            ActivateTalkingHeadNew("TH_Trn_Obj4", true);
+            addNewObjectiveIndicatorToProp(propRefFromName("vmTrig4"), 0);            
+            //Has Landed In Trigger In ObjectiveTriggerTests
+            SetNumSubObjectives(1, iObjective);
+        }
+    }
+    else if (iObjective == 5)
+    {
+       /* propRef pLaat;
+        pLaat = SpawnPropFromTemplate("rep_gunship", propRefFromName("LaatLand"), vector(0,0,0));            
+        AddPropToGroup(propRefFromName("laatG"), pLaat);*/
+
+        propRef pLaat = GetNthPropFromGroup(propRefFromName("laatG"), 0);
+    //    AddToVehicle(pPlayer, pLaat, 4);       
+    	PassengerVehicleBF(pPlayer, pLaat, true, "PASSNGR1");        
+        //TODO: PassengerVehicleBF use passenger space
+        waitForGameTime(0.1f);
+//        BFEnableSwitchSeats(pLaat, false);        
+        setSeatSwitchAllowed(pPlayer, false);
+        
+        //Fly Down
+        removeObjectiveIndicatorFromProp(propRefFromName("LaatLand"));
+
+        //Welcome Aboard sir...
+        chrSpeak(pPlayer, "l00b_250_clone", 0, 0.0f, 20.0f, pPlayer, true, true);
+        chrWaitUntilFinishedSpeaking(pPlayer); 
+
+        //meet me in the outskirts...
+        ActivateTalkingHeadNew("TH_Trn_Obj5", true);
+        waitForGameTime(3.0f);
+        
+        //Understood...
+        chrSpeak(pPlayer, "l00b_270_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+        chrWaitUntilFinishedSpeaking(pPlayer); 
+        
+        //Yes sir...
+        chrSpeak(pPlayer, "l00b_280_clone", 0, 0.0f, 20.0f, pPlayer, true, true);
+        chrWaitUntilFinishedSpeaking(pPlayer);
+
+        wholeScreenFade(1.0f, 1.0f, false);
+        waitForGameTime(1.0f);
+        
+        propRef pCTemp;
+        pCTemp = SpawnPropFromTemplate("rep_troop_snpc", pLaat, vector(0, 10, 0));
+        AddToVehicle(pCTemp, pLaat, 0); 
+        waitForGameTime(0.5f);
+        
+        propTeleportToProp(pLaat, propRefFromName("LaatGSpline"));
+        waitForGameTime(0.5f);
+       	BFShipFollowScriptedSplineNoAvoidance(pLaat, propRefFromName("LaatGSpline"));	
+        wholeScreenFade(1.0f, 0.0f, false);
+        
+        //KILL OFF ALL THE TROOPERS IN SPACE
+        BFKillAllNPCsFromSpawner("bfRepX2Sp1");            
+        BFKillAllNPCsFromSpawner("SaluteG");                
+        BFKillAllNPCsFromSpawner("bfMFerroda1");            
+        waitForGameTime(0.1f);        
+        BFKillAllNPCsFromSpawner("bfRandomSp1");
+        BFKillAllNPCsFromSpawner("bfRandomSp3");
+        BFKillAllNPCsFromSpawner("bfRandomSp4");
+        BFKillAllNPCsFromSpawner("bfRandomSp5");
+        BFKillAllNPCsFromSpawner("bfRandomSp6");
+        BFKillAllNPCsFromSpawner("bfRandomSp7");
+        BFKillAllNPCsFromSpawner("bfRandomSp8");
+        BFKillAllNPCsFromSpawner("bfRandomSp9"); 
+        waitForGameTime(0.1f);
+
+        //TEMP
+        SetPropRefInvincible(propRefFromName("barcspdr3"), true);
+        SetPropRefInvincible(propRefFromName("barcspdr1"), true);
+        
+        //How long until...
+        chrSpeak(pPlayer, "l00b_290_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+        chrWaitUntilFinishedSpeaking(pPlayer);
+        
+        //Not long...
+        chrSpeak(pPlayer, "l00b_300_clone", 0, 0.0f, 20.0f, pPlayer, true, true);
+        chrWaitUntilFinishedSpeaking(pPlayer);
+        
+        //Mayday...
+        ActivateTalkingHeadNew("TH_Trn_Obj5_E", true);
+        waitForGameTime(3.0f);
+
+        //Get us there now...
+        chrSpeak(pPlayer, "l00b_320_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+        chrWaitUntilFinishedSpeaking(pPlayer);
+                    
+        //JumpToObjective(7, true);
+        nextObjective(iObjective);
+        return false;
+    }
+    else if (iObjective == 6)
+    {
+        if (iSubObjective == 1)
+        {
+            //Land In Objective Tests
+            removeAllHelpMessages();
+            addHelpMessage("STR_TRAINING_GETOUT", fPermMsgTime);            
+        }
+        else
+        {
+            //Tusken Air Attack
+            ActivateSpawner("Spwn-6");
+            ActivateSpawner("SpwnObj6");
+            ActivateSpawner("EngInjured");    
+
+            lib_SetupGroupZone(cObjectiveName, "Spwn-6", "TuskZone", "EngZone", k_objtype_clear_area);        
+            lib_SetupGroupZone(cObjectiveName, "SpwnObj6", "EngZone", "TuskZone", k_objtype_hold_area);
+            waitForGameTime(1.0f);
+            
+            removeAllHelpMessages();
+            addHelpMessage("STR_TRAINING_FIRE", fPermMsgTime);
+            
+            SetPropRefInvincible(propRefFromName("SpwnObj6"), true);
+            SetPropRefInvincible(propRefFromName("EngInjured"), true);
+            pChr_Temp = GetPropFromGroupSpawner(propRefFromName("EngInjured"), 0, 0); 
+            chrPlayAnim(propRefFromName("EngInjured"), StringToChar16("AN_sol_arc_wnd"), 0.1f, true);                        
+            waitForGameTime(0.1f);
+
+            SetNumSubObjectives(1, iObjective);
+            SetObjectiveKillSpawners(1, iObjective);
+        }
+    } 
+    else if (iObjective == 7)
+    {
+        //Tusken Waves
+        if (iSubObjective == 1)
+        {
+            removeObjectiveIndicatorFromProp(propRefFromName("crate_stand27"));
+            enableTrigger(propRefFromName("deathOutP"));            
+            //Run to point continuously for awhile while x1 kills them... maybe            
+            //Open Fire
+            chrSpeak(pChr_X1, "l00c_050_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+            chrWaitUntilFinishedSpeaking(pChr_X1);
+
+            ActivateSpawner("Spwn-7_1");      
+            MoveToPoint(propRefFromName("bfRepX2Sp2"), propRefFromName("dofCover"), false);            
+            waitForGameTime(0.5);
+            setVMPropActive(propRefFromName("vmTuskPh2"), true);
+            
+            removeAllHelpMessages();            
+            addHelpMessage("STR_TRAINING_FIRE", fPermMsgTime);
+            lib_GetAngry();
+
+            SetObjectiveKillSpawners(1, iObjective);
+        }
+        else if (iSubObjective == 2)
+        {            
+            //X1 shoot Others Now Run Out Throw Grenade
+            ActivateSpawner("Spwn-7_2");
+
+            //Thermal Detonator
+            chrSpeak(pChr_X1, "l00c_140_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+            chrWaitUntilFinishedSpeaking(pChr_X1);            
+
+            removeAllHelpMessages();            
+            addHelpMessage("STR_TRAINING_GRENADE", fPermMsgTime);            
+
+            addNewObjectiveIndicatorToProp(propRefFromName("Spwn-7_2"), 0);
+            
+            lib_GetAngry();            
+            SetObjectiveKillSpawners(1, iObjective);
+        }
+        else if (iSubObjective == 3)
+        {
+            //Finish Off Raiders
+            ActivateSpawner("Spwn-7_3");            
+            setNthVMPropStringVar(propRefFromName("vmTuskPh2"), "Spwn-7_3", 0);
+            setNthVMPropStringVar(propRefFromName("vmTuskPh2"), "dofTuskE_", 1);
+            waitForGameTime(0.5);
+
+            //Theres another wave
+            chrSpeak(pChr_Temp, "l00c_030_clone", 0, 0.0f, 20.0f, pPlayer, true, true);
+            chrWaitUntilFinishedSpeaking(pChr_Temp);             
+            
+            removeAllHelpMessages();            
+            addHelpMessage("STR_TRAINING_RELOAD", fPermMsgTime);            
+            addHelpMessage("STR_TRAINING_WSWITCH", fPermMsgTime);
+            
+            //Open Fire
+            chrSpeak(pChr_X1, "l00c_050_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+            chrWaitUntilFinishedSpeaking(pChr_X1);
+            
+            setVMPropActive(propRefFromName("vmTuskPh2"), true);
+            lib_GetAngry();            
+            SetObjectiveKillSpawners(1, iObjective);
+        }
+        else if (iSubObjective == 4)
+        {
+            removeAllHelpMessages();            
+            //Move to Talk To Engineers    
+            MoveToPoint(propRefFromName("bfRepX2Sp2"), propRefFromName("dofEngWnd"), false);
+            disableTrigger(propRefFromName("deathOutP"));
+            waitForGameTime(0.1f);
+            removeObjectiveIndicatorFromProp(propRefFromName("deathOutP")); //Just Incase
+            SetObjectiveTriggered(true, iObjective);            
+        }
+        else if (iSubObjective == 5)
+        {
+            //Engineers saved talking
+            //This is commander
+            chrSpeak(pChr_X1, "l00c_210_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+            chrWaitUntilFinishedSpeaking(pChr_X1);
+
+            //Copy that
+            ActivateTalkingHeadNew("TH_Trn_Obj7", true);
+            waitForGameTime(5.0f);
+
+            //x1 x2 where are you?
+            ActivateTalkingHeadNew("TH_Trn_Obj7_F", true);
+            waitForGameTime(5.0f);
+
+            //We got sidetracked
+            chrSpeak(pChr_X1, "l00c_240_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+            chrWaitUntilFinishedSpeaking(pChr_X1);            
+            
+            //Take my speeder
+            chrSpeak(pChr_Temp, "l00c_250_clone", 0, 0.0f, 20.0f, pPlayer, true, true);
+            chrWaitUntilFinishedSpeaking(pChr_Temp);
+            
+            SetObjectiveTimer(2.0f, iObjective);
+        }
+        else
+        {                       
+            ActivateSpawner("bfRepX2Sp2");                    
+            waitForGameTime(1.0f);            
+                       
+            pChr_X1 = GetPropFromGroupSpawner(propRefFromName("bfRepX2Sp2"), 0, 0); 
+                
+            SetPropRefInvincible(propRefFromName("bfRepX2Sp2"), true);
+            waitForGameTime(0.1f);
+            
+            propHealthReduceToFractionWithUniformDamage(propRefFromName("barcspdr3"), 0.1f);            
+            waitForGameTime(1.0f);
+            
+            //Incoming...
+            chrSpeak(pChr_Temp, "l00c_020_clone", 0, 0.0f, 20.0f, pPlayer, true, true);
+            chrWaitUntilFinishedSpeaking(pChr_Temp);
+
+            //Take Cover
+            chrSpeak(pChr_X1, "l00c_040_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+            chrWaitUntilFinishedSpeaking(pChr_X1);
+            
+            addNewObjectiveIndicatorToProp(propRefFromName("crate_stand27"), 0);
+            addSpeechMessage("X2, knock those tins off for a clear shot!", 2.0f);            
+
+            removeAllHelpMessages();            
+            addHelpMessage("STR_TRAINING_MELEE", fPermMsgTime);
+
+            lib_GetAngry();
+            SetNumSubObjectives(5, iObjective);
+
+            waitForGameTime(1.0f);
+            nextObjective(iObjective);
+            return false;
+//            SetObjectiveTimer(4, iObjective);            
+            //Melee in objective tests
+        }
+    }
+    else if (iObjective == 8)
+    {
+        if (iSubObjective == 1)
+        {   
+            removeAllHelpMessages();    
+            removeObjectiveIndicatorFromProp(propRefFromName("EngInjured"));
+            //Repair The Speeder
+            MoveToPoint(propRefFromName("bfRepX2Sp2"), propRefFromName("dofRepair"), false);
+        
+            //Fall back down
+            chrPlayAnim(propRefFromName("EngInjured"), StringToChar16("AN_sol_collapse"), 0.0f, false);
+            while (!AnimComplete(propRefFromName("EngInjured")))
+                waitForGameTime(0.1f);            
+            chrPlayAnim(propRefFromName("EngInjured"), StringToChar16("AN_sol_arc_loop"), 0.0f, true);            
+
+            addNewObjectiveIndicatorToProp(propRefFromName("barcspdr3"), 0);
+            //Fix that thing
+            chrSpeak(pChr_X1, "l00c_260_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+            chrWaitUntilFinishedSpeaking(pChr_X1);          
+
+            lib_GetAngry();
+        }
+        else if (iSubObjective == 2)
+        {
+            //Get On BarcSpeeder
+            addSpeechMessage("Hop on X2!", 2.0f);
+            removeObjectiveIndicatorFromProp(propRefFromName("barcspdr3"));
+            addNewObjectiveIndicatorToProp(pChr_X1, 0);  
+            
+            lib_GetAngry();            
+        }
+        else if (iSubObjective == 3)
+        {
+            //Follow X2 START
+            setAIState(propRefFromName("bfRepX2Sp2"), "AISTATE_BF_STORY");
+            waitForGameTime(1.0f);
+            
+            addSpeechMessage("Try and Keep Up, X2!", 2.0f);
+            setVMPropActive(propRefFromName("vmSpeeder"), true);
+            nextObjective(iObjective);
+            return false;
+        }
+        else
+        {                        
+            removeAllHelpMessages();            
+            addHelpMessage("STR_TRAINING_KSWITCH", fPermMsgTime);            
+     
+            //Take The Fusion Cutter
+            addNewObjectiveIndicatorToProp(propRefFromName("EngInjured"), 0);
+            chrPlayAnim(propRefFromName("EngInjured"), StringToChar16("AN_sol_give_arc"), 0.1f, false);
+            
+            lib_GetAngry();            
+            SetNumSubObjectives(3, iObjective);
+        }
+    }
+    else if (iObjective == 9)
+    {
+        //Keep Up With X1
+        //Follow me
+        chrSpeak(pChr_X1, "l00c_340_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+        chrWaitUntilFinishedSpeaking(pChr_X1);        
+        
+        //Good job
+        chrSpeak(pChr_X1, "l00d_010_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+        chrWaitUntilFinishedSpeaking(pChr_X1);
+
+        ActivateTalkingHeadNew("TH_Trn_Obj8", true);
+        waitForGameTime(2.0f);
+        
+        //Something?
+        chrSpeak(pChr_X1, "l00d_030_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+        chrWaitUntilFinishedSpeaking(pChr_X1);      
+
+        //Oh my god
+        ActivateTalkingHeadNew("TH_Trn_Obj8_A", true);
+        waitForGameTime(2.0f);
+        
+        //Whats going on over there
+        chrSpeak(pChr_X1, "l00d_050_x1", 0, 0.0f, 20.0f, pPlayer, true, true);
+        chrWaitUntilFinishedSpeaking(pChr_X1);  
+                
+        lib_GetAngry();        
+        SetObjectiveTriggered(true, iObjective);
+    }
+    else if (iObjective == 10)
+    {
+        removeObjectiveIndicatorFromProp(pChr_X1);
+        //Krayt Dragon
+//        propRef krayt;
+        //krayt = SpawnPropFromTemplate("kraytdragonEx", propRefFromName("dofKrayt"), vector(0, 0, 0));
+
+        waitForGameTime(0.5f);
+        wholeScreenFade(0.0f, 1.0f, false);
+        waitForGameTime(1.0f);
+
+        bEndLevel = true;
+    }
+
+    logStr("-------------> ObjectiveSetup End");    
+    return true;
+}
+
+///////////////This Script Actions
+
+wholeScreenFade(0.0f, 1.0f, false);
+waitForGameTime(0.1f);
+ScriptHasStarted(); //Do any setups
+waitForGameTime(3.0f);
+wholeScreenFade(1.0f, 0.0f, false);
+
+//Main game loop
+while(!bEndLevel)
+{
+    int iNumActive = BFObjectiveGetNumActive();
+    int i = 0;
+    int iObjective = 0;
+    int iSubObjective = 0;
+
+    ProcessCallBacks();    
+    ObjectiveSetupCheck();
+
+    for (i=0; i<iNumActive; i++)
+    {
+        iObjective = BFObjectiveGetNumForNthActive(i);
+        iSubObjective = BFObjectiveGetSub(iObjective);
+        logStr("Objective: ");
+        logInt(iObjective);    
+        logInt(iSubObjective);        
+
+        ObjectiveTests(iObjective);        
+        waitForGameTime(0.01f);
+    }
+
+    waitForGameTimeOrLVChange(0.2f, "iObjLV", "iCBLV");
+    logStr("tick");
+}
+
+NextLevel("tatooine/tatooine_story.res");

@@ -1,0 +1,133 @@
+// vim: set syntax=c :
+
+boolean inited = false;
+callback int GalConquestIsMoveAllowed(int planet, int player, int team)
+{
+    //Script the movement rule set. return 1 if the movement is allowed, 0 otherwise.
+    //Below are rules setup based on the test scenario.
+    int planet_endor = getPlanetIndexByName("proxyplanet7_");
+    int planet_bespin = getPlanetIndexByName("proxyplanet8_");
+    int planet_yavin = getPlanetIndexByName("proxyplanet3_");
+    int planet_hoth = getPlanetIndexByName("proxyplanet9_");
+    //cannot attack own planet.
+    if(isPlanetOwnedByPlayer(planet, player))
+	return 0;
+    
+    if(team == 0)//REB
+    {	
+	if(planet == planet_endor) 
+	{   
+	    if(isPlanetOwnedByPlayer(planet_bespin, player))
+		return 1;
+	    else
+		return 0;
+	}
+	else if(planet == planet_hoth) 
+	{
+	    if((isPlanetOwnedByPlayer(planet_bespin, player)) && (isPlanetOwnedByPlayer(planet_endor, player)))
+		return 1;
+	    else
+		return 0;
+	}
+	else //if the target is any other planet go for it...
+	{
+	    return 1;
+	}//define movement rules for team 1;
+    }
+    else if ( team == 1 )//IMP
+    {
+	if(planet == planet_bespin) 
+	{   
+	    if(isPlanetOwnedByPlayer(planet_endor, player))
+		return 1;
+	    else
+		return 0;
+	}
+	else if(planet == planet_yavin) 
+	{
+	    if((isPlanetOwnedByPlayer(planet_endor, player)) && (isPlanetOwnedByPlayer(planet_bespin, player)))
+		return 1;
+	    else
+		return 0;
+	}
+	else //if the target is any other planet go for it...
+	{
+	    return 1;
+	}//define movement rules for team 1;
+    }
+
+    return 0; 
+}
+
+callback int GalConquestCheckVictoryConditions(int player, int team)
+{
+    //Script the victory conditions check in here.
+    //e.g. has the time/turn limit been reached, 
+    //has the player gained control of the required number of planets,
+    //has the player gained control of a specific planets, etc
+    //return 1 if the victory conditions have been reached, 0 otherwise.
+    int turns = getCurrentTurnNum();
+    int planet_hoth = getPlanetIndexByName("proxyplanet9_");
+    int planet_yavin = getPlanetIndexByName("proxyplanet3_");
+
+    //if IMP gains control of Yavin
+    if(team == 1 && isPlanetOwnedByPlayer(planet_yavin, player))
+    {
+    	return 1;
+    }
+
+    //if REB gains control of Hoth
+    if(team == 0 && isPlanetOwnedByPlayer(planet_hoth, player))
+    {
+    	return 1;
+    }
+
+	return 0;
+
+}
+
+function void InitialiseScenario()
+{
+    //Set up the initial state of a scenario.
+    //e.g. allocate planets to each team based on the game play overview.
+    //enable planets that are part of the scenario, others are disabled by default.
+    int planet_endor = getPlanetIndexByName("proxyplanet7_");
+    int planet_bespin = getPlanetIndexByName("proxyplanet8_");
+    int planet_yavin = getPlanetIndexByName("proxyplanet3_");
+    int planet_hoth = getPlanetIndexByName("proxyplanet9_");
+    setPlanetOwningTeam(planet_bespin, 1);
+    setPlanetOWningTeam(planet_yavin, 0);
+    setPlanetOwningTeam(planet_endor, 1);
+    setPlanetToNeutral(planet_hoth); // should be neutral
+    inited = true;
+}
+
+function void UpdateCurrentScenarioState()
+{
+    resolveGalConquestState();
+}
+
+AllowCallback(CALLBACK_GalConquestIsMoveAllowed, GalConquestIsMoveAllowed);
+AllowCallback(CALLBACK_GalConquestCheckVictoryConditions, GalConquestCheckVictoryConditions);
+
+while(1)
+{
+    if(galConquestMapNeedsInit())
+    {
+	InitialiseScenario();
+	CheckSectorOwnerShip(0);//check for core world sector
+	CheckSectorOwnerShip(1);//check for core world sector
+	CheckSectorOwnerShip(2);//check for core world sector
+    }
+    else
+    {
+	if(!inited)
+	{
+	    UpdateCurrentScenarioState();
+            CheckSectorOwnerShip(0);//check for core world sector
+	    CheckSectorOwnerShip(1);//check for core world sector
+	    CheckSectorOwnerShip(2);//check for core world sector
+	    inited = true;
+	}
+    }
+}

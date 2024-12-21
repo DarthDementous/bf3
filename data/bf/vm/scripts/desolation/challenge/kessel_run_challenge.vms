@@ -1,0 +1,209 @@
+// vim: set syntax=c :
+
+
+int numberOfLaps = 1;
+
+// proprefs for checkpoints
+
+propRef firstCheckpoint = propRefFromName("checkpoint1_");
+propRef secondCheckpoint = propRefFromName("checkpoint2_");
+propRef thirdCheckpoint = propRefFromName("checkpoint3_");
+propRef fourthCheckpoint = propRefFromName("checkpoint4_");
+propRef fifthCheckpoint = propRefFromName("checkpoint5_");
+propRef sixthCheckpoint = propRefFromName("checkpoint6_");
+propRef seventhCheckpoint = propRefFromName("checkpoint7_");
+propRef eigthCheckpoint = propRefFromName("checkpoint8_");
+propRef ninthCheckpoint = propRefFromName("checkpoint9_");
+propRef tenthCheckpoint = propRefFromName("checkpoint10_");
+propRef eleventhCheckpoint = propRefFromName("checkpoint11_");
+propRef twelfthCheckpoint = propRefFromName("checkpoint12_");
+propRef thirteenthCheckpoint = propRefFromName("checkpoint13_");
+propRef fourteenthCheckpoint = propRefFromName("checkpoint14_");
+propRef fifteenthCheckpoint = propRefFromName("checkpoint15_");
+propRef sixteenthCheckpoint = propRefFromName("checkpoint16_");
+propRef seventeenthCheckpoint = propRefFromName("checkpoint17_");
+propRef lastCheckpoint  = propRefFromName("checkpoint18_");
+
+propRef falcon  = propRefFromName("reb_falcon1");
+
+callback void racerReachedCheckpoint(propRef racer, propRef checkpoint, int lapNumber)
+
+
+{
+    if(lapNumber == 1)
+    {
+	if(checkpoint == firstCheckpoint)
+	{
+	    ChallengeBegin();
+	}
+	if(checkpoint == firstCheckpoint)
+	{
+	    BFAddFlyingAIPropCentricPatrolZone(falcon, 200.f);
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint2_"), k_objectiveIndicatorType_mainObjective);
+//	    BFAddFlyingAIPatrolZone(vector(836.878f, 1603.54f, 1035.74f),600.0); // patrol_area_1
+	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_1"), "imp_stormtrooper_npc_story", "tie_fighter", 40, false, k_seatPos_driver);
+	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_1"), "imp_stormtrooper_npc_story", "tie_fighter", 40, false, k_seatPos_driver);
+	}
+	if(checkpoint == secondCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint2_"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint3_"), k_objectiveIndicatorType_mainObjective);
+	}
+	if(checkpoint == thirdCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint3_"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint4_"), k_objectiveIndicatorType_mainObjective);
+	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_2"), "imp_stormtrooper_npc_story", "tie_fighter", 40, false, k_seatPos_driver);
+//	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_1"), "imp_stormtrooper_npc_story", "tie_bomber", 40, false, k_seatPos_driver);
+	}
+	if(checkpoint == fourthCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint4_"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint5_"), k_objectiveIndicatorType_mainObjective);
+//	    BFAddFlyingAIPatrolZone(vector(-196.56f, 1871.32f, 519.24f),600.0); // patrol_area_2
+//	    BFRemoveFlyingAIPatrolZone(vector(836.878f, 1603.54f, 1035.74f)); 
+	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_2"), "imp_stormtrooper_npc_story", "tie_fighter", 40, false, k_seatPos_driver);
+//	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_2"), "imp_stormtrooper_npc_story", "tie_bomber", 40, false, k_seatPos_driver);
+	}
+	if(checkpoint == fifthCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint5_"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint6_"), k_objectiveIndicatorType_mainObjective);
+	}
+	if(checkpoint == sixthCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint6_"));
+	    SpawnAIVehicle(propRefFromName("xwing_dof_1"), "reb_soldier_npc_story", "xwing_fighter", 40, false, k_seatPos_driver);
+	    SpawnAIVehicle(propRefFromName("xwing_dof_1"), "reb_soldier_npc_story", "xwing_fighter", 40, false, k_seatPos_driver);
+//	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_2"), "imp_stormtrooper_npc_story", "tie_interceptor", 40, false, k_seatPos_driver);
+	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_3"), "imp_stormtrooper_npc_story", "tie_fighter", 40, false, k_seatPos_driver);
+	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_3"), "imp_stormtrooper_npc_story", "tie_fighter", 40, false, k_seatPos_driver);
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint7_"), k_objectiveIndicatorType_mainObjective);
+	}
+	if(checkpoint == seventhCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint7_"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint8_"), k_objectiveIndicatorType_mainObjective);
+//	    BFAddFlyingAIPatrolZone(vector(-348.51f, 1772.12f, -489.21f),600.0); // patrol_area_3 
+//	    BFRemoveFlyingAIPatrolZone(vector(-196.56f, 1871.32f, 519.24)); 
+	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_3"), "imp_stormtrooper_npc_story", "tie_fighter", 40, false, k_seatPos_driver);
+//	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_3"), "imp_stormtrooper_npc_story", "tie_interceptor", 40, false, k_seatPos_driver);
+	}
+	if(checkpoint == eigthCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint8_"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint9_"), k_objectiveIndicatorType_mainObjective);
+	}
+	if(checkpoint == ninthCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint9_"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint10_"), k_objectiveIndicatorType_mainObjective);
+//	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_3"), "imp_stormtrooper_npc_story", "tie_bomber", 40, false, k_seatPos_driver);
+//	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_3"), "imp_stormtrooper_npc_story", "tie_interceptor", 40, false, k_seatPos_driver);
+	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_4"), "imp_stormtrooper_npc_story", "tie_fighter", 40, false, k_seatPos_driver);	}
+	if(checkpoint == tenthCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint10_"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint11_"), k_objectiveIndicatorType_mainObjective);
+//	    BFAddFlyingAIPatrolZone(vector(422.64f, 1717.46f, -188.24f),600.0); // patrol_area_4
+//	    BFRemoveFlyingAIPatrolZone(vector(-348.51f, 1772.12f, -489.21f)); 
+	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_4"), "imp_stormtrooper_npc_story", "tie_fighter", 40, false, k_seatPos_driver);
+//	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_4"), "imp_stormtrooper_npc_story", "tie_interceptor", 40, false, k_seatPos_driver);
+	}
+	if(checkpoint == eleventhCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint11_"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint12_"), k_objectiveIndicatorType_mainObjective);
+	}
+	if(checkpoint == twelfthCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint12_"));
+	    SpawnAIVehicle(propRefFromName("xwing_dof_2"), "reb_soldier_npc_story", "xwing_fighter", 40, false, k_seatPos_driver);
+	    SpawnAIVehicle(propRefFromName("xwing_dof_2"), "reb_soldier_npc_story", "xwing_fighter", 40, false, k_seatPos_driver);
+//	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_4"), "imp_stormtrooper_npc_story", "tie_interceptor", 40, false, k_seatPos_driver);
+	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_3"), "imp_stormtrooper_npc_story", "tie_fighter", 40, false, k_seatPos_driver);
+//	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_4"), "imp_stormtrooper_npc_story", "tie_bomber", 40, false, k_seatPos_driver);
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint13_"), k_objectiveIndicatorType_mainObjective);
+	}
+	if(checkpoint == thirteenthCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint13_"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint14_"), k_objectiveIndicatorType_mainObjective);
+//	    BFAddFlyingAIPatrolZone(vector(907.86f, 2294.57f, 181.87f),600.0); // patrol_area_5
+//	    BFRemoveFlyingAIPatrolZone(vector(422.64f, 1717.46f, -188.24f)); 
+	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_5"), "imp_stormtrooper_npc_story", "tie_fighter", 40, false, k_seatPos_driver);
+//	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_5"), "imp_stormtrooper_npc_story", "tie_interceptor", 40, false, k_seatPos_driver);
+	}
+	if(checkpoint == fourteenthCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint14_"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint15_"), k_objectiveIndicatorType_mainObjective);
+	}
+	if(checkpoint == fifteenthCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint15_"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint16_"), k_objectiveIndicatorType_mainObjective);
+//	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_5"), "imp_stormtrooper_npc_story", "tie_bomber", 40, false, k_seatPos_driver);
+//	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_5"), "imp_stormtrooper_npc_story", "tie_interceptor", 40, false, k_seatPos_driver);
+	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_6"), "imp_stormtrooper_npc_story", "tie_fighter", 40, false, k_seatPos_driver);
+	}
+	if(checkpoint == sixteenthCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint16_"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint17_"), k_objectiveIndicatorType_mainObjective);
+//	    BFAddFlyingAIPatrolZone(vector(236.63f, 1211.14f, 201.02f),600.0); // patrol_area_6
+//	    BFRemoveFlyingAIPatrolZone(vector(907.86f, 2294.57f, 181.87f)); 
+	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_6"), "imp_stormtrooper_npc_story", "tie_fighter", 40, false, k_seatPos_driver);
+	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_6"), "imp_stormtrooper_npc_story", "tie_fighter", 40, false, k_seatPos_driver);
+//	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_6"), "imp_stormtrooper_npc_story", "tie_bomber", 40, false, k_seatPos_driver);
+//	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_6"), "imp_stormtrooper_npc_story", "tie_interceptor", 40, false, k_seatPos_driver);
+//	    SpawnAIVehicle(propRefFromName("TIEspawnDOF_6"), "imp_stormtrooper_npc_story", "tie_interceptor", 40, false, k_seatPos_driver);
+	}
+	if(checkpoint == seventeenthCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint17_"));
+	    addNewObjectiveIndicatorToProp(propRefFromName("checkpoint18_"), k_objectiveIndicatorType_mainObjective);
+	}
+	if(checkpoint == lastCheckpoint)
+	{
+	    removeObjectiveIndicatorFromProp(propRefFromName("checkpoint18_"));
+	    ChallengeEnd();
+	}
+    }
+}
+
+/*    if(lapNumber == numberOfLaps) 
+    {
+	if(checkpoint == lastCheckpoint)
+	{
+	    ChallengeEnd();
+	}
+    }
+}
+*/
+
+AllowCallback(CALLBACK_ChallengeRacerReachedRaceCheckpoint, racerReachedCheckpoint);
+
+//propRef speeder = propRefFromName("speederbike1_"); // this looks for a specific speeder name...
+// ChallengeBeginSoloRace(speeder, firstCheckpoint, numberOfLaps); // ...then used that as a prop ref, so would only work with that specific speeder
+
+propRef player = getPlayerPropRefFromID(GetPlayerId()); // this gets the player reference
+ChallengeBeginSoloRace(player, firstCheckpoint, numberOfLaps); //and uses player ref here so any speeder/vehicle type will work
+
+// Vehicle select below - uncomment the line for the vehicle you want to test the level with!
+
+// SpawnInVehicle(player, propRefFromName("FalconSpwnDOF_"), "mfalcon_challenge", 1, k_seatPos_driver ); //Spawn player in the Falcon
+
+DriveVehicleBF(player, falcon, true); // new method of putting player in the driving seat
+
+// SpawnInVehicle(player, propRefFromName("FalconSpwnDOF_"), "slave_I", 1, k_seatPos_driver ); //Spawn player in Slave I
+// SpawnInVehicle(player, propRefFromName("FalconSpwnDOF_"), "snowspeeder", 1, k_seatPos_driver ); //Spawn player in Snowspeeder
+
+
+
+
+while(1)
+{
+    waitForGameTime(5.0f);
+}
+

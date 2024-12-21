@@ -1,0 +1,32 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      00006003 00001200     	EXEC ADDR(0x3) CNT(0x6) BOOL_ADDR(0x80)
+03: 4c410002 00b9b11b 3001ff01	      ALU:	DOT3v	R2.x___ = C257.ywyy, C511.yyyy
+                          						    	RECIP_IEEE	R0.__z_ = R1.wwww
+04: c80c0000 00c6ac00 a100ff00	      ALU:	MULv	R0.__zw = R0.zzzz, C511.xxxy
+05: c80e0002 0006fc00 e1000100	      ALU:	MULv	R2._yzw = R0.zzzw, R1.xxyz
+06: 140c0000 01f16cb1 8002ff01	      ALU:	ADDv	R0.__zw = R2.yyyz, C511.xxxx
+07: 041c0100 0006066c a1000102	      ALU:	MULv	R0.__zw = R0.zzzw, C257.zzzw
+                          						    	ADD_PREVs	R1.x___ = R2.xxxx
+08: b0120101 026c1b42 c0010001	      ALU:	ADDv	R1._y__ = R1.xxxx, -R0.wwww
+                          						    	ADD_CONST_0	R1.x___ = C257.x, R0.z
+      00256009 00001200     	EXEC ADDR(0x9) CNT(0x6) BOOL_ADDR(0x80)
+09: 10182021 1f1ffff8 00004000	      FETCH:	SAMPLE	R2.x___ = R1.xyx CONST(1) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+0a: 10080001 1f1ff688 00004000	      FETCH:	SAMPLE	R0.xyzw = R0.xyx CONST(0) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+0b: c8040001 001bc600 a200ff00	   (S)ALU:	MAXv	R1.__z_ = R0.wwww, C511.zzzz
+0c: 4c430101 02186cc6 a0020001	      ALU:	ADDv	R1.xy__ = R2.xwww, -C256.xxxx
+                          						    	RECIP_IEEE	R1.__z_ = R1.zzzz
+0d: 4c100100 0000006c e2000001	      ALU:	RECIP_IEEE	R1.x___ = R1.xxxx
+0e: 4c270100 00c6c0b1 e1010001	      ALU:	MULv	R0.xyz_ = R1.zzzz, R0.xyzz
+                          						    	RECIP_IEEE	R1._y__ = R1.yyyy
+      0000600f 00001200     	EXEC ADDR(0xf) CNT(0x6) BOOL_ADDR(0x80)
+0f: c8030001 00b0b100 a1010000	      ALU:	MULv	R1.xy__ = R1.xyyy, C256.yyyy
+10: 4c120101 026cb16c c0010102	      ALU:	ADDv	R1._y__ = R1.xxxx, -R1.yyyy
+                          						    	RECIP_IEEE	R1.x___ = C258.xxxx
+11: c8010001 04b16cb1 cb0101ff	      ALU:	MULADDv	R1.x___ = C511.yyyy, -R1.yyyy, R1.xxxx
+12: c8010001 006c1b00 a201ff00	      ALU:	MAXv	R1.x___ = R1.xxxx, C511.wwww
+13: c8080000 046c6c1b eb010100	      ALU:	MULADDv	R0.___w = R0.wwww, -R1.xxxx, R1.xxxx
+14: c8080000 001b1b00 a200ff00	      ALU:	MAXv	R0.___w = R0.wwww, C511.wwww
+      00002015 00002200     	EXEC_END ADDR(0x15) CNT(0x2) BOOL_ADDR(0x80)
+15: c8070000 00c01b00 e1000000	      ALU:	MULv	R0.xyz_ = R0.xyzz, R0.wwww
+16: c80f8000 00000000 e2000000	      ALU:	MAXv	export0 = R0, R0	; COLOR
+      00000000 00000000     	NOP

@@ -1,0 +1,50 @@
+      00000000 0000c400     	ALLOC PARAM/PIXEL SIZE(0x0)
+      00096004 00001200     	EXEC ADDR(0x4) CNT(0x6) BOOL_ADDR(0x80)
+04: 10006081 1f1ffe3f 00004000	      FETCH:	SAMPLE	R6.__x_ = R4.xyx CONST(0) ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+05: c8020506 00bebe00 f0000000	   (S)ALU:	DOT3v	R6._y__ = R0.zxyy, R0.zxyy
+06: 08180600 00b1c6cb 2103ff03	      ALU:	MULv	R0.___w = C259.yyyy, C511.zzzz
+                          						    	MULs	R6.x___ = R3.wwzz
+07: c8080500 01c6b11b ab060300	      ALU:	MULADDv	R0.___w = -R0.wwww, R6.zzzz, C259.yyyy
+08: c8010506 00c61b6c eb020206	      ALU:	MULADDv	R6.x___ = R6.xxxx, R2.zzzz, R2.wwww
+09: c8010506 00c61b6c eb010106	      ALU:	MULADDv	R6.x___ = R6.xxxx, R1.zzzz, R1.wwww
+      0000600a 00001200     	EXEC ADDR(0xa) CNT(0x6) BOOL_ADDR(0x80)
+0a: 58270507 00c0c0b1 e0050586	      ALU:	ADDv	R7.xyz_ = R5.xyzz, R5.xyzz
+                          						    	RECIPSQ_IEEE	R5._y__ = abs(R6).yyyy
+0b: ac110506 006c6c05 c0060603	      ALU:	ADDv	R6.x___ = R6.xxxx, R6.xxxx
+                          						    	MUL_CONST_1	R5.x___ = C259.w, R5.y
+0c: c8020501 046cc61b eb060101	      ALU:	MULADDv	R1._y__ = R1.wwww, -R6.xxxx, R1.zzzz
+0d: c8040501 046cc61b eb060202	      ALU:	MULADDv	R1.__z_ = R2.wwww, -R6.xxxx, R2.zzzz
+0e: c8080501 046cc61b eb060303	      ALU:	MULADDv	R1.___w = R3.wwww, -R6.xxxx, R3.zzzz
+0f: c8030500 00b0b000 e1050000	      ALU:	MULv	R0.xy__ = R5.xyyy, R0.xyyy
+      00006010 00001200     	EXEC ADDR(0x10) CNT(0x6) BOOL_ADDR(0x80)
+10: c8030508 00b01bb0 eb000004	      ALU:	MULADDv	R8.xy__ = R4.xyyy, R0.xyyy, R0.wwww
+11: c8010500 00c3c300 f0010100	      ALU:	DOT3v	R0.x___ = R1.wyzz, R1.wyzz
+12: 58110001 006c1b6c 2101ff80	      ALU:	MULv	R1.x___ = C257.xxxx, C511.wwww
+                          						    	RECIPSQ_IEEE	R0.x___ = abs(R0).xxxx
+13: c8070500 00156c00 e1010000	      ALU:	MULv	R0.xyz_ = R1.yzww, R0.xxxx
+14: c80f0500 00a6cd00 f2000000	      ALU:	CUBEv	R0 = R0.zzxy, R0.yxzz
+15: 4c240106 001b1bc6 e2000080	      ALU:	MAXv	R6.__z_ = R0.wwww, R0.wwww
+                          						    	RECIP_IEEE	R1._y__ = abs(R0).zzzz
+      05506016 00001200     	EXEC ADDR(0x16) CNT(0x6) BOOL_ADDR(0x80)
+16: c8060501 0061b100 e1000100	      ALU:	MULv	R1._yz_ = R0.yyxx, R1.yyyy
+17: c80b0506 00656100 a001ff00	      ALU:	ADDv	R6.xy_w = R1.yzxx, C511.yyxx
+18: b8283081 1f1ffe88 00004000	      FETCH:	SAMPLE	R3.xyz_ = R4.zwz CONST(2) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+19: 10382081 1f1ffe88 00004000	      FETCH:	SAMPLE	R2.xyz_ = R4.xyx CONST(3) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+1a: 905810c1 1f1ffe88 0000c000	      FETCH:	SAMPLE	R1.xyz_ = R6.xyz CONST(5) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+1b: 10484101 1f1ffe88 00004000	      FETCH:	SAMPLE	R4.xyz_ = R8.xyx CONST(4) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+      0009601c 00001200     	EXEC ADDR(0x1c) CNT(0x6) BOOL_ADDR(0x80)
+1c: 10180101 1f1ff688 00004000	      FETCH:	SAMPLE	R0.xyzw = R8.xyx CONST(1) VALID_ONLY ARBITRARY(2x4_SYM) LOCATION(CENTROID)
+1d: c8088000 001b1b00 e1000500	   (S)ALU:	MULv	export0.___w = R0.wwww, R5.wwww	; COLOR
+1e: c8070505 00c0c600 a104ff00	      ALU:	MULv	R5.xyz_ = R4.xyzz, C511.zzzz
+1f: c80b0505 00c0c000 e1050100	      ALU:	MULv	R5.xy_w = R5.xyzz, R1.xyzz
+20: ac170001 00c0c0c4 c1070003	      ALU:	MULv	R1.xyz_ = R7.xyzz, R0.xyzz
+                          						    	MUL_CONST_1	R0.x___ = C259.z, R5.x
+21: ac240005 001b6cc5 81060203	      ALU:	MULv	R5.__z_ = R6.wwww, C258.xxxx
+                          						    	MUL_CONST_1	R0._y__ = C259.z, R5.y
+      00004022 00002200     	EXEC_END ADDR(0x22) CNT(0x4) BOOL_ADDR(0x80)
+22: ac470002 00c6c0c7 c1050203	      ALU:	MULv	R2.xyz_ = R5.zzzz, R2.xyzz
+                          						    	MUL_CONST_1	R0.__z_ = C259.z, R5.w
+23: c8070505 00c06cc0 ab030002	      ALU:	MULADDv	R5.xyz_ = R2.xyzz, R3.xyzz, C256.xxxx
+24: c8070505 00c0c0c0 eb010500	      ALU:	MULADDv	R5.xyz_ = R0.xyzz, R1.xyzz, R5.xyzz
+25: c8078000 00c06c00 a1050400	      ALU:	MULv	export0.xyz_ = R5.xyzz, C260.xxxx	; COLOR
+      00000000 00000000     	NOP

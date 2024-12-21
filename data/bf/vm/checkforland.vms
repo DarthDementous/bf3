@@ -1,0 +1,14 @@
+callback void tickShipVM(propRef thisPropRef)
+{
+    if ( BFShipHasAI(thisPropRef) )
+    {
+	    if ( BFShipHasLanded(thisPropRef, IN_CONTROLLER_TRIANGLE) )
+	    {
+		    BFRemoveShipAI(thisPropRef);
+		    BFShipAssignVMToPropFromPlayer(thisPropRef, "empty");
+	    }
+    }
+}
+
+AllowCallback(CALLBACK_TickShipVM, tickShipVM);
+

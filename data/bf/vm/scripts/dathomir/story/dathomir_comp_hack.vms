@@ -1,0 +1,58 @@
+propRef shara     = propRefFromName("sharaJoin");
+chrRef chr_shara    = chrRefFromName("sharaJoin");
+chrSetPatrolState(chr_shara);
+beginInGameCutSceneIgnorePerceptsAndDamage(chr_shara);
+chrRunToPadAndAlign(chr_shara, propGetPosFromName("sharaX1Hack"), propGetDirFromName("sharaX1Hack"), 800.f);
+waitUntilVMsDone(chr_shara);
+
+propSetVisible(0, propRefFromName("x1_act32"));
+
+activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f,3.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "Let's see if we can't get to the bottom of this"); 
+
+chrPlayAnimSlot(chr_shara, "AN_hm_ter_lp", 1, false);
+playerWaitUntilAnimDone(chr_shara);
+
+chrPlayAnimSlot(chr_shara, "AN_hm_ter_lp", 1, false);
+playerWaitUntilAnimDone(chr_shara);
+
+activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 6.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "Hmm, there's a recording of a transmission in here from shortly before our arrival. I'll see if I can punch it up"); 
+waitForGameTime(4.0f);
+chrPlayAnimSlot(chr_shara, "AN_hm_ter_lp", 1, false);
+waitForGameTime(1.0f);
+
+propSetVisible(1, propRefFromName("x1_act32"));
+activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 4.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "-gasp- X1!");
+waitForGameTime(4.0f);
+
+activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 5.0f, "characters/cutscene_models/x1act3/x1act3", "AN_lnd_tlk01", "--EXPOSITION ABOUT SITHWITCH CLONING, ITS ALL GOING WRONG ETC--");
+waitForGameTime(5.0f);
+propDelete(propRefFromName("x1_act32"));
+
+chrPlayAnimSlot(chr_shara, "AN_hm_ter_lp", 1, false);
+
+activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 5.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "Cloning experiments? We've got to stop this, I'm picking up lots of activity in the main tower that's got to be where the labs are");
+chrPlayAnimSlot(chr_shara, "AN_hm_ter_lp", 1, false);
+playerWaitUntilAnimDone(chr_shara);
+chrPlayAnimSlot(chr_shara, "AN_hm_ter_lp", 1, false);
+playerWaitUntilAnimDone(chr_shara);
+chrPlayAnimSlot(chr_shara, "AN_hm_ter_lp", 1, false);
+playerWaitUntilAnimDone(chr_shara);
+
+activateTalkingHead(0.0f, 1.72f, -1.3f, 0.0f, 1.72f, -2.0f, 6.0f, "characters/heroes/shara/scenes/shara", "AN_lnd_tlk01", "You can take that door behind me and head up to the roof. I'll just unlock the doors you need and I'll meet up with you in the next building");
+chrPlayAnimSlot(chr_shara, "AN_hm_ter_lp", 1, false);
+playerWaitUntilAnimDone(chr_shara);
+
+chrPlayAnimSlot(chr_shara, "AN_shar_point_000", 1, false);
+doorOpen(propReffromName("dat_base_up2"), true);
+enableTrigger(propRefFromName("eventTrig5"));
+playerWaitUntilAnimDone(chr_shara);
+
+chrPlayAnimSlot(chr_shara, "AN_hm_ter_lp", 1, false);
+playerWaitUntilAnimDone(chr_shara);
+chrPlayAnimSlot(chr_shara, "AN_hm_ter_lp", 1, false);
+playerWaitUntilAnimDone(chr_shara);
+endInGameCutScene();
+setAISpawnState(chr_shara, "AISTATE_BF_STORY", true);
+
+
+

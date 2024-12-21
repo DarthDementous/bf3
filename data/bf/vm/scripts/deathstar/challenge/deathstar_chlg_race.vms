@@ -1,0 +1,91 @@
+// vim: set syntax=c :
+
+int numberOfLaps = 3;
+propRef firstCheckpoint = propRefFromName("checkpoint1_");
+propRef lastCheckpoint  = propRefFromName("checkpoint6_");
+
+//Add the first indicators to show the player where to go
+addObjectiveIndicatorToProp(propRefFromName("dofProp_1_"),  vector(0.f, 0.f, 0.f), vector(0.5, 0.5, 0.5));
+addObjectiveIndicatorToProp(propRefFromName("dofProp_2_"),  vector(0.f, 0.f, 0.f), vector(0.5, 0.5, 0.5));
+
+propRef player = getPlayerPropRefFromID(GetPlayerId());
+DriveVehicleBF(player,propRefFromName("msedroid1"),1); //player spawn in vehicle
+BFSetVehicleViewMode(player, 0);//set to 3rd person view
+
+callback void racerReachedCheckpoint(propRef racer, propRef checkpoint, int lapNumber)
+{
+    
+    //Code to add/change the objective indicators
+    if (checkpoint == propRefFromName("checkpoint1_"))
+    {	
+	removeObjectiveIndicatorFromProp(propRefFromName("dofProp_1_"));
+	removeObjectiveIndicatorFromProp(propRefFromName("dofProp_2_"));
+	addObjectiveIndicatorToProp(propRefFromName("dofProp_3_"),  vector(0.f, 0.f, 0.f), vector(0.5, 0.5, 0.5));
+	addObjectiveIndicatorToProp(propRefFromName("dofProp_4_"),  vector(0.f, 0.f, 0.f), vector(0.5, 0.5, 0.5));
+    }
+    else if (checkpoint == propRefFromName("checkpoint2_"))
+    {	
+	removeObjectiveIndicatorFromProp(propRefFromName("dofProp_3_"));
+	removeObjectiveIndicatorFromProp(propRefFromName("dofProp_4_"));
+	addObjectiveIndicatorToProp(propRefFromName("dofProp_5_"),  vector(0.f, 0.f, 0.f), vector(0.5, 0.5, 0.5));
+	addObjectiveIndicatorToProp(propRefFromName("dofProp_6_"),  vector(0.f, 0.f, 0.f), vector(0.5, 0.5, 0.5));
+    }
+    else if (checkpoint == propRefFromName("checkpoint3_"))
+    {	
+	removeObjectiveIndicatorFromProp(propRefFromName("dofProp_5_"));
+	removeObjectiveIndicatorFromProp(propRefFromName("dofProp_6_"));
+	addObjectiveIndicatorToProp(propRefFromName("dofProp_7_"),  vector(0.f, 0.f, 0.f), vector(0.5, 0.5, 0.5));
+	addObjectiveIndicatorToProp(propRefFromName("dofProp_8_"),  vector(0.f, 0.f, 0.f), vector(0.5, 0.5, 0.5));
+    }
+    else if (checkpoint == propRefFromName("checkpoint4_"))
+    {	
+	removeObjectiveIndicatorFromProp(propRefFromName("dofProp_7_"));
+	removeObjectiveIndicatorFromProp(propRefFromName("dofProp_8_"));
+	addObjectiveIndicatorToProp(propRefFromName("dofProp_9_"),  vector(0.f, 0.f, 0.f), vector(0.5, 0.5, 0.5));
+	addObjectiveIndicatorToProp(propRefFromName("dofProp_10_"),  vector(0.f, 0.f, 0.f), vector(0.5, 0.5, 0.5));
+    }
+    else if (checkpoint == propRefFromName("checkpoint5_"))
+    {	
+	removeObjectiveIndicatorFromProp(propRefFromName("dofProp_9_"));
+	removeObjectiveIndicatorFromProp(propRefFromName("dofProp_10_"));
+	addObjectiveIndicatorToProp(propRefFromName("dofProp_11_"),  vector(0.f, 0.f, 0.f), vector(0.5, 0.5, 0.5));
+	addObjectiveIndicatorToProp(propRefFromName("dofProp_12_"),  vector(0.f, 0.f, 0.f), vector(0.5, 0.5, 0.5));
+    }
+    else if (checkpoint == propRefFromName("checkpoint6_"))
+    {	
+	removeObjectiveIndicatorFromProp(propRefFromName("dofProp_11_"));
+	removeObjectiveIndicatorFromProp(propRefFromName("dofProp_12_"));
+	if (lapNumber < numberOfLaps)
+	{
+	    addObjectiveIndicatorToProp(propRefFromName("dofProp_1_"),  vector(0.f, 0.f, 0.f), vector(0.5, 0.5, 0.5));
+	    addObjectiveIndicatorToProp(propRefFromName("dofProp_2_"),  vector(0.f, 0.f, 0.f), vector(0.5, 0.5, 0.5));
+	}
+    }
+
+    if(lapNumber == 1)
+    {
+	if(checkpoint == firstCheckpoint)
+	{
+	    ChallengeBegin();
+	}
+    }
+
+    if(lapNumber == numberOfLaps)
+    {
+	if(checkpoint == lastCheckpoint)
+	{
+	    ChallengeEnd();
+	}
+    }
+}
+
+AllowCallback(CALLBACK_ChallengeRacerReachedRaceCheckpoint, racerReachedCheckpoint);
+
+propRef mse_droid = propRefFromName("msedroid1");
+ChallengeBeginSoloRace(mse_droid, firstCheckpoint, numberOfLaps);
+
+while(1)
+{
+    waitForGameTime(5.0f);
+}
+

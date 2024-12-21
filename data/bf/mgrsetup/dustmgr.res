@@ -1,0 +1,2 @@
+DustManagerTemplate DustManager
+{}

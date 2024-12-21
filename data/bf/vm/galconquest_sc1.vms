@@ -1,0 +1,115 @@
+// vim: set syntax=c :
+
+int turnLimit = 5;
+boolean inited = false;
+callback int GalConquestIsMoveAllowed(int planet, int player, int team)
+{
+    //Script the movement rule set. return 1 if the movement is allowed, 0 otherwise.
+    //Below are rules setup based on the test scenario.
+    int planet_kash = getPlanetIndexByName("proxyplanet6_");
+    int planet_cor = getPlanetIndexByName("corplanet1_");
+    int planet_cato = getPlanetIndexByName("proxyplanet1_");
+    int planet_dath = getPlanetIndexByName("proxyplanet2_"); 
+    //cannot attack own planet.
+    if(isPlanetOwnedByPlayer(planet, player))
+	return 0;
+    
+    if(team == 0)//REP
+    {	
+	return 1;
+    }
+    else if ( team == 1 )//CIS
+    {
+	if(planet == planet_cor) 
+	{   //if the CIS wants to attack Coruscant, it's only possible when CIS is in in controls of Tatooine and Cato
+	    if((isPlanetOwnedByPlayer(planet_kash, player)) && (isPlanetOwnedByPlayer(planet_cato, player)))
+		return 1;
+	    else
+		return 0;
+	}
+	else //if the target is another planet, go for it...
+	{
+	    return 1;
+	}//define movement rules for team 1;
+    }
+
+    return 0; 
+}
+
+callback int GalConquestCheckVictoryConditions(int player, int team)
+{
+    //Script the victory conditions check in here.
+    //e.g. has the time/turn limit been reached, 
+    //has the player gained control of the required number of planets,
+    //has the player gained control of a specific planets, etc
+    //return 1 if the victory conditions have been reached, 0 otherwise.
+    int turns = getCurrentTurnNum();
+    int planet_cor = getPlanetIndexByName("corplanet1_");
+    int planet_dath = getPlanetIndexByName("proxyplanet2_");
+    if(turns < turnLimit)
+    {
+	//if CIS gains control of coruscant within the turn limit
+	if(team == 1 && isPlanetOwnedByPlayer(planet_cor, player)) 
+	{
+		return 1;
+	}
+	//if REP knocks CIS out of dathomir
+	if(team == 0 && isPlanetOwnedByPlayer(planet_dath, player)) 
+	{
+	    	return 1;
+	}
+    }
+    else
+    {
+	//turn limit is reached, whichever team has control on coruscant will be the victor.
+	if(isPlanetOwnedByPlayer(planet_cor,player))
+	    return 1;
+    }
+    return 0;
+}
+
+function void InitialiseScenario()
+{
+    //Set up the initial state of a scenario.
+    //e.g. allocate planets to each team based on the game play overview.
+    //enable planets that are part of the scenario, others are disabled by default.
+    int planet_kash = getPlanetIndexByName("proxyplanet6_");
+    int planet_cor = getPlanetIndexByName("corplanet1_");
+    int planet_cato = getPlanetIndexByName("proxyplanet1_");
+    int planet_dath = getPlanetIndexByName("proxyplanet2_");
+    setPlanetOwningTeam(planet_kash, 0);
+    setPlanetOWningTeam(planet_cor, 0);
+    setPlanetOwningTeam(planet_cato, 0);
+    setPlanetOwningTeam(planet_dath, 1);
+    inited = true;
+}
+
+function void UpdateCurrentScenarioState()
+{
+    resolveGalConquestState();
+}
+
+AllowCallback(CALLBACK_GalConquestIsMoveAllowed, GalConquestIsMoveAllowed);
+AllowCallback(CALLBACK_GalConquestCheckVictoryConditions, GalConquestCheckVictoryConditions);
+
+while(1)
+{
+    if(galConquestMapNeedsInit())
+    {
+	InitialiseScenario();
+	CheckSectorOwnerShip(0);//check for core world sector
+	CheckSectorOwnerShip(1);//check for core world sector
+	CheckSectorOwnerShip(2);//check for core world sector
+    }
+    else
+    {
+	if(!inited)
+	{
+	    UpdateCurrentScenarioState();
+            CheckSectorOwnerShip(0);//check for core world sector
+	    CheckSectorOwnerShip(1);//check for core world sector
+	    CheckSectorOwnerShip(2);//check for core world sector
+	    inited = true;
+	}
+    }
+}

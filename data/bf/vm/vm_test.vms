@@ -1,0 +1,321 @@
+// vim: set syntax=c :
+
+// ---------------
+// ANIMATION TEST
+// ---------------
+
+logStr("Script start");
+
+// To get a prop as a reference for the rest of the script
+propRef door     = propRefFromName("doortest_");
+propRef scouttrooper     = propRefFromName("scoutrooper1_");
+propRef healthdroid     = propRefFromName("healthDroid1_");
+
+// A delay in the script
+waitForGameTime(1.0f);
+
+// Sets visibility of a prop by its reference
+//propSetVisible(0, door);
+
+// To output a debug string to the console
+logStr("********DOOR DONE*********");
+
+// To play a sound - can also be linked to a prop by its reference
+playSound("force_lightning_loop");
+playSoundAtProp("force_choke_choking_loop", scouttrooper); 
+
+logStr("3");
+// Gets a character reference from a prop reference
+propRef prop_steve     = propRefFromName("steve");
+chrRef chr_steve    = chrRefFromName("steve");//PropRef(prop_steve);
+//chrRef lando    = chrRefFromName("lando");//PropRef(prop_steve);
+
+logStr("4");
+// Get a reference to the player character
+chrRef playr1   = chrRefFromName("player_0");
+
+logStr("5");
+// Plays a speech from a character
+//chrSpeak(playr1, "character01_death", 1, 3.0f, 25.0f, scouttrooper);
+
+// Should walk character to an action point prop (DOESN'T CURRENTLY WORK ON BF)
+//chrWalkToPadAndAlign(chr_steve, propGetPosFromName("actpnt5W"), propGetDirFromName("actpnt5W"), 800.f);
+
+chrSetPatrolState(prop_steve);
+
+
+// Turns off AI so animations can be played on characters (DOESN'T WORK ON BF CURRENTLY)
+beginInGameCutSceneIgnorePerceptsAndDamage(prop_steve);
+
+logStr("Steve running to pad!");
+chrRunToPadAndAlign(prop_steve, propGetPosFromName("actpnt1_"), propGetDirFromName("actpnt1_"), 800.f);
+logStr("********chrWalkToPadAndAlign*********");
+
+while (waitingUntilVMsDone(prop_steve))
+{
+    waitForGameTime(1.0f);
+    logStr("********waitUntilVMsDone*********");
+}
+
+waitUntilVMsDone(prop_steve);
+logStr("********waitUntilVMsDone*********");
+
+// *Should* play an animation on a character or prop
+//chrPlayAnimSlot(chr_steve, "AN_btl_walk_000", 1);
+
+waitForGameTime(1.0f);
+
+logStr("********PLAYING LANDO ANIM*********");
+
+chrPlayAnimSlot(chr_steve, "AN_hm_ter_lp", 1, true);
+//chrPlayAnimSlot(lando, "AN_cln_bscdeath", 1);
+
+//propPlayAnim(animguy,    "AN_hm_ter_lp");
+//propPlayAnimSlotLooping(healthdroid, "AN_trpr_crwlk_000");
+
+
+
+
+
+/*
+
+//------------------------------------------------------------
+// Duvall & Pals: Scene 16 plus into bodies room and beyond...
+//------------------------------------------------------------
+
+if(!propValid(propRefFromName("duvall")))
+{
+propRef duvall    = propSpawn(propRefFromName("g5FrDuvallSp1W"));
+}
+if(!propValid(propRefFromName("peshy")))
+{
+propRef peshy     = propSpawn(propRefFromName("g5FrPeshy1W"));
+}
+if(!propValid(propRefFromName("wstrap")))
+{
+propRef wstrap    = propSpawn(propRefFromName("g5FrWStrap1W"));
+}
+
+propRef door1     = propRefFromName("metdoor1W");
+//propRef player1   = getPlayerPropRefFromID(0);
+propRef door2     = propRefFromName("metdoor2W");
+propRef bodies    = propRefFromName("corpses1W");
+propRef door3     = propRefFromName("metaldr1W");
+propRef door4     = propRefFromName("dmgdoor2W");
+
+chrRef duval    = chrRefFromPropRef(duvall);
+chrRef pesy     = chrRefFromPropRef(peshy);
+chrRef wstrp    = chrRefFromPropRef(wstrap);
+chrRef playr1   = chrRefFromName("player_0");
+
+//--------------------------------------------
+// Hide the mangled door and bodies for later.
+// Plus the usual sanity checks.
+// Also reset bgStreamDust to 75 after quarry.
+//--------------------------------------------
+
+propSetVisible(0, bodies);
+propSetVisible(0, door4);
+enableSpeechPhraseEvents(false);
+setSafeToOpenVisorsWhenInFunctional(true,true);
+bgSetStreamDist(75.0f);  
+objectiveSetVisibility("obj_cop_start1", k_visibility_visible);
+beginInGameCutSceneIgnorePerceptsAndDamage  	(duvall, peshy, wstrap);
+
+//-------------------------------------------------------
+// Move the duvall squad to doorway and into little room.
+//-------------------------------------------------------
+
+chrWalkToPadAndAlign(duvall, propGetPosFromName("actpnt20W"), propGetDirFromName("actpnt20W"), 800.f);
+chrWalkToPadAndAlign(peshy, propGetPosFromName("actpnt19W"), propGetDirFromName("actpnt19W"), 800.f);
+chrWalkToPadAndAlign(wstrap, propGetPosFromName("actpnt18W"), propGetDirFromName("actpnt18W"), 800.f);
+waitUntilVMsDone(duvall);
+// Duvall: I'll lead
+chrSpeak(duval, "s1501duvall", 0, 3.0f, 25.0f, playr1);
+// Duvall has a butchers while Carpenter: you sound like you know...
+chrPlayAnimSlot(duvall, "AN_stlft_pklft", 0);
+waitUntilVMsDone(duvall);
+chrPlayAnimSlot(duvall, "AN_pklf_pklf_a", 0);
+waitUntilVMsDone(duvall);
+chrSpeak(playr1, "s1602carpenter", 0, 3.0f, 25.0f, duval);
+chrPlayAnimSlot(duvall, "AN_pklf_a_stlft", 0);
+waitUntilVMsDone(duvall);
+
+//--------------------------------------------------------
+// Chaps head off to next actionpoints where mocap starts.
+//--------------------------------------------------------
+
+chrWalkToPadAndAlign(duvall, propGetPosFromName("actpnt5W"), propGetDirFromName("actpnt5W"), 800.f);
+chrWalkToPadAndAlign(peshy, propGetPosFromName("actpnt4W"), propGetDirFromName("actpnt4W"), 800.f);
+chrWalkToPadAndAlign(wstrap, propGetPosFromName("actpnt8W"), propGetDirFromName("actpnt8W"), 800.f);
+// Duvall answers: "I do".
+waitForGameTime(0.8f);
+chrSpeakToWithFacialAnim(duval, playr1, "s1603duvall", "AN_sc16_dv2", false);
+// Peshy adds a comment 
+waitForGameTime(1.4f);
+chrSpeakToWithFacialAnim(pesy, wstrp, "s1604peshy", "AN_sc16_pe1", false);
+
+//-------------------------------------------------
+// MOCAP scene 16 here once player drops level var.
+//-------------------------------------------------
+
+WaitUntilLevelVarFlagChangesTo("start", true);
+//propSetVisible(0, playr1);
+allPlayersSetVisible(0);
+
+chrPlayAnimSlot(duval, "AN_sc16_duv_mo", 0);
+chrPlayAnimSlot(pesy, "AN_sc16_pesh_mo", 0);
+chrPlayAnimSlot(wstrp, "AN_sc16_ws_mo", 0);
+//camAnimateFirstPerson(playr1, "AN_sc16_ply_cam", 1.5f, 1.f, false);
+camAnimateFirstPersonAll("AN_sc16_ply_cam", 1.5f, 1.f, false);
+AllPlayersJumpToFixedProp(false, 12.f,propRefFromName("actpnt27W")); // Add more points for the other players
+
+playSound("s16_sfx");
+playSoundAtProp("s16_carpenter", playr1); 
+playSoundAtProp("s16_duvall", duvall);
+playSoundAtProp("s16_watchstrap", wstrap);
+playSoundAtProp("s16_peshy", peshy);
+
+waitForGameTime(1.0f);
+
+//playerStartAutoMoveToPosition(playr1, propGetPosFromName("actpnt27W"), 90.f, 0.f);
+allPlayersStartAutoMoveToPositions(90.f, 0.f, 12.f, propGetPosFromName("actpnt27W"), vector(1786.3, -32.922531, 1227.6)); // Add more for more players
+allPlayersStickToCurrentPosition();
+
+//propTweenToPos(playr1, propGetPosFromName("actpnt27W"), 12.0f);
+//playerStickToCurrentPosition(playr1);
+
+waitUntilVMsDone(duvall, pesy, wstrp);
+
+//playerAllowWalkFreely(playr1);
+allPlayersAllowWalkFreely();
+//propSetVisible(1, playr1);
+allPlayersSetVisible(1);
+
+//---------------------------------------
+// Chaps wander down towards bodies room.
+//---------------------------------------
+
+chrWalkToPadAndAlign(duvall, propGetPosFromName("actpnt9W"), propGetDirFromName("actpnt9W"), 800.f);
+chrWalkToPadAndAlign(peshy, propGetPosFromName("actpnt10W"), propGetDirFromName("actpnt10W"), 800.f);
+chrWalkToPadAndAlign(wstrap, propGetPosFromName("actpnt11W"), propGetDirFromName("actpnt11W"), 800.f);
+
+//--------------------------------------------------------------------
+// Once player is again close enough to Duvall, big D kicks door down.
+//--------------------------------------------------------------------
+
+waitUntilPlayerCloseToProp(duvall, 20.0f);
+waitForGameTime(1.2f);
+chrWalkToPadAndAlign(duvall, propGetPosFromName("actpnt21W"), propGetDirFromName("actpnt21W"), 800.f);
+waitUntilVMsDone(duvall);
+npcPlayFullBodyWithSound(duvall, "AN_doorkick02", "copperplant_duvall_door_kick_open");
+waitForGameTime(0.6f);
+hingeDoorOpen(door1, true, true);
+waitForGameTime(1.2f);
+
+//----------------------------------------------------------------------
+// Duvall, Watchstrap and Peshy all move to waypoints in the scary n-KTR
+// withdrawal room. 
+//----------------------------------------------------------------------
+
+chrWalkToPadAndAlign(duvall, propGetPosFromName("actpnt12W"), propGetDirFromName("actpnt12W"), 800.f);
+waitForGameTime(1.0f);
+chrWalkToPadAndAlign(wstrap, propGetPosFromName("actpnt13W"), propGetDirFromName("actpnt13W"), 800.f);
+waitForGameTime(1.0f);
+chrWalkToPadAndAlign(peshy, propGetPosFromName("actpnt16W"), propGetDirFromName("actpnt16W"), 800.f);
+waitUntilVMsDone(duvall, peshy, wstrap);
+
+//-----------------------------------------------------
+// Wait until player suffers nectar withdrawal and then 
+// Watchstrap laughs at the players fear and confusion.
+//-----------------------------------------------------
+
+WaitUntilLevelVarFlagChangesTo("body", true);
+waitForGameTime(5.0f);
+npcPlayFullBodyWithSound(wstrp, "AN_sc17_ws1", "s1705watchstrap");
+waitForGameTime(3.5f);
+
+//------------------------------------------------------------
+// Duvall and Watchstrap move to waypoints near the end of the
+// scary n-KTR withdrawal room.
+//------------------------------------------------------------
+
+chrWalkToPadAndAlign(duvall, propGetPosFromName("actpnt15W"), propGetDirFromName("actpnt15W"), 800.f);
+waitForGameTime(1.0f);
+chrWalkToPadAndAlign(wstrap, propGetPosFromName("actpnt17W"), propGetDirFromName("actpnt17W"), 800.f);
+waitUntilVMsDone(duvall, wstrap);
+
+//----------------------------------------------------------------
+// Duvall and his crew move to the exit to repeat the door kicking
+// experience. 
+//----------------------------------------------------------------
+
+waitForGameTime(0.6f);
+chrWalkToPadAndAlign(duvall, propGetPosFromName("actpnt22W"), propGetDirFromName("actpnt22W"), 800.f);
+waitUntilVMsDone(duvall);
+npcPlayFullBodyWithSound(duvall, "AN_doorkick02", "copperplant_duvall_door_kick_open");
+waitForGameTime(0.6f);
+hingeDoorOpen(door2, true, true);
+
+//-------------------------------------------------------------------
+// Now the door is open, Duvall's squad move through the next room to
+// further waypoints near their exit point. 
+//-------------------------------------------------------------------
+
+waitForGameTime(1.1f);
+chrWalkToPadAndAlign(duvall, propGetPosFromName("actpnt2W"), propGetDirFromName("actpnt2W"), 800.f);
+chrWalkToPadAndAlign(peshy, propGetPosFromName("actpnt3W"), propGetDirFromName("actpnt3W"), 800.f);
+chrWalkToPadAndAlign(wstrap, propGetPosFromName("actpnt1W"), propGetDirFromName("actpnt1W"), 800.f);
+
+//------------------------------------------------------------
+// Peshy is laughing as the player approaches.
+// Duvall then states the plan of action with his squad taking
+// a different route than that of the player.
+//------------------------------------------------------------
+
+waitUntilVMsDone(duvall, peshy, wstrap);
+waitUntilPlayerCloseToProp(duvall, 10.0f); //waitUntilPropsAreClose(duvall, player1, 10.0f);
+npcPlayFullBodyWithSound(peshy, "AN_sc17_pe1","s1705peshy");
+chrWaitUntilFinishedSpeaking(pesy);
+waitForGameTime(0.5f);
+chrPlayAnimSlot(duvall, "AN_sc17_dv2", 0);
+chrSpeak(duval, "s1706duvall", 0, 3.0f, 25.0f, playr1);
+
+//-------------------------------------------------------
+// Peshy walks up to the door and starts bashing it down.
+// Looping anims used here until player moves on.
+// Level Var used for this.
+//-------------------------------------------------------
+
+waitForGameTime(3.5f);
+chrWalkToPadAndAlign(peshy, propGetPosFromName("actpnt6W"), propGetDirFromName("actpnt6W"), 800.f);
+waitUntilVMsDone(peshy);
+
+zoneref startZone = zoneRefFromName("start_ambience2");
+
+while(GetLevelVarFlag("duv")==0 || anyPlayerIsInZone(startZone))
+			{
+			npcPlayFullBodyWithSound(peshy, "AN_pe_barge1", "peshy_door_barge_loop");
+			waitUntilVMsDone(peshy);
+			logStr("*****ONE ROUND OF BANGING DONE******");
+			npcPlayFullBodyWithSound(peshy, "AN_pe_barge1", "peshy_door_barge_loop");
+			waitUntilVMsDone(peshy);
+			waitForGameTime(0.6f);
+			waitWhileChrSlideToPosAndRotate(pesy, propGetPosFromName("actpnt6W"), 2.0f, propGetYRotFromName("actpnt6W" ), 700.f);
+		    	}
+
+logStr("********PESHY DONE BANGING*********");
+
+//-------------------------------------------------------------------
+// This removal of the duvall squad will be triggered when the player 
+// is out of view, by a trigger volume. Normal door gets removed, and 
+// replaced with a mangled version.
+//-------------------------------------------------------------------
+
+playSoundAtProp("copperplant_peshy_kick_open_door_distant", door3); 
+propSetVisible(0, door3);
+propSetVisible(1, door4);
+propDelete(duvall, peshy, wstrap);
+logStr("duvall_squad_removed");
+enableSpeechPhraseEvents(true);
+*/
